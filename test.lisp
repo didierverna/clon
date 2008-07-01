@@ -13,6 +13,12 @@
 
 ;;; Code:
 
-(defparameter *ctx* (clon::make-context :postfix "files..."))
+(defun test ()
+  (let ((ctx (clon::make-context :postfix "files...")))
+    (let ((grp (clon::make-group)))
+      (clon::seal grp))
+    (clon::seal ctx)))
+
+
 
 ;;; test.lisp ends here

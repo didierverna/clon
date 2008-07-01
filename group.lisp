@@ -1,11 +1,11 @@
-;;; clon.lisp --- Main interface to Clon
+;;; group.lisp --- Group management for Clon
 
 ;; Copyright (C) 2008 Didier Verna
 
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
-;; Created:       Mon Jun 30 17:23:36 2008
-;; Last Revision: Mon Jun 30 17:23:36 2008
+;; Created:       Tue Jul  1 15:52:44 2008
+;; Last Revision: Tue Jul  1 15:52:44 2008
 
 ;; This file is part of Clon.
 
@@ -35,12 +35,29 @@
 
 
 ;; ============================================================================
-;; General protocol declarations
+;; Group creation
 ;; ============================================================================
 
-(defgeneric seal (obj)
-  (:documentation "Seal OBJ.
-After OBJ is sealed, it is not possible to modify it."))
+(defstruct (group (:constructor make-group-instance))
+  "The GROUP structure.
+Groups contain strings, options or other groups.
+When outputting help strings, groups are indented according to their nesting
+level."
+  (closed nil))
+
+(defun make-group ()
+  (make-group-instance))
 
 
-;;; clon.lisp ends here
+;; ============================================================================
+;; Group sealing
+;; ============================================================================
+
+(defmethod seal ((grp group))
+  "Seal GRP.
+A group must be sealed before it can be added to a context."
+  (and (group-closed grp) (error "Group ~A already closed." grp))
+  (setf (group-closed grp) t))
+
+
+;;; group.lisp ends here
