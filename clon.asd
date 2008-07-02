@@ -49,6 +49,7 @@
 	       (:file "util")
 	       (:file "container")
 	       (:file "text")
+	       (:file "option")
 	       (:file "group")
 	       (:file "context"))
   :serial t)
