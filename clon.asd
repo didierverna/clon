@@ -46,9 +46,10 @@
 (defsystem :clon
   :version #.+version+
   :components ((:file "package")
-	       (:file "clon")
-	       (:file "context")
-	       (:file "group"))
+	       (:file "util")
+	       (:file "container")
+	       (:file "group")
+	       (:file "context"))
   :serial t)
 
 ;;; clon.asd ends here
