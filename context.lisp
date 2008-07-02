@@ -38,13 +38,12 @@
 ;; Context creation
 ;; ============================================================================
 
-(defstruct (context (:constructor make-context-instance))
-  "The CONTEXT structure.
-This structure holds the necessary information to process a particular set of
+(defclass context (container)
+  "The CONTEXT class.
+This class holds the necessary information to process a particular set of
 command-line options."
   (arglist nil :type list)
-  (postfix nil :type string)
-  (closed nil))
+  (postfix nil :type string))
 
 ;; #### FIXME: SBCL-specific
 (defun make-context (&key (arglist sb-ext:*posix-argv*) (postfix ""))
@@ -54,20 +53,9 @@ command-line options."
   The list is copied (the original is left untouched).
 - POSTFIX is a string to append to the one-line help.
   It defaults to the empty string."
-  (make-context-instance :arglist (copy-list arglist)
-			 :postfix postfix))
-
-
-;; ============================================================================
-;; Context sealing
-;; ============================================================================
-
-(defmethod seal ((ctx context))
-  "Seal CTX.
-A context must be sealed before it can be used,
-be it for option processing or help string generation."
-  (and (context-closed ctx) (error "Context ~A already closed." ctx))
-  (setf (context-closed ctx) t))
+  (make-instance 'context
+    :arglist (copy-list arglist)
+    :postfix postfix))
 
 
 ;;; context.lisp ends here

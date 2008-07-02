@@ -16,8 +16,13 @@
 (defun test ()
   (let ((ctx (clon::make-context :postfix "files...")))
     (let ((grp (clon::make-group)))
-      (clon::seal grp))
-    (clon::seal ctx)))
+      (clon::seal grp)
+      (clon::add-to ctx grp))
+    (let ((grp (clon::make-group)))
+      (clon::seal grp)
+      (clon::add-to ctx grp))
+    (clon::seal ctx)
+    ctx))
 
 
 

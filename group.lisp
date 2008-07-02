@@ -38,26 +38,15 @@
 ;; Group creation
 ;; ============================================================================
 
-(defstruct (group (:constructor make-group-instance))
-  "The GROUP structure.
+(defclass group (container)
+  "The GROUP class.
 Groups contain strings, options or other groups.
 When outputting help strings, groups are indented according to their nesting
-level."
-  (closed nil))
+level.")
 
 (defun make-group ()
-  (make-group-instance))
-
-
-;; ============================================================================
-;; Group sealing
-;; ============================================================================
-
-(defmethod seal ((grp group))
-  "Seal GRP.
-A group must be sealed before it can be added to a context."
-  (and (group-closed grp) (error "Group ~A already closed." grp))
-  (setf (group-closed grp) t))
+  "Make a new group."
+  (make-instance 'group))
 
 
 ;;; group.lisp ends here

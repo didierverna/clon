@@ -35,12 +35,12 @@
 
 
 ;; ============================================================================
-;; General protocol declarations
+;; Utilities
 ;; ============================================================================
 
-(defgeneric seal (obj)
-  (:documentation "Seal OBJ.
-After OBJ is sealed, it is not possible to modify it."))
+(defmacro endpush (object place)
+  "Like push, but at the end."
+  `(setf ,place (nconc ,place (list ,object))))
 
 
 ;;; clon.lisp ends here
