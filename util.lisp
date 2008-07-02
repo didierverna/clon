@@ -1,4 +1,4 @@
-;;; clon.lisp --- Main interface to Clon
+;;; util.lisp --- General utilities for Clon
 
 ;; Copyright (C) 2008 Didier Verna
 
@@ -34,13 +34,9 @@
 (in-package :clon)
 
 
-;; ============================================================================
-;; Utilities
-;; ============================================================================
-
 (defmacro endpush (object place)
   "Like push, but at the end."
   `(setf ,place (nconc ,place (list ,object))))
 
 
-;;; clon.lisp ends here
+;;; util.lisp ends here
