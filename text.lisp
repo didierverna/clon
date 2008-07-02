@@ -1,13 +1,13 @@
-;;; clon.asd --- ASDF system definition for Clon
+;;; text.lisp --- Text management for Clon
 
 ;; Copyright (C) 2008 Didier Verna
 
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
-;; Created:       Wed Jun 18 08:40:38 2008
-;; Last Revision: Wed Jun 18 08:40:38 2008
+;; Created:       Wed Jul  2 13:49:48 2008
+;; Last Revision: Wed Jul  2 13:49:48 2008
 
-;; This file is part of clon.
+;; This file is part of Clon.
 
 ;; Clon is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -31,26 +31,21 @@
 
 ;;; Code:
 
-(in-package :cl-user)
-
-(defpackage :clon-system
-    (:use :cl :asdf)
-  (:export :+version+))
+(in-package :clon)
 
 
-(in-package :clon-system)
+(defclass text ()
+  ((string :documentation "The actual text string"
+	   :type string
+	   :reader text-string
+	   :initarg :string))
+  (:documentation "The TEXT class.
+Program help can contain plain text as well as options or groups."))
 
-(defconstant +version+ "0.1"
-  "Current version of Clon")
 
-(defsystem :clon
-  :version #.+version+
-  :components ((:file "package")
-	       (:file "util")
-	       (:file "container")
-	       (:file "text")
-	       (:file "group")
-	       (:file "context"))
-  :serial t)
+;; #### FIXME: does it make sense to accept empty strings ?
+(defun make-text (&key (string ""))
+  (make-instance 'text :string string))
 
-;;; clon.asd ends here
+
+;;; text.lisp ends here

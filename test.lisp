@@ -19,6 +19,15 @@
       (clon::seal grp)
       (clon::add-to ctx grp))
     (let ((grp (clon::make-group)))
+      (clon::add-to grp
+	(clon::make-text
+	 :string "This is a group with examples of boolean options."))
+      (let ((subgrp (clon::make-group)))
+	(clon::add-to subgrp
+	  (clon::make-text
+	   :string "This is a demo of the group imbrication feature."))
+	(clon::seal subgrp)
+	(clon::add-to grp subgrp))
       (clon::seal grp)
       (clon::add-to ctx grp))
     (clon::seal ctx)
