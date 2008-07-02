@@ -34,6 +34,10 @@
 (in-package :clon)
 
 
+;; ============================================================================
+;; The Text class
+;; ============================================================================
+
 (defclass text ()
   ((string :documentation "The actual text string"
 	   :type string
