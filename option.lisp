@@ -52,7 +52,8 @@
    (builtin :documentation "Whether this option is a built-in one."
 	    :reader option-builtin
 	    :initarg :builtin))
-  (:documentation "The OPTION class."))
+  (:documentation "The OPTION class.
+This class is the basic abstract class for all options."))
 
 (defmethod initialize-instance :after ((option option) &rest initargs)
   "Check consistency of OPTION."
