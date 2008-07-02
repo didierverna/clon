@@ -41,11 +41,11 @@
 (defclass context (container)
   ((arglist :documentation "The argument list to process."
 	    :type list
-	    :accessor arglist
+	    :accessor context-arglist
 	    :initarg :arglist)
    (postfix :documentation "A postfix to the program synopsis."
 	    :type string
-	    :reader postfix
+	    :reader context-postfix
 	    :initarg :postfix))
   (:documentation "The CONTEXT class.
 This class holds the necessary information to process a particular set of
