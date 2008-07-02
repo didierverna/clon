@@ -40,6 +40,7 @@
 
 (defclass context (container)
   ((arglist :documentation "The argument list to process."
+	    ;; There is at least the program pathname in the list.
 	    :type list
 	    :accessor context-arglist
 	    :initarg :arglist)
