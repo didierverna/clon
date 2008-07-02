@@ -91,7 +91,7 @@ ITEM must be sealed, CONTAINER must not.")
   (:method :before ((container container) item)
     "Ensure that ITEM is sealed and CONTAINER is not."
     (when (sealedp container)
-      (error "Adding item ~A to container ~A: object sealed." item container))
+      (error "Adding item ~A to container ~A: container sealed." item container))
     (unless (sealedp item)
       (error "Adding item ~A to container ~A: item not sealed." item
 	     container)))

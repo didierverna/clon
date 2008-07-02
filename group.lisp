@@ -39,14 +39,24 @@
 ;; ============================================================================
 
 (defclass group (container)
-  "The GROUP class.
+  ()
+  (:documentation "The GROUP class.
 Groups contain strings, options or other groups.
 When outputting help strings, groups are indented according to their nesting
-level.")
+level."))
 
 (defun make-group ()
   "Make a new group."
   (make-instance 'group))
 
+
+;; ============================================================================
+;; Group sealing
+;; ============================================================================
+
+(defmethod seal ((group group))
+  "Seal group GROUP."
+  ;; #### FIXME: check name collision.
+  (values))
 
 ;;; group.lisp ends here
