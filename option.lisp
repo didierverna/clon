@@ -59,6 +59,8 @@
   (:documentation "The OPTION class.
 This class is the basic abstract class for all options."))
 
+;; #### FIXME: we should probably do this on the keywords, in a :before
+;; method.
 (defmethod initialize-instance :after ((option option) &rest initargs)
   "Check consistency of OPTION."
   (declare (ignore initargs))
@@ -130,11 +132,11 @@ This class implements options that don't take any argument."))
 ;; #### FIXME: make abstract
 (defclass argument ()
   ((required :documentation "Whether the option's argument is required."
-	     :reader argument-required-p
+	     :reader requiredp
 	     :initarg :argument-required)
    (name :documentation "The option's argument name."
 	 :type string
-	 :reader argument-name
+	 :reader name
 	 :initarg :argument-name)
    (default-value :documentation "The option's default value."
 		 :type (or null string)
@@ -151,6 +153,16 @@ This class implements options that don't take any argument."))
     :env-var nil)
   (:documentation "The Argument class.
 This class is a mixin used for non-flag options (accepting an argument)."))
+
+;; #### FIXME: we should probably do this on the keywords, in a :before
+;; method.
+(defmethod initialize-instance :after ((argument argument) &rest initargs)
+  "Check consistency of ARGUMENT."
+  (when (and (name argument) (zerop (length (name argument))))
+    (error "option ~A: empty argument name."))
+  ;; #### FIXME: I can't remember why we don't accept empty defval...
+  (when (and (default-value argument) (zerop (length (default-value argument))))
+    (error "option ~A: empty default value."))
 
 
 ;;; option.lisp ends here
