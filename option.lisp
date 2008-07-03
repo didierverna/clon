@@ -123,4 +123,34 @@ This class implements options that don't take any argument."))
   (apply #'make-instance 'flag keys))
 
 
+;; ============================================================================
+;; The Argument class
+;; ============================================================================
+
+;; #### FIXME: make abstract
+(defclass argument ()
+  ((required :documentation "Whether the option's argument is required."
+	     :reader argument-required-p
+	     :initarg :argument-required)
+   (name :documentation "The option's argument name."
+	 :type string
+	 :reader argument-name
+	 :initarg :argument-name)
+   (default-value :documentation "The option's default value."
+		 :type (or null string)
+		 :reader default-value
+		 :initarg :default-value)
+   (env-var :documentation "The option's associated environment variable."
+	    :type (or null string)
+	    :reader env-var
+	    :initarg :env-var))
+  (:default-initargs
+    :argument-required t
+    :argument-name "ARG"
+    :default-value nil
+    :env-var nil)
+  (:documentation "The Argument class.
+This class is a mixin used for non-flag options (accepting an argument)."))
+
+
 ;;; option.lisp ends here

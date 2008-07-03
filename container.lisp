@@ -57,6 +57,7 @@ command-line hierarchy."))
 ;; The sealing protocol
 ;; ============================================================================
 
+;; #### FIXME: see about making this directly the accessor
 (defgeneric sealedp (object)
   (:documentation "Returns t if OBJECT is sealed.")
   ;; This function is supposed to work even on non-container objects (options
