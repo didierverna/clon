@@ -54,8 +54,9 @@
 This class holds the necessary information to process a particular set of
 command-line options."))
 
-(defmethod initialize-instance :after ((context context))
+(defmethod initialize-instance :after ((context context) &rest initargs)
   "Replace the provided argument list with a copy."
+  (declare (ignore initargs))
   (setf (arglist context) (copy-list (arglist context))))
 
 ;; #### FIXME: SBCL-specific
@@ -66,6 +67,7 @@ command-line options."))
   The list is copied (the original is left untouched).
 - POSTFIX is a string to append to the program synopsis.
   It defaults to the empty string."
+  (declare (ignore arglist postfix))
   (apply #'make-instance 'context keys))
 
 

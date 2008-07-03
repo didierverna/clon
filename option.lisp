@@ -119,7 +119,8 @@ This class implements options that don't take any argument."))
   It defaults to nil.
 - DESCRIPTION is the option's description appearing in help strings.
   It defaults to nil."
-  (apply 'make-instance 'flag keys))
+  (declare (ignore short-name long-name description))
+  (apply #'make-instance 'flag keys))
 
 
 ;;; option.lisp ends here
