@@ -31,6 +31,9 @@
 
 ;;; Code:
 
+(in-package :clon)
+
+
 ;; ============================================================================
 ;; The Option class
 ;; ============================================================================
@@ -49,6 +52,8 @@
 		:type (or null string)
 		:reader description
 		:initarg :description)
+   ;; #### FIXME: this slot is unsatisfactory because it is used only for
+   ;; option setup. Should be in &allow-other-keys
    (builtin :documentation "Whether this option is internal to Clon."
 	    :reader builtin
 	    :initform nil))
@@ -57,7 +62,7 @@
     :long-name nil
     :description nil)
   (:documentation "The OPTION class.
-This class is the basic abstract class for all options."))
+This class is the base class for all options."))
 
 ;; #### FIXME: we should probably do this on the keywords, in a :before
 ;; method.
@@ -105,6 +110,13 @@ This class is the basic abstract class for all options."))
 ;; The Flag class
 ;; ============================================================================
 
+;; A flag can appear in the following forms:
+
+;; -f, --flag                           both names
+;; -f                                   short name
+;; --flag                               long name
+
+;; #### FIXME: make final
 (defclass flag (option)
   ()
   (:documentation "The FLAG class.
@@ -123,18 +135,18 @@ This class implements options that don't take any argument."))
 
 
 ;; ============================================================================
-;; The Argument class
+;; The Valued Option class
 ;; ============================================================================
 
 ;; #### FIXME: make abstract
-(defclass argument ()
-  ((required :documentation "Whether the option's argument is required."
-	     :reader requiredp
-	     :initarg :argument-required)
-   (name :documentation "The option's argument name."
-	 :type string
-	 :reader name
-	 :initarg :argument-name)
+(defclass valued-option (option)
+  ((argument-required :documentation "Whether the option's argument is required."
+		      :reader argument-required-p
+		      :initarg :argument-required)
+   (argument-name :documentation "The option's argument display name."
+		  :type string
+		  :reader argument-name
+		  :initarg :argument-name)
    (default-value :documentation "The option's default value."
 		 :type (or null string)
 		 :reader default-value
@@ -148,18 +160,79 @@ This class implements options that don't take any argument."))
     :argument-name "ARG"
     :default-value nil
     :env-var nil)
-  (:documentation "The Argument class.
-This class is a mixin used for non-flag options (accepting an argument)."))
+  (:documentation "The VALUED-OPTION class.
+This class implements is the base class for options accepting arguments."))
 
 ;; #### FIXME: we should probably do this on the keywords, in a :before
 ;; method.
-(defmethod initialize-instance :after ((argument argument) &rest initargs)
-  "Check consistency of ARGUMENT."
-  (when (and (name argument) (zerop (length (name argument))))
-    (error "option ~A: empty argument name." argument))
-  ;; #### FIXME: I can't remember why we don't accept empty defval...
-  (when (and (default-value argument) (zerop (length (default-value argument))))
-    (error "option ~A: empty default value." argument)))
+(defmethod initialize-instance :after ((option valued-option) &rest initargs)
+  "Check consistency OPTION's value part."
+  (declare (ignore initargs))
+  (when (and (argument-name option) (zerop (length (argument-name option))))
+    (error "option ~A: empty argument name." option))
+  ;; #### FIXME: I can't remember why we don't accept empty default values...
+  (when (and (default-value option) (zerop (length (default-value option))))
+    (error "option ~A: empty default value." option)))
+
+
+;; ============================================================================
+;; The String Option class
+;; ============================================================================
+
+;; A string option can appear in the following formats:
+;;
+;;   -o, --option=STR                   both names, required argument
+;;   -o, --option[=STR]                 both names, optional argument
+;;   -o, --option                       both names, null argument name
+;;   -o STR                             short name, required argument
+;;   -o [STR]                           short name, optional argument
+;;   -o                                 short name, null argument name
+;;   --option=STR                       long name,  required argument
+;;   --option[=STR]                     long name,  optional argument
+;;   --option                           long name,  null argument name
+
+;; #### FIXME: make final
+(defclass stropt (valued-option)
+  ()
+  (:default-initargs :argument-name "STR")
+  (:documentation "The STROPT class.
+This class implements options the values of which are strings."))
+
+(defun make-stropt (&rest keys
+		    &key short-name long-name description
+			 argument-required argument-name
+			 default-value env-var)
+  "Make a new STROPT."
+  (declare (ignore short-name long-name description
+		   argument-required argument-name
+		   default-value env-var))
+  (apply 'make-instance 'stropt keys))
+
+
+;; ============================================================================
+;; The Switch class
+;; ============================================================================
+
+;; A switch can appear in the following forms:
+;;
+;;  -(+)b, --boolean=yes(no)            both names, argument name given
+;;  -(+)b, --boolean[=yes(no)]          both names, argument name given
+;;  -(+)b, --boolean                    both names, null argument name
+;;  -(+)b                               short name, regardless of argument
+;;  --boolean[=yes(no)]                 long name,  argument name given,
+;;  --boolean                           long name,  null argument name
+
+(defclass switch (option argument)
+  (argument)
+  (:default-initargs
+    :argument-required t
+    :argument-name "ARG"
+    :default-value nil
+    :env-var nil)
+  (:documentation "The SWITCH class.
+This class implements boolean options."))
+
+;(defun make-switch (&rest keys &keys)
 
 
 ;;; option.lisp ends here
