@@ -80,15 +80,13 @@ This class is the basic abstract class for all options."))
     ;; - a boolean, enabling `-' or `+',
     ;; - a string, enabling `- foo'.
     ;; - a user option, behaving the same way.
-    (when (and (stringp long-name) (zerop (length long-name)))
+    (when (and long-name (zerop (length long-name)))
       (error "Option ~A: empty long name." option))
-    (when (and (stringp short-name)
-	       (stringp long-name)
-	       (string= short-name long-name))
+    (when (and short-name long-name (string= short-name long-name))
       (error "Option ~A: short and long names identical." option))
     ;; Short names can't begin with a dash because that would conflict with
     ;; the long name syntax.
-    (when (and (stringp short-name)
+    (when (and short-name
 	       (not (zerop (length short-name)))
 	       (string= short-name "-" :end1 1))
       (error "Option ~A: short name begins with a dash." option))
@@ -96,11 +94,10 @@ This class is the basic abstract class for all options."))
     ;; reserve the prefix in both cases.
     (unless (builtin option)
       (dolist (name (list short-name long-name))
-	(when (and (stringp name)
-		   (or (and (= (length name) 4)
-			    (string= name "clon"))
-		       (and (> (length name) 4)
-			    (string= name "clon-" :end1 5))))
+	(when (and name (or (and (= (length name) 4)
+				 (string= name "clon"))
+			    (and (> (length name) 4)
+				 (string= name "clon-" :end1 5))))
 	  (error "Option ~A: name ~S reserved by Clon." option name))))))
 
 
@@ -159,10 +156,10 @@ This class is a mixin used for non-flag options (accepting an argument)."))
 (defmethod initialize-instance :after ((argument argument) &rest initargs)
   "Check consistency of ARGUMENT."
   (when (and (name argument) (zerop (length (name argument))))
-    (error "option ~A: empty argument name."))
+    (error "option ~A: empty argument name." argument))
   ;; #### FIXME: I can't remember why we don't accept empty defval...
   (when (and (default-value argument) (zerop (length (default-value argument))))
-    (error "option ~A: empty default value."))
+    (error "option ~A: empty default value." argument)))
 
 
 ;;; option.lisp ends here
