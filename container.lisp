@@ -38,7 +38,7 @@
 ;; The container class
 ;; ============================================================================
 
-;; #### FIXME: make final
+;; #### FIXME: make mixin
 (defclass container ()
   ((items :documentation "The items in the container."
 	  :type list
@@ -48,30 +48,36 @@
 	   :accessor container-sealed
 	   :initform nil))
   (:documentation "The CONTAINER class.
-This class is used as a mixin for Clon contexts and groups, to hold groups,
-options and strings."))
+This class is a mixin used in contexts and groups to represent the program's
+synopsis hierarchy. Contexts may contain groups, options or strings; groups
+may contain groups, options or strings."))
+
 
 
 ;; ============================================================================
 ;; The sealing protocol
 ;; ============================================================================
 
-;; This function is supposed to work even on non-container objects (options
-;; and strings) because of the add-to function below.
 (defgeneric sealedp (object)
   (:documentation "Returns t if OBJECT is sealed.")
+  ;; This function is supposed to work even on non-container objects (options
+  ;; and strings) because of the add-to function below, hence the following
+  ;; non-specialized default method:
   (:method (object)
-    "Non container OBJECTs (options and strings) are always sealed."
+    "Return t (always consider non-container OBJECTs as sealed)."
     t)
   (:method ((container container))
-    "Returns t if the CONTAINER is sealed."
+    "Return t if CONTAINER is sealed."
     (container-sealed container)))
 
-;; This one, however, is not. That's because sealing is manual, so you're
-;; supposed to know what you're doing.
+;; On the contrary, this function is not supposed to work on non-container
+;; objects, because sealing is manual (so you're supposed to know what you're
+;; doing).
 (defgeneric seal (container)
-  (:documentation "Seal OBJECT.
-After OBJECT is sealed, it is not possible to modify its items.")
+  (:documentation "Seal CONTAINER, making it impossible to modify its items.")
+  ;; Common work (checking and marking) is provided below by before: and
+  ;; after: methods. However, it's the mixing class's responsibility to
+  ;; provide a primary method, empty as it may.
   (:method :before ((container container))
     "Ensure that CONTAINER is not already sealed."
     (when (container-sealed container)
@@ -86,8 +92,9 @@ After OBJECT is sealed, it is not possible to modify its items.")
 ;; ============================================================================
 
 (defgeneric add-to (container item)
-  (:documentation "Add ITEM to CONTAINER.
-ITEM must be sealed, CONTAINER must not.")
+  (:documentation "Append ITEM to (unsealed) CONTAINER's items.")
+  ;; There is currently no need to further specialize this function, as
+  ;;everything is done below.
   (:method :before ((container container) item)
     "Ensure that ITEM is sealed and CONTAINER is not."
     (when (sealedp container)
@@ -98,7 +105,6 @@ ITEM must be sealed, CONTAINER must not.")
   (:method ((container container) item)
     "Append ITEM to CONTAINER's items."
     (endpush item (container-items container))))
-
 
 
 ;;; container.lisp ends here
