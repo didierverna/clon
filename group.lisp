@@ -41,9 +41,8 @@
 (defclass group (container)
   ()
   (:documentation "The GROUP class.
-Groups contain strings, options or other groups.
-When outputting help strings, groups are indented according to their nesting
-level."))
+This class groups other groups, options or strings together, effectively
+implementing hierarchical program command-line."))
 
 (defun make-group ()
   "Make a new group."
@@ -55,7 +54,7 @@ level."))
 ;; ============================================================================
 
 (defmethod seal ((group group))
-  "Seal group GROUP."
+  "Seal GROUP."
   ;; #### FIXME: check name collision.
   (values))
 

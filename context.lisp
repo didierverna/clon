@@ -40,29 +40,33 @@
 
 (defclass context (container)
   ((arglist :documentation "The argument list to process."
-	    ;; There is at least the program pathname in the list.
 	    :type list
-	    :accessor context-arglist
+	    :accessor arglist
 	    :initarg :arglist)
    (postfix :documentation "A postfix to the program synopsis."
 	    :type string
-	    :reader context-postfix
+	    :reader postfix
 	    :initarg :postfix))
+  (:default-initargs
+    :arglist sb-ext:*posix-argv* ;; #### FIXME: SBCL specific
+    :postfix "")
   (:documentation "The CONTEXT class.
 This class holds the necessary information to process a particular set of
 command-line options."))
 
+(defmethod initialize-instance :after ((context context))
+  "Replace the provided argument list with a copy."
+  (setf (arglist context) (copy-list (arglist context))))
+
 ;; #### FIXME: SBCL-specific
-(defun make-context (&key (arglist sb-ext:*posix-argv*) (postfix ""))
+(defun make-context (&rest keys &key arglist postfix)
   "Make a new context.
 - ARGLIST is the argument list (strings) to process.
   It defaults to the user-specific part of the command-line options.
   The list is copied (the original is left untouched).
 - POSTFIX is a string to append to the program synopsis.
   It defaults to the empty string."
-  (make-instance 'context
-    :arglist (copy-list arglist)
-    :postfix postfix))
+  (apply #'make-instance 'context keys))
 
 
 ;; ============================================================================
@@ -70,7 +74,7 @@ command-line options."))
 ;; ============================================================================
 
 (defmethod seal ((context context))
-  "Seal context CONTEXT."
+  "Seal CONTEXT."
   ;; #### FIXME: do some stuff
   (values))
 

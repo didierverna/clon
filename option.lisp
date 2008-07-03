@@ -39,19 +39,23 @@
 (defclass option ()
   ((short-name :documentation "The option's short name."
 	       :type (or null string)
-	       :reader option-short-name
+	       :reader short-name
 	       :initarg :short-name)
    (long-name :documentation "The option's long name."
 	      :type (or null string)
-	      :reader option-long-name
+	      :reader long-name
 	      :initarg :long-name)
-   (documentation :documentation "The option's documentation."
-		  :type (or null string)
-		  :reader option-documentation
-		  :initarg :documentation)
-   (builtin :documentation "Whether this option is a built-in one."
-	    :reader option-builtin
-	    :initarg :builtin))
+   (description :documentation "The option's description."
+		:type (or null string)
+		:reader description
+		:initarg :description)
+   (builtin :documentation "Whether this option is internal to Clon."
+	    :reader builtin
+	    :initform nil))
+  (:default-initargs
+    :short-name nil
+    :long-name nil
+    :description nil)
   (:documentation "The OPTION class.
 This class is the basic abstract class for all options."))
 
@@ -88,7 +92,7 @@ This class is the basic abstract class for all options."))
       (error "Option ~A: short name begins with a dash." option))
     ;; Clon uses only long names, not short ones. But it's preferable to
     ;; reserve the prefix in both cases.
-    (unless (option-builtin option)
+    (unless (builtin option)
       (dolist (name (list short-name long-name))
 	(when (and (stringp name)
 		   (or (and (= (length name) 4)
@@ -96,6 +100,26 @@ This class is the basic abstract class for all options."))
 		       (and (> (length name) 4)
 			    (string= name "clon-" :end1 5))))
 	  (error "Option ~A: name ~S reserved by Clon." option name))))))
+
+
+;; ============================================================================
+;; The Flag class
+;; ============================================================================
+
+(defclass flag (option)
+  ()
+  (:documentation "The FLAG class.
+This class implements options that don't take any argument."))
+
+(defun make-flag (&rest keys &key short-name long-name description)
+  "Make a new flag.
+- SHORT-NAME is the option's short name without the dash.
+  It defaults to nil.
+- LONG-NAME is the option's long name, without the double-dash.
+  It defaults to nil.
+- DESCRIPTION is the option's description appearing in help strings.
+  It defaults to nil."
+  (apply 'make-instance 'flag keys))
 
 
 ;;; option.lisp ends here

@@ -34,9 +34,32 @@
 (in-package :clon)
 
 
+;; ============================================================================
+;; Basic auxiliary routines
+;; ============================================================================
+
 (defmacro endpush (object place)
   "Like push, but at the end."
   `(setf ,place (nconc ,place (list ,object))))
+
+
+;; ============================================================================
+;; Key-Value pairs manipulation
+;; ============================================================================
+
+(defun select-keys (keys &rest selected)
+  "Return a new property list from KEYS with only SELECTED ones."
+  (loop :for key :in keys :by #'cddr
+	:for val :in (cdr keys) :by #'cddr
+	:when (member key selected)
+	:nconc (list key val)))
+
+(defun remove-keys (keys &rest removed)
+  "Return a new property list from KEYS without REMOVED ones."
+  (loop :for key :in keys :by #'cddr
+	:for val :in (cdr keys) :by #'cddr
+	:unless (member key removed)
+	:nconc (list key val)))
 
 
 ;;; util.lisp ends here

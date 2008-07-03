@@ -49,8 +49,7 @@
 	   :initform nil))
   (:documentation "The CONTAINER class.
 This class is a mixin used in contexts and groups to represent the program's
-synopsis hierarchy. Contexts may contain groups, options or strings; groups
-may contain groups, options or strings."))
+command-line hierarchy."))
 
 
 
@@ -64,7 +63,7 @@ may contain groups, options or strings."))
   ;; and strings) because of the add-to function below, hence the following
   ;; non-specialized default method:
   (:method (object)
-    "Return t (always consider non-container OBJECTs as sealed)."
+    "Return t (consider non-container OBJECTs as sealed)."
     t)
   (:method ((container container))
     "Return t if CONTAINER is sealed."
@@ -74,7 +73,7 @@ may contain groups, options or strings."))
 ;; objects, because sealing is manual (so you're supposed to know what you're
 ;; doing).
 (defgeneric seal (container)
-  (:documentation "Seal CONTAINER, making it impossible to modify its items.")
+  (:documentation "Seal CONTAINER.")
   ;; Common work (checking and marking) is provided below by before: and
   ;; after: methods. However, it's the mixing class's responsibility to
   ;; provide a primary method, empty as it may.
@@ -92,7 +91,7 @@ may contain groups, options or strings."))
 ;; ============================================================================
 
 (defgeneric add-to (container item)
-  (:documentation "Append ITEM to (unsealed) CONTAINER's items.")
+  (:documentation "Add ITEM to CONTAINER.")
   ;; There is currently no need to further specialize this function, as
   ;;everything is done below.
   (:method :before ((container container) item)
@@ -103,7 +102,7 @@ may contain groups, options or strings."))
       (error "Adding item ~A to container ~A: item not sealed." item
 	     container)))
   (:method ((container container) item)
-    "Append ITEM to CONTAINER's items."
+    "Add ITEM to CONTAINER."
     (endpush item (container-items container))))
 
 
