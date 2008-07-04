@@ -54,9 +54,9 @@
 		:initarg :description)
    ;; #### FIXME: this slot is unsatisfactory because it is used only for
    ;; option setup. Should be in &allow-other-keys
-   (builtin :documentation "Whether this option is internal to Clon."
+   #|(builtin :documentation "Whether this option is internal to Clon."
 	    :reader builtin
-	    :initform nil))
+	    :initform nil)|#)
   (:default-initargs
     :short-name nil
     :long-name nil
@@ -64,46 +64,44 @@
   (:documentation "The OPTION class.
 This class is the base class for all options."))
 
-;; #### FIXME: we should probably do this on the keywords, in a :before
-;; method.
-(defmethod initialize-instance :after ((option option) &rest initargs)
-  "Check consistency of OPTION."
-  (declare (ignore initargs))
-  (with-slots (short-name long-name) option
-    (unless (or short-name long-name)
-      (error "Option ~A: no name given." option))
-    ;; #### FIXME: is this really necessary ? What about the day I would like
-    ;; to add new syntax like -= etc ?
-    ;; Empty long names are forbidden because of the special syntax -- (for
-    ;; terminating options). However, it *is* possible to have *one* option
-    ;; with an empty (that's different from NIL) short name. This option will
-    ;; just appear as `-'. Note that this special option can't appear in a
-    ;; minus or plus pack (of course :-), and can't have a sticky argument
-    ;; either (that would look like a non-empty short name). Actually, its
-    ;; usage can be one of:
-    ;; - a flag, enabling `-',
-    ;; - a boolean, enabling `-' or `+',
-    ;; - a string, enabling `- foo'.
-    ;; - a user option, behaving the same way.
-    (when (and long-name (zerop (length long-name)))
-      (error "Option ~A: empty long name." option))
-    (when (and short-name long-name (string= short-name long-name))
-      (error "Option ~A: short and long names identical." option))
-    ;; Short names can't begin with a dash because that would conflict with
-    ;; the long name syntax.
-    (when (and short-name
-	       (not (zerop (length short-name)))
-	       (string= short-name "-" :end1 1))
-      (error "Option ~A: short name begins with a dash." option))
-    ;; Clon uses only long names, not short ones. But it's preferable to
-    ;; reserve the prefix in both cases.
-    (unless (builtin option)
-      (dolist (name (list short-name long-name))
-	(when (and name (or (and (= (length name) 4)
-				 (string= name "clon"))
-			    (and (> (length name) 4)
-				 (string= name "clon-" :end1 5))))
-	  (error "Option ~A: name ~S reserved by Clon." option name))))))
+(defmethod initialize-instance :before
+    ((option option) &key short-name long-name description)
+  "Check consistency of OPTION's initargs."
+  (declare (ignore description))
+  (unless (or short-name long-name)
+    (error "Option ~A: no name given." option))
+  ;; #### FIXME: is this really necessary ? What about the day I would like
+  ;; to add new syntax like -= etc ?
+  ;; Empty long names are forbidden because of the special syntax -- (for
+  ;; terminating options). However, it *is* possible to have *one* option with
+  ;; an empty (that's different from NIL) short name. This option will just
+  ;; appear as `-'. Note that this special option can't appear in a minus or
+  ;; plus pack (of course :-), and can't have a sticky argument either (that
+  ;; would look like a non-empty short name). Actually, its usage can be one
+  ;; of:
+  ;; - a flag, enabling `-',
+  ;; - a boolean, enabling `-' or `+',
+  ;; - a string, enabling `- foo'.
+  ;; - a user option, behaving the same way.
+  (when (and long-name (zerop (length long-name)))
+    (error "Option ~A: empty long name." option))
+  (when (and short-name long-name (string= short-name long-name))
+    (error "Option ~A: short and long names identical." option))
+  ;; Short names can't begin with a dash because that would conflict with
+  ;; the long name syntax.
+  (when (and short-name
+	     (not (zerop (length short-name)))
+	     (string= short-name "-" :end1 1))
+    (error "Option ~A: short name begins with a dash." option))
+  ;; Clon uses only long names, not short ones. But it's preferable to
+  ;; reserve the prefix in both cases.
+  #|(unless (builtin option)
+    (dolist (name (list short-name long-name))
+      (when (and name (or (and (= (length name) 4)
+			       (string= name "clon"))
+			  (and (> (length name) 4)
+			       (string= name "clon-" :end1 5))))
+	(error "Option ~A: name ~S reserved by Clon." option name))))|#)
 
 
 ;; ============================================================================
@@ -234,6 +232,7 @@ This class implements options the values of which are strings."))
 ;;  --boolean                           long name,  null argument
 
 (defclass switch (valued-option)
+  ()
   (:default-initargs
     :argument-required nil
     :argument-name "yes(no)"
