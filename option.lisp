@@ -147,13 +147,14 @@ This class implements options that don't take any argument."))
 
 ;; #### FIXME: make abstract
 (defclass valued-option (option)
-  ((argument-required :documentation "Whether the option's argument is required."
-		      :reader argument-required-p
-		      :initarg :argument-required)
-   (argument-name :documentation "The option's argument display name."
+  ((argument-name :documentation "The option's argument display name."
 		  :type string
 		  :reader argument-name
 		  :initarg :argument-name)
+   (argument-required-p :documentation "Whether the option's argument is required."
+			;; This slot will be initialized afterwards, according
+			;;to the :argument-type initarg.
+			:reader argument-required-p)
    (default-value :documentation "The option's default value."
 		 :type (or null string)
 		 :reader default-value
@@ -163,24 +164,37 @@ This class implements options that don't take any argument."))
 	    :reader env-var
 	    :initarg :env-var))
   (:default-initargs
-    :argument-required t
     :argument-name "ARG"
+    :argument-type :required
     :default-value nil
     :env-var nil)
   (:documentation "The VALUED-OPTION class.
 This class implements is the base class for options accepting arguments."))
 
-;; #### FIXME: we should probably do this on the keywords, in a :before
-;; method.
-(defmethod initialize-instance :after ((option valued-option) &rest initargs)
-  "Check consistency OPTION's value part."
-  (declare (ignore initargs))
-  (when (and (argument-name option) (zerop (length (argument-name option))))
+(defmethod initialize-instance :before
+    ((option valued-option) &key argument-type argument-name default-value env-var)
+  "Check consistency OPTION's value-related initargs."
+  (declare (ignore env-var))
+  (unless (or (eq argument-type :required)
+	      (eq argument-type :mandatory)
+	      (eq argument-type :optional))
+    (error "Option ~A: invalid argument type ~S." option argument-type))
+  (when (and argument-name (zerop (length argument-name)))
     (error "option ~A: empty argument name." option))
   ;; #### FIXME: I can't remember why we don't accept empty default values,
   ;; but right now it feels wrong to me.
-  (when (and (default-value option) (zerop (length (default-value option))))
+  (when (and default-value (zerop (length default-value)))
     (error "option ~A: empty default value." option)))
+
+(defmethod initialize-instance :after
+    ((option valued-option) &key argument-type argument-name default-value env-var)
+  "Compute values for uninitialized OPTION slots."
+  (declare (ignore argument-name default-value env-var))
+  (case argument-type
+    ((:required :mandatory)
+     (setf (slot-value option 'argument-required-p) t))
+    (:optional
+     (setf (slot-value option 'argument-required-p) nil))))
 
 
 ;; ============================================================================
@@ -208,11 +222,11 @@ This class implements options the values of which are strings."))
 
 (defun make-stropt (&rest keys
 		    &key short-name long-name description
-			 argument-required argument-name
+			 argument-type argument-name
 			 default-value env-var)
   "Make a new string option."
   (declare (ignore short-name long-name description
-		   argument-required argument-name
+		   argument-type argument-name
 		   default-value env-var))
   (apply 'make-instance 'stropt keys))
 
