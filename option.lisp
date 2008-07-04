@@ -138,6 +138,15 @@ This class implements options that don't take any argument."))
 ;; The Valued Option class
 ;; ============================================================================
 
+;; #### FIXME: we should distinguish between the argument's display name, in
+;; itself, and the fact that we want to actually use it. For instance, we
+;; might want to display an option as just --color, but still declare that the
+;; argument name is CLR so that one day, it is possible to implement escape
+;; sequences like %n (for arg name) directly in the help strings. It's even
+;; more than that: while the argument display name belongs to the application,
+;; the fact that we want to see it probably rather belongs to the user
+;; preference. Like, an option to display help in short form or something.
+
 ;; #### FIXME: make abstract
 (defclass valued-option (option)
   ((argument-required :documentation "Whether the option's argument is required."
@@ -170,7 +179,8 @@ This class implements is the base class for options accepting arguments."))
   (declare (ignore initargs))
   (when (and (argument-name option) (zerop (length (argument-name option))))
     (error "option ~A: empty argument name." option))
-  ;; #### FIXME: I can't remember why we don't accept empty default values...
+  ;; #### FIXME: I can't remember why we don't accept empty default values,
+  ;; but right now it feels wrong to me.
   (when (and (default-value option) (zerop (length (default-value option))))
     (error "option ~A: empty default value." option)))
 
@@ -183,13 +193,13 @@ This class implements is the base class for options accepting arguments."))
 ;;
 ;;   -o, --option=STR                   both names, required argument
 ;;   -o, --option[=STR]                 both names, optional argument
-;;   -o, --option                       both names, null argument name
+;;   -o, --option                       both names, null argument
 ;;   -o STR                             short name, required argument
 ;;   -o [STR]                           short name, optional argument
-;;   -o                                 short name, null argument name
+;;   -o                                 short name, null argument
 ;;   --option=STR                       long name,  required argument
 ;;   --option[=STR]                     long name,  optional argument
-;;   --option                           long name,  null argument name
+;;   --option                           long name,  null argument
 
 ;; #### FIXME: make final
 (defclass stropt (valued-option)
@@ -202,7 +212,7 @@ This class implements options the values of which are strings."))
 		    &key short-name long-name description
 			 argument-required argument-name
 			 default-value env-var)
-  "Make a new STROPT."
+  "Make a new string option."
   (declare (ignore short-name long-name description
 		   argument-required argument-name
 		   default-value env-var))
@@ -215,24 +225,32 @@ This class implements options the values of which are strings."))
 
 ;; A switch can appear in the following forms:
 ;;
-;;  -(+)b, --boolean=yes(no)            both names, argument name given
-;;  -(+)b, --boolean[=yes(no)]          both names, argument name given
-;;  -(+)b, --boolean                    both names, null argument name
-;;  -(+)b                               short name, regardless of argument
-;;  --boolean[=yes(no)]                 long name,  argument name given,
-;;  --boolean                           long name,  null argument name
+;;  -(+)b, --boolean=yes(no)            both names, required argument
+;;  -(+)b, --boolean[=yes(no)]          both names, optional argument
+;;  -(+)b, --boolean                    both names, null argument
+;;  -(+)b                               short name, whatevefr the argument
+;;  --boolean=yes(no)                   long name,  required argument
+;;  --boolean[=yes(no)]                 long name,  optional argument
+;;  --boolean                           long name,  null argument
 
-(defclass switch (option argument)
-  (argument)
+(defclass switch (valued-option)
   (:default-initargs
-    :argument-required t
-    :argument-name "ARG"
+    :argument-required nil
+    :argument-name "yes(no)"
     :default-value nil
     :env-var nil)
   (:documentation "The SWITCH class.
 This class implements boolean options."))
 
-;(defun make-switch (&rest keys &keys)
+(defun make-switch (&rest keys
+		    &key short-name long-name description
+			 argument-required argument-name
+			 default-value env-var)
+  "Make a new switch."
+  (declare (ignore short-name long-name description
+		   argument-required argument-name
+		   default-value env-var))
+  (apply 'make-instance 'switch keys))
 
 
 ;;; option.lisp ends here
