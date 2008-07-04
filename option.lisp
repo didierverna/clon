@@ -172,22 +172,22 @@ This class implements options that don't take any argument."))
 This class implements is the base class for options accepting arguments."))
 
 (defmethod initialize-instance :before
-    ((option valued-option) &key argument-type argument-name default-value env-var)
+    ((option valued-option) &key argument-name argument-type default-value env-var)
   "Check consistency OPTION's value-related initargs."
   (declare (ignore env-var))
+  (when (and argument-name (zerop (length argument-name)))
+    (error "option ~A: empty argument name." option))
   (unless (or (eq argument-type :required)
 	      (eq argument-type :mandatory)
 	      (eq argument-type :optional))
     (error "Option ~A: invalid argument type ~S." option argument-type))
-  (when (and argument-name (zerop (length argument-name)))
-    (error "option ~A: empty argument name." option))
   ;; #### FIXME: I can't remember why we don't accept empty default values,
   ;; but right now it feels wrong to me.
   (when (and default-value (zerop (length default-value)))
     (error "option ~A: empty default value." option)))
 
 (defmethod initialize-instance :after
-    ((option valued-option) &key argument-type argument-name default-value env-var)
+    ((option valued-option) &key argument-name argument-type default-value env-var)
   "Compute values for uninitialized OPTION slots."
   (declare (ignore argument-name default-value env-var))
   (case argument-type
@@ -222,11 +222,11 @@ This class implements options the values of which are strings."))
 
 (defun make-stropt (&rest keys
 		    &key short-name long-name description
-			 argument-type argument-name
+			 argument-name argument-type
 			 default-value env-var)
   "Make a new string option."
   (declare (ignore short-name long-name description
-		   argument-type argument-name
+		   argument-name argument-type
 		   default-value env-var))
   (apply 'make-instance 'stropt keys))
 
@@ -248,8 +248,8 @@ This class implements options the values of which are strings."))
 (defclass switch (valued-option)
   ()
   (:default-initargs
-    :argument-required nil
     :argument-name "yes(no)"
+    :argument-type :optional
     :default-value nil
     :env-var nil)
   (:documentation "The SWITCH class.
@@ -257,11 +257,11 @@ This class implements boolean options."))
 
 (defun make-switch (&rest keys
 		    &key short-name long-name description
-			 argument-required argument-name
+			 argument-name argument-type
 			 default-value env-var)
   "Make a new switch."
   (declare (ignore short-name long-name description
-		   argument-required argument-name
+		   argument-name argument-type
 		   default-value env-var))
   (apply 'make-instance 'switch keys))
 
