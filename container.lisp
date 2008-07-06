@@ -35,7 +35,7 @@
 
 
 ;; ============================================================================
-;; The container class
+;; The Container class
 ;; ============================================================================
 
 ;; #### FIXME: make mixin
@@ -52,9 +52,8 @@ This class is a mixin used in contexts and groups to represent the program's
 command-line hierarchy."))
 
 
-
 ;; ============================================================================
-;; The sealing protocol
+;; The Sealing protocol
 ;; ============================================================================
 
 ;; #### FIXME: see about making this directly the accessor
@@ -75,20 +74,25 @@ command-line hierarchy."))
 ;; doing).
 (defgeneric seal (container)
   (:documentation "Seal CONTAINER.")
-  ;; Common work (checking and marking) is provided below by before: and
-  ;; after: methods. However, it's the mixing class's responsibility to
-  ;; provide a primary method, empty as it may.
+  ;; Common work is provided below, but subclasses will likely implement their
+  ;; own primary method as well. #### FIXME: should be a progn combination.
   (:method :before ((container container))
     "Ensure that CONTAINER is not already sealed."
     (when (container-sealed container)
       (error "Sealing container ~A: already sealed." container)))
+  (:method ((container container))
+    "Ensure that there is no name clash within CONTAINER's options."
+    (loop :for items :on (container-items container)
+	  :while (cdr items)
+	  :do (loop :for item2 in (cdr items)
+		    :do (check-name-clash (car items) item2))))
   (:method :after ((container container))
     "Mark CONTAINER as sealed."
     (setf (container-sealed container) t)))
 
 
 ;; ============================================================================
-;; The addition protocol
+;; The Addition protocol
 ;; ============================================================================
 
 (defgeneric add-to (container item)
@@ -105,6 +109,31 @@ command-line hierarchy."))
   (:method ((container container) item)
     "Add ITEM to CONTAINER."
     (endpush item (container-items container))))
+
+
+;; ============================================================================
+;; The Name Clash Check protocol
+;; ============================================================================
+
+(defgeneric check-name-clash (items1 items2)
+  (:documentation
+   "Check for name clash between ITEMS1's options and ITEMS2's options.")
+  (:method (item1 item2)
+    "Do nothing (no name clash for a non-group or non-option ITEMs."
+    (values))
+  (:method ((container container) item2)
+    "Check for name clash between CONTAINER's options and ITEM2's ones."
+    (dolist (item1 (container-items container))
+      (check-name-clash item1 item2)))
+  (:method (item1 (container container))
+    "Check for name clash between ITEM1's options and CONTAINER's ones."
+    (dolist (item2 (container-items container))
+      (check-name-clash item1 item2)))
+  (:method ((container1 container) (container2 container))
+    "Check for name clash between CONTAINER1's options and CONTAINER2's ones."
+    (dolist (item1 (container-items container1))
+      (dolist (item2 (container-items container2))
+	(check-name-clash item1 item2)))))
 
 
 ;;; container.lisp ends here

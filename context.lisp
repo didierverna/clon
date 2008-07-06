@@ -77,7 +77,7 @@ command-line options."))
 
 (defmethod seal ((context context))
   "Seal CONTEXT."
-  ;; #### FIXME: do some stuff
+  (call-next-method) ;; this calls the CONTAINER sealing method
   (values))
 
 

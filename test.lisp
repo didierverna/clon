@@ -16,10 +16,12 @@
 (defun test ()
   (let ((ctx (clon::make-context :postfix "files...")))
     (let ((grp (clon::make-group)))
-      (clon::add-to grp (make-flag :short-name "h" :long-name "help"
-				   :description "Print this help and exit."))
-      (clon::add-to grp (make-flag :short-name "v" :long-name "version"
-				   :description "Print version and exit."))
+      (clon::add-to grp
+	(clon::make-flag :short-name "h" :long-name "help"
+			 :description "Print this help and exit."))
+      (clon::add-to grp
+	(clon::make-flag :short-name "v" :long-name "version"
+			 :description "Print version and exit."))
       (clon::seal grp)
       (clon::add-to ctx grp))
     (let ((grp (clon::make-group)))
@@ -34,6 +36,9 @@
 	(clon::add-to grp subgrp))
       (clon::seal grp)
       (clon::add-to ctx grp))
+    (clon::add-to ctx
+      (clon::make-flag :short-name "v" :long-name "version"
+		       :description "Print version and exit."))
     (clon::seal ctx)
     ctx))
 

@@ -64,6 +64,11 @@
   (:documentation "The OPTION class.
 This class is the base class for all options."))
 
+
+;; --------------
+;; Initialization
+;; --------------
+
 (defmethod initialize-instance :before
     ((option option) &key short-name long-name description)
   "Check consistency of OPTION's initargs."
@@ -102,6 +107,23 @@ This class is the base class for all options."))
 			  (and (> (length name) 4)
 			       (string= name "clon-" :end1 5))))
 	(error "Option ~A: name ~S reserved by Clon." option name))))|#)
+
+
+;; -------------------------
+;; Name clash check protocol
+;; -------------------------
+
+(defmethod check-name-clash ((option1 option) (option2 option))
+  "Ensure that there is no name clash between OPTION1 and OPTION2."
+  (unless (eq option1 option2)
+    (when (and (short-name option1) (short-name option2)
+	       (string= (short-name option1) (short-name option2)))
+      (error "Options ~A and ~A: indentical short name ~S."
+	     option1 option2 (short-name option1)))
+    (when (and (long-name option1) (long-name option2)
+	       (string= (long-name option1) (long-name option2)))
+      (error "Options ~A and ~A: identical Long name ~S."
+	     option1 option2 (long-name option1)))))
 
 
 ;; ============================================================================

@@ -55,7 +55,7 @@ implementing hierarchical program command-line."))
 
 (defmethod seal ((group group))
   "Seal GROUP."
-  ;; #### FIXME: check name collision.
+  (call-next-method) ;; this calls the CONTAINER sealing method
   (values))
 
 ;;; group.lisp ends here
