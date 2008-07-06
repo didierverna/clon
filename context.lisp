@@ -85,7 +85,32 @@ WHICH can be `number', `short' or `long'."
 		  :argument-name "WHICH"
 		  :argument-type :optional
 		  :default-value "long"
-		  :env-var "CLON_VERSION_FORMAT"))
+		  :env-var "VERSION_FORMAT"))
+    (let ((subgrp (make-group)))
+      (add-to subgrp (make-text :string "Clon output:"))
+      (add-to subgrp (make-internal-stropt "search-path" "Set Clon's search path.
+If you don't want any search path at all, use this option with no argument."
+		       :argument-name "PATH"
+		       :argument-type :optional
+		       ;; #### FIXME: port DATADIR from the C version
+		       :default-value "~/share/clon:"
+		       :env-var "SEARCH_PATH"))
+      (add-to subgrp (make-internal-stropt "theme" "Set Clon's output theme.
+If you don't want any theme at all, use this option with no argument. Unless
+starting with /, ./ or ../, files are looked for in the Clon search path. The
+cth extension can be omitted."
+		       :argument-name "PATH"
+		       :argument-type :optional
+		       :default-value "default"
+		       :env-var "THEME"))
+      (add-to subgrp (make-internal-stropt "line-width"
+			 "Set Clon's output line width.
+If not given, the terminal size will be used when possible. Otherwise, 80
+columns will be assumed."
+		       :argument-name "WIDTH"
+		       :env-var "WIDTH"))
+      (seal subgrp)
+      (add-to grp subgrp))
     (seal grp)
     (add-to context grp))
   (call-next-method)) ;; this calls the CONTAINER sealing method

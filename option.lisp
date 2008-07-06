@@ -266,13 +266,18 @@ This class implements options the values of which are strings."))
 			     &key argument-name argument-type
 				  default-value env-var)
   "Make a new built-in string option."
-  (declare (ignore argument-name argument-type default-value env-var))
+  (declare (ignore argument-name argument-type default-value))
+  (when env-var
+    ;; #### NOTE: this works because the default-initargs option for env-var
+    ;; is actually nil, so I don't risk missing a concatenation later.
+    (setq env-var (concatenate 'string "CLON_" env-var)))
   (apply 'make-instance 'stropt
 	 :long-name (concatenate 'string "clon-" long-name)
 	 :description description
+	 :env-var env-var
 	 :allow-other-keys t
 	 :internal t
-	 keys))
+	 (remove-keys keys :env-var)))
 
 
 ;; ============================================================================
