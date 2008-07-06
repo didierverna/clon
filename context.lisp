@@ -80,6 +80,12 @@ command-line options."))
   (let ((grp (make-group)))
     (add-to grp (make-text :string "Clon specific options:"))
     (add-to grp (make-internal-flag "help" "Display Clon-specific help."))
+    (add-to grp (make-internal-stropt "version" "Display Clon's version number.
+WHICH can be `number', `short' or `long'."
+		  :argument-name "WHICH"
+		  :argument-type :optional
+		  :default-value "long"
+		  :env-var "CLON_VERSION_FORMAT"))
     (seal grp)
     (add-to context grp))
   (call-next-method)) ;; this calls the CONTAINER sealing method

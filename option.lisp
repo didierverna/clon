@@ -68,7 +68,6 @@ This class is the base class for all options."))
     ((option option) &rest keys &key short-name long-name description)
   "Check consistency of OPTION's initargs."
   (declare (ignore description))
-  (print keys)
   (unless (or short-name long-name)
     (error "Option ~A: no name given." option))
   ;; #### FIXME: is this really necessary ? What about the day I would like
@@ -150,6 +149,7 @@ This class implements options that don't take any argument."))
   (apply #'make-instance 'flag keys))
 
 (defun make-internal-flag (long-name description)
+  "Make a new internal flag."
   (make-instance 'flag
     :long-name (concatenate 'string "clon-" long-name)
     :description description
@@ -260,6 +260,19 @@ This class implements options the values of which are strings."))
 		   argument-name argument-type
 		   default-value env-var))
   (apply 'make-instance 'stropt keys))
+
+(defun make-internal-stropt (long-name description
+			     &rest keys
+			     &key argument-name argument-type
+				  default-value env-var)
+  "Make a new built-in string option."
+  (declare (ignore argument-name argument-type default-value env-var))
+  (apply 'make-instance 'stropt
+	 :long-name (concatenate 'string "clon-" long-name)
+	 :description description
+	 :allow-other-keys t
+	 :internal t
+	 keys))
 
 
 ;; ============================================================================
