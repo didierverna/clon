@@ -33,10 +33,10 @@
 
 ;;; Code:
 
-(dolist (symbol '(select-keys remove-keys
-		  add-to))
+(dolist (symbol '(select-keys remove-keys add-to))
   (put symbol 'common-lisp-indent-function 1))
 
-(put 'make-internal-stropt 'common-lisp-indent-function 2)
+(dolist (symbol '(make-internal-stropt make-internal-switch))
+  (put symbol 'common-lisp-indent-function 2))
 
 ;;; clon-indent.el ends here

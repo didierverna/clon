@@ -314,5 +314,23 @@ This class implements boolean options."))
 		   default-value env-var))
   (apply 'make-instance 'switch keys))
 
+(defun make-internal-switch (long-name description
+			     &rest keys
+			     &key argument-name argument-type
+				  default-value env-var)
+  "Make a new internal switch."
+  (declare (ignore argument-name argument-type env-var))
+  (when env-var
+    ;; #### NOTE: this works because the default-initargs option for env-var
+    ;; is actually nil, so I don't risk missing a concatenation later.
+    (setq env-var (concatenate 'string "CLON_" env-var)))
+  (apply 'make-instance 'switch
+	 :long-name (concatenate 'string "clon-" long-name)
+	 :description description
+	 :env-var env-var
+	 :allow-other-keys t
+	 :internal t
+	 (remove-keys keys :env-var)))
+
 
 ;;; option.lisp ends here
