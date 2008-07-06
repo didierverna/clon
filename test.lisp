@@ -36,9 +36,6 @@
 	(clon::add-to grp subgrp))
       (clon::seal grp)
       (clon::add-to ctx grp))
-    (clon::add-to ctx
-      (clon::make-flag :short-name "v" :long-name "version"
-		       :description "Print version and exit."))
     (clon::seal ctx)
     ctx))
 

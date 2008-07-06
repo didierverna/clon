@@ -55,7 +55,6 @@ implementing hierarchical program command-line."))
 
 (defmethod seal ((group group))
   "Seal GROUP."
-  (call-next-method) ;; this calls the CONTAINER sealing method
-  (values))
+  (call-next-method)) ;; this calls the CONTAINER sealing method
 
 ;;; group.lisp ends here

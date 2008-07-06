@@ -51,12 +51,7 @@
    (description :documentation "The option's description."
 		:type (or null string)
 		:reader description
-		:initarg :description)
-   ;; #### FIXME: this slot is unsatisfactory because it is used only for
-   ;; option setup. Should be in &allow-other-keys
-   #|(builtin :documentation "Whether this option is internal to Clon."
-	    :reader builtin
-	    :initform nil)|#)
+		:initarg :description))
   (:default-initargs
     :short-name nil
     :long-name nil
@@ -70,9 +65,10 @@ This class is the base class for all options."))
 ;; --------------
 
 (defmethod initialize-instance :before
-    ((option option) &key short-name long-name description)
+    ((option option) &rest keys &key short-name long-name description)
   "Check consistency of OPTION's initargs."
   (declare (ignore description))
+  (print keys)
   (unless (or short-name long-name)
     (error "Option ~A: no name given." option))
   ;; #### FIXME: is this really necessary ? What about the day I would like
@@ -100,13 +96,13 @@ This class is the base class for all options."))
     (error "Option ~A: short name begins with a dash." option))
   ;; Clon uses only long names, not short ones. But it's preferable to
   ;; reserve the prefix in both cases.
-  #|(unless (builtin option)
+  (unless (cadr (member :internal keys))
     (dolist (name (list short-name long-name))
       (when (and name (or (and (= (length name) 4)
 			       (string= name "clon"))
 			  (and (> (length name) 4)
 			       (string= name "clon-" :end1 5))))
-	(error "Option ~A: name ~S reserved by Clon." option name))))|#)
+	(error "Option ~A: name ~S reserved by Clon." option name)))))
 
 
 ;; -------------------------
@@ -152,6 +148,19 @@ This class implements options that don't take any argument."))
   It defaults to nil."
   (declare (ignore short-name long-name description))
   (apply #'make-instance 'flag keys))
+
+(defun make-internal-flag (long-name description)
+  (make-instance 'flag
+    :long-name (concatenate 'string "clon-" long-name)
+    :description description
+    ;; #### FIXME: I'm not quite satisfied with this design here. Other
+    ;; possibilities would be to:
+    ;; - temporarily set a global variable like *internal*, but /yuck/.
+    ;; - temporarily define an additional :before method performing the clon-
+    ;; prefix check, but only for user-level options. Cleaner, but obviously
+    ;; more costly, although it certainly doesn't matter much.
+    :allow-other-keys t
+    :internal t))
 
 
 ;; ============================================================================

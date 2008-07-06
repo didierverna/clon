@@ -77,8 +77,12 @@ command-line options."))
 
 (defmethod seal ((context context))
   "Seal CONTEXT."
-  (call-next-method) ;; this calls the CONTAINER sealing method
-  (values))
+  (let ((grp (make-group)))
+    (add-to grp (make-text :string "Clon specific options:"))
+    (add-to grp (make-internal-flag "help" "Display Clon-specific help."))
+    (seal grp)
+    (add-to context grp))
+  (call-next-method)) ;; this calls the CONTAINER sealing method
 
 
 ;;; context.lisp ends here
