@@ -39,4 +39,6 @@
 (dolist (symbol '(make-internal-stropt make-internal-switch))
   (put symbol 'common-lisp-indent-function 2))
 
+(put 'do-options 'common-lisp-indent-function '((&whole 4 2 1) &body))
+
 ;;; clon-indent.el ends here

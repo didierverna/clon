@@ -46,7 +46,10 @@
 	  :initform nil)
    (sealed :documentation "Whether the container is sealed."
 	   :accessor container-sealed
-	   :initform nil))
+	   :initform nil)
+   (traversed :documentation "Whether the container has been traversed."
+	      :accessor container-traversed
+	      :initform nil))
   (:documentation "The CONTAINER class.
 This class is a mixin used in contexts and groups to represent the program's
 command-line hierarchy."))
@@ -135,6 +138,49 @@ command-line hierarchy."))
     (dolist (item1 (container-items container1))
       (dolist (item2 (container-items container2))
 	(check-name-clash item1 item2)))))
+
+
+;; ============================================================================
+;; The traversal protocol
+;; ============================================================================
+
+(defgeneric untraverse (object)
+  (:documentation "Reset OBJECT's traversal state.")
+  (:method (object)
+    "Do nothing by default."
+    (values))
+  (:method ((container container))
+    "Untraverse CONTAINER's items."
+    (dolist (item (container-items container))
+      (untraverse item)))
+  (:method :after ((container container))
+    "Mark CONTAINER as untraversed."
+    (setf (container-traversed container) nil)))
+
+(defgeneric next-option (object)
+  (:documentation "Return the next untraversed option in OBJECT.")
+  (:method (object)
+    "Return nil (OBJECT doesn't contain or is not an option by default."
+    nil)
+  (:method ((container container))
+    "Return the next option in CONTAINER or one of its sub-containers."
+    (unless (container-traversed container)
+      (dolist (item (container-items container))
+	(let ((opt (next-option item)))
+	  (when opt
+	    (return-from next-option opt))))
+      (setf (container-traversed container) t)
+      nil)))
+
+(defmacro do-options ((val container) &body body)
+  (let ((the-container (gensym "container")))
+    `(let ((,the-container ,container))
+      (loop :initially (untraverse ,the-container)
+	:for ,val = (next-option ,the-container)
+	:then (next-option ,the-container)
+	:while ,val
+	:do ,@body))))
+
 
 
 ;;; container.lisp ends here

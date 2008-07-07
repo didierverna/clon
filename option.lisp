@@ -51,7 +51,10 @@
    (description :documentation "The option's description."
 		:type (or null string)
 		:reader description
-		:initarg :description))
+		:initarg :description)
+   (traversed :documentation "Whether the option's been traversed."
+	      :accessor option-traversed
+	      :initform nil))
   (:default-initargs
     :short-name nil
     :long-name nil
@@ -119,6 +122,22 @@ This class is the base class for all options."))
 	       (string= (long-name option1) (long-name option2)))
       (error "Options ~A and ~A: identical Long name ~S."
 	     option1 option2 (long-name option1)))))
+
+
+;; ----------------------
+;; The traversal protocol
+;; ----------------------
+
+(defmethod untraverse ((option option))
+  "Mark OPTION as untraversed."
+  (setf (option-traversed option) nil))
+
+
+(defmethod next-option ((option option))
+  "Return OPTION is it is untraversed (and mark it as traversed)."
+  (unless (option-traversed option)
+    (setf (option-traversed option) t)
+    option))
 
 
 ;; ============================================================================
