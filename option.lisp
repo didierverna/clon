@@ -141,6 +141,21 @@ This class is the base class for all options."))
 
 
 ;; ============================================================================
+;; The Pack chars protocol
+;; ============================================================================
+
+(defgeneric minus-char (option)
+  ;; #### NOTE: we actually don't return a char, but a string of length 1.
+  (:documentation "Return OPTION's minus char, if any.")
+  (:method ((option option))
+    "Return OPTION's minus char, if any."
+    (with-slots (short-name) option
+      (when (and short-name (= (length short-name) 1))
+	short-name))))
+
+
+
+;; ============================================================================
 ;; The Flag class
 ;; ============================================================================
 
@@ -245,6 +260,19 @@ This class implements is the base class for options accepting arguments."))
      (setf (slot-value option 'argument-required-p) t))
     (:optional
      (setf (slot-value option 'argument-required-p) nil))))
+
+
+;; -----------------------
+;; The pack chars protocol
+;; -----------------------
+
+;; Options with a one-character short name and requiring an argument may
+;; appear as the last option in a minus pack. However, we don't make them
+;; appear in the usage string.
+(defmethod minus-char ((option valued-option))
+  "Return OPTION's minus char, if any."
+  (unless (argument-required-p option)
+    (call-next-method)))
 
 
 ;; ============================================================================

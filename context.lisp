@@ -46,7 +46,15 @@
    (postfix :documentation "A postfix to the program synopsis."
 	    :type string
 	    :reader postfix
-	    :initarg :postfix))
+	    :initarg :postfix)
+   (minus-pack :documentation "The minus pack string."
+	       :type string
+	       :accessor minus-pack
+	       :initform nil)
+   (plus-pack :documentation "The plus pack string."
+	      :type string
+	      :accessor plus-pack
+	      :initform nil))
   (:default-initargs
     :arglist sb-ext:*posix-argv* ;; #### FIXME: SBCL specific
     :postfix "")
@@ -77,6 +85,7 @@ command-line options."))
 
 (defmethod seal ((context context))
   "Seal CONTEXT."
+  ;; Add the Clon internal options group
   (let ((grp (make-group)))
     (add-to grp (make-text :string "Clon specific options:"))
     (add-to grp (make-internal-flag "help" "Display Clon-specific help."))
@@ -118,7 +127,19 @@ otherwise."
       (add-to grp subgrp))
     (seal grp)
     (add-to context grp))
-  (call-next-method)) ;; this calls the CONTAINER sealing method
+  ;; this calls the CONTAINER sealing method, hence performing name clash
+  ;; check.
+  (call-next-method)
+  ;; Compute the minus and plus packs
+  (do-options (option context)
+    (let ((minus-char (minus-char option))
+	  #|(plus-char (plus-char option))|#)
+      (when minus-char
+	(setf (minus-pack context)
+	      (concatenate 'string (minus-pack context) minus-char)))
+      #|(when plus-char
+	(setf (plus-pack context)
+	      (concatenate 'string (plus-pack context) plus-char)))|#)))
 
 
 ;;; context.lisp ends here
