@@ -77,7 +77,8 @@
       (clon::add-to grp
 	(clon::make-stropt :short-name "c"
 			   :description
-			   "short name, optional argument"))
+			   "short name, optional argument"
+			   :argument-type :optional))
       (clon::add-to grp
 	(clon::make-stropt :long-name "phone"
 			   :description
@@ -85,7 +86,8 @@
       (clon::add-to grp
 	(clon::make-stropt :long-name "fax"
 			   :description
-			   "long name, optional argument"))
+			   "long name, optional argument"
+			   :argument-type :optional))
       (clon::seal grp)
       (clon::add-to ctx grp))
     (let ((grp (clon::make-group)))
