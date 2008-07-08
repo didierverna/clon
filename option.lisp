@@ -283,70 +283,24 @@ This class implements is the base class for options accepting arguments."))
 
 
 ;; ============================================================================
-;; The String Option class
-;; ============================================================================
-
-;; A string option can appear in the following formats:
-;;
-;;   -o, --option=STR                   both names, required argument
-;;   -o, --option[=STR]                 both names, optional argument
-;;   -o, --option                       both names, null argument
-;;   -o STR                             short name, required argument
-;;   -o [STR]                           short name, optional argument
-;;   -o                                 short name, null argument
-;;   --option=STR                       long name,  required argument
-;;   --option[=STR]                     long name,  optional argument
-;;   --option                           long name,  null argument
-
-;; #### FIXME: make final
-(defclass stropt (valued-option)
-  ()
-  (:default-initargs :argument-name "STR")
-  (:documentation "The STROPT class.
-This class implements options the values of which are strings."))
-
-(defun make-stropt (&rest keys
-		    &key short-name long-name description
-			 argument-name argument-type
-			 default-value env-var)
-  "Make a new string option."
-  (declare (ignore short-name long-name description
-		   argument-name argument-type
-		   default-value env-var))
-  (apply 'make-instance 'stropt keys))
-
-(defun make-internal-stropt (long-name description
-			     &rest keys
-			     &key argument-name argument-type
-				  default-value env-var)
-  "Make a new built-in string option."
-  (declare (ignore argument-name argument-type default-value))
-  (when env-var
-    ;; #### NOTE: this works because the default-initargs option for env-var
-    ;; is actually nil, so I don't risk missing a concatenation later.
-    (setq env-var (concatenate 'string "CLON_" env-var)))
-  (apply 'make-instance 'stropt
-	 :long-name (concatenate 'string "clon-" long-name)
-	 :description description
-	 :env-var env-var
-	 :allow-other-keys t
-	 :internal t
-	 (remove-keys keys :env-var)))
-
-
-;; ============================================================================
 ;; The Switch class
 ;; ============================================================================
 
+;; #### FIXME: provide :yes-or-no, :on-or-off and :true-or-false special
+;; initargs for the argument name, because that's the only ones Clon is able
+;; to recognize.
+
+;; #### NOTE: this makes me think that maybe people would like to subclass the
+;; switches in order to use other true/false values (I don't know, black/white
+;; or something) and have Clon still recognize this as a boolean option.
+
 ;; A switch can appear in the following forms:
 ;;
-;;  -(+)b, --boolean=yes(no)            both names, required argument
 ;;  -(+)b, --boolean[=yes(no)]          both names, optional argument
-;;  -(+)b, --boolean                    both names, null argument
-;;  -(+)b                               short name, whatevefr the argument
-;;  --boolean=yes(no)                   long name,  required argument
+;;  -(+)b, --boolean=yes(no)            both names, required argument
+;;  -(+)b                               short name, whatever the argument
 ;;  --boolean[=yes(no)]                 long name,  optional argument
-;;  --boolean                           long name,  null argument
+;;  --boolean=yes(no)                   long name,  required argument
 
 (defclass switch (valued-option)
   ()
@@ -394,6 +348,55 @@ This class implements boolean options."))
 (defmethod plus-char ((option switch))
   "Return OPTION's plus char (same as minus char for switches)."
   (minus-char option))
+
+
+;; ============================================================================
+;; The String Option class
+;; ============================================================================
+
+;; A string option can appear in the following formats:
+;;
+;;   -o, --option=STR                   both names, required argument
+;;   -o, --option[=STR]                 both names, optional argument
+;;   -o STR                             short name, required argument
+;;   -o [STR]                           short name, optional argument
+;;   --option=STR                       long name,  required argument
+;;   --option[=STR]                     long name,  optional argument
+
+;; #### FIXME: make final
+(defclass stropt (valued-option)
+  ()
+  (:default-initargs :argument-name "STR")
+  (:documentation "The STROPT class.
+This class implements options the values of which are strings."))
+
+(defun make-stropt (&rest keys
+		    &key short-name long-name description
+			 argument-name argument-type
+			 default-value env-var)
+  "Make a new string option."
+  (declare (ignore short-name long-name description
+		   argument-name argument-type
+		   default-value env-var))
+  (apply 'make-instance 'stropt keys))
+
+(defun make-internal-stropt (long-name description
+			     &rest keys
+			     &key argument-name argument-type
+				  default-value env-var)
+  "Make a new built-in string option."
+  (declare (ignore argument-name argument-type default-value))
+  (when env-var
+    ;; #### NOTE: this works because the default-initargs option for env-var
+    ;; is actually nil, so I don't risk missing a concatenation later.
+    (setq env-var (concatenate 'string "CLON_" env-var)))
+  (apply 'make-instance 'stropt
+	 :long-name (concatenate 'string "clon-" long-name)
+	 :description description
+	 :env-var env-var
+	 :allow-other-keys t
+	 :internal t
+	 (remove-keys keys :env-var)))
 
 
 ;;; option.lisp ends here

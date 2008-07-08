@@ -14,20 +14,81 @@
 ;;; Code:
 
 (defun test ()
-  (let ((ctx (clon::make-context :postfix "files...")))
+  (let ((ctx (clon::make-context :postfix "postfix")))
+    (clon::add-to ctx (clon::make-text :string "Demonstration of Clon."))
     (let ((grp (clon::make-group)))
+      (clon::add-to grp (clon::make-text :string "Flags:"))
       (clon::add-to grp
 	(clon::make-flag :short-name "h" :long-name "help"
-			 :description "Print this help and exit."))
+			 :description "both names."))
       (clon::add-to grp
-	(clon::make-flag :short-name "v" :long-name "version"
-			 :description "Print version and exit."))
+	(clon::make-flag :short-name "v"
+			 :description "short name."))
+      (clon::add-to grp
+	(clon::make-flag :long-name "version"
+			 :description "long name."))
+      (clon::seal grp)
+      (clon::add-to ctx grp))
+    (let ((grp (clon::make-group)))
+      (clon::add-to grp (clon::make-text :string "Switches:"))
+      (clon::add-to grp
+	(clon::make-switch :short-name "d"
+			   :long-name "debug"
+			   :description
+			   "both names, optional argument yes/no (the default)"))
+      (clon::add-to grp
+	(clon::make-switch :short-name "i"
+			   :long-name "interactive"
+			   :description
+			   "both names, argument required, another name"
+			   :argument-name "on(off)"
+			   :argument-type :required))
+      (clon::add-to grp
+	(clon::make-switch :short-name "n"
+			   :description "short name, whatever the argument"))
+      (clon::add-to grp
+	(clon::make-switch  :long-name "verbose"
+			    :description
+			    "long name, optional argument, yet another name"
+			    :argument-name "true(false)"))
+      (clon::add-to grp
+	(clon::make-switch  :long-name "simulate"
+			    :description "long name, optional argument"
+			    :argument-type :required))
       (clon::seal grp)
       (clon::add-to ctx grp))
     (let ((grp (clon::make-group)))
       (clon::add-to grp
-	(clon::make-text
-	 :string "This is a group with examples of boolean options."))
+	(clon::make-stropt :short-name "f"
+			   :long-name "first-name"
+			   :description
+			   "both names, required argument (default)"))
+      (clon::add-to grp
+	(clon::make-stropt :short-name "F"
+			   :long-name "family-name"
+			   :description
+			   "both names, optional argument, another name"
+			   :argument-type :optional
+			   :argument-name "NAME"))
+      (clon::add-to grp
+	(clon::make-stropt :short-name "a"
+			   :description
+			   "short name, required argument"))
+      (clon::add-to grp
+	(clon::make-stropt :short-name "c"
+			   :description
+			   "short name, optional argument"))
+      (clon::add-to grp
+	(clon::make-stropt :long-name "phone"
+			   :description
+			   "long name, required argument"))
+      (clon::add-to grp
+	(clon::make-stropt :long-name "fax"
+			   :description
+			   "long name, optional argument"))
+      (clon::seal grp)
+      (clon::add-to ctx grp))
+    (let ((grp (clon::make-group)))
       (let ((subgrp (clon::make-group)))
 	(clon::add-to subgrp
 	  (clon::make-text
