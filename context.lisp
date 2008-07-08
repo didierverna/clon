@@ -43,6 +43,10 @@
 	    :type list
 	    :accessor arglist
 	    :initarg :arglist)
+   (remainder :documentation "The non-Clon part of the argument list."
+	      :type list
+	      :accessor remainder
+	      :initform nil)
    (postfix :documentation "A postfix to the program synopsis."
 	    :type string
 	    :reader postfix
@@ -139,7 +143,44 @@ otherwise."
 	      (concatenate 'string (minus-pack context) minus-char)))
       (when plus-char
 	(setf (plus-pack context)
-	      (concatenate 'string (plus-pack context) plus-char))))))
-
+	      (concatenate 'string (plus-pack context) plus-char)))))
+  ;; Do a first scan of the command line, distinguish options, minus and plus
+  ;; packs. Syntax checking is not done here, but only at option retrieval
+  ;; time. More specifically:
+  ;;
+  ;; - We never try to be clever about possible misuses of the options (like,
+  ;; a short name used with a double dash or stuff like that).
+  ;;
+  ;;  - After `--', we detect long names, possibly up to an `=' sign. Whether
+  ;;  the option actually takes an argument is not checked.
+  ;;
+  ;;  - If the above fails, we consider that we have an unknow option. We
+  ;;  don't try to see if it's a short name bogusly used, or stuff like that.
+  ;;
+  ;;  - After a `-', we detect short names, if not, sticky arguments, and
+  ;;  otherwise, minus packs (in which case the last character is authorized
+  ;;  to have an argument, but not sticky).
+  ;;
+  ;;  - If the above failed, we consider that we have an unknow option. We
+  ;;  don't try to see if it's a long name bogusly used, or stuff like that.
+  ;;
+  ;;  - After a `+' we detect booleans short names, if not, plus packs (only
+  ;;  booleans also).
+  ;;
+  ;;  - If the above failed, we consider that we have an unknow boolean
+  ;;  option. We don't try to see if it's another type of option, or stuff
+  ;;  like that.
+  ;;
+  ;;  #### NOTE: Maybe we could try *all* options names, in *all* cases, in
+  ;;  order to detect the maximum of usage mistakes ?
+  (let ((desclist (list (car (arglist context))))
+	(arglist (cdr (arglist context))))
+    (do ((arg (pop arglist) (pop arglist)))
+	((null arg))
+      (cond ((string= arg "--")
+	     (setf (remainder context) arglist)
+	     (setq arglist nil))
+	    ))
+    (setf (arglist context) desclist)))
 
 ;;; context.lisp ends here
