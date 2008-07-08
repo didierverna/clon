@@ -214,7 +214,7 @@ This class implements options that don't take any argument."))
 ;; sequences like %n (for arg name) directly in the help strings. It's even
 ;; more than that: while the argument display name belongs to the application,
 ;; the fact that we want to see it probably rather belongs to the user
-;; preference. Like, an option to display help in short form or something.
+;; preferences. Like, an option to display help in short form or something.
 
 ;; #### FIXME: make abstract
 (defclass valued-option (option)
