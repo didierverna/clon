@@ -133,13 +133,13 @@ otherwise."
   ;; Compute the minus and plus packs
   (do-options (option context)
     (let ((minus-char (minus-char option))
-	  #|(plus-char (plus-char option))|#)
+	  (plus-char (plus-char option)))
       (when minus-char
 	(setf (minus-pack context)
 	      (concatenate 'string (minus-pack context) minus-char)))
-      #|(when plus-char
+      (when plus-char
 	(setf (plus-pack context)
-	      (concatenate 'string (plus-pack context) plus-char)))|#)))
+	      (concatenate 'string (plus-pack context) plus-char))))))
 
 
 ;;; context.lisp ends here

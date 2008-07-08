@@ -141,7 +141,7 @@ This class is the base class for all options."))
 
 
 ;; ============================================================================
-;; The Pack chars protocol
+;; The Pack Chars protocol
 ;; ============================================================================
 
 (defgeneric minus-char (option)
@@ -153,6 +153,12 @@ This class is the base class for all options."))
       (when (and short-name (= (length short-name) 1))
 	short-name))))
 
+(defgeneric plus-char (option)
+  ;; #### NOTE: we actually don't return a char, but a string of length 1.
+  (:documentation "Return OPTION's plus char, if any.")
+  (:method ((option option))
+    "Return nil (only switches are plus-packable)."
+    nil))
 
 
 ;; ============================================================================
@@ -378,6 +384,15 @@ This class implements boolean options."))
 	 :allow-other-keys t
 	 :internal t
 	 (remove-keys keys :env-var)))
+
+
+;; -----------------------
+;; The pack chars protocol
+;; -----------------------
+
+(defmethod plus-char ((option switch))
+  "Return OPTION's plus char (same as minus char for switches)."
+  (minus-char option))
 
 
 ;;; option.lisp ends here
