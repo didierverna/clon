@@ -144,35 +144,33 @@ otherwise."
       (when plus-char
 	(setf (plus-pack context)
 	      (concatenate 'string (plus-pack context) plus-char)))))
-  ;; Do a first scan of the command line, distinguish options, minus and plus
-  ;; packs. Syntax checking is not done here, but only at option retrieval
-  ;; time. More specifically:
+  ;; Syntactically parse the command line: spot options, minus and plus packs,
+  ;; and the rest. Semantic analysis is not done here, but only at option
+  ;; retrieval time. More specifically:
   ;;
   ;; - We never try to be clever about possible misuses of the options (like,
   ;; a short name used with a double dash or stuff like that).
   ;;
-  ;;  - After `--', we detect long names, possibly up to an `=' sign. Whether
-  ;;  the option actually takes an argument is not checked.
+  ;;  - After `--', detect long names, possibly up to an `=' sign. Whether the
+  ;;  option actually takes an argument is not checked.
   ;;
-  ;;  - If the above fails, we consider that we have an unknow option. We
-  ;;  don't try to see if it's a short name bogusly used, or stuff like that.
+  ;;  - If the above fails, consider that we have an unknow option.
   ;;
-  ;;  - After a `-', we detect short names, if not, sticky arguments, and
-  ;;  otherwise, minus packs (in which case the last character is authorized
-  ;;  to have an argument, but not sticky).
+  ;;  - After a `-', detect in turn short names, sticky arguments or minus
+  ;;  packs (in which case the last character is authorized to have an
+  ;;  argument, but not a sticky one). Recall that this last arg is not
+  ;;  described in the minus pack help string.
   ;;
-  ;;  - If the above failed, we consider that we have an unknow option. We
-  ;;  don't try to see if it's a long name bogusly used, or stuff like that.
+  ;;  - If the above fails, consider that we have an unknow option.
   ;;
-  ;;  - After a `+' we detect booleans short names, if not, plus packs (only
-  ;;  booleans also).
+  ;;  - After a `+' detect in turn booleans short names or plus packs (only
+  ;;  booleans in there).
   ;;
-  ;;  - If the above failed, we consider that we have an unknow boolean
-  ;;  option. We don't try to see if it's another type of option, or stuff
-  ;;  like that.
+  ;;  - If the above fails, consider that we have an unknow boolean option.
   ;;
-  ;;  #### NOTE: Maybe we could try *all* options names, in *all* cases, in
-  ;;  order to detect the maximum of usage mistakes ?
+  ;;  #### NOTE: currently, name clashs are considered on short and long names
+  ;;  independently. That is, it is possible to have a short name identical to
+  ;;  a long one, although I don't see why you would want to do that.
   (let ((desclist (list (car (arglist context))))
 	(arglist (cdr (arglist context))))
     (do ((arg (pop arglist) (pop arglist)))

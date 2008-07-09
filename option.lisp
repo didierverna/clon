@@ -322,7 +322,7 @@ This class implements boolean options."))
 			     &key argument-name argument-type
 				  default-value env-var)
   "Make a new internal switch."
-  (declare (ignore argument-name argument-type env-var))
+  (declare (ignore argument-name argument-type default-value))
   (when env-var
     ;; #### NOTE: this works because the default-initargs option for env-var
     ;; is actually nil, so I don't risk missing a concatenation later.

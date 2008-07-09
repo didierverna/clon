@@ -60,25 +60,28 @@ command-line hierarchy."))
 ;; ============================================================================
 
 ;; #### FIXME: see about making this directly the accessor
-(defgeneric sealedp (object)
-  (:documentation "Returns t if OBJECT is sealed.")
-  ;; This function is supposed to work even on non-container objects (options
+(defgeneric sealedp (item)
+  (:documentation "Returns t if ITEM is sealed.")
+  ;; This function is supposed to work even on non-container items (options
   ;; and strings) because of the add-to function below, hence the following
   ;; non-specialized default method:
-  (:method (object)
-    "Return t (consider non-container OBJECTs as sealed)."
+  (:method (item)
+    "Return t (consider non-container ITEMs as sealed)."
     t)
   (:method ((container container))
     "Return t if CONTAINER is sealed."
     (container-sealed container)))
 
 ;; On the contrary, this function is not supposed to work on non-container
-;; objects, because sealing is manual (so you're supposed to know what you're
+;; items, because sealing is manual (so you're supposed to know what you're
 ;; doing).
 (defgeneric seal (container)
   (:documentation "Seal CONTAINER.")
   ;; Common work is provided below, but subclasses will likely implement their
-  ;; own primary method as well. #### FIXME: should be a progn combination.
+  ;; own primary method as well.
+  ;; #### FIXME:  specializers of this function need to (call-next-method)
+  ;; somewhere, but the exact place is their own choice, so we can't use a
+  ;; progn method combination type.
   (:method :before ((container container))
     "Ensure that CONTAINER is not already sealed."
     (when (container-sealed container)
@@ -99,6 +102,8 @@ command-line hierarchy."))
 ;; The Addition Protocol
 ;; ============================================================================
 
+;; #### NOTE: using a generic function here is overkill because no other
+;; method is implemented anywhere else.
 (defgeneric add-to (container item)
   (:documentation "Add ITEM to CONTAINER.")
   ;; There is currently no need to further specialize this function, as
@@ -119,9 +124,9 @@ command-line hierarchy."))
 ;; The Name Clash Check Protocol
 ;; ============================================================================
 
-(defgeneric check-name-clash (items1 items2)
+(defgeneric check-name-clash (item1 item2)
   (:documentation
-   "Check for name clash between ITEMS1's options and ITEMS2's options.")
+   "Check for name clash between ITEM1's options and ITEM2's options.")
   (:method (item1 item2)
     "Do nothing (no name clash for a non-group or non-option ITEMs."
     (values))
@@ -144,9 +149,9 @@ command-line hierarchy."))
 ;; The Traversal Protocol
 ;; ============================================================================
 
-(defgeneric untraverse (object)
-  (:documentation "Reset OBJECT's traversal state.")
-  (:method (object)
+(defgeneric untraverse (item)
+  (:documentation "Reset ITEM's traversal state.")
+  (:method (item)
     "Do nothing by default."
     (values))
   (:method ((container container))
@@ -157,10 +162,10 @@ command-line hierarchy."))
     "Mark CONTAINER as untraversed."
     (setf (container-traversed container) nil)))
 
-(defgeneric next-option (object)
-  (:documentation "Return the next untraversed option in OBJECT.")
-  (:method (object)
-    "Return nil (OBJECT doesn't contain or is not an option by default."
+(defgeneric next-option (item)
+  (:documentation "Return the next untraversed option in ITEM.")
+  (:method (item)
+    "Return nil (ITEM doesn't contain or is not an option by default."
     nil)
   (:method ((container container))
     "Return the next option in CONTAINER or one of its sub-containers."
@@ -173,6 +178,7 @@ command-line hierarchy."))
       nil)))
 
 (defmacro do-options ((val container) &body body)
+  "Execute BODY with VAL bound to every option in CONTAINER."
   (let ((the-container (gensym "container")))
     `(let ((,the-container ,container))
       (loop :initially (untraverse ,the-container)
