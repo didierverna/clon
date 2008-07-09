@@ -35,7 +35,7 @@
 
 
 ;; ============================================================================
-;; The Option class
+;; The Option Class
 ;; ============================================================================
 
 ;; #### FIXME: make abstract
@@ -61,11 +61,6 @@
     :description nil)
   (:documentation "The OPTION class.
 This class is the base class for all options."))
-
-
-;; --------------
-;; Initialization
-;; --------------
 
 (defmethod initialize-instance :before
     ((option option) &rest keys &key short-name long-name description)
@@ -124,9 +119,9 @@ This class is the base class for all options."))
 	     option1 option2 (long-name option1)))))
 
 
-;; ----------------------
-;; The traversal protocol
-;; ----------------------
+;; ------------------
+;; Traversal protocol
+;; ------------------
 
 (defmethod untraverse ((option option))
   "Mark OPTION as untraversed."
@@ -141,7 +136,7 @@ This class is the base class for all options."))
 
 
 ;; ============================================================================
-;; The Pack Chars protocol
+;; The Char Packs  Protocol
 ;; ============================================================================
 
 (defgeneric minus-char (option)
@@ -162,7 +157,7 @@ This class is the base class for all options."))
 
 
 ;; ============================================================================
-;; The Flag class
+;; The Flag Class
 ;; ============================================================================
 
 ;; A flag can appear in the following forms:
@@ -204,7 +199,7 @@ This class implements options that don't take any argument."))
 
 
 ;; ============================================================================
-;; The Valued Option class
+;; The Valued Option Class
 ;; ============================================================================
 
 ;; #### FIXME: we should distinguish between the argument's display name, in
@@ -269,9 +264,9 @@ This class implements is the base class for options accepting arguments."))
      (setf (slot-value option 'argument-required-p) nil))))
 
 
-;; -----------------------
-;; The pack chars protocol
-;; -----------------------
+;; -------------------
+;; Char packs protocol
+;; -------------------
 
 ;; Options with a one-character short name and requiring an argument may
 ;; appear as the last option in a minus pack. However, we don't make them
@@ -283,7 +278,7 @@ This class implements is the base class for options accepting arguments."))
 
 
 ;; ============================================================================
-;; The Switch class
+;; The Switch Class
 ;; ============================================================================
 
 ;; #### FIXME: provide :yes-or-no, :on-or-off and :true-or-false special
@@ -341,9 +336,9 @@ This class implements boolean options."))
 	 (remove-keys keys :env-var)))
 
 
-;; -----------------------
-;; The pack chars protocol
-;; -----------------------
+;; -------------------
+;; Char packs protocol
+;; -------------------
 
 (defmethod plus-char ((option switch))
   "Return OPTION's plus char (same as minus char for switches)."
@@ -351,7 +346,7 @@ This class implements boolean options."))
 
 
 ;; ============================================================================
-;; The String Option class
+;; The String Option Class
 ;; ============================================================================
 
 ;; A string option can appear in the following formats:

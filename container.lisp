@@ -35,7 +35,7 @@
 
 
 ;; ============================================================================
-;; The Container class
+;; The Container Class
 ;; ============================================================================
 
 ;; #### FIXME: make mixin
@@ -56,7 +56,7 @@ command-line hierarchy."))
 
 
 ;; ============================================================================
-;; The Sealing protocol
+;; The Sealing Protocol
 ;; ============================================================================
 
 ;; #### FIXME: see about making this directly the accessor
@@ -96,7 +96,7 @@ command-line hierarchy."))
 
 
 ;; ============================================================================
-;; The Addition protocol
+;; The Addition Protocol
 ;; ============================================================================
 
 (defgeneric add-to (container item)
@@ -116,7 +116,7 @@ command-line hierarchy."))
 
 
 ;; ============================================================================
-;; The Name Clash Check protocol
+;; The Name Clash Check Protocol
 ;; ============================================================================
 
 (defgeneric check-name-clash (items1 items2)
@@ -141,7 +141,7 @@ command-line hierarchy."))
 
 
 ;; ============================================================================
-;; The traversal protocol
+;; The Traversal Protocol
 ;; ============================================================================
 
 (defgeneric untraverse (object)
