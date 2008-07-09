@@ -178,7 +178,10 @@ otherwise."
       (cond ((string= arg "--")
 	     (setf (remainder context) arglist)
 	     (setq arglist nil))
+	    ((and (> (length arg) 2)
+		  (string= arg "--" :end1 2))
+
 	    ))
-    (setf (arglist context) desclist)))
+    (setf (arglist context) desclist))))
 
 ;;; context.lisp ends here
