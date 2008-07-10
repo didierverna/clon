@@ -87,18 +87,14 @@ This class is the base class for all options."))
     (error "Option ~A: short and long names identical." option))
   ;; Short names can't begin with a dash because that would conflict with
   ;; the long name syntax.
-  (when (and short-name
-	     (not (zerop (length short-name)))
-	     (string= short-name "-" :end1 1))
+  (when (and short-name (string-start short-name "-"))
     (error "Option ~A: short name begins with a dash." option))
   ;; Clon uses only long names, not short ones. But it's preferable to
   ;; reserve the prefix in both cases.
   (unless (cadr (member :internal keys))
     (dolist (name (list short-name long-name))
-      (when (and name (or (and (= (length name) 4)
-			       (string= name "clon"))
-			  (and (> (length name) 4)
-			       (string= name "clon-" :end1 5))))
+      (when (and name (or (string= name "clon")
+			  (string-start name "clon-"))
 	(error "Option ~A: name ~S reserved by Clon." option name)))))
 
 
@@ -149,14 +145,9 @@ This class is the base class for all options."))
 (defun option-matches (option &key short-name long-name partial-name)
   "Return t if OPTION's names match.
 OPTION's names must match either SHORT-NAME, LONG-NAME, or PARTIAL-(long)-NAME."
-  (cond (short-name
-	 (string= short-name (short-name option)))
-	(long-name
-	 (string= long-name (long-name option)))
-	(partial-name
-	 (and (>= (length (long-name option)) (length partial-name))
-	      (string= partial-name (long-name option)
-		       :end2 (length partial-name))))))
+  (cond (short-name (string= short-name (short-name option)))
+	(long-name (string= long-name (long-name option)))
+	(partial-name (string-start (long-name option) partial-name))))
 
 
 ;; ============================================================================
