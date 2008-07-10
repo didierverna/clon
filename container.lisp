@@ -204,5 +204,12 @@ begins with it."
 		 (select-keys keys :short-name :long-name :partial-name))
       (return-from search-option option))))
 
+(defun search-sticky-option (container namearg)
+  "Search for a sticky option in CONTAINER.
+NAMEARG is the combination of the option's name and its argument."
+  (do-options (option container)
+    (when (option-matches-sticky option namearg)
+      (return-from search-sticky-option option))))
+
 
 ;;; container.lisp ends here

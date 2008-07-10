@@ -190,11 +190,10 @@ otherwise."
 	     ;; Isolate the rest of the command line.
 	     (setf (remainder context) arglist)
 	     (setq arglist nil))
+	    ;; A long (possibly unknown) option:
 	    ((string-start arg "--")
-	     ;; A long (possibly unknown) option:
 	     (let* ((value-start (position #\= arg :start 2))
 		    (name (subseq arg 2 value-start))
-		    (value (when value-start (subseq arg (1+ value-start))))
 		    ;; #### NOTE: we authorize partial matching (abreviations)
 		    ;; for long names: an exact match is search first. If that
 		    ;; fails, we try partial matching, and the first matching
@@ -205,24 +204,32 @@ otherwise."
 		    ;; such cases. Think harder about this.
 		    (option (or (search-option context :long-name name)
 				(search-option context :partial-name name)))
+		    (value (if value-start
+			       (subseq arg (1+ value-start))
+			       (unless (or (eq (elt (car arglist) 0) #\-)
+					   (eq (elt (car arglist) 0) #\+))
+				 (pop arglist))))
 		    ;; #### NOTE: OPTION might be nil if it is unknown to
 		    ;; Clon. What to do with unknown options is up to the
 		    ;; user. We don't do anyting special here.
 		    (cmdline-option
 		     (make-cmdline-option
 		      :name name :option option :value value)))
-	       ;; Unless there is already a value (an equal sign was found),
-	       ;; try to pick one from the next cmdline item, if it doesn't
-	       ;; start with + or a - sign.
-	       (unless (or value
-			   (eq (elt (car arglist) 0) #\-)
-			   (eq (elt (car arglist) 0) #\+))
-		 (setf (cmdline-option-value cmdline-option)
-		       (pop arglist)))
 	       (endpush cmdline-option desclist)))
 	    ;; A short (possibly unknown) option or a minus pack:
 	    ((string-start arg "-")
-
+	     (let* ((name (subseq arg 1))
+		    (option (search-option context :short-name name)))
+	       (cond (option
+		      (let* ((value (unless (or (eq (elt (car arglist) 0) #\-)
+						(eq (elt (car arglist) 0) #\+))
+				      (pop arglist)))
+			     (cmdline-option
+			      (make-cmdline-option
+			       :name name :option option :value value)))
+			(endpush cmdline-option desclist)))
+		     ((setq option (search-sticky-option context name))
+		      )))
 	     )))
     (setf (arglist context) desclist)))
 

@@ -74,13 +74,10 @@ This class is the base class for all options."))
   ;; terminating options). However, it *is* possible to have *one* option with
   ;; an empty (that's different from NIL) short name. This option will just
   ;; appear as `-'. Note that this special option can't appear in a minus or
-  ;; plus pack (of course :-), and can't have a sticky argument either (that
-  ;; would look like a non-empty short name). Actually, its usage can be one
-  ;; of:
-  ;; - a flag, enabling `-',
-  ;; - a boolean, enabling `-' or `+',
-  ;; - a string, enabling `- foo'.
-  ;; - a user option, behaving the same way.
+  ;; plus pack (of course :-). However (and contrary to what I had in my C
+  ;; version), it can have a sticky argument if it's not a flag or a boolean.
+  ;; In such a case, note that Clon will never detect unknown short options,
+  ;; because it will detect the - option with a sticky argument instead.
   (when (and long-name (zerop (length long-name)))
     (error "Option ~A: empty long name." option))
   (when (and short-name long-name (string= short-name long-name))
@@ -95,7 +92,7 @@ This class is the base class for all options."))
     (dolist (name (list short-name long-name))
       (when (and name (or (string= name "clon")
 			  (string-start name "clon-"))
-	(error "Option ~A: name ~S reserved by Clon." option name)))))
+	(error "Option ~A: name ~S reserved by Clon." option name))))))
 
 
 ;; -------------------------
@@ -148,6 +145,9 @@ OPTION's names must match either SHORT-NAME, LONG-NAME, or PARTIAL-(long)-NAME."
   (cond (short-name (string= short-name (short-name option)))
 	(long-name (string= long-name (long-name option)))
 	(partial-name (string-start (long-name option) partial-name))))
+
+(defgeneric option-matches-sticky (option namearg)
+  (:documentation "Check whether NAMEARG matches OPTION with a sticky argument."))
 
 
 ;; ============================================================================
@@ -211,6 +211,14 @@ This class implements options that don't take any argument."))
     ;; more costly, although it certainly doesn't matter much.
     :allow-other-keys t
     :internal t))
+
+;; -------------------------
+;; Option searching protocol
+;; -------------------------
+
+(defmethod option-matches-sticky ((option flag) namearg)
+  "Return nil (flags don't have any argument)."
+  nil)
 
 
 ;; ============================================================================
@@ -277,6 +285,19 @@ This class implements is the base class for options accepting arguments."))
      (setf (slot-value option 'argument-required-p) t))
     (:optional
      (setf (slot-value option 'argument-required-p) nil))))
+
+
+;; -------------------------
+;; Option searching protocol
+;; -------------------------
+
+(defmethod option-matches-sticky ((option valued-option) namearg)
+  "Check whether NAMEARG matches OPTION with a sticky argument.
+If so, return two values: the option, and the argument."
+  (with-slots (short-name) option
+    (when (and short-name
+	       (string-start namearg short-name))
+      (values option (subseq namearg (length short-name))))))
 
 
 ;; -------------------
@@ -349,6 +370,15 @@ This class implements boolean options."))
 	 :allow-other-keys t
 	 :internal t
 	 (remove-keys keys :env-var)))
+
+
+;; -------------------------
+;; Option searching protocol
+;; -------------------------
+
+(defmethod option-matches-sticky ((option switch) namearg)
+  "Return nil (switches can't be sticky because of their short syntax)."
+  nil)
 
 
 ;; -------------------
