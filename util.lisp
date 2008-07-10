@@ -42,6 +42,13 @@
   "Like push, but at the end."
   `(setf ,place (nconc ,place (list ,object))))
 
+(defun string-start (string start)
+  "Check that STRING starts with START.
+This check also protects against too short strings."
+  (let ((length (length start)))
+    (and (>= (length string) length)
+	 (string= string start :end1 length))))
+
 
 ;; ============================================================================
 ;; Key-Value pairs manipulation
