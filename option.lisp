@@ -297,7 +297,8 @@ If so, return two values: the option, and the argument."
   (with-slots (short-name) option
     (when (and short-name
 	       (string-start namearg short-name))
-      (values option (subseq namearg (length short-name))))))
+      ;; Yuck !
+      (list option (subseq namearg (length short-name))))))
 
 
 ;; -------------------
