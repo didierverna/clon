@@ -208,9 +208,8 @@ begins with it."
   "Search for a sticky option in CONTAINER.
 NAMEARG is the concatenation of the option's name and its argument."
   (do-options (option container)
-    (let ((result (option-matches-sticky option namearg)))
-      (when result
-	(return-from search-sticky-option result)))))
+    (when (option-matches-sticky option namearg)
+      (return-from search-sticky-option option))))
 
 
 ;;; container.lisp ends here

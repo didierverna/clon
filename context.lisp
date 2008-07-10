@@ -203,8 +203,6 @@ otherwise."
 		    ;; --foobar. I'm not sure this is the best behavior in
 		    ;; such cases. Think harder about this.
 		    (option (or (search-option context :long-name name)
-				;; #### FIXME: the name I store in the
-				;; structure is only partial here.
 				(search-option context :partial-name name)))
 		    (value (if value-start
 			       (subseq arg (1+ value-start))
@@ -216,34 +214,34 @@ otherwise."
 		    ;; user. We don't do anyting special here.
 		    (cmdline-option
 		     (make-cmdline-option
-		      :name name :option option :value value)))
+		      :name (or (when option (long-name option)) name)
+		      :option option :value value)))
 	       (endpush cmdline-option desclist)))
 	    ;; A short (possibly unknown) option or a minus pack:
 	    ((string-start arg "-")
 	     (let* ((name (subseq arg 1))
-		    ;; #### NOTE: if an option is not found, we try to find a
-		    ;; sticky option and stop at the first match, even if, for
-		    ;; instance, another option would match a longer part of
-		    ;; the argument. I'm not sure this is the best behavior in
-		    ;; such cases. Think harder about this.
-		    (result (or (search-option context :short-name name)
-				(search-sticky-option context name))))
-	       (cond ((typep result 'option)
+		    option)
+	       (cond ((setq option (search-option context :short-name name))
 		      ;; We found an option. Let's look for an argument.
 		      (let* ((value (unless (or (eq (elt (car arglist) 0) #\-)
 						(eq (elt (car arglist) 0) #\+))
 				      (pop arglist)))
 			     (cmdline-option
 			      (make-cmdline-option
-			       :name name :option result :value value)))
+			       :name name :option option :value value)))
 			(endpush cmdline-option desclist)))
-		     ((consp result)
-		      ;; We found a sticky option.
+		     ((setq option (search-sticky-option context name))
+		      ;; #### NOTE: if an option is not found, we try to find
+		      ;; a sticky option and stop at the first match, even if,
+		      ;; for instance, another option would match a longer
+		      ;; part of the argument. I'm not sure this is the best
+		      ;; behavior in such cases. Think harder about this.
 		      (let ((cmdline-option
 			     (make-cmdline-option
-			      :name (short-name (car result))
-			      :option (car result)
-			      :value (cadr result))))
+			      :name (short-name option)
+			      :option option
+			      :value (subseq name
+					     (length (short-name option))))))
 			(endpush cmdline-option desclist)))
 		     )))))
     (setf (arglist context) desclist)))

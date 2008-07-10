@@ -147,7 +147,7 @@ OPTION's names must match either SHORT-NAME, LONG-NAME, or PARTIAL-(long)-NAME."
 	(partial-name (string-start (long-name option) partial-name))))
 
 (defgeneric option-matches-sticky (option namearg)
-  (:documentation "Check whether NAMEARG matches OPTION with a sticky argument."))
+  (:documentation "Return t if NAMEARG matches OPTION with a sticky argument."))
 
 
 ;; ============================================================================
@@ -292,13 +292,13 @@ This class implements is the base class for options accepting arguments."))
 ;; -------------------------
 
 (defmethod option-matches-sticky ((option valued-option) namearg)
-  "Check whether NAMEARG matches OPTION with a sticky argument.
-If so, return two values: the option, and the argument."
+  "Return t if NAMEARG matches OPTION with a sticky argument."
   (with-slots (short-name) option
     (when (and short-name
 	       (string-start namearg short-name))
+      option)))
       ;; Yuck !
-      (list option (subseq namearg (length short-name))))))
+;;      (list option (subseq namearg (length short-name))))))
 
 
 ;; -------------------
