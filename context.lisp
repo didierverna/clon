@@ -35,7 +35,18 @@
 
 
 ;; ============================================================================
-;; The Context class
+;; The Command-Line Option Structure
+;; ============================================================================
+
+(defstruct cmdline-option
+  (name) ;; the name as it appears on the command line
+  (option) ;; the actual option is corresponds to, or null if unknown
+  (value) ;; the option's value as it appears on the command line
+  )
+
+
+;; ============================================================================
+;; The Context Class
 ;; ============================================================================
 
 (defclass context (container)
@@ -83,9 +94,9 @@ command-line options."))
   (apply #'make-instance 'context keys))
 
 
-;; ============================================================================
-;; Context sealing
-;; ============================================================================
+;; ----------------
+;; Sealing protocol
+;; ----------------
 
 (defmethod seal ((context context))
   "Seal CONTEXT."
@@ -144,17 +155,15 @@ otherwise."
       (when plus-char
 	(setf (plus-pack context)
 	      (concatenate 'string (plus-pack context) plus-char)))))
-  ;; Syntactically parse the command line: spot options, minus and plus packs,
-  ;; and the rest. Semantic analysis is not done here, but only at option
-  ;; retrieval time. More specifically:
+  ;; Perform syntactic analysis of the command-line: spot options, option
+  ;; values, minus and plus packs, and isolate the non-Clon part. Semantic
+  ;; analysis (extra/missing option values, value conversion error etc) is
+  ;; done when options are actually retrieved.
+  ;;
+  ;; More specifically:
   ;;
   ;; - We never try to be clever about possible misuses of the options (like,
   ;; a short name used with a double dash or stuff like that).
-  ;;
-  ;;  - After `--', detect long names, possibly up to an `=' sign. Whether the
-  ;;  option actually takes an argument is not checked.
-  ;;
-  ;;  - If the above fails, consider that we have an unknow option.
   ;;
   ;;  - After a `-', detect in turn short names, sticky arguments or minus
   ;;  packs (in which case the last character is authorized to have an
@@ -168,20 +177,53 @@ otherwise."
   ;;
   ;;  - If the above fails, consider that we have an unknow boolean option.
   ;;
-  ;;  #### NOTE: currently, name clashs are considered on short and long names
-  ;;  independently. That is, it is possible to have a short name identical to
-  ;;  a long one, although I don't see why you would want to do that.
+  ;;  #### NOTE: currently, name clashes are considered on short and long
+  ;;  names independently. That is, it is possible to have a short name
+  ;;  identical to a long one, although I don't see why you would want to do
+  ;;  that.
   (let ((desclist (list (car (arglist context))))
 	(arglist (cdr (arglist context))))
     (do ((arg (pop arglist) (pop arglist)))
 	((null arg))
       (cond ((string= arg "--")
+	     ;; The Clon separator:
+	     ;; Isolate the rest of the command line.
 	     (setf (remainder context) arglist)
 	     (setq arglist nil))
-	    ((and (> (length arg) 2)
-		  (string= arg "--" :end1 2))
+	    ((string-start arg "--")
+	     ;; A long (possibly unknown) option:
+	     (let* ((value-start (position #\= arg :start 2))
+		    (name (subseq arg 2 value-start))
+		    (value (when value-start (subseq arg (1+ value-start))))
+		    ;; #### NOTE: we authorize partial matching (abreviations)
+		    ;; for long names: an exact match is search first. If that
+		    ;; fails, we try partial matching, and the first matching
+		    ;; option is returned. For instance, if you have --foobar
+		    ;; and --foo options in that order, passing --foo will
+		    ;; match the option --foo, but passing --fo will match
+		    ;; --foobar. I'm not sure this is the best behavior in
+		    ;; such cases. Think harder about this.
+		    (option (or (search-option context :long-name name)
+				(search-option context :partial-name name)))
+		    ;; #### NOTE: OPTION might be nil if it is unknown to
+		    ;; Clon. What to do with unknown options is up to the
+		    ;; user. We don't do anyting special here.
+		    (cmdline-option
+		     (make-cmdline-option
+		      :name name :option option :value value)))
+	       ;; Unless there is already a value (an equal sign was found),
+	       ;; try to pick one from the next cmdline item, if it doesn't
+	       ;; start with + or a - sign.
+	       (unless (or value
+			   (eq (elt (car arglist) 0) #\-)
+			   (eq (elt (car arglist) 0) #\+))
+		 (setf (cmdline-option-value cmdline-option)
+		       (pop arglist)))
+	       (endpush cmdline-option desclist)))
+	    ;; A short (possibly unknown) option or a minus pack:
+	    ((string-start arg "-")
 
-	    ))
-    (setf (arglist context) desclist))))
+	     )))
+    (setf (arglist context) desclist)))
 
 ;;; context.lisp ends here
