@@ -35,13 +35,18 @@
 
 
 ;; ============================================================================
-;; The Command-Line Option Structure
+;; The Command-Line Structures
 ;; ============================================================================
 
 (defstruct cmdline-option
   (name) ;; the name as it appears on the command line
   (option) ;; the actual option is corresponds to, or null if unknown
   (value) ;; the option's value as it appears on the command line
+  )
+
+(defstruct cmdline-pack
+  (type) ;; either :minus or :plus
+  (contents) ;; the contents (characters) of the pack
   )
 
 
@@ -208,15 +213,14 @@ otherwise."
 			       (subseq arg (1+ value-start))
 			       (unless (or (eq (elt (car arglist) 0) #\-)
 					   (eq (elt (car arglist) 0) #\+))
-				 (pop arglist))))
-		    ;; #### NOTE: OPTION might be nil if it is unknown to
-		    ;; Clon. What to do with unknown options is up to the
-		    ;; user. We don't do anyting special here.
-		    (cmdline-option
-		     (make-cmdline-option
-		      :name (or (when option (long-name option)) name)
-		      :option option :value value)))
-	       (endpush cmdline-option desclist)))
+				 (pop arglist)))))
+	       ;; #### NOTE: OPTION might be nil if it is unknown to Clon.
+	       ;; What to do with unknown options is up to the user. We don't
+	       ;; do anyting special here.
+	       (endpush (make-cmdline-option
+			 :name (or (when option (long-name option)) name)
+			 :option option :value value)
+			desclist)))
 	    ;; A short (possibly unknown) option or a minus pack:
 	    ((string-start arg "-")
 	     (let* ((name (subseq arg 1))
@@ -225,25 +229,91 @@ otherwise."
 		      ;; We found an option. Let's look for an argument.
 		      (let* ((value (unless (or (eq (elt (car arglist) 0) #\-)
 						(eq (elt (car arglist) 0) #\+))
-				      (pop arglist)))
-			     (cmdline-option
-			      (make-cmdline-option
-			       :name name :option option :value value)))
-			(endpush cmdline-option desclist)))
+				      (pop arglist))))
+			(endpush (make-cmdline-option
+				  :name name :option option :value value)
+				 desclist)))
 		     ((setq option (search-sticky-option context name))
-		      ;; #### NOTE: if an option is not found, we try to find
-		      ;; a sticky option and stop at the first match, even if,
-		      ;; for instance, another option would match a longer
-		      ;; part of the argument. I'm not sure this is the best
-		      ;; behavior in such cases. Think harder about this.
-		      (let ((cmdline-option
-			     (make-cmdline-option
-			      :name (short-name option)
-			      :option option
-			      :value (subseq name
-					     (length (short-name option))))))
-			(endpush cmdline-option desclist)))
-		     )))))
+		      ;; We found an option with a sticky argument.
+		      ;; #### NOTE: when looking for a sticky option, we stop
+		      ;; at the first match, even if, for instance, another
+		      ;; option would match a longer part of the argument. I'm
+		      ;; not sure this is the best behavior in such cases.
+		      ;; Think harder about this.
+		      (endpush (make-cmdline-option
+				:name (short-name option)
+				:option option
+				:value (subseq name
+					       (length (short-name option))))
+			       desclist))
+		     ((minus-pack context)
+		      ;; Let's find out whether it is a minus pack:
+		      (let ((trimmed (string-left-trim (minus-pack context)
+						       name)))
+			(cond ((zerop (length trimmed))
+			       ;; We found a simple minus pack
+			       (endpush
+				(make-cmdline-pack :type :minus :contents name)
+				desclist))
+			      ((= (length trimmed) 1)
+			       ;; There's one character left: maybe a last
+			       ;; option in the pack requiring an argument
+			       ;; (remember that those options don't appear in
+			       ;; the minus pack description).
+			       (setq option (search-option context
+					      :short-name trimmed))
+			       (cond (option
+				      ;; We found an option. Separate the pack
+				      ;; into a simple minus pack, and a
+				      ;; cmdline option:
+				      (endpush
+				       (make-cmdline-pack
+					:type :minus
+					:contents (subseq name 0
+							  (1- (length name))))
+				       desclist)
+				      (endpush
+				       (make-cmdline-option
+					:name trimmed
+					:option option
+					:value
+					(unless (or (eq (elt (car arglist) 0)
+							#\-)
+						    (eq (elt (car arglist) 0)
+							#\+))
+					  (pop arglist)))
+				       desclist))
+				     ;; The last character doesn't correspond
+				     ;; to a known option. Consider the whole
+				     ;; pack as an unknown option.
+				     (t
+				      (endpush (make-cmdline-option
+						:name name
+						:value
+						(unless (or (eq (elt
+								 (car arglist)
+								 0)
+								#\-)
+							    (eq (elt
+								 (car arglist)
+								 0)
+								#\+))
+						  (pop arglist)))
+					       desclist))))
+			      (t
+			       ;; There's more than one character left. As
+			       ;; above, consider the whole pack as an unknown
+			       ;; option.
+			       (endpush (make-cmdline-option
+					 :name name
+					 :value
+					 (unless (or (eq (elt (car arglist) 0)
+							 #\-)
+						     (eq (elt (car arglist) 0)
+							 #\+))
+					   (pop arglist)))
+					desclist)
+			       )))))))))
     (setf (arglist context) desclist)))
 
 ;;; context.lisp ends here

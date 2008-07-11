@@ -294,11 +294,8 @@ This class implements is the base class for options accepting arguments."))
 (defmethod option-matches-sticky ((option valued-option) namearg)
   "Return t if NAMEARG matches OPTION with a sticky argument."
   (with-slots (short-name) option
-    (when (and short-name
-	       (string-start namearg short-name))
+    (when (and short-name (string-start namearg short-name))
       option)))
-      ;; Yuck !
-;;      (list option (subseq namearg (length short-name))))))
 
 
 ;; -------------------

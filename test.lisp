@@ -14,7 +14,8 @@
 ;;; Code:
 
 (defun test ()
-  (let ((ctx (clon::make-context :arglist '("foo" "--deb=yes" "-fdidier" "--" "baz")
+  (let ((ctx (clon::make-context
+	      :arglist '("foo" "--deb=yes" "-vdhi" "didier" "--" "baz")
 				 :postfix "postfix")))
     (clon::add-to ctx (clon::make-text :string "Demonstration of Clon."))
     (let ((grp (clon::make-group)))
