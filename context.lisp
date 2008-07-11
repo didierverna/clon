@@ -170,13 +170,6 @@ otherwise."
   ;; - We never try to be clever about possible misuses of the options (like,
   ;; a short name used with a double dash or stuff like that).
   ;;
-  ;;  - After a `-', detect in turn short names, sticky arguments or minus
-  ;;  packs (in which case the last character is authorized to have an
-  ;;  argument, but not a sticky one). Recall that this last arg is not
-  ;;  described in the minus pack help string.
-  ;;
-  ;;  - If the above fails, consider that we have an unknow option.
-  ;;
   ;;  - After a `+' detect in turn booleans short names or plus packs (only
   ;;  booleans in there).
   ;;
@@ -223,16 +216,18 @@ otherwise."
 			desclist)))
 	    ;; A short (possibly unknown) option or a minus pack:
 	    ((string-start arg "-")
-	     (let* ((name (subseq arg 1))
-		    option)
+	     (let ((name (subseq arg 1))
+		   option)
 	       (cond ((setq option (search-option context :short-name name))
-		      ;; We found an option. Let's look for an argument.
-		      (let* ((value (unless (or (eq (elt (car arglist) 0) #\-)
-						(eq (elt (car arglist) 0) #\+))
-				      (pop arglist))))
-			(endpush (make-cmdline-option
-				  :name name :option option :value value)
-				 desclist)))
+		      ;; We found an option:
+		      (endpush
+		       (make-cmdline-option
+			:name name
+			:option option
+			:value (unless (or (eq (elt (car arglist) 0) #\-)
+					   (eq (elt (car arglist) 0) #\+))
+				 (pop arglist)))
+		       desclist))
 		     ((setq option (search-sticky-option context name))
 		      ;; We found an option with a sticky argument.
 		      ;; #### NOTE: when looking for a sticky option, we stop
@@ -312,8 +307,49 @@ otherwise."
 						     (eq (elt (car arglist) 0)
 							 #\+))
 					   (pop arglist)))
-					desclist)
-			       )))))))))
+					desclist))))))))
+	    ;; A short (possibly unknown) switch, or a plus pack.
+	    ((string-start arg "+")
+	     (let ((name (subseq arg 1))
+		   option)
+	       (cond ((setq option (search-option context :short-name name))
+		      ;; We found an option.
+		      ;; #### NOTE: the value we assign to the option here is
+		      ;; "no" since the option is supposed to be a switch. In
+		      ;; case of a usage error (not a switch), we have a
+		      ;; problem that might or might not be detected at
+		      ;; retrieval time: flags would notice an extra value, a
+		      ;; user converter might notice an invalid value, but a
+		      ;; simple stropt would not notice anything.
+		      ;; We could try to be more clever and detect that the
+		      ;; option's type is wrong, but I'm too lazy to do that
+		      ;; right now.
+		      (endpush (make-cmdline-option
+				:name name :option option :value "no")
+			       desclist))
+		     ((plus-pack context)
+		      ;; Let's find out whether it is a plus pack:
+		      (let ((trimmed (string-left-trim (plus-pack context) name)))
+			(cond ((zerop (length trimmed))
+			       ;; We found a plus pack
+			       (endpush
+				(make-cmdline-pack :type :plus :contents name)
+				desclist))
+			      (t
+			       ;; We found an unknown switch:
+			       (endpush
+				(make-cmdline-option :name name :value "no")
+				desclist))))))))
+	    ;; Otherwise, it's junk.
+	    (t
+	     ;; #### FIXME: SBCL specific.
+	     (cond ((sb-ext:posix-getenv "POSIXLY_CORRECT")
+		    ;; That's the end of the Clon-specific part:
+		    (setf (remainder context) (cons arg arglist))
+		    (setq arglist nil))
+		   (t
+		    ;; Otherwise, that's really junk:
+		    (endpush arg desclist))))))
     (setf (arglist context) desclist)))
 
 ;;; context.lisp ends here
