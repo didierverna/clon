@@ -165,16 +165,6 @@ otherwise."
   ;; analysis (extra/missing option values, value conversion error etc) is
   ;; done when options are actually retrieved.
   ;;
-  ;; More specifically:
-  ;;
-  ;; - We never try to be clever about possible misuses of the options (like,
-  ;; a short name used with a double dash or stuff like that).
-  ;;
-  ;;  - After a `+' detect in turn booleans short names or plus packs (only
-  ;;  booleans in there).
-  ;;
-  ;;  - If the above fails, consider that we have an unknow boolean option.
-  ;;
   ;;  #### NOTE: currently, name clashes are considered on short and long
   ;;  names independently. That is, it is possible to have a short name
   ;;  identical to a long one, although I don't see why you would want to do
@@ -351,5 +341,58 @@ otherwise."
 		    ;; Otherwise, that's really junk:
 		    (endpush arg desclist))))))
     (setf (arglist context) desclist)))
+
+(defmethod seal :after ((context context))
+  "Immediately handle Clon's internal options."
+  )
+
+;; ============================================================================
+;; The Option retrieval Protocol
+;; ============================================================================
+
+(defun getopt (context &rest keys &key short-name long-name option)
+  "Get an option's value in CONTEXT.
+The option can be specified either by SHORT-NAME, LONG-NAME, or directly via
+an OPTION object."
+  (unless (sealedp context)
+    (error "Getting option ~S from context ~A: context not sealed."
+	   (or short-name long-name)
+	   context))
+  (unless option
+    (setq option (apply #'search-option context keys)))
+  (unless option
+    (error "Getting option ~S from context ~A: option unknown."
+	   (or short-name long-name)
+	   context))
+  (let ((minus-char (let ((mc (minus-char option)))
+		      (when mc (coerce mc 'character))))
+	(plus-char (let ((mc (plus-char option)))
+		     (when mc (coerce mc 'character)))))
+    (loop :for desclist :on (arglist context)
+	  :for item = (cadr desclist)
+	  :while item
+	  :do (cond ((and (cmdline-option-p item)
+			  (eq (cmdline-option-option item) option))
+		     (rplacd desclist (cddr desclist))
+		     (return-from getopt
+		       (convert option
+			 (cmdline-option-name item)
+			 (cmdline-option-value item))))
+		    ((and (cmdline-pack-p item)
+			  (eq (cmdline-pack-type item) :minus)
+			  minus-char
+			  (position minus-char (cmdline-pack-contents item)))
+		     (setf (cmdline-pack-contents item)
+			   (remove minus-char (cmdline-pack-contents item)))
+		     (return-from getopt
+		       (convert option (short-name option) "yes")))
+		    ((and (cmdline-pack-p item)
+			  (eq (cmdline-pack-type item) :plus)
+			  plus-char
+			  (position plus-char (cmdline-pack-contents item)))
+		     (setf (cmdline-pack-contents item)
+			   (remove plus-char (cmdline-pack-contents item)))
+		     (return-from getopt
+		       (convert option (short-name option) "no")))))))
 
 ;;; context.lisp ends here

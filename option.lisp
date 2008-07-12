@@ -128,9 +128,9 @@ This class is the base class for all options."))
     option))
 
 
-;; -------------------------
-;; Option searching protocol
-;; -------------------------
+;; ============================================================================
+;; The Option Search protocol
+;; ============================================================================
 
 ;; #### NOTE: partial matches are not allowed on short options. I didn't think
 ;; this through, but it would probably make things very difficult wrt sticky
@@ -169,6 +169,16 @@ OPTION's names must match either SHORT-NAME, LONG-NAME, or PARTIAL-(long)-NAME."
   (:method ((option option))
     "Return nil (only switches are plus-packable)."
     nil))
+
+
+;; ============================================================================
+;; The Convertion Protocol
+;; ============================================================================
+
+(defgeneric convert (option name value)
+  (:documentation "Convert command line VALUE for OPTION called with NAME.")
+  (:method (option name value)
+    (values option name value)))
 
 
 ;; ============================================================================
