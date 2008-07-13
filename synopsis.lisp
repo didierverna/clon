@@ -46,12 +46,10 @@
 	    :initarg :postfix)
    (minus-pack :documentation "The minus pack string."
 	       :type (or null string)
-	       :reader minus-pack
-	       :initform nil)
+	       :reader minus-pack)
    (plus-pack :documentation "The plus pack string."
 	      :type (or null string)
-	      :reader plus-pack
-	      :initform nil))
+	      :reader plus-pack))
   (:default-initargs
       :postfix ""))
 
@@ -125,14 +123,15 @@ otherwise."
 
 (defmethod seal :after ((synopsis synopsis))
   "Compute the minus and plus packs of SYNOPSIS."
-  (do-options (option synopsis)
-    (let ((minus-char (minus-char option))
-	  (plus-char (plus-char option)))
-      (when minus-char
-	(setf (slot-value synopsis 'minus-pack)
-	      (concatenate 'string (slot-value synopsis 'minus-pack) minus-char)))
-      (when plus-char
-	(setf (slot-value synopsis 'plus-pack)
-	      (concatenate 'string (slot-value synopsis 'plus-pack) plus-char))))))
+  (let (minus-pack plus-pack)
+    (do-options (option synopsis)
+      (let ((minus-char (minus-char option))
+	    (plus-char (plus-char option)))
+	(when minus-char
+	  (setq minus-pack (concatenate 'string minus-pack minus-char)))
+	(when plus-char
+	  (setq plus-pack (concatenate 'string plus-pack plus-char)))))
+    (setf (slot-value synopsis 'minus-pack) minus-pack)
+    (setf (slot-value synopsis 'plus-pack) plus-pack)))
 
 ;;; synopsis.lisp ends here

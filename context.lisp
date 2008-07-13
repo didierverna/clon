@@ -74,8 +74,7 @@
 	    :accessor arglist)
    (remainder :documentation "The non-Clon part of the argument list."
 	      :type list
-	      :accessor remainder
-	      :initform nil))
+	      :reader remainder))
   (:default-initargs
       ;; #### FIXME: SBCL specific
       :cmdline sb-ext:*posix-argv*)
@@ -103,7 +102,8 @@ Extract the program name, construct the parsed argument list and the remainder."
   ;;  names independently. That is, it is possible to have a short name
   ;;  identical to a long one, although I don't see why you would want to do
   ;;  that.
-  (let ((arglist (list)))
+  (let ((arglist (list))
+	remainder)
     (macrolet ((maybe-next-cmdline-arg ()
 		 '(unless (or (eq (elt (car cmdline) 0) #\-)
 			   (eq (elt (car cmdline) 0) #\+))
@@ -113,7 +113,7 @@ Extract the program name, construct the parsed argument list and the remainder."
 	(cond ((string= arg "--")
 	       ;; The Clon separator:
 	       ;; Isolate the rest of the command line.
-	       (setf (remainder context) cmdline)
+	       (setq remainder cmdline)
 	       (setq cmdline nil))
 	      ;; A long (possibly unknown) option:
 	      ((string-start arg "--")
@@ -261,12 +261,13 @@ Extract the program name, construct the parsed argument list and the remainder."
 	       ;; #### FIXME: SBCL specific.
 	       (cond ((sb-ext:posix-getenv "POSIXLY_CORRECT")
 		      ;; That's the end of the Clon-specific part:
-		      (setf (remainder context) (cons arg cmdline))
+		      (setq remainder (cons arg cmdline))
 		      (setq cmdline nil))
 		     (t
 		      ;; Otherwise, that's really junk:
 		      (push arg arglist)))))))
-    (setf (arglist context) (nreverse arglist))))
+    (setf (arglist context) (nreverse arglist))
+    (setf (slot-value context 'remainder) remainder)))
 
 ;; #### FIXME: SBCL-specific
 (defun make-context (&rest keys &key synopsis cmdline)
