@@ -51,6 +51,7 @@
 	       (:file "text")
 	       (:file "option")
 	       (:file "group")
+	       (:file "synopsis")
 	       (:file "context"))
   :serial t)
 

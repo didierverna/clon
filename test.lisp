@@ -14,10 +14,8 @@
 ;;; Code:
 
 (defun test ()
-  (let ((ctx (clon::make-context
-	      :arglist '("foo" "--deb=yes" "-vdhi" "didier" "baro" "--" "baz")
-				 :postfix "postfix")))
-    (clon::add-to ctx (clon::make-text :string "Demonstration of Clon."))
+  (let ((synopsis (clon::make-synopsis :postfix "postfix")))
+    (clon::add-to synopsis (clon::make-text :string "Demonstration of Clon."))
     (let ((grp (clon::make-group)))
       (clon::add-to grp (clon::make-text :string "Flags:"))
       (clon::add-to grp
@@ -30,7 +28,7 @@
 	(clon::make-flag :long-name "version"
 			 :description "long name."))
       (clon::seal grp)
-      (clon::add-to ctx grp))
+      (clon::add-to synopsis grp))
     (let ((grp (clon::make-group)))
       (clon::add-to grp (clon::make-text :string "Switches:"))
       (clon::add-to grp
@@ -58,7 +56,7 @@
 			    :description "long name, optional argument"
 			    :argument-type :required))
       (clon::seal grp)
-      (clon::add-to ctx grp))
+      (clon::add-to synopsis grp))
     (let ((grp (clon::make-group)))
       (clon::add-to grp
 	(clon::make-stropt :short-name "f"
@@ -91,7 +89,7 @@
 			   "long name, optional argument"
 			   :argument-type :optional))
       (clon::seal grp)
-      (clon::add-to ctx grp))
+      (clon::add-to synopsis grp))
     (let ((grp (clon::make-group)))
       (let ((subgrp (clon::make-group)))
 	(clon::add-to subgrp
@@ -100,9 +98,10 @@
 	(clon::seal subgrp)
 	(clon::add-to grp subgrp))
       (clon::seal grp)
-      (clon::add-to ctx grp))
-    (clon::seal ctx)
-    ctx))
-
+      (clon::add-to synopsis grp))
+    (clon::seal synopsis)
+    (clon::make-context
+     :synopsis synopsis
+     :cmdline '("foo" "--deb=yes" "-vdhi" "didier" "baro" "--" "baz"))))
 
 ;;; test.lisp ends here

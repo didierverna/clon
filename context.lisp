@@ -54,123 +54,46 @@
 ;; The Context Class
 ;; ============================================================================
 
+;; #### FIXME: make final
 ;; #### FIXME: the ugliness of using arglist to successively store different
 ;; things as I do is a demonstration that this stuff is not well abstracted.
 ;; We should have a separate description of the options somewhere, and then
 ;; contexts using this description to work on a specific cmdline. What's shaky
 ;; right now is that the cmdline is provided at context creation, but really
 ;; used only when sealing.
-(defclass context (container)
-  ((progname :documentation "The program name, as it appears on the command line."
+(defclass context ()
+  ((synopsis :documentation "The program synopsis."
+	     :type synopsis
+	     :reader synopsis
+	     :initarg :synopsis)
+   (progname :documentation "The program name, as it appears on the command line."
 	     :type string
-	     :accessor progname)
+	     :reader progname)
    (arglist :documentation "The argument list to process."
 	    :type list
-	    :accessor arglist
-	    :initarg :arglist)
+	    :accessor arglist)
    (remainder :documentation "The non-Clon part of the argument list."
 	      :type list
 	      :accessor remainder
-	      :initform nil)
-   (postfix :documentation "A postfix to the program synopsis."
-	    :type string
-	    :reader postfix
-	    :initarg :postfix)
-   (minus-pack :documentation "The minus pack string."
-	       :type (or null string)
-	       :accessor minus-pack
-	       :initform nil)
-   (plus-pack :documentation "The plus pack string."
-	      :type (or null string)
-	      :accessor plus-pack
 	      :initform nil))
   (:default-initargs
-    :arglist sb-ext:*posix-argv* ;; #### FIXME: SBCL specific
-    :postfix "")
+      ;; #### FIXME: SBCL specific
+      :cmdline sb-ext:*posix-argv*)
   (:documentation "The CONTEXT class.
 This class holds the necessary information to process a particular set of
 command-line options."))
 
-(defmethod initialize-instance :after ((context context) &rest initargs)
-  "Replace the provided argument list with a copy."
-  (declare (ignore initargs))
-  (let ((arglist (copy-list (arglist context))))
-    (setf (progname context) (car arglist))
-    (setf (arglist context) (cdr arglist))))
+(defmethod initialize-instance :before ((context context) &key synopsis cmdline)
+  "Ensure that SYNOPSIS is sealed."
+  (declare (ignore cmdline))
+  (unless (sealedp synopsis)
+    (error "Initializing context ~A: synopsis ~A not sealed." context synopsis)))
 
-;; #### FIXME: SBCL-specific
-(defun make-context (&rest keys &key arglist postfix)
-  "Make a new context.
-- ARGLIST is the argument list (strings) to process.
-  It defaults to the user-specific part of the command-line options.
-  The list is copied (the original is left untouched).
-- POSTFIX is a string to append to the program synopsis.
-  It defaults to the empty string."
-  (declare (ignore arglist postfix))
-  (apply #'make-instance 'context keys))
-
-
-;; ----------------
-;; Sealing protocol
-;; ----------------
-
-(defmethod seal ((context context))
-  "Seal CONTEXT."
-  ;; Add the Clon internal options group
-  (let ((grp (make-group)))
-    (add-to grp (make-text :string "Clon specific options:"))
-    (add-to grp (make-internal-flag "help" "Display Clon-specific help."))
-    (add-to grp (make-internal-stropt "version" "Display Clon's version number.
-WHICH can be `number', `short' or `long'."
-		  :argument-name "WHICH"
-		  :argument-type :optional
-		  :default-value "long"
-		  :env-var "VERSION_FORMAT"))
-    (let ((subgrp (make-group)))
-      (add-to subgrp (make-text :string "Clon output:"))
-      (add-to subgrp (make-internal-stropt "search-path" "Set Clon's search path.
-If you don't want any search path at all, use this option with no argument."
-		       :argument-name "PATH"
-		       :argument-type :optional
-		       ;; #### FIXME: port DATADIR from the C version
-		       :default-value "~/share/clon:"
-		       :env-var "SEARCH_PATH"))
-      (add-to subgrp (make-internal-stropt "theme" "Set Clon's output theme.
-If you don't want any theme at all, use this option with no argument. Unless
-starting with /, ./ or ../, files are looked for in the Clon search path. The
-cth extension can be omitted."
-		       :argument-name "PATH"
-		       :argument-type :optional
-		       :default-value "default"
-		       :env-var "THEME"))
-      (add-to subgrp (make-internal-stropt "line-width"
-			 "Set Clon's output line width.
-If not given, the terminal size will be used when possible. Otherwise, 80
-columns will be assumed."
-		       :argument-name "WIDTH"
-		       :env-var "WIDTH"))
-      (add-to subgrp (make-internal-switch "highlight"
-			 "Force or inhibit Clon's output highlighting.
-If not given, highlighting will be turned on for tty output, and off
-otherwise."
-		       :env-var "HIGHLIGHT"))
-      (seal subgrp)
-      (add-to grp subgrp))
-    (seal grp)
-    (add-to context grp))
-  ;; this calls the CONTAINER sealing method, hence performing name clash
-  ;; check.
-  (call-next-method)
-  ;; Compute the minus and plus packs
-  (do-options (option context)
-    (let ((minus-char (minus-char option))
-	  (plus-char (plus-char option)))
-      (when minus-char
-	(setf (minus-pack context)
-	      (concatenate 'string (minus-pack context) minus-char)))
-      (when plus-char
-	(setf (plus-pack context)
-	      (concatenate 'string (plus-pack context) plus-char)))))
+(defmethod initialize-instance :after ((context context) &key synopsis cmdline)
+  "Parse CMDLINE.
+Extract the program name, construct the parsed argument list and the remainder."
+  (declare (ignore synopsis))
+  (setf (slot-value context 'progname) (pop cmdline))
   ;; Perform syntactic analysis of the command-line: spot options, option
   ;; values, minus and plus packs, and isolate the non-Clon part. Semantic
   ;; analysis (extra/missing option values, value conversion error etc) is
@@ -180,19 +103,18 @@ otherwise."
   ;;  names independently. That is, it is possible to have a short name
   ;;  identical to a long one, although I don't see why you would want to do
   ;;  that.
-  (let ((desclist (list))
-	(arglist (arglist context)))
+  (let ((arglist (list)))
     (macrolet ((maybe-next-cmdline-arg ()
-		 '(unless (or (eq (elt (car arglist) 0) #\-)
-			   (eq (elt (car arglist) 0) #\+))
-		   (pop arglist))))
-      (do ((arg (pop arglist) (pop arglist)))
+		 '(unless (or (eq (elt (car cmdline) 0) #\-)
+			   (eq (elt (car cmdline) 0) #\+))
+		   (pop cmdline))))
+      (do ((arg (pop cmdline) (pop cmdline)))
 	  ((null arg))
 	(cond ((string= arg "--")
 	       ;; The Clon separator:
 	       ;; Isolate the rest of the command line.
-	       (setf (remainder context) arglist)
-	       (setq arglist nil))
+	       (setf (remainder context) cmdline)
+	       (setq cmdline nil))
 	      ;; A long (possibly unknown) option:
 	      ((string-start arg "--")
 	       (let* ((value-start (position #\= arg :start 2))
@@ -206,8 +128,10 @@ otherwise."
 		      ;; --foo, but passing --fo will match --foobar. I'm not
 		      ;; sure this is the best behavior in such cases. Think
 		      ;; harder about this.
-		      (option (or (search-option context :long-name name)
-				  (search-option context :partial-name name)))
+		      (option (or (search-option (synopsis context)
+				    :long-name name)
+				  (search-option (synopsis context)
+				    :partial-name name)))
 		      (value (if value-start
 				 (subseq arg (1+ value-start))
 				 (maybe-next-cmdline-arg))))
@@ -217,19 +141,21 @@ otherwise."
 		 (push (make-cmdline-option
 			:name (or (when option (long-name option)) name)
 			:option option :value value)
-		       desclist)))
+		       arglist)))
 	      ;; A short (possibly unknown) option or a minus pack:
 	      ((string-start arg "-")
 	       (let ((name (subseq arg 1))
 		     option)
-		 (cond ((setq option (search-option context :short-name name))
+		 (cond ((setq option (search-option (synopsis context)
+				       :short-name name))
 			;; We found an option:
 			(push (make-cmdline-option
 			       :name name
 			       :option option
 			       :value (maybe-next-cmdline-arg))
-			      desclist))
-		       ((setq option (search-sticky-option context name))
+			      arglist))
+		       ((setq option (search-sticky-option (synopsis context)
+							   name))
 			;; We found an option with a sticky argument.
 			;; #### NOTE: when looking for a sticky option, we
 			;; stop at the first match, even if, for instance,
@@ -241,23 +167,23 @@ otherwise."
 			       :option option
 			       :value (subseq name
 					      (length (short-name option))))
-			      desclist))
-		       ((minus-pack context)
+			      arglist))
+		       ((minus-pack (synopsis context))
 			;; Let's find out whether it is a minus pack:
-			(let ((trimmed (string-left-trim (minus-pack context)
-							 name)))
+			(let ((trimmed (string-left-trim
+					(minus-pack (synopsis context))
+					name)))
 			  (cond ((zerop (length trimmed))
 				 ;; We found a simple minus pack
-				 (push
-				  (make-cmdline-pack
-				   :type :minus :contents name)
-				  desclist))
+				 (push (make-cmdline-pack
+					:type :minus :contents name)
+				       arglist))
 				((= (length trimmed) 1)
 				 ;; There's one character left: maybe a last
 				 ;; option in the pack requiring an argument
 				 ;; (remember that those options don't appear
 				 ;; in the minus pack description).
-				 (setq option (search-option context
+				 (setq option (search-option (synopsis context)
 						:short-name trimmed))
 				 (cond (option
 					;; We found an option. Separate the
@@ -268,14 +194,14 @@ otherwise."
 					  :type :minus
 					  :contents (subseq name 0
 							    (1- (length name))))
-					 desclist)
+					 arglist)
 					(push
 					 (make-cmdline-option
 					  :name trimmed
 					  :option option
 					  :value
 					  (maybe-next-cmdline-arg))
-					 desclist))
+					 arglist))
 				       ;; The last character doesn't
 				       ;; correspond to a known option.
 				       ;; Consider the whole pack as an
@@ -285,7 +211,7 @@ otherwise."
 					       :name name
 					       :value
 					       (maybe-next-cmdline-arg))
-					      desclist))))
+					      arglist))))
 				(t
 				 ;; There's more than one character left. As
 				 ;; above, consider the whole pack as an
@@ -294,12 +220,13 @@ otherwise."
 					:name name
 					:value
 					(maybe-next-cmdline-arg))
-				       desclist))))))))
+				       arglist))))))))
 	      ;; A short (possibly unknown) switch, or a plus pack.
 	      ((string-start arg "+")
 	       (let ((name (subseq arg 1))
 		     option)
-		 (cond ((setq option (search-option context :short-name name))
+		 (cond ((setq option (search-option (synopsis context)
+				       :short-name name))
 			;; We found an option.
 			;; #### NOTE: the value we assign to the option here
 			;; is "no" since the option is supposed to be a
@@ -313,36 +240,44 @@ otherwise."
 			;; to do that right now.
 			(push (make-cmdline-option
 			       :name name :option option :value "no")
-			      desclist))
-		       ((plus-pack context)
+			      arglist))
+		       ((plus-pack (synopsis context))
 			;; Let's find out whether it is a plus pack:
-			(let ((trimmed (string-left-trim (plus-pack context)
-							 name)))
+			(let ((trimmed (string-left-trim
+					(plus-pack (synopsis context))
+					name)))
 			  (cond ((zerop (length trimmed))
 				 ;; We found a plus pack
 				 (push
 				  (make-cmdline-pack :type :plus :contents name)
-				  desclist))
+				  arglist))
 				(t
 				 ;; We found an unknown switch:
 				 (push
 				  (make-cmdline-option :name name :value "no")
-				  desclist))))))))
+				  arglist))))))))
 	      ;; Otherwise, it's junk.
 	      (t
 	       ;; #### FIXME: SBCL specific.
 	       (cond ((sb-ext:posix-getenv "POSIXLY_CORRECT")
 		      ;; That's the end of the Clon-specific part:
-		      (setf (remainder context) (cons arg arglist))
-		      (setq arglist nil))
+		      (setf (remainder context) (cons arg cmdline))
+		      (setq cmdline nil))
 		     (t
 		      ;; Otherwise, that's really junk:
-		      (push arg desclist)))))))
-    (setf (arglist context) (nreverse desclist))))
+		      (push arg arglist)))))))
+    (setf (arglist context) (nreverse arglist))))
 
-(defmethod seal :after ((context context))
-  "Immediately handle Clon's internal options."
-  )
+;; #### FIXME: SBCL-specific
+(defun make-context (&rest keys &key synopsis cmdline)
+  "Make a new context.
+- SYNOPSIS is the program synopsis to use in that context.
+- CMDLINE is the argument list (strings) to process.
+  It defaults to a POSIX conformant argv.
+  The list is copied (the original is left untouched)."
+  (declare (ignore synopsis cmdline))
+  (apply #'make-instance 'context keys))
+
 
 ;; ============================================================================
 ;; The Option retrieval Protocol
@@ -352,15 +287,12 @@ otherwise."
   "Get an option's value in CONTEXT.
 The option can be specified either by SHORT-NAME, LONG-NAME, or directly via
 an OPTION object."
-  (unless (sealedp context)
-    (error "Getting option ~S from context ~A: context not sealed."
-	   (or short-name long-name)
-	   context))
   (unless option
-    (setq option (apply #'search-option context keys)))
+    (setq option (apply #'search-option (synopsis context) keys)))
   (unless option
-    (error "Getting option ~S from context ~A: option unknown."
+    (error "Getting option ~S from synopsis ~A in context ~A: option unknown."
 	   (or short-name long-name)
+	   (synopsis context)
 	   context))
   (let ((minus-char (let ((mc (minus-char option)))
 		      (when mc (coerce mc 'character))))
