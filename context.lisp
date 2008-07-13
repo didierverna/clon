@@ -179,12 +179,34 @@ Extract program name, options, remainder and junk."
 		       option)
 		   (cond ((setq option (search-option (synopsis context)
 					 :short-name name))
-			  ;; We found an option:
-			  (push (make-cmdline-option
-				 :name name
-				 :option option
-				 :value (maybe-next-cmdline-arg))
-				arglist))
+			  (cond ((eq (type-of option) 'flag) ;; a flag
+				 ;; In case of "-flag nonsense", we don't
+				 ;; consider the next cmdline item as a
+				 ;; spurious arg. Rather, the next iteration
+				 ;; will put it either into the junk category,
+				 ;; or into the remainder.
+				 (push (make-cmdline-option
+					:name (short-name option)
+					:option option)
+				       arglist))
+				(option ;; another (but then, valued) option
+				 ;; If the option requires an argument, it
+				 ;; might be in the next cmdline item, unless
+				 ;; it looks like an option (but then, the
+				 ;; converter will later report a missing
+				 ;; argument error). Optional arguments are
+				 ;; necessary sticky, so we don't look into
+				 ;; the next cmdline item. If this option's
+				 ;; argument is optional and the next cmdline
+				 ;; item is not an option, the next iteration
+				 ;; will put it either into the junk category,
+				 ;; or into the remainder.
+				 (push (make-cmdline-option
+					:name (short-name option)
+					:option option
+					:value (when (argument-required-p option)
+						 (maybe-next-cmdline-arg)))
+				       arglist))))
 			 ((setq option (search-sticky-option (synopsis context)
 							     name))
 			  ;; We found an option with a sticky argument.
@@ -200,7 +222,7 @@ Extract program name, options, remainder and junk."
 						(length (short-name option))))
 				arglist))
 			 ((minus-pack (synopsis context))
-			  ;; Let's find out whether it is a minus pack:
+			  ;; Let's find out whether this is a minus pack:
 			  (let ((trimmed (string-left-trim
 					  (minus-pack (synopsis context))
 					  name)))
@@ -216,15 +238,17 @@ Extract program name, options, remainder and junk."
 				   ;; appear in the minus pack description).
 				   (setq option (search-option (synopsis context)
 						  :short-name trimmed))
-				   (cond (option
+				   (cond ((and option
+					       (argument-required-p option))
 					  ;; We found an option. Separate the
 					  ;; package into a simple minus pack,
 					  ;; and a cmdline option:
 					  (push
 					   (make-cmdline-pack
 					    :type :minus
-					    :contents (subseq name 0
-							      (1- (length name))))
+					    :contents
+					    (subseq name 0
+						    (1- (length name))))
 					   arglist)
 					  (push
 					   (make-cmdline-option
@@ -234,9 +258,10 @@ Extract program name, options, remainder and junk."
 					    (maybe-next-cmdline-arg))
 					   arglist))
 					 ;; The last character doesn't
-					 ;; correspond to a known option.
-					 ;; Consider the whole pack as an
-					 ;; unknown option.
+					 ;; correspond to a known option
+					 ;; requiring and argument. Consider
+					 ;; the whole pack as an unknown
+					 ;; option.
 					 (t
 					  (push (make-cmdline-option
 						 :name name
@@ -268,7 +293,8 @@ Extract program name, options, remainder and junk."
 			  ;; invalid value, but a simple stropt would not
 			  ;; notice anything. We could try to be more clever
 			  ;; and detect that the option's type is wrong, but
-			  ;; I'm too lazy to do that right now.
+			  ;; on the other hand, the +stropt is a funny trick
+			  ;; to use even for non boolean options.
 			  (push (make-cmdline-option
 				 :name name :option option :value "no")
 				arglist))
@@ -280,7 +306,8 @@ Extract program name, options, remainder and junk."
 			    (cond ((zerop (length trimmed))
 				   ;; We found a plus pack
 				   (push
-				    (make-cmdline-pack :type :plus :contents name)
+				    (make-cmdline-pack
+				     :type :plus :contents name)
 				    arglist))
 				  (t
 				   ;; We found an unknown switch:
