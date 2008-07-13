@@ -54,8 +54,17 @@
 ;; The Context Class
 ;; ============================================================================
 
+;; #### FIXME: the ugliness of using arglist to successively store different
+;; things as I do is a demonstration that this stuff is not well abstracted.
+;; We should have a separate description of the options somewhere, and then
+;; contexts using this description to work on a specific cmdline. What's shaky
+;; right now is that the cmdline is provided at context creation, but really
+;; used only when sealing.
 (defclass context (container)
-  ((arglist :documentation "The argument list to process."
+  ((progname :documentation "The program name, as it appears on the command line."
+	     :type string
+	     :accessor progname)
+   (arglist :documentation "The argument list to process."
 	    :type list
 	    :accessor arglist
 	    :initarg :arglist)
@@ -68,11 +77,11 @@
 	    :reader postfix
 	    :initarg :postfix)
    (minus-pack :documentation "The minus pack string."
-	       :type string
+	       :type (or null string)
 	       :accessor minus-pack
 	       :initform nil)
    (plus-pack :documentation "The plus pack string."
-	      :type string
+	      :type (or null string)
 	      :accessor plus-pack
 	      :initform nil))
   (:default-initargs
@@ -85,7 +94,9 @@ command-line options."))
 (defmethod initialize-instance :after ((context context) &rest initargs)
   "Replace the provided argument list with a copy."
   (declare (ignore initargs))
-  (setf (arglist context) (copy-list (arglist context))))
+  (let ((arglist (copy-list (arglist context))))
+    (setf (progname context) (car arglist))
+    (setf (arglist context) (cdr arglist))))
 
 ;; #### FIXME: SBCL-specific
 (defun make-context (&rest keys &key arglist postfix)
@@ -169,8 +180,8 @@ otherwise."
   ;;  names independently. That is, it is possible to have a short name
   ;;  identical to a long one, although I don't see why you would want to do
   ;;  that.
-  (let ((desclist (list (car (arglist context))))
-	(arglist (cdr (arglist context))))
+  (let ((desclist (list))
+	(arglist (arglist context)))
     (macrolet ((maybe-next-cmdline-arg ()
 		 '(unless (or (eq (elt (car arglist) 0) #\-)
 			   (eq (elt (car arglist) 0) #\+))
@@ -203,22 +214,21 @@ otherwise."
 		 ;; #### NOTE: OPTION might be nil if it is unknown to Clon.
 		 ;; What to do with unknown options is up to the user. We
 		 ;; don't do anyting special here.
-		 (endpush (make-cmdline-option
-			   :name (or (when option (long-name option)) name)
-			   :option option :value value)
-			  desclist)))
+		 (push (make-cmdline-option
+			:name (or (when option (long-name option)) name)
+			:option option :value value)
+		       desclist)))
 	      ;; A short (possibly unknown) option or a minus pack:
 	      ((string-start arg "-")
 	       (let ((name (subseq arg 1))
 		     option)
 		 (cond ((setq option (search-option context :short-name name))
 			;; We found an option:
-			(endpush
-			 (make-cmdline-option
-			  :name name
-			  :option option
-			  :value (maybe-next-cmdline-arg))
-			 desclist))
+			(push (make-cmdline-option
+			       :name name
+			       :option option
+			       :value (maybe-next-cmdline-arg))
+			      desclist))
 		       ((setq option (search-sticky-option context name))
 			;; We found an option with a sticky argument.
 			;; #### NOTE: when looking for a sticky option, we
@@ -226,19 +236,19 @@ otherwise."
 			;; another option would match a longer part of the
 			;; argument. I'm not sure this is the best behavior in
 			;; such cases. Think harder about this.
-			(endpush (make-cmdline-option
-				  :name (short-name option)
-				  :option option
-				  :value (subseq name
-						 (length (short-name option))))
-				 desclist))
+			(push (make-cmdline-option
+			       :name (short-name option)
+			       :option option
+			       :value (subseq name
+					      (length (short-name option))))
+			      desclist))
 		       ((minus-pack context)
 			;; Let's find out whether it is a minus pack:
 			(let ((trimmed (string-left-trim (minus-pack context)
 							 name)))
 			  (cond ((zerop (length trimmed))
 				 ;; We found a simple minus pack
-				 (endpush
+				 (push
 				  (make-cmdline-pack
 				   :type :minus :contents name)
 				  desclist))
@@ -253,13 +263,13 @@ otherwise."
 					;; We found an option. Separate the
 					;; pack into a simple minus pack, and
 					;; a cmdline option:
-					(endpush
+					(push
 					 (make-cmdline-pack
 					  :type :minus
 					  :contents (subseq name 0
 							    (1- (length name))))
 					 desclist)
-					(endpush
+					(push
 					 (make-cmdline-option
 					  :name trimmed
 					  :option option
@@ -271,20 +281,20 @@ otherwise."
 				       ;; Consider the whole pack as an
 				       ;; unknown option.
 				       (t
-					(endpush (make-cmdline-option
-						  :name name
-						  :value
-						  (maybe-next-cmdline-arg))
-						 desclist))))
+					(push (make-cmdline-option
+					       :name name
+					       :value
+					       (maybe-next-cmdline-arg))
+					      desclist))))
 				(t
 				 ;; There's more than one character left. As
 				 ;; above, consider the whole pack as an
 				 ;; unknown option.
-				 (endpush (make-cmdline-option
-					   :name name
-					   :value
-					   (maybe-next-cmdline-arg))
-					  desclist))))))))
+				 (push (make-cmdline-option
+					:name name
+					:value
+					(maybe-next-cmdline-arg))
+				       desclist))))))))
 	      ;; A short (possibly unknown) switch, or a plus pack.
 	      ((string-start arg "+")
 	       (let ((name (subseq arg 1))
@@ -301,21 +311,21 @@ otherwise."
 			;; anything. We could try to be more clever and detect
 			;; that the option's type is wrong, but I'm too lazy
 			;; to do that right now.
-			(endpush (make-cmdline-option
-				  :name name :option option :value "no")
-				 desclist))
+			(push (make-cmdline-option
+			       :name name :option option :value "no")
+			      desclist))
 		       ((plus-pack context)
 			;; Let's find out whether it is a plus pack:
 			(let ((trimmed (string-left-trim (plus-pack context)
 							 name)))
 			  (cond ((zerop (length trimmed))
 				 ;; We found a plus pack
-				 (endpush
+				 (push
 				  (make-cmdline-pack :type :plus :contents name)
 				  desclist))
 				(t
 				 ;; We found an unknown switch:
-				 (endpush
+				 (push
 				  (make-cmdline-option :name name :value "no")
 				  desclist))))))))
 	      ;; Otherwise, it's junk.
@@ -327,8 +337,8 @@ otherwise."
 		      (setq arglist nil))
 		     (t
 		      ;; Otherwise, that's really junk:
-		      (endpush arg desclist)))))))
-    (setf (arglist context) desclist)))
+		      (push arg desclist)))))))
+    (setf (arglist context) (nreverse desclist))))
 
 (defmethod seal :after ((context context))
   "Immediately handle Clon's internal options."
@@ -355,32 +365,34 @@ an OPTION object."
   (let ((minus-char (let ((mc (minus-char option)))
 		      (when mc (coerce mc 'character))))
 	(plus-char (let ((mc (plus-char option)))
-		     (when mc (coerce mc 'character)))))
-    (loop :for desclist :on (arglist context)
-	  :for item = (cadr desclist)
-	  :while item
-	  :do (cond ((and (cmdline-option-p item)
-			  (eq (cmdline-option-option item) option))
-		     (rplacd desclist (cddr desclist))
-		     (return-from getopt
-		       (convert option
-			 (cmdline-option-name item)
-			 (cmdline-option-value item))))
-		    ((and (cmdline-pack-p item)
-			  (eq (cmdline-pack-type item) :minus)
-			  minus-char
-			  (position minus-char (cmdline-pack-contents item)))
-		     (setf (cmdline-pack-contents item)
-			   (remove minus-char (cmdline-pack-contents item)))
-		     (return-from getopt
-		       (convert option (short-name option) "yes")))
-		    ((and (cmdline-pack-p item)
-			  (eq (cmdline-pack-type item) :plus)
-			  plus-char
-			  (position plus-char (cmdline-pack-contents item)))
-		     (setf (cmdline-pack-contents item)
-			   (remove plus-char (cmdline-pack-contents item)))
-		     (return-from getopt
-		       (convert option (short-name option) "no")))))))
+		     (when mc (coerce mc 'character))))
+	(arglist (list)))
+    (do ((arg (pop (arglist context)) (pop (arglist context))))
+	((null arg))
+      ;; #### NOTE: actually, I *do* have a use for nreconc ;-)
+      (cond ((and (cmdline-option-p arg) (eq (cmdline-option-option arg) option))
+	     (setf (arglist context) (nreconc arglist (arglist context)))
+	     (return-from getopt (convert option
+				   (cmdline-option-name arg)
+				   (cmdline-option-value arg))))
+	    ((and (cmdline-pack-p arg)
+		  (eq (cmdline-pack-type arg) :minus)
+		  minus-char
+		  (position minus-char (cmdline-pack-contents arg)))
+	     (setf (cmdline-pack-contents arg)
+		   (remove minus-char (cmdline-pack-contents arg)))
+	     (setf (arglist context) (nreconc (push arg arglist) (arglist context)))
+	     (return-from getopt (convert option (short-name option) "yes")))
+	    ((and (cmdline-pack-p arg)
+		  (eq (cmdline-pack-type arg) :plus)
+		  plus-char
+		  (position plus-char (cmdline-pack-contents arg)))
+	     (setf (cmdline-pack-contents arg)
+		   (remove plus-char (cmdline-pack-contents arg)))
+	     (setf (arglist context) (nreconc (push arg arglist) (arglist context)))
+	     (return-from getopt (convert option (short-name option) "no")))
+	    (t
+	     (push arg arglist))))
+    (setf (arglist context) (nreverse arglist))))
 
 ;;; context.lisp ends here

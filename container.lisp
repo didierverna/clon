@@ -117,6 +117,9 @@ command-line hierarchy."))
 	     container)))
   (:method ((container container) item)
     "Add ITEM to CONTAINER."
+    ;; #### FIXME: efficiency is really not a concern here, but it would be
+    ;; better to just push the elements, and then reverse them when sealing
+    ;; the container.
     (endpush item (container-items container))))
 
 
