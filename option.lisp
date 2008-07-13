@@ -252,7 +252,7 @@ This class implements options that don't take any argument."))
 		  :initarg :argument-name)
    (argument-required-p :documentation "Whether the option's argument is required."
 			;; This slot will be initialized afterwards, according
-			;;to the :argument-type initarg.
+			;; to the :argument-type initarg.
 			:reader argument-required-p)
    (default-value :documentation "The option's default value."
 		 :type (or null string)

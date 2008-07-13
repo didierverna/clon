@@ -127,6 +127,10 @@ command-line hierarchy."))
 ;; The Name Clash Check Protocol
 ;; ============================================================================
 
+;; #### NOTE: currently, name clashes are considered on short and long names
+;; independently. That is, it is possible to have a short name identical to a
+;; long one, although I don't see why you would want to do that.
+
 (defgeneric check-name-clash (item1 item2)
   (:documentation
    "Check for name clash between ITEM1's options and ITEM2's options.")
