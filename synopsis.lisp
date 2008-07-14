@@ -125,8 +125,8 @@ otherwise."
   "Compute the minus and plus packs of SYNOPSIS."
   (let (minus-pack plus-pack)
     (do-options (option synopsis)
-      (let ((minus-char (minus-char option))
-	    (plus-char (plus-char option)))
+      (let ((minus-char (minus-char option :as-string))
+	    (plus-char (plus-char option  :as-string)))
 	(when minus-char
 	  (setq minus-pack (concatenate 'string minus-pack minus-char)))
 	(when plus-char

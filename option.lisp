@@ -154,19 +154,22 @@ OPTION's names must match either SHORT-NAME, LONG-NAME, or PARTIAL-(long)-NAME."
 ;; The Char Packs  Protocol
 ;; ============================================================================
 
-(defgeneric minus-char (option)
-  ;; #### NOTE: we actually don't return a char, but a string of length 1.
-  (:documentation "Return OPTION's minus char, if any.")
-  (:method ((option option))
-    "Return OPTION's minus char, if any."
+(defgeneric minus-char (option &optional as-string)
+  (:documentation "Return OPTION's minus char, if any.
+If AS-STRING is not nil, return a string of that character.")
+  (:method ((option option)  &optional as-string)
+    "Return OPTION's minus char, if any.
+If AS-STRING is not nil, return a string of that character."
     (with-slots (short-name) option
       (when (and short-name (= (length short-name) 1))
-	short-name))))
+	(if as-string
+	    short-name
+	    (coerce short-name 'character))))))
 
-(defgeneric plus-char (option)
-  ;; #### NOTE: we actually don't return a char, but a string of length 1.
-  (:documentation "Return OPTION's plus char, if any.")
-  (:method ((option option))
+(defgeneric plus-char (option &optional as-string)
+  (:documentation "Return OPTION's plus char, if any.
+If AS-STRING is not nil, return a string of that character.")
+  (:method ((option option) &optional as-string)
     "Return nil (only switches are plus-packable)."
     nil))
 
@@ -315,8 +318,9 @@ This class implements is the base class for options accepting arguments."))
 ;; Options with a one-character short name and requiring an argument may
 ;; appear as the last option in a minus pack. However, we don't make them
 ;; appear in the usage string.
-(defmethod minus-char ((option valued-option))
-  "Return OPTION's minus char, if any."
+(defmethod minus-char ((option valued-option) &optional as-string)
+  "Return OPTION's minus char, if any.
+If AS-STRING is not nil, return a string of that character."
   (unless (argument-required-p option)
     (call-next-method)))
 
@@ -393,9 +397,9 @@ This class implements boolean options."))
 ;; Char packs protocol
 ;; -------------------
 
-(defmethod plus-char ((option switch))
+(defmethod plus-char ((option switch) &optional as-string)
   "Return OPTION's plus char (same as minus char for switches)."
-  (minus-char option))
+  (minus-char option as-string))
 
 
 ;; ============================================================================
