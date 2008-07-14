@@ -52,20 +52,25 @@
 		:type (or null string)
 		:reader description
 		:initarg :description)
+   (env-var :documentation "The option's associated environment variable."
+	    :type (or null string)
+	    :reader env-var
+	    :initarg :env-var)
    (traversed :documentation "Whether the option's been traversed."
 	      :accessor option-traversed
 	      :initform nil))
   (:default-initargs
     :short-name nil
     :long-name nil
-    :description nil)
+    :description nil
+    :env-var nil)
   (:documentation "The OPTION class.
 This class is the base class for all options."))
 
 (defmethod initialize-instance :before
-    ((option option) &rest keys &key short-name long-name description)
+    ((option option) &rest keys &key short-name long-name description env-var)
   "Check consistency of OPTION's initargs."
-  (declare (ignore description))
+  (declare (ignore description env-var))
   (unless (or short-name long-name)
     (error "Option ~A: no name given." option))
   ;; #### FIXME: is this really necessary ? What about the day I would like
@@ -200,7 +205,7 @@ If AS-STRING is not nil, return a string of that character.")
   (:documentation "The FLAG class.
 This class implements options that don't take any argument."))
 
-(defun make-flag (&rest keys &key short-name long-name description)
+(defun make-flag (&rest keys &key short-name long-name description env-var)
   "Make a new flag.
 - SHORT-NAME is the option's short name without the dash.
   It defaults to nil.
@@ -208,14 +213,15 @@ This class implements options that don't take any argument."))
   It defaults to nil.
 - DESCRIPTION is the option's description appearing in help strings.
   It defaults to nil."
-  (declare (ignore short-name long-name description))
+  (declare (ignore short-name long-name description env-var))
   (apply #'make-instance 'flag keys))
 
-(defun make-internal-flag (long-name description)
+(defun make-internal-flag (long-name description &optional env-var)
   "Make a new internal flag."
   (make-instance 'flag
     :long-name (concatenate 'string "clon-" long-name)
     :description description
+    :env-var env-var
     ;; #### FIXME: I'm not quite satisfied with this design here. Other
     ;; possibilities would be to:
     ;; - temporarily set a global variable like *internal*, but /yuck/.
@@ -260,16 +266,11 @@ This class implements options that don't take any argument."))
    (default-value :documentation "The option's default value."
 		 :type (or null string)
 		 :reader default-value
-		 :initarg :default-value)
-   (env-var :documentation "The option's associated environment variable."
-	    :type (or null string)
-	    :reader env-var
-	    :initarg :env-var))
+		 :initarg :default-value))
   (:default-initargs
     :argument-name "ARG"
     :argument-type :required
-    :default-value nil
-    :env-var nil)
+    :default-value nil)
   (:documentation "The VALUED-OPTION class.
 This class implements is the base class for options accepting arguments."))
 
