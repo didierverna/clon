@@ -102,6 +102,6 @@
     (clon::seal synopsis)
     (clon::make-context
      :synopsis synopsis
-     :cmdline '("foo" "--deb=yes" "-vdi" "-F" "verna" "--foobar" "baro" "--" "baz"))))
+     :cmdline '("foo" "--deb=yes" "--help=yes" "-vdi" "-F" "verna" "--foobar" "baro" "--" "baz"))))
 
 ;;; test.lisp ends here

@@ -180,7 +180,7 @@ If AS-STRING is not nil, return a string of that character.")
 
 
 ;; ============================================================================
-;; The Convertion Protocol
+;; The Conversion Protocol
 ;; ============================================================================
 
 (defgeneric convert-value (option name value)
@@ -236,7 +236,7 @@ This class implements options that don't take any argument."))
 ;; Option searching protocol
 ;; -------------------------
 
-(defmethod option-matches-sticky ((option flag) namearg)
+(defmethod option-matches-sticky ((flag flag) namearg)
   "Return nil (flags don't have any argument)."
   nil)
 
@@ -245,14 +245,24 @@ This class implements options that don't take any argument."))
 ;; Conversion protocol
 ;; -------------------
 
-(defmethod convert-value ((option flag) name value)
-  "Always return t."
-  t)
+(defmethod convert-value ((flag flag) name value)
+  "Retrieve command line status for FLAG.
+This method returns two values:
+- the first one is :CMDLINE,
+- the second one is T if the command line status is OK, or the list
+  '(NAME :EXTRA-ARGUMENT VALUE) if FLAG was given an argument."
+  ;; We always return :cmdline first because this converter is only called
+  ;; when FLAG is actually found on the command line.
+  (let ((status (if value (list name :extra-argument value) t)))
+    (values :cmdline status)))
 
-(defmethod convert-environment ((option flag))
-  "Return t if an OPTION's associated env var exists."
+(defmethod convert-environment ((flag flag))
+  "Retrieve environment status for FLAG.
+This method returns :ENV-VAR if FLAG has an associated and existing
+environment variable, or nil otherwise."
   ;; #### FIXME: SBCL-specific
-  (sb-ext:posix-getenv (env-var option)))
+  (when (sb-ext:posix-getenv (env-var flag))
+    :env-var))
 
 
 ;; ============================================================================
@@ -416,6 +426,20 @@ This class implements boolean options."))
 (defmethod plus-char ((option switch) &optional as-string)
   "Return OPTION's plus char (same as minus char for switches)."
   (minus-char option as-string))
+
+
+;; -------------------
+;; Conversion protocol
+;; -------------------
+
+(defmethod convert-value ((option switch) name value)
+  "."
+  t)
+
+(defmethod convert-environment ((option switch))
+  "Return t if an OPTION's associated env var exists."
+  ;; #### FIXME: SBCL-specific
+  (sb-ext:posix-getenv (env-var option)))
 
 
 ;; ============================================================================
