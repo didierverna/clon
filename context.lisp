@@ -368,7 +368,7 @@ an OPTION object."
       ;; #### NOTE: actually, I *do* have a use for nreconc, he he ;-)
       (cond ((and (cmdline-option-p arg) (eq (cmdline-option-option arg) option))
 	     (setf (arglist context) (nreconc arglist (arglist context)))
-	     (return-from getopt (convert option
+	     (return-from getopt (convert-value option
 				   (cmdline-option-name arg)
 				   (cmdline-option-value arg))))
 	    ((and (cmdline-pack-p arg)
@@ -378,7 +378,10 @@ an OPTION object."
 	     (setf (cmdline-pack-contents arg)
 		   (remove minus-char (cmdline-pack-contents arg)))
 	     (setf (arglist context) (nreconc (push arg arglist) (arglist context)))
-	     (return-from getopt (convert option (short-name option) "yes")))
+	     (return-from getopt (convert-value option
+				   (short-name option)
+				   (unless (eq (type-of option) 'flag)
+				     "yes"))))
 	    ((and (cmdline-pack-p arg)
 		  (eq (cmdline-pack-type arg) :plus)
 		  plus-char
@@ -386,9 +389,11 @@ an OPTION object."
 	     (setf (cmdline-pack-contents arg)
 		   (remove plus-char (cmdline-pack-contents arg)))
 	     (setf (arglist context) (nreconc (push arg arglist) (arglist context)))
-	     (return-from getopt (convert option (short-name option) "no")))
+	     (return-from getopt (convert-value option (short-name option) "no")))
 	    (t
 	     (push arg arglist))))
-    (setf (arglist context) (nreverse arglist))))
+    (setf (arglist context) (nreverse arglist)))
+  ;; Not found: try an env var
+  (convert-environment option))
 
 ;;; context.lisp ends here

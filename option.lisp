@@ -183,10 +183,11 @@ If AS-STRING is not nil, return a string of that character.")
 ;; The Convertion Protocol
 ;; ============================================================================
 
-(defgeneric convert (option name value)
-  (:documentation "Convert command line VALUE for OPTION called with NAME.")
-  (:method (option name value)
-    (values option name value)))
+(defgeneric convert-value (option name value)
+  (:documentation "Convert command line VALUE for OPTION called with NAME."))
+
+(defgeneric convert-environment (option)
+  (:documentation "Get OPTION's value from environment."))
 
 
 ;; ============================================================================
@@ -238,6 +239,20 @@ This class implements options that don't take any argument."))
 (defmethod option-matches-sticky ((option flag) namearg)
   "Return nil (flags don't have any argument)."
   nil)
+
+
+;; -------------------
+;; Conversion protocol
+;; -------------------
+
+(defmethod convert-value ((option flag) name value)
+  "Always return t."
+  t)
+
+(defmethod convert-environment ((option flag))
+  "Return t if an OPTION's associated env var exists."
+  ;; #### FIXME: SBCL-specific
+  (sb-ext:posix-getenv (env-var option)))
 
 
 ;; ============================================================================

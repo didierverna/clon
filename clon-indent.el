@@ -33,7 +33,9 @@
 
 ;;; Code:
 
-(dolist (symbol '(select-keys remove-keys add-to convert))
+(dolist (symbol '(select-keys remove-keys
+		  add-to
+		  convert-value convert-environment))
   (put symbol 'common-lisp-indent-function 1))
 
 (dolist (symbol '(make-internal-stropt make-internal-switch))
