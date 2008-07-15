@@ -106,7 +106,7 @@ Extract program name, options, remainder and junk."
       (macrolet ((no-more-option ()
 		   '(notany #'option-p cmdline))
 		 (maybe-next-cmdline-arg ()
-		   '(unless (option-p (car cmdline))
+		   '(when (and (car cmdline) (not (option-p (car cmdline))))
 		     (pop cmdline))))
 	(do ((arg (pop cmdline) (pop cmdline)))
 	    ((null arg))
@@ -279,6 +279,7 @@ Extract program name, options, remainder and junk."
 					 arglist))))))))
 		;; A short (possibly unknown) switch, or a plus pack.
 		((string-start arg "+")
+		 ;; #### FIXME: check invalid syntax +foo=val
 		 (let ((name (subseq arg 1))
 		       option)
 		   (cond ((setq option (search-option (synopsis context)
@@ -368,9 +369,8 @@ an OPTION object."
       ;; #### NOTE: actually, I *do* have a use for nreconc, he he ;-)
       (cond ((and (cmdline-option-p arg) (eq (cmdline-option-option arg) option))
 	     (setf (arglist context) (nreconc arglist (arglist context)))
-	     (return-from getopt (convert-value option
-				   (cmdline-option-name arg)
-				   (cmdline-option-value arg))))
+	     (return-from getopt (convert-value option (cmdline-option-value arg)
+				   :name (cmdline-option-name arg))))
 	    ((and (cmdline-pack-p arg)
 		  (eq (cmdline-pack-type arg) :minus)
 		  minus-char
@@ -378,10 +378,7 @@ an OPTION object."
 	     (setf (cmdline-pack-contents arg)
 		   (remove minus-char (cmdline-pack-contents arg)))
 	     (setf (arglist context) (nreconc (push arg arglist) (arglist context)))
-	     (return-from getopt (convert-value option
-				   (short-name option)
-				   (unless (eq (type-of option) 'flag)
-				     "yes"))))
+	     (return-from getopt (convert-value option nil :source :minus-pack)))
 	    ((and (cmdline-pack-p arg)
 		  (eq (cmdline-pack-type arg) :plus)
 		  plus-char
@@ -389,11 +386,14 @@ an OPTION object."
 	     (setf (cmdline-pack-contents arg)
 		   (remove plus-char (cmdline-pack-contents arg)))
 	     (setf (arglist context) (nreconc (push arg arglist) (arglist context)))
-	     (return-from getopt (convert-value option (short-name option) "no")))
+	     (return-from getopt (convert-value option nil :source :plus-pack)))
 	    (t
 	     (push arg arglist))))
     (setf (arglist context) (nreverse arglist)))
   ;; Not found: try an env var
-  (convert-environment option))
+  ;; #### FIXME: SBCL-specific
+  (let ((value (sb-posix:getenv (env-var option))))
+    (when value
+      (convert-value option value :source :environment))))
 
 ;;; context.lisp ends here

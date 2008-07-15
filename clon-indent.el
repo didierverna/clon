@@ -38,7 +38,7 @@
 		  convert-value convert-environment))
   (put symbol 'common-lisp-indent-function 1))
 
-(dolist (symbol '(make-internal-stropt make-internal-switch))
+(dolist (symbol '(make-internal-stropt make-internal-switch convert-value))
   (put symbol 'common-lisp-indent-function 2))
 
 (put 'do-options 'common-lisp-indent-function '((&whole 4 2 1) &body))

@@ -183,11 +183,11 @@ If AS-STRING is not nil, return a string of that character.")
 ;; The Conversion Protocol
 ;; ============================================================================
 
-(defgeneric convert-value (option name value)
-  (:documentation "Convert command line VALUE for OPTION called with NAME."))
+(defgeneric convert-value (option value &key source name)
+  (:documentation "Convert VALUE string for OPTION.
+- SOURCE is where the value comes from.
+- NAME is the option's name to use to report errors."))
 
-(defgeneric convert-environment (option)
-  (:documentation "Get OPTION's value from environment."))
 
 
 ;; ============================================================================
@@ -245,24 +245,31 @@ This class implements options that don't take any argument."))
 ;; Conversion protocol
 ;; -------------------
 
-(defmethod convert-value ((flag flag) name value)
-  "Retrieve command line status for FLAG.
+(defmethod convert-value ((flag flag) value &key source name)
+  "Convert VALUE for FLAG, coming from SOURCE and called with NAME.
 This method returns two values:
 - the first one is :CMDLINE,
 - the second one is T if the command line status is OK, or the list
   '(NAME :EXTRA-ARGUMENT VALUE) if FLAG was given an argument."
-  ;; We always return :cmdline first because this converter is only called
-  ;; when FLAG is actually found on the command line.
-  (let ((status (if value (list name :extra-argument value) t)))
-    (values :cmdline status)))
-
-(defmethod convert-environment ((flag flag))
-  "Retrieve environment status for FLAG.
-This method returns :ENV-VAR if FLAG has an associated and existing
-environment variable, or nil otherwise."
-  ;; #### FIXME: SBCL-specific
-  (when (sb-ext:posix-getenv (env-var flag))
-    :env-var))
+  (unless source (setq source :option))
+  (unless name (setq name (or (long-name flag) (short-name flag))))
+  ;; Always return t because a flag has no value (it is simply given or not).
+  ;; The cases not handled below are OK:
+  ;; - If the source is a minus pack, the status is necessarily OK.
+  ;; - If the source is the environment (and contrary to the :option case), we
+  ;;   simply disregard the value because and env var can't just exist without
+  ;;   a value. Its value is at least the empty string.
+  (let ((status t))
+    (case source
+      (:option
+       (when value
+	 (setq status (list name :extra-argument value)))))
+    ;; Actually, not. A flag couldn't be recognized as coming from a plus
+    ;; pack, because it is not plus-packable.
+    ;;      (:plus-pack
+    ;;       (setq status (list name :plus-syntax))))
+    (assert (not (eq source :plus-pack)))
+    (values t source status)))
 
 
 ;; ============================================================================
@@ -432,14 +439,9 @@ This class implements boolean options."))
 ;; Conversion protocol
 ;; -------------------
 
-(defmethod convert-value ((option switch) name value)
-  "."
+(defmethod convert-value ((option switch) value &key source name)
   t)
 
-(defmethod convert-environment ((option switch))
-  "Return t if an OPTION's associated env var exists."
-  ;; #### FIXME: SBCL-specific
-  (sb-ext:posix-getenv (env-var option)))
 
 
 ;; ============================================================================
@@ -489,6 +491,15 @@ This class implements options the values of which are strings."))
 	 :allow-other-keys t
 	 :internal t
 	 (remove-keys keys :env-var)))
+
+
+;; -------------------
+;; Conversion protocol
+;; -------------------
+
+(defmethod convert-value ((option stropt) value &key source name)
+  t)
+
 
 
 ;;; option.lisp ends here
