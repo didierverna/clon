@@ -298,7 +298,7 @@ This class implements is the base class for options accepting arguments."))
 
 (defmethod initialize-instance :before
     ((option valued-option) &key argument-name argument-type default-value env-var)
-  "Check consistency OPTION's value-related initargs."
+  "Check consistency of OPTION's value-related initargs."
   (declare (ignore env-var))
   (when (or (null argument-name)
 	    (and argument-name (zerop (length argument-name))))
@@ -306,11 +306,7 @@ This class implements is the base class for options accepting arguments."))
   (unless (or (eq argument-type :required)
 	      (eq argument-type :mandatory)
 	      (eq argument-type :optional))
-    (error "Option ~A: invalid argument type ~S." option argument-type))
-  ;; #### FIXME: I can't remember why we don't accept empty default values,
-  ;; but right now it feels wrong to me.
-  (when (and default-value (zerop (length default-value)))
-    (error "option ~A: empty default value." option)))
+    (error "Option ~A: invalid argument type ~S." option argument-type)))
 
 (defmethod initialize-instance :after
     ((option valued-option) &key argument-name argument-type default-value env-var)

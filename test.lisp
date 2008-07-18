@@ -41,7 +41,8 @@
 		       :description
 		       "both names, argument required, another name"
 		       :argument-name "on(off)"
-		       :argument-type :required))
+		       :argument-type :required
+		       :default-value t))
   (clon::add-to grp
     (clon::make-switch :short-name "n"
 		       :description "short name, whatever the argument"))
@@ -68,7 +69,8 @@
 		       :description
 		       "both names, optional argument, another name"
 		       :argument-type :optional
-		       :argument-name "NAME"))
+		       :argument-name "NAME"
+		       :default-value "unknown"))
   (clon::add-to grp
     (clon::make-stropt :short-name "a"
 		       :description
