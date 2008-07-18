@@ -35,7 +35,7 @@
 
 
 ;; ============================================================================
-;; Basic auxiliary routines
+;; Misc auxiliary routines
 ;; ============================================================================
 
 (defmacro endpush (object place)
@@ -48,6 +48,13 @@ This check also protects against too short strings."
   (let ((length (length start)))
     (and (>= (length string) length)
 	 (string= string start :end1 length))))
+
+(defun complete-started-string (start full)
+  "Complete START with the rest of FULL in parentheses.
+START must be the beginning of FULL.
+For instance, completing he with help will produce he(lp)."
+  (assert (string-start full start))
+  (concatenate 'string start "(" (subseq full (length start)) ")"))
 
 
 ;; ============================================================================

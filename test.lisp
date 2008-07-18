@@ -52,7 +52,7 @@
 			:argument-name "true(false)"))
   (clon::add-to grp
     (clon::make-switch  :long-name "simulate"
-			:description "long name, optional argument"
+			:description "long name, required argument"
 			:argument-type :required))
   (clon::seal grp)
   (clon::add-to *synopsis* grp))

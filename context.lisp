@@ -35,18 +35,14 @@
 
 
 ;; ============================================================================
-;; The Command-Line Structures
+;; The Command-Line Structure
 ;; ============================================================================
 
 (defstruct cmdline-option
-  name ;; the name as it appears on the command line
-  option ;; the actual option is corresponds to, or null if unknown
-  value ;; the option's value as it appears on the command line
-  )
-
-(defstruct cmdline-pack
-  type ;; either :minus or :plus
-  contents ;; the contents (characters) of the pack
+  name ;; the option's name used on the cmdline
+  option ;; the corresponding option object
+  value ;; the corresponding converted value
+  status ;; the status of the conversion
   )
 
 
@@ -87,8 +83,7 @@ command-line options."))
     (error "Initializing context ~A: synopsis ~A not sealed." context synopsis)))
 
 (defmethod initialize-instance :after ((context context) &key synopsis cmdline)
-  "Parse CMDLINE.
-Extract program name, options, remainder and junk."
+  "Parse CMDLINE."
   (declare (ignore synopsis))
   (setf (slot-value context 'progname) (pop cmdline))
   ;; ### FIXME: all the stuff below is not very well abstracted.
@@ -118,153 +113,347 @@ Extract program name, options, remainder and junk."
 		;; A long (possibly unknown) option:
 		((string-start arg "--")
 		 (let* ((value-start (position #\= arg :start 2))
-			(name (subseq arg 2 value-start))
-			;; #### NOTE: we authorize partial matching
-			;; (abreviations) for long names: an exact match is
-			;; search first. If that fails, we try partial
-			;; matching, and the first matching option is
-			;; returned. For instance, if you have --foobar and
-			;; --foo options in that order, passing --foo will
-			;; match the option --foo, but passing --fo will match
-			;; --foobar. I'm not sure this is the best behavior in
-			;; such cases. Think harder about this.
-			(option (or (search-option (synopsis context)
-				      :long-name name)
-				    (search-option (synopsis context)
-				      :partial-name name)))
-			(value (when value-start
-				 (subseq arg (1+ value-start)))))
-		   (cond ((eq (type-of option) 'flag) ;; a flag
-			  ;; If we have an argument for a flag here (in case
-			  ;; of --flag=nonsense), we register it so that the
-			  ;; converter can later report the error. However, in
-			  ;; case of "--flag nonsense", we don't consider the
-			  ;; next cmdline item as a spurious arg. Rather, the
-			  ;; next iteration will put it either into the junk
-			  ;; category, or into the remainder.
+			(cmdline-name (subseq arg 2 value-start))
+			(cmdline-value (when value-start
+					 (subseq arg (1+ value-start))))
+			(option (search-option (synopsis context)
+				  :long-name cmdline-name)))
+		   ;; #### NOTE: we authorize partial matching (abreviations)
+		   ;; for long names: an exact match is search first. If that
+		   ;; fails, we try partial matching, and the first matching
+		   ;; option is returned. For instance, if you have --foobar
+		   ;; and --foo options in that order, passing --foo will
+		   ;; match the option --foo, but passing --fo will match
+		   ;; --foobar. This is probably not the best behavior: it
+		   ;; would be better to find the option "closest" to the
+		   ;; partial match.
+		   (unless option
+		     (when (setq option (search-option (synopsis context)
+					  :partial-name cmdline-name))
+		       ;; The cmdline option's name is the long one, but in
+		       ;; case of abbreviation (for instance --he instead of
+		       ;; --help), we will display it like this: he(lp). In
+		       ;; case of error report, this is closer to what the
+		       ;; user actually typed.
+		       (setq cmdline-name (complete-started-string
+					   cmdline-name (long-name option)))))
+		   (cond ((eq (type-of option) 'flag)
+			  ;; This is a flag. Here, we can't avoid noticing
+			  ;; when a flag was given an argument through an
+			  ;; =-syntax. However, we don't check whether the
+			  ;; next cmdline item could be a spurious arg,
+			  ;; because that would mess with a possible automatic
+			  ;; remainder detection. Rather, the next iteration
+			  ;; will put it either into the junk category, or
+			  ;; into the remainder.
 			  (push (make-cmdline-option
-				 :name (long-name option)
+				 :name cmdline-name
 				 :option option
-				 :value value)
+				 :value t
+				 :status (if cmdline-value
+					     (list :extra-argument cmdline-value)
+					     t))
 				arglist))
-			 (option ;; another (but then, valued) option
-			  ;; If the option requires an argument, but none is
-			  ;; provided by an =-syntax, we might find it in the
-			  ;; next cmdline item, unless it looks like an option
-			  ;; (but then, the converter will later report a
-			  ;; missing argument error). Optional arguments are
+			 ((eq (type-of option) 'switch)
+			  ;; This is a switch. The difference with other
+			  ;; valued options (see below) is that an omitted
+			  ;; optional argument stands for a "yes".
+			  (cond ((argument-required-p option)
+				 (unless cmdline-value
+				   (setq cmdline-value
+					 (maybe-next-cmdline-arg)))
+				 (if cmdline-value
+				     (destructuring-bind (value status)
+					 (retrieve option cmdline-value)
+				       (push (make-cmdline-option
+					      :name cmdline-name
+					      :option option
+					      :value value
+					      :status status)
+					     arglist))
+				     (push (make-cmdline-option
+					    :name cmdline-name
+					    :option option
+					    :value (default-value option)
+					    :status
+					    (list :missing-argument))
+					   arglist)))
+				(t
+				 (if cmdline-value
+				     (destructuring-bind (value status)
+					 (retrieve option cmdline-value)
+				       (push (make-cmdline-option
+					      :name cmdline-name
+					      :option option
+					      :value value
+					      :status status)
+					     arglist))
+				     (push (make-cmdline-option
+					    :name cmdline-name
+					    :option option
+					    :value t ;; omitted means "yes"
+					    :status t)
+					   arglist)))))
+			 (option
+			  ;; This is a valued option. If the option requires
+			  ;; an argument, but none is provided by an =-syntax,
+			  ;; we might find it in the next cmdline item, unless
+			  ;; it looks like an option, in which case it is a
+			  ;; missing argument error. Optional arguments are
 			  ;; only available through the =-syntax, so we don't
 			  ;; look into the next cmdline item. If the next
 			  ;; cmdline item is not an option, the next iteration
 			  ;; will put it either into the junk category, or
 			  ;; into the remainder.
+			  (cond ((argument-required-p option)
+				 (unless cmdline-value
+				   (setq cmdline-value
+					 (maybe-next-cmdline-arg)))
+				 (if cmdline-value
+				     (destructuring-bind (value status)
+					 (retrieve option cmdline-value)
+				       (push (make-cmdline-option
+					      :name cmdline-name
+					      :option option
+					      :value value
+					      :status status)
+					     arglist))
+				     (push (make-cmdline-option
+					    :name cmdline-name
+					    :option option
+					    :value (default-value option)
+					    :status
+					    (list :missing-argument))
+					   arglist)))
+				(t
+				 (if cmdline-value
+				     (destructuring-bind (value status)
+					 (retrieve option cmdline-value)
+				       (push (make-cmdline-option
+					      :name cmdline-name
+					      :option option
+					      :value value
+					      :status status)
+					     arglist))
+				     (push (make-cmdline-option
+					    :name cmdline-name
+					    :option option
+					    :value (default-value option)
+					    :status t)
+					   arglist)))))
+			 (t
+			  ;; This is an unknown option. These ones are
+			  ;; considered to require an argument, because that
+			  ;; is the default in the valued-option abstract
+			  ;; class. This choice leaves less junk on the
+			  ;; cmdline. A missing argument to an unknown option
+			  ;; is not reported though (things are messed up well
+			  ;; enough already).
 			  (push (make-cmdline-option
-				 :name (long-name option)
-				 :option option
-				 :value (or value
-					    (when (argument-required-p option)
-					      (maybe-next-cmdline-arg))))
-				arglist))
-			 (t ;; an unknown option
-			  ;; Unknown options are considered to require an
-			  ;; argument, because that is the default. This
-			  ;; choice leaves less junk on the cmdline.
-			  (push (make-cmdline-option
-				 :name name
-				 :value (maybe-next-cmdline-arg))
+				 :name cmdline-name
+				 :value (or cmdline-value
+					    (maybe-next-cmdline-arg)))
 				arglist)))))
 		;; A short (possibly unknown) option or a minus pack:
 		((string-start arg "-")
-		 (let ((name (subseq arg 1))
+		 ;; #### FIXME: check invalid syntax -foo=val
+		 (let ((cmdline-name (subseq arg 1))
 		       option)
+		   ;; #### NOTE: we don't allow partial match on short names
+		   ;; because that would make it too complicated to
+		   ;; distinguish abreviations, sticky arguments and stuff.
 		   (cond ((setq option (search-option (synopsis context)
-					 :short-name name))
-			  (cond ((eq (type-of option) 'flag) ;; a flag
-				 ;; In case of "-flag nonsense", we don't
-				 ;; consider the next cmdline item as a
-				 ;; spurious arg. Rather, the next iteration
-				 ;; will put it either into the junk category,
-				 ;; or into the remainder.
+					 :short-name cmdline-name))
+			  (cond ((or (eq (type-of option) 'flag)
+				     (eq (type-of option) 'switch))
+				 ;; If this is a flag, we don't check whether
+				 ;; the next cmdline item could be a spurious
+				 ;; arg, because that would mess with a
+				 ;; possible automatic remainder detection.
+				 ;; Rather, the next iteration will put it
+				 ;; either into the junk category, or into the
+				 ;; remainder.
+				 ;;
+				 ;; If this is a switch, it doesn't take any
+				 ;; argument in short form (whether optional
+				 ;; or not), so we don't check anything
+				 ;; either. the minus form just means "yes".
 				 (push (make-cmdline-option
-					:name (short-name option)
-					:option option)
-				       arglist))
-				(option ;; another (but then, valued) option
-				 ;; If the option requires an argument, it
-				 ;; might be in the next cmdline item, unless
-				 ;; it looks like an option (but then, the
-				 ;; converter will later report a missing
-				 ;; argument error). Optional arguments are
-				 ;; necessary sticky, so we don't look into
-				 ;; the next cmdline item. If this option's
-				 ;; argument is optional and the next cmdline
-				 ;; item is not an option, the next iteration
-				 ;; will put it either into the junk category,
-				 ;; or into the remainder.
-				 (push (make-cmdline-option
-					:name (short-name option)
+					:name cmdline-name
 					:option option
-					:value (when (argument-required-p option)
-						 (maybe-next-cmdline-arg)))
-				       arglist))))
-			 ((setq option (search-sticky-option (synopsis context)
-							     name))
+					:value t
+					:status t)
+				       arglist))
+				(option
+				 ;; This is a valued option. If the option
+				 ;; requires an argument, we might find it in
+				 ;; the next cmdline item, unless it looks
+				 ;; like an option, in which case it is a
+				 ;; missing argument error. Optional arguments
+				 ;; are necessarily sticky, so we don't look
+				 ;; into the next cmdline item. If the next
+				 ;; cmdline item is not an option, the next
+				 ;; iteration will put it either into the junk
+				 ;; category, or into the remainder.
+				 (cond ((argument-required-p option)
+					(let ((cmdline-value
+					       (maybe-next-cmdline-arg)))
+					  (if cmdline-value
+					      (destructuring-bind (value status)
+						  (retrieve option cmdline-value)
+						(push (make-cmdline-option
+						       :name cmdline-name
+						       :option option
+						       :value value
+						       :status status)
+						      arglist))
+					      (push (make-cmdline-option
+						     :name cmdline-name
+						     :option option
+						     :value
+						     (default-value option)
+						     :status
+						     (list :missing-argument))
+						    arglist))))
+				       (t
+					(push (make-cmdline-option
+					       :name cmdline-name
+					       :option option
+					       :value (default-value option)
+					       :status t)
+					      arglist))))))
+			 ((setq option (search-sticky-option
+					(synopsis context) cmdline-name))
 			  ;; We found an option with a sticky argument.
 			  ;; #### NOTE: when looking for a sticky option, we
 			  ;; stop at the first match, even if, for instance,
 			  ;; another option would match a longer part of the
-			  ;; argument. I'm not sure this is the best behavior
-			  ;; in such cases. Think harder about this.
-			  (push (make-cmdline-option
-				 :name (short-name option)
-				 :option option
-				 :value (subseq name
-						(length (short-name option))))
-				arglist))
+			  ;; argument. This is probably not the best behavior:
+			  ;; it would be better to find the option "closest"
+			  ;; to the partial match.
+			  (destructuring-bind (value status)
+			      (retrieve option
+				(subseq cmdline-name
+					(length (short-name option))))
+			    (push (make-cmdline-option
+				   :name (short-name option)
+				   :option option
+				   :value value
+				   :status status)
+				  arglist)))
 			 ((minus-pack (synopsis context))
 			  ;; Let's find out whether this is a minus pack:
+			  ;; #### NOTE: the way things are currently designed,
+			  ;; only conformant options return a minus char. This
+			  ;; means that if a non-conformant option appears by
+			  ;; mistake in a minus pack, Clon won't detect that,
+			  ;; but will detect an unknown option instead.
 			  (let ((trimmed (string-left-trim
 					  (minus-pack (synopsis context))
-					  name)))
+					  cmdline-name)))
 			    (cond ((zerop (length trimmed))
-				   ;; We found a simple minus pack
-				   (push (make-cmdline-pack
-					  :type :minus :contents name)
-					 arglist))
+				   ;; We found a simple minus pack. Remember
+				   ;; that it is composed of flags, switches,
+				   ;; or options with optional argument (not
+				   ;; given here). Split the pack into
+				   ;; multiple option calls.
+				   (loop :for char :across cmdline-name
+					 :do
+					 (let* ((name (make-string
+						       1
+						       :initial-element char))
+						(option (search-option
+							    (synopsis context)
+							  :short-name
+							  name)))
+					   (assert option)
+					   (push (make-cmdline-option
+						  :name name
+						  :option option
+						  :value
+						  (if (or (eq (type-of option)
+							      'flag)
+							  (eq (type-of option)
+							      'switch))
+						      t
+						      (default-value option))
+						  :status t)
+						 arglist))))
 				  ((= (length trimmed) 1)
-				   ;; There's one character left: maybe a last
-				   ;; option in the pack requiring an argument
+				   ;; There's one character left: this can be
+				   ;; an option requiring an argument, with
+				   ;; the argument in the next cmdline item.
 				   ;; (remember that those options don't
 				   ;; appear in the minus pack description).
 				   (setq option (search-option (synopsis context)
 						  :short-name trimmed))
-				   (cond ((and option
-					       (argument-required-p option))
-					  ;; We found an option. Separate the
-					  ;; package into a simple minus pack,
-					  ;; and a cmdline option:
-					  (push
-					   (make-cmdline-pack
-					    :type :minus
-					    :contents
-					    (subseq name 0
-						    (1- (length name))))
-					   arglist)
-					  (push
-					   (make-cmdline-option
-					    :name trimmed
-					    :option option
-					    :value
-					    (maybe-next-cmdline-arg))
-					   arglist))
+				   (cond (option
+					  ;; We found an option. Split the
+					  ;; pack into multiple option calls,
+					  ;; including the last one which is a
+					  ;; bit different.
+					  (assert (argument-required-p option))
+					  ;; (otherwise, this option would
+					  ;; have appeared in the pack)
+					  (loop :for char
+					    :across
+					    (subseq cmdline-name 0
+						    (1- (length
+							 cmdline-name)))
+					    :do
+					    (let* ((name
+						    (make-string
+						     1
+						     :initial-element char))
+						   (option (search-option
+							       (synopsis
+								context)
+							     :short-name
+							     name)))
+					      (assert option)
+					      (push (make-cmdline-option
+						     :name name
+						     :option option
+						     :value
+						     (if (or (eq (type-of
+								  option)
+								 'flag)
+							     (eq (type-of
+								  option)
+								 'switch))
+							 t
+							 (default-value option))
+						     :status t)
+						    arglist)))
+					  (let ((cmdline-value
+						 (maybe-next-cmdline-arg)))
+					    (if cmdline-value
+						(destructuring-bind
+						      (value status)
+						    (retrieve option
+						      cmdline-value)
+						  (push (make-cmdline-option
+							 :name trimmed
+							 :option option
+							 :value value
+							 :status status)
+							arglist))
+						(push (make-cmdline-option
+						       :name trimmed
+						       :option option
+						       :value (default-value
+								  option)
+						       :status
+						       (list
+							:missing-argument))
+						      arglist))))
 					 ;; The last character doesn't
-					 ;; correspond to a known option
-					 ;; requiring and argument. Consider
-					 ;; the whole pack as an unknown
-					 ;; option.
+					 ;; correspond to a known option.
+					 ;; Consider the whole pack as an
+					 ;; unknown option.
 					 (t
 					  (push (make-cmdline-option
-						 :name name
+						 :name cmdline-name
 						 :value
 						 (maybe-next-cmdline-arg))
 						arglist))))
@@ -273,47 +462,59 @@ Extract program name, options, remainder and junk."
 				   ;; above, consider the whole pack as an
 				   ;; unknown option.
 				   (push (make-cmdline-option
-					  :name name
-					  :value
-					  (maybe-next-cmdline-arg))
+					  :name cmdline-name
+					  :value (maybe-next-cmdline-arg))
 					 arglist))))))))
 		;; A short (possibly unknown) switch, or a plus pack.
 		((string-start arg "+")
 		 ;; #### FIXME: check invalid syntax +foo=val
-		 (let ((name (subseq arg 1))
+		 (let ((cmdline-name (subseq arg 1))
 		       option)
 		   (cond ((setq option (search-option (synopsis context)
-					 :short-name name))
+					 :short-name cmdline-name))
 			  ;; We found an option.
-			  ;; #### NOTE: the value we assign to the option here
-			  ;; is "no" since the option is supposed to be a
-			  ;; switch. In case of a usage error (not a switch),
-			  ;; we have a problem that might or might not be
-			  ;; detected at retrieval time: flags would notice an
-			  ;; extra value, a user converter might notice an
-			  ;; invalid value, but a simple stropt would not
-			  ;; notice anything. We could try to be more clever
-			  ;; and detect that the option's type is wrong, but
-			  ;; on the other hand, the +stropt is a funny trick
-			  ;; to use even for non boolean options.
 			  (push (make-cmdline-option
-				 :name name :option option :value "no")
+				 :name cmdline-name
+				 :option option
+				 :value (etypecase option
+					  (flag t)
+					  (switch nil)
+					  (t (default-value option)))
+				 :status (if (eq (type-of option) 'switch)
+					     t
+					     (list :invliad-+-syntax)))
 				arglist))
 			 ((plus-pack (synopsis context))
 			  ;; Let's find out whether it is a plus pack:
 			  (let ((trimmed (string-left-trim
 					  (plus-pack (synopsis context))
-					  name)))
+					  cmdline-name)))
 			    (cond ((zerop (length trimmed))
-				   ;; We found a plus pack
-				   (push
-				    (make-cmdline-pack
-				     :type :plus :contents name)
-				    arglist))
+				   ;; We found a plus pack. Split the pack
+				   ;; into multiple option calls.
+				   (loop :for char :across cmdline-name
+					 :do
+					 (let* ((name (make-string
+						       1
+						       :initial-element char))
+						(option (search-option
+							    (synopsis context)
+							  :short-name
+							  name)))
+					   (assert option)
+					   (assert (eq (type-of option)
+						       'switch))
+					   (push (make-cmdline-option
+						  :name name
+						  :option option
+						  :value nil
+						  :status t)
+						 arglist))))
 				  (t
 				   ;; We found an unknown switch:
 				   (push
-				    (make-cmdline-option :name name :value "no")
+				    (make-cmdline-option :name cmdline-name
+							 :value "no")
 				    arglist))))))))
 		;; Otherwise, it's junk.
 		(t
@@ -357,43 +558,48 @@ an OPTION object."
   (unless option
     (setq option (apply #'search-option (synopsis context) keys)))
   (unless option
-    (error "Getting option ~S from synopsis ~A in context ~A: option unknown."
+    (error "Getting option ~S from synopsis ~A in context ~A: unknown option."
 	   (or short-name long-name)
 	   (synopsis context)
 	   context))
-  (let ((minus-char (minus-char option))
-	(plus-char (plus-char option))
-	(arglist (list)))
+  (let ((arglist (list)))
     (do ((arg (pop (arglist context)) (pop (arglist context))))
 	((null arg))
       ;; #### NOTE: actually, I *do* have a use for nreconc, he he ;-)
       (cond ((and (cmdline-option-p arg) (eq (cmdline-option-option arg) option))
 	     (setf (arglist context) (nreconc arglist (arglist context)))
-	     (return-from getopt (convert-value option (cmdline-option-value arg)
-				   :name (cmdline-option-name arg))))
-	    ((and (cmdline-pack-p arg)
-		  (eq (cmdline-pack-type arg) :minus)
-		  minus-char
-		  (position minus-char (cmdline-pack-contents arg)))
-	     (setf (cmdline-pack-contents arg)
-		   (remove minus-char (cmdline-pack-contents arg)))
-	     (setf (arglist context) (nreconc (push arg arglist) (arglist context)))
-	     (return-from getopt (convert-value option nil :source :minus-pack)))
-	    ((and (cmdline-pack-p arg)
-		  (eq (cmdline-pack-type arg) :plus)
-		  plus-char
-		  (position plus-char (cmdline-pack-contents arg)))
-	     (setf (cmdline-pack-contents arg)
-		   (remove plus-char (cmdline-pack-contents arg)))
-	     (setf (arglist context) (nreconc (push arg arglist) (arglist context)))
-	     (return-from getopt (convert-value option nil :source :plus-pack)))
+	     (return-from getopt (values (cmdline-option-value arg)
+					 (if (eq (cmdline-option-status arg)
+						 t)
+					     t
+					     (cons (cmdline-option-name arg)
+						   (cmdline-option-status
+						    arg)))
+					 :cmdline)))
 	    (t
 	     (push arg arglist))))
     (setf (arglist context) (nreverse arglist)))
   ;; Not found: try an env var
   ;; #### FIXME: SBCL-specific
   (let ((value (sb-posix:getenv (env-var option))))
-    (when value
-      (convert-value option value :source :environment))))
+    (if value
+	(cond ((eq (type-of option) 'flag)
+	       (return-from getopt
+		 (values t t (list :environment (env-var option)))))
+	      (t
+	       (destructuring-bind (value status) (retrieve option value)
+		 (if (eq status t)
+		     (return-from getopt
+		       (values value t (list :environment (env-var option))))
+		     (return-from getopt
+		       (values (default-value option)
+			       (cons (or (long-name option)
+					 (short-name option))
+				     status)
+			       (list :environment (env-var option))))))))
+	(return-from getopt (values (if (eq (type-of option) 'flag)
+					nil
+					(default-value option))
+				    nil)))))
 
 ;;; context.lisp ends here

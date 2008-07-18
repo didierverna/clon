@@ -52,6 +52,10 @@
 		:type (or null string)
 		:reader description
 		:initarg :description)
+   ;; #### NOTE: this is here and not in the VALUED-OPTION class because even
+   ;; for flags, there can be an associated environment variable. The
+   ;; existence of such a variable acts as the presence of the option on the
+   ;; cmdline, regardless of its value.
    (env-var :documentation "The option's associated environment variable."
 	    :type (or null string)
 	    :reader env-var
@@ -159,17 +163,18 @@ OPTION's names must match either SHORT-NAME, LONG-NAME, or PARTIAL-(long)-NAME."
 ;; The Char Packs  Protocol
 ;; ============================================================================
 
+(defun single-character-short-name (option &optional as-string)
+  "Return OPTION's short name, if it is a single character.
+If AS-STRING is not nil, return a string of that character."
+  (with-slots (short-name) option
+    (when (and short-name (= (length short-name) 1))
+      (if as-string
+	  short-name
+	  (coerce short-name 'character)))))
+
 (defgeneric minus-char (option &optional as-string)
   (:documentation "Return OPTION's minus char, if any.
-If AS-STRING is not nil, return a string of that character.")
-  (:method ((option option)  &optional as-string)
-    "Return OPTION's minus char, if any.
-If AS-STRING is not nil, return a string of that character."
-    (with-slots (short-name) option
-      (when (and short-name (= (length short-name) 1))
-	(if as-string
-	    short-name
-	    (coerce short-name 'character))))))
+If AS-STRING is not nil, return a string of that character."))
 
 (defgeneric plus-char (option &optional as-string)
   (:documentation "Return OPTION's plus char, if any.
@@ -183,11 +188,18 @@ If AS-STRING is not nil, return a string of that character.")
 ;; The Conversion Protocol
 ;; ============================================================================
 
-(defgeneric convert-value (option value &key source name)
-  (:documentation "Convert VALUE string for OPTION.
-- SOURCE is where the value comes from.
-- NAME is the option's name to use to report errors."))
+(defgeneric convert (option argument)
+  (:documentation "Try to convert ARGUMENT into OPTION's VALUE.
+Return a list of that value, and the conversion status."))
 
+(defun retrieve (option argument)
+  "Convert ARGUMENT into OPTION's value.
+If the conversion has failed, return OPTION's default value instead."
+  (destructuring-bind (value status) (convert option argument)
+    (list (if (consp status)
+	      (default-value option)
+	      value)
+	  status)))
 
 
 ;; ============================================================================
@@ -232,6 +244,7 @@ This class implements options that don't take any argument."))
     :allow-other-keys t
     :internal t))
 
+
 ;; -------------------------
 ;; Option searching protocol
 ;; -------------------------
@@ -242,34 +255,12 @@ This class implements options that don't take any argument."))
 
 
 ;; -------------------
-;; Conversion protocol
+;; Char packs protocol
 ;; -------------------
 
-(defmethod convert-value ((flag flag) value &key source name)
-  "Convert VALUE for FLAG, coming from SOURCE and called with NAME.
-This method returns two values:
-- the first one is :CMDLINE,
-- the second one is T if the command line status is OK, or the list
-  '(NAME :EXTRA-ARGUMENT VALUE) if FLAG was given an argument."
-  (unless source (setq source :option))
-  (unless name (setq name (or (long-name flag) (short-name flag))))
-  ;; Always return t because a flag has no value (it is simply given or not).
-  ;; The cases not handled below are OK:
-  ;; - If the source is a minus pack, the status is necessarily OK.
-  ;; - If the source is the environment (and contrary to the :option case), we
-  ;;   simply disregard the value because and env var can't just exist without
-  ;;   a value. Its value is at least the empty string.
-  (let ((status t))
-    (case source
-      (:option
-       (when value
-	 (setq status (list name :extra-argument value)))))
-    ;; Actually, not. A flag couldn't be recognized as coming from a plus
-    ;; pack, because it is not plus-packable.
-    ;;      (:plus-pack
-    ;;       (setq status (list name :plus-syntax))))
-    (assert (not (eq source :plus-pack)))
-    (values t source status)))
+(defmethod minus-char ((flag flag) &optional as-string)
+  "Return FLAG's minus char."
+  (single-character-short-name flag as-string))
 
 
 ;; ============================================================================
@@ -296,7 +287,6 @@ This method returns two values:
 			;; to the :argument-type initarg.
 			:reader argument-required-p)
    (default-value :documentation "The option's default value."
-		 :type (or null string)
 		 :reader default-value
 		 :initarg :default-value))
   (:default-initargs
@@ -352,17 +342,16 @@ This class implements is the base class for options accepting arguments."))
 ;; appear as the last option in a minus pack. However, we don't make them
 ;; appear in the usage string.
 (defmethod minus-char ((option valued-option) &optional as-string)
-  "Return OPTION's minus char, if any.
-If AS-STRING is not nil, return a string of that character."
+  "Return OPTION's minus char, if OPTION's argument is optional."
   (unless (argument-required-p option)
-    (call-next-method)))
+    (single-character-short-name option as-string)))
 
 
 ;; ============================================================================
 ;; The Switch Class
 ;; ============================================================================
 
-;; #### FIXME: provide :yes-or-no, :on-or-off and :true-or-false special
+;; #### FIXME: provide :yes/no, :on/off and :true/false special
 ;; initargs for the argument name, because that's the only ones Clon is able
 ;; to recognize.
 
@@ -377,6 +366,11 @@ If AS-STRING is not nil, return a string of that character."
 ;;  -(+)b                               short name, whatever the argument
 ;;  --boolean[=yes(no)]                 long name,  optional argument
 ;;  --boolean=yes(no)                   long name,  required argument
+
+;; Switches arguments are optional by default. This is only meaningful for
+;; long-name syntax, though, because short names never take an argument (the
+;; value is given by the -/+ call. When the argument is optional, omitting it
+;; is equivalent to saying yes.
 
 (defclass switch (valued-option)
   ()
@@ -421,7 +415,7 @@ This class implements boolean options."))
 ;; Option searching protocol
 ;; -------------------------
 
-(defmethod option-matches-sticky ((option switch) namearg)
+(defmethod option-matches-sticky ((switch switch) namearg)
   "Return nil (switches can't be sticky because of their short syntax)."
   nil)
 
@@ -430,23 +424,39 @@ This class implements boolean options."))
 ;; Char packs protocol
 ;; -------------------
 
-(defmethod plus-char ((option switch) &optional as-string)
+(defmethod minus-char ((switch switch) &optional as-string)
+  "Return SWITCH's minus char."
+  ;; Regardless of the argument type, because this only applies to long-name
+  ;; calls.
+  (single-character-short-name switch as-string))
+
+(defmethod plus-char ((switch switch) &optional as-string)
   "Return OPTION's plus char (same as minus char for switches)."
-  (minus-char option as-string))
+  (single-character-short-name switch as-string))
 
 
 ;; -------------------
 ;; Conversion protocol
 ;; -------------------
 
-(defmethod convert-value ((option switch) value &key source name)
-  t)
-
+(let ((yes-values (list "yes" "on" "true"))
+      (no-values (list "no" "off" "false")))
+  (defmethod convert ((switch switch) argument)
+    "Convert ARGUMENT into a SWITCH value.
+Conformant arguments can be either yes/on/true/no/off/false."
+    (cond ((member argument yes-values :test #'string=)
+	   (list t t))
+	  ((member argument no-values :test #'string=)
+	   (list nil t))
+	  (t
+	   (list nil (list :invalid-value argument))))))
 
 
 ;; ============================================================================
 ;; The String Option Class
 ;; ============================================================================
+
+;; #### NOTE: all of this applies to user-defined options as well.
 
 ;; A string option can appear in the following formats:
 ;;
@@ -456,6 +466,12 @@ This class implements boolean options."))
 ;;   -o [STR]                           short name, optional argument
 ;;   --option=STR                       long name,  required argument
 ;;   --option[=STR]                     long name,  optional argument
+
+;; String option's arguments are required by default. In such a case, you
+;; might provide the argument in the next cmdline item after either a short or
+;; long name. if the argument is optional, then giving it must be done after
+;; an equal sign for long names, or as a sticky argument after a short name,
+;; but that's all.
 
 ;; #### FIXME: make final
 (defclass stropt (valued-option)
@@ -497,9 +513,8 @@ This class implements options the values of which are strings."))
 ;; Conversion protocol
 ;; -------------------
 
-(defmethod convert-value ((option stropt) value &key source name)
-  t)
-
-
+(defmethod convert ((stropt stropt) argument)
+  "Just return the argument as-is."
+  (list argument t))
 
 ;;; option.lisp ends here
