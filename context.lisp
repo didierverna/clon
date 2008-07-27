@@ -35,14 +35,14 @@
 
 
 ;; ============================================================================
-;; The Command-Line Structure
+;; The Command Line Option Structure
 ;; ============================================================================
 
 (defstruct cmdline-option
-  name ;; the option's name used on the cmdline
+  name ;; the option's name as used on the cmdline
   option ;; the corresponding option object
-  value ;; the corresponding converted value
-  status ;; the status of the conversion
+  value ;; the converted option's cmdline value
+  status ;; the conversion status
   )
 
 
