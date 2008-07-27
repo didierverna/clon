@@ -44,6 +44,9 @@
 	    :type string
 	    :reader postfix
 	    :initarg :postfix)
+   (potential-pack :documentation "The potential pack string."
+		   :type (or null string)
+		   :reader potential-pack)
    (minus-pack :documentation "The minus pack string."
 	       :type (or null string)
 	       :reader minus-pack)
@@ -123,14 +126,19 @@ otherwise."
 
 (defmethod seal :after ((synopsis synopsis))
   "Compute the minus and plus packs of SYNOPSIS."
-  (let (minus-pack plus-pack)
+  (let (potential-pack minus-pack plus-pack)
     (do-options (option synopsis)
-      (let ((minus-char (minus-char option :as-string))
-	    (plus-char (plus-char option  :as-string)))
-	(when minus-char
-	  (setq minus-pack (concatenate 'string minus-pack minus-char)))
-	(when plus-char
-	  (setq plus-pack (concatenate 'string plus-pack plus-char)))))
+      (let ((potential-pack-char (potential-pack-char option :as-string))
+	    (minus-pack-char (minus-pack-char option :as-string))
+	    (plus-pack-char (plus-pack-char option  :as-string)))
+	(when potential-pack-char
+	  (setq potential-pack
+		(concatenate 'string potential-pack potential-pack-char)))
+	(when minus-pack-char
+	  (setq minus-pack (concatenate 'string minus-pack minus-pack-char)))
+	(when plus-pack-char
+	  (setq plus-pack (concatenate 'string plus-pack plus-pack-char)))))
+    (setf (slot-value synopsis 'potential-pack) potential-pack)
     (setf (slot-value synopsis 'minus-pack) minus-pack)
     (setf (slot-value synopsis 'plus-pack) plus-pack)))
 

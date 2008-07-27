@@ -178,20 +178,22 @@ OPTION's names must match either SHORT-NAME, LONG-NAME, or PARTIAL-(long)-NAME."
 ;; The Char Packs  Protocol
 ;; ============================================================================
 
-(defun single-character-short-name (option &optional as-string)
-  "Return OPTION's short name, if it is a single character.
+(defun potential-pack-char (option &optional as-string)
+  "Return OPTION's potential pack character.
 If AS-STRING is not nil, return a string of that character."
+  ;; An option is potentially packable if its short name has a single
+  ;; character.
   (with-slots (short-name) option
     (when (and short-name (= (length short-name) 1))
       (if as-string
 	  short-name
 	  (coerce short-name 'character)))))
 
-(defgeneric minus-char (option &optional as-string)
+(defgeneric minus-pack-char (option &optional as-string)
   (:documentation "Return OPTION's minus char, if any.
 If AS-STRING is not nil, return a string of that character."))
 
-(defgeneric plus-char (option &optional as-string)
+(defgeneric plus-pack-char (option &optional as-string)
   (:documentation "Return OPTION's plus char, if any.
 If AS-STRING is not nil, return a string of that character.")
   (:method ((option option) &optional as-string)
@@ -305,9 +307,9 @@ This class implements options that don't take any argument."))
 ;; Char packs protocol
 ;; -------------------
 
-(defmethod minus-char ((flag flag) &optional as-string)
+(defmethod minus-pack-char ((flag flag) &optional as-string)
   "Return FLAG's minus char."
-  (single-character-short-name flag as-string))
+  (potential-pack-char flag as-string))
 
 
 ;; -------------------
@@ -413,10 +415,10 @@ This class implements is the base class for options accepting arguments."))
 ;; Options with a one-character short name and requiring an argument may
 ;; appear as the last option in a minus pack. However, we don't make them
 ;; appear in the usage string.
-(defmethod minus-char ((option valued-option) &optional as-string)
+(defmethod minus-pack-char ((option valued-option) &optional as-string)
   "Return OPTION's minus char, if OPTION's argument is optional."
   (unless (argument-required-p option)
-    (single-character-short-name option as-string)))
+    (potential-pack-char option as-string)))
 
 
 ;; -------------------
@@ -543,15 +545,15 @@ This class implements boolean options."))
 ;; Char packs protocol
 ;; -------------------
 
-(defmethod minus-char ((switch switch) &optional as-string)
+(defmethod minus-pack-char ((switch switch) &optional as-string)
   "Return SWITCH's minus char."
   ;; Regardless of the argument type, because this only applies to long-name
   ;; calls.
-  (single-character-short-name switch as-string))
+  (potential-pack-char switch as-string))
 
-(defmethod plus-char ((switch switch) &optional as-string)
+(defmethod plus-pack-char ((switch switch) &optional as-string)
   "Return OPTION's plus char (same as minus char for switches)."
-  (single-character-short-name switch as-string))
+  (potential-pack-char switch as-string))
 
 
 ;; -------------------
