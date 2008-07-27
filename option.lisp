@@ -178,6 +178,13 @@ OPTION's names must match either SHORT-NAME, LONG-NAME, or PARTIAL-(long)-NAME."
 ;; The Char Packs  Protocol
 ;; ============================================================================
 
+;; When examining the command line, we first try to spot an option, then a
+;; minus or plus pack, and then fall back to an unknown option. When things
+;; are messed up, we prefer to try to spot options misplaced in a pack rather
+;; than directly an unknown option. That's what a "potential" pack is: a pack
+;; composed of single character options that are potentially misused.
+;; Potential misuse means non-switches in a plus pack, options with mandatory
+;; arguments in the middle of a pack and so on.
 (defun potential-pack-char (option &optional as-string)
   "Return OPTION's potential pack character.
 If AS-STRING is not nil, return a string of that character."
@@ -239,16 +246,11 @@ This function returns a list of three values:
 - the retrieved value,
 - the retrieval status."))
 
-(defgeneric retrieve-from-plus-call (option cmdline)
-  (:documentation "Retrieve OPTION's value from a plus call in CMDLINE.
-This function returns a list of three values:
-- the new cmdline (currently untouched),
+(defgeneric retrieve-from-plus-call (option)
+  (:documentation "Retrieve OPTION's value from a plus call.
+This function returns a list of two values:
 - the retrieved value,
-- the retrieval status.")
-  (:method ((option option) cmdline)
-    "Return an invalid + syntax error by default, because only switches can be
-used that way."
-    (list cmdline nil (list :invlaid-+-syntax))))
+- the retrieval status."))
 
 
 ;; ============================================================================
@@ -339,6 +341,11 @@ This class implements options that don't take any argument."))
 	(if cmdline-value
 	    (list :extra-argument cmdline-value)
 	    t)))
+
+(defmethod retrieve-from-plus-call ((flag flag))
+  "Return t and an invalid + syntax error."
+  ;; t because FLAG was given on the command line anyway.
+  (list t (list :invalid-+-syntax)))
 
 
 ;; ============================================================================
@@ -466,6 +473,11 @@ This class implements is the base class for options accepting arguments."))
 	     (destructuring-bind (value status) (safe-convert option cmdline-value)
 	       (list cmdline value status))
 	     (list cmdline (default-value option) t)))))
+
+;; This method applies to all valued options but the switches.
+(defmethod retrieve-from-plus-call ((option valued-option))
+  "Return OPTION's default value and an invalid + syntax error."
+  (list (default-value option) (list :invalid-+-syntax)))
 
 
 ;; ============================================================================
@@ -602,9 +614,9 @@ Conformant arguments can be either yes/on/true/no/off/false."
 	    (list :extra-argument cmdline-value)
 	    t)))
 
-(defmethod retrieve-from-plus-call ((switch switch) cmdline)
+(defmethod retrieve-from-plus-call ((switch switch))
   "Retrieve SWITCH's value from a plus call in CMDLINE."
-  (list cmdline nil t))
+  (list nil t))
 
 
 ;; ============================================================================

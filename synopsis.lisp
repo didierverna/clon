@@ -44,15 +44,15 @@
 	    :type string
 	    :reader postfix
 	    :initarg :postfix)
-   (potential-pack :documentation "The potential pack string."
-		   :type (or null string)
-		   :reader potential-pack)
    (minus-pack :documentation "The minus pack string."
 	       :type (or null string)
 	       :reader minus-pack)
    (plus-pack :documentation "The plus pack string."
 	      :type (or null string)
-	      :reader plus-pack))
+	      :reader plus-pack)
+   (potential-pack :documentation "The potential pack string."
+		   :type (or null string)
+		   :reader potential-pack))
   (:default-initargs
       :postfix ""))
 

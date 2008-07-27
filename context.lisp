@@ -183,61 +183,66 @@ command-line options."))
 				 :value value
 				 :status status)
 				arglist))))
-		     ((minus-pack (synopsis context))
+		     ((potential-pack (synopsis context))
 		      ;; Let's find out whether this is a minus pack:
-		      ;; #### NOTE: the way things are currently designed,
-		      ;; only conformant options return a minus char. This
-		      ;; means that if a non-conformant option appears by
-		      ;; mistake in a minus pack, Clon won't detect that, but
-		      ;; will detect an unknown option instead. Remember that
-		      ;; a minus pack can end with an option that requires an
-		      ;; argument (and for which the argument should be given
-		      ;; in the next cmdline item.
 		      (let ((trimmed (string-left-trim
-				      (minus-pack (synopsis context))
+				      (potential-pack (synopsis context))
 				      cmdline-name)))
-			(if (or (zerop (length trimmed))
-				(and (= (length trimmed) 1)
-				     (let ((option (search-option
-						       (synopsis context)
-						     :short-name trimmed)))
-				       (when option
-					 (assert (argument-required-p option))
-					 option))))
-			    ;; We found a minus pack. Split it into multiple
-			    ;; short calls.
-			    (loop :for char :across cmdline-name
-				  :do
-				  (let* ((name (make-string 1
-						 :initial-element char))
-					 (option (search-option
-						     (synopsis context)
-						   :short-name name)))
-				    (assert option)
-				    (destructuring-bind
-					  (new-cmdline value status)
-					(retrieve-from-short-call
-					 option cmdline)
-				      (setq cmdline new-cmdline)
-				      (push (make-cmdline-option
-					     :name (short-name option)
-					     :option option
-					     :value value
-					     :status status)
-					    arglist))))
-			    ;; This is not a minus pack, so we have an unknown
-			    ;; option. Don't mess with the rest of the cmdline
-			    ;; in order to avoid conflict with the automatic
-			    ;; remainder detection. Of course, the next
-			    ;; cmdline item might be an argument for a
-			    ;; misspelled option, but when things are messed
-			    ;; up, they're messed up, that's all.
-			    (push (make-cmdline-option :name cmdline-name)
-				  arglist))))
+			(cond ((zerop (length trimmed))
+			       ;; We found a potential minus pack. Split it
+			       ;; into multiple short calls. Only the last one
+			       ;; gets a cmdline, though, because only the
+			       ;; last one is allowed to get an argument from
+			       ;; the next cmdline arg.
+			       (loop :for char
+				 :across (subseq cmdline-name
+						 0
+						 (1- (length cmdline-name)))
+				 :do
+				 (let* ((name (make-string 1
+						:initial-element char))
+					(option (search-option (synopsis context)
+						  :short-name name)))
+				   (assert option)
+				   (destructuring-bind (new-cmdline value status)
+				       (retrieve-from-short-call option nil)
+				     (declare (ignore new-cmdline))
+				     (push (make-cmdline-option
+					    :name (short-name option)
+					    :option option
+					    :value value
+					    :status status)
+					   arglist))))
+			       (let* ((name (subseq cmdline-name
+						    (1-
+						     (length cmdline-name))))
+				      (option (search-option (synopsis context)
+						:short-name name)))
+				 (assert option)
+				 (destructuring-bind (new-cmdline value status)
+				     (retrieve-from-short-call option cmdline)
+				   (setq cmdline new-cmdline)
+				   (push (make-cmdline-option
+					  :name (short-name option)
+					  :option option
+					  :value value
+					  :status status)
+					 arglist))))
+			      (t
+			       ;; This is not a minus pack, so we have an
+			       ;; unknown option. Don't mess with the rest of
+			       ;; the cmdline in order to avoid conflict with
+			       ;; the automatic remainder detection. Of
+			       ;; course, the next cmdline item might be an
+			       ;; argument for a misspelled option, but when
+			       ;; things are messed up, they're messed up,
+			       ;; that's all.
+			       (push (make-cmdline-option :name cmdline-name)
+				     arglist)))))
 		     (t
-		      ;; There's no minus pack, so we have an unknown option.
-		      ;; Don't mess with the rest of the cmdline in order to
-		      ;; avoid conflict with the automatic remainder
+		      ;; There's no potential pack, so we have an unknown
+		      ;; option. Don't mess with the rest of the cmdline in
+		      ;; order to avoid conflict with the automatic remainder
 		      ;; detection. Of course, the next cmdline item might be
 		      ;; an argument for a misspelled option, but when things
 		      ;; are messed up, they're messed up, that's all.
@@ -257,28 +262,22 @@ command-line options."))
 			      :short-name cmdline-name)))
 	       (cond (option
 		      ;; We found an option.
-		      (destructuring-bind (new-cmdline value status)
-			  (retrieve-from-plus-call option cmdline)
-			(setq cmdline new-cmdline)
+		      (destructuring-bind (value status)
+			  (retrieve-from-plus-call option)
 			(push (make-cmdline-option
 			       :name (short-name option)
 			       :option option
 			       :value value
 			       :status status)
 			      arglist)))
-		     ((plus-pack (synopsis context))
-		      ;; Let's find out whether it is a plus pack: #### NOTE:
-		      ;; the way things are currently designed, only
-		      ;; conformant options return a plus char. This means
-		      ;; that if a non-conformant option appears by mistake in
-		      ;; a plus pack, Clon won't detect that, but will detect
-		      ;; an unknown option instead.
+		     ((potential-pack (synopsis context))
+		      ;; Let's find out whether this is a plus pack:
 		      (let ((trimmed (string-left-trim
-				      (plus-pack (synopsis context))
+				      (potential-pack (synopsis context))
 				      cmdline-name)))
 			(if (zerop (length trimmed))
-			    ;; We found a plus pack. Split the pack into
-			    ;; multiple option calls.
+			    ;; We found a potential plus pack. Split the pack
+			    ;; into multiple option calls.
 			    (loop :for char :across cmdline-name
 				  :do
 				  (let* ((name (make-string 1
@@ -286,13 +285,8 @@ command-line options."))
 					 (option (search-option
 						     (synopsis context)
 						   :short-name name)))
-				    (assert option)
-				    (assert (eq (type-of option) 'switch))
-				    (destructuring-bind
-					  (new-cmdline value status)
-					(retrieve-from-plus-call
-					 option cmdline)
-				      (setq cmdline new-cmdline)
+				    (destructuring-bind (value status)
+					(retrieve-from-plus-call option)
 				      (push (make-cmdline-option
 					     :name (short-name option)
 					     :option option
@@ -302,7 +296,12 @@ command-line options."))
 			    ;; This is not a plus pack, so we have an unknown
 			    ;; option.
 			    (push (make-cmdline-option :name cmdline-name)
-				  arglist)))))))
+				  arglist))))
+		     (t
+		      ;; There's no potential pack, so we have an unknown
+		      ;; option.
+		      (push (make-cmdline-option :name cmdline-name)
+			    arglist)))))
 	    ;; Otherwise, it's junk.
 	    (t
 	     ;; #### FIXME: SBCL specific.
