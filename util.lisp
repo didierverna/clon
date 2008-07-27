@@ -49,11 +49,12 @@ This check also protects against too short strings."
     (and (>= (length string) length)
 	 (string= string start :end1 length))))
 
-(defun complete-started-string (start full)
+(defun complete-string (start full)
   "Complete START with the rest of FULL in parentheses.
 START must be the beginning of FULL.
 For instance, completing he with help will produce he(lp)."
   (assert (string-start full start))
+  (assert (not (string= full start)))
   (concatenate 'string start "(" (subseq full (length start)) ")"))
 
 

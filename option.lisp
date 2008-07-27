@@ -33,6 +33,21 @@
 
 (in-package :clon)
 
+;; ============================================================================
+;; utilities
+;; ============================================================================
+
+;; The following two routines are used in the retrieval methods.
+(defun option-p (arg)
+  "Returns t if ARG looks like an option."
+  (or (eq (elt arg 0) #\-)
+      (eq (elt arg 0) #\+)))
+
+(defmacro maybe-pop-arg (cmdline)
+  "Pop argument from CMDLINE if it doesn't look like an option."
+  `(when (and (car ,cmdline) (not (option-p (car ,cmdline))))
+    (pop ,cmdline)))
+
 
 ;; ============================================================================
 ;; The Option Class
@@ -189,17 +204,49 @@ If AS-STRING is not nil, return a string of that character.")
 ;; ============================================================================
 
 (defgeneric convert (option argument)
-  (:documentation "Try to convert ARGUMENT into OPTION's VALUE.
+  (:documentation "Try to convert ARGUMENT into OPTION's value.
 Return a list of that value, and the conversion status."))
 
-(defun retrieve (option argument)
+;; #### NOTE: this is just to spare the burden of checking the conversion
+;; status for people extending Clon. Maybe a simple macro and documenting that
+;; they have to use it would be sufficient.
+(defun safe-convert (option argument)
   "Convert ARGUMENT into OPTION's value.
-If the conversion has failed, return OPTION's default value instead."
+Only, return OPTION's default value in case of conversion failure."
   (destructuring-bind (value status) (convert option argument)
     (list (if (consp status)
 	      (default-value option)
 	      value)
 	  status)))
+
+(defgeneric retrieve-from-long-call (option cmdline &optional cmdline-value)
+  (:documentation "Retrieve OPTION's value from a long call in CMDLINE.
+CMDLINE-VALUE is a potentially already parsed cmdline argument.
+This function returns a list of three values:
+- the new cmdline (possibly with the first item popped if the option requires
+  an argument),
+- the retrieved value,
+- the retrieval status."))
+
+(defgeneric retrieve-from-short-call (option cmdline &optional cmdline-value)
+  (:documentation "Retrieve OPTION's value from a short call in CMDLINE.
+CMDLINE-VALUE is a potentially already parsed cmdline argument.
+This function returns a list of three values:
+- the new cmdline (possibly with the first item popped if the option requires
+  an argument),
+- the retrieved value,
+- the retrieval status."))
+
+(defgeneric retrieve-from-plus-call (option cmdline)
+  (:documentation "Retrieve OPTION's value from a plus call in CMDLINE.
+This function returns a list of three values:
+- the new cmdline (currently untouched),
+- the retrieved value,
+- the retrieval status.")
+  (:method ((option option) cmdline)
+    "Return an invalid + syntax error by default, because only switches can be
+used that way."
+    (list cmdline nil (list :invlaid-+-syntax))))
 
 
 ;; ============================================================================
@@ -261,6 +308,35 @@ This class implements options that don't take any argument."))
 (defmethod minus-char ((flag flag) &optional as-string)
   "Return FLAG's minus char."
   (single-character-short-name flag as-string))
+
+
+;; -------------------
+;; Conversion protocol
+;; -------------------
+
+(defmethod retrieve-from-long-call ((flag flag) cmdline &optional cmdline-value)
+  "Retrieve FLAG's value from a long call in CMDLINE."
+  ;; CMDLINE-VALUE might be non-nil when a flag was given an argument through
+  ;; an =-syntax. However, we don't check whether the next cmdline item could
+  ;; be a spurious arg, because that would mess with a possible automatic
+  ;; remainder detection.
+  (list cmdline
+	t
+	(if cmdline-value
+	    (list :extra-argument cmdline-value)
+	    t)))
+
+(defmethod retrieve-from-short-call ((flag flag) cmdline &optional cmdline-value)
+  "Retrieve FLAG's value from a short call in CMDLINE."
+  ;; CMDLINE-VALUE might be non-nil when a flag was given a sticky argument.
+  ;; However, we don't check whether the next cmdline item could be a spurious
+  ;; arg, because that would mess with a possible automatic remainder
+  ;; detection.
+  (list cmdline
+	t
+	(if cmdline-value
+	    (list :extra-argument cmdline-value)
+	    t)))
 
 
 ;; ============================================================================
@@ -341,6 +417,53 @@ This class implements is the base class for options accepting arguments."))
   "Return OPTION's minus char, if OPTION's argument is optional."
   (unless (argument-required-p option)
     (single-character-short-name option as-string)))
+
+
+;; -------------------
+;; Conversion protocol
+;; -------------------
+
+(defmethod retrieve-from-long-call
+    ((option valued-option) cmdline &optional cmdline-value)
+  "Retrieve OPTION's value from a long call in CMDLINE."
+  ;; If the option requires an argument, but none is provided by an =-syntax,
+  ;; we might find it in the next cmdline item, unless it looks like an
+  ;; option, in which case it is a missing argument error. Optional arguments
+  ;; are only available through the =-syntax, so we don't look into the next
+  ;; cmdline item.
+  (cond ((argument-required-p option)
+	 (unless cmdline-value
+	   (setq cmdline-value (maybe-pop-arg cmdline)))
+	 (if cmdline-value
+	     (destructuring-bind (value status) (safe-convert option cmdline-value)
+	       (list cmdline value status))
+	     (list cmdline (default-value option) (list :missing-argument))))
+	(t
+	 (if cmdline-value
+	     (destructuring-bind (value status) (safe-convert option cmdline-value)
+	       (list cmdline value status))
+	     (list cmdline (default-value option) t)))))
+
+(defmethod retrieve-from-short-call
+    ((option valued-option) cmdline &optional cmdline-value)
+  "Retrieve OPTION's value from a short call in CMDLINE."
+  ;; If the option requires an argument, but none is provided by a sticky
+  ;; syntax, we might find it in the next cmdline item, unless it looks like
+  ;; an option, in which case it is a missing argument error. Optional
+  ;; arguments are only available through the sticky syntax, so we don't look
+  ;; into the next cmdline item.
+  (cond ((argument-required-p option)
+	 (unless cmdline-value
+	   (setq cmdline-value (maybe-pop-arg cmdline)))
+	 (if cmdline-value
+	     (destructuring-bind (value status) (safe-convert option cmdline-value)
+	       (list cmdline value status))
+	     (list cmdline (default-value option) (list :missing-argument))))
+	(t
+	 (if cmdline-value
+	     (destructuring-bind (value status) (safe-convert option cmdline-value)
+	       (list cmdline value status))
+	     (list cmdline (default-value option) t)))))
 
 
 ;; ============================================================================
@@ -446,6 +569,40 @@ Conformant arguments can be either yes/on/true/no/off/false."
 	   (list nil t))
 	  (t
 	   (list nil (list :invalid-value argument))))))
+
+(defmethod retrieve-from-long-call
+    ((switch switch) cmdline &optional cmdline-value)
+  "Retrieve SWITCH's value from a long call in CMDLINE."
+  ;; The difference with other valued options (see above) is that an omitted
+  ;; optional argument stands for a "yes". Otherwise, it's pretty similar.
+  (cond ((argument-required-p switch)
+	 (unless cmdline-value
+	   (setq cmdline-value (maybe-pop-arg cmdline)))
+	 (if cmdline-value
+	     (destructuring-bind (value status) (safe-convert switch cmdline-value)
+	       (list cmdline value status))
+	     (list cmdline (default-value switch) (list :missing-argument))))
+	(t
+	 (if cmdline-value
+	     (destructuring-bind (value status)(safe-convert switch cmdline-value)
+	       (list cmdline value status))
+	     (list cmdline t t)))))
+
+(defmethod retrieve-from-short-call
+    ((switch switch) cmdline &optional cmdline-value)
+  "Retrieve SWITCH's value from a short call in CMDLINE."
+  ;; The difference with other valued options (see above) is that switches
+  ;; don't take *any* argument in short form (whether optional or not), so we
+  ;; don't check anything in CMDLINE. The minus form just means "yes".
+  (list cmdline
+	t
+	(if cmdline-value
+	    (list :extra-argument cmdline-value)
+	    t)))
+
+(defmethod retrieve-from-plus-call ((switch switch) cmdline)
+  "Retrieve SWITCH's value from a plus call in CMDLINE."
+  (list cmdline nil t))
 
 
 ;; ============================================================================
