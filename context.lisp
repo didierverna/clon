@@ -95,234 +95,228 @@ command-line options."))
   (let ((arglist (list))
 	(remainder (list))
 	(junk (list)))
-    (do ((arg (pop cmdline) (pop cmdline)))
-	((null arg))
-      (cond ((string= arg "--")
-	     ;; The Clon separator: isolate the rest of the command line.
-	     (setq remainder cmdline)
-	     (setq cmdline nil))
-	    ;; A long (possibly unknown) option:
-	    ((string-start arg "--")
-	     (let* ((value-start (position #\= arg :start 2))
-		    (cmdline-name (subseq arg 2 value-start))
-		    (cmdline-value (when value-start
-				     (subseq arg (1+ value-start))))
-		    ;; #### NOTE: we authorize partial matching (abreviations)
-		    ;; for long names: an exact match is search first. If that
-		    ;; fails, we try partial matching, and the first matching
-		    ;; option is returned. For instance, if you have --foobar
-		    ;; and --foo options in that order, passing --foo will
-		    ;; match the option --foo, but passing --fo will match
-		    ;; --foobar. This is probably not the best behavior: it
-		    ;; would be better to find the option "closest" to the
-		    ;; partial match.
-		    (option (or (search-option (synopsis context)
-				  :long-name cmdline-name)
-				(search-option (synopsis context)
-				  :partial-name cmdline-name))))
-	       (if option
-		   ;; We have an option. Let's retrieve its actual value.
-		   (multiple-value-bind (new-cmdline value status)
-		       (retrieve-from-long-call option cmdline cmdline-value)
-		     (setq cmdline new-cmdline)
-		     (push (make-cmdline-option
-			    ;; The cmdline option's name is the long one, but
-			    ;; in case of abbreviation (for instance --he
-			    ;; instead of --help), we will display it like
-			    ;; this: he(lp). In case of error report, this
-			    ;; will help the user spot where he did something
-			    ;; wrong.
-			    :name
-			    (complete-string cmdline-name (long-name option))
-			    :option option
-			    :value value
-			    :status status)
-			   arglist))
-		   ;; We have an unknown option. Don't mess with the rest of
-		   ;; the cmdline in order to avoid conflict with the
-		   ;; automatic remainder detection. Of course, the next
-		   ;; cmdline item might be an argument for a misspelled
-		   ;; option, but when things are messed up, they're messed
-		   ;; up, that's all.
-		   (push (make-cmdline-option :name cmdline-name
-					      :value cmdline-value)
-			 arglist))))
-	    ;; A short (possibly unknown) option or a minus pack:
-	    ((string-start arg "-")
-	     ;; #### FIXME: check invalid syntax -foo=val
-	     (let* ((cmdline-name (subseq arg 1))
-		    ;; #### NOTE: we don't allow partial match on short names
-		    ;; because that would make it too complicated to
-		    ;; distinguish abreviations, sticky arguments and stuff.
-		    (option (or (search-option (synopsis context)
-				  :short-name cmdline-name)
-				;; #### NOTE: when looking for a sticky
-				;; option, we stop at the first match, even
-				;; if, for instance, another option would
-				;; match a longer part of the argument. This
-				;; is probably not the best behavior: it would
-				;; be better to find the option "closest" to
-				;; the partial match.
-				(search-sticky-option
-				 (synopsis context) cmdline-name))))
-	       (cond (option
-		      ;; We have an option. Let's retrieve its actual value,
-		      ;; maybe already with a sticky argument:
-		      (let ((cmdline-value
-			     (when (not (string= cmdline-name
-						 (short-name option)))
-			       (subseq cmdline-name
-				       (length (short-name option))))))
-			(multiple-value-bind (new-cmdline value status)
-			    (retrieve-from-short-call option cmdline
-						      cmdline-value)
-			  (setq cmdline new-cmdline)
-			  (push (make-cmdline-option
-				 :name (short-name option)
-				 :option option
-				 :value value
-				 :status status)
-				arglist))))
-		     ((potential-pack (synopsis context))
-		      ;; Let's find out whether this is a minus pack:
-		      (let ((trimmed (string-left-trim
-				      (potential-pack (synopsis context))
-				      cmdline-name)))
-			(cond ((zerop (length trimmed))
-			       ;; We found a potential minus pack. Split it
-			       ;; into multiple short calls. Only the last one
-			       ;; gets a cmdline, though, because only the
-			       ;; last one is allowed to get an argument from
-			       ;; the next cmdline arg.
-			       (loop :for char
-				 :across (subseq cmdline-name
-						 0
-						 (1- (length cmdline-name)))
-				 :do
-				 (let* ((name (make-string 1
-						:initial-element char))
+    (macrolet ((push-cmdline-option (arglist &rest body)
+		 `(push (make-cmdline-option ,@body) ,arglist)))
+      (do ((arg (pop cmdline) (pop cmdline)))
+	  ((null arg))
+	(cond ((string= arg "--")
+	       ;; The Clon separator: isolate the rest of the command line.
+	       (setq remainder cmdline)
+	       (setq cmdline nil))
+	      ;; A long (possibly unknown) option:
+	      ((string-start arg "--")
+	       (let* ((value-start (position #\= arg :start 2))
+		      (cmdline-name (subseq arg 2 value-start))
+		      (cmdline-value (when value-start
+				       (subseq arg (1+ value-start))))
+		      ;; #### NOTE: we authorize partial matching
+		      ;; (abreviations) for long names: an exact match is
+		      ;; search first. If that fails, we try partial matching,
+		      ;; and the first matching option is returned. For
+		      ;; instance, if you have --foobar and --foo options in
+		      ;; that order, passing --foo will match the option
+		      ;; --foo, but passing --fo will match --foobar. This is
+		      ;; probably not the best behavior: it would be better to
+		      ;; find the option "closest" to the partial match.
+		      (option (or (search-option (synopsis context)
+				    :long-name cmdline-name)
+				  (search-option (synopsis context)
+				    :partial-name cmdline-name))))
+		 (if option
+		     ;; We have an option. Let's retrieve its actual value.
+		     (multiple-value-bind (new-cmdline value status)
+			 (retrieve-from-long-call option cmdline cmdline-value)
+		       (setq cmdline new-cmdline)
+		       (push-cmdline-option arglist
+			 ;; The cmdline option's name is the long one, but in
+			 ;; case of abbreviation (for instance --he instead of
+			 ;; --help), we will display it like this: he(lp). In
+			 ;; case of error report, this will help the user spot
+			 ;; where he did something wrong.
+			 :name (complete-string cmdline-name (long-name option))
+			 :option option
+			 :value value
+			 :status status))
+		     ;; We have an unknown option. Don't mess with the rest of
+		     ;; the cmdline in order to avoid conflict with the
+		     ;; automatic remainder detection. Of course, the next
+		     ;; cmdline item might be an argument for a misspelled
+		     ;; option, but when things are messed up, they're messed
+		     ;; up, that's all.
+		     (push-cmdline-option arglist
+		       :name cmdline-name
+		       :value cmdline-value))))
+	      ;; A short (possibly unknown) option or a minus pack:
+	      ((string-start arg "-")
+	       ;; #### FIXME: check invalid syntax -foo=val
+	       (let* ((cmdline-name (subseq arg 1))
+		      ;; #### NOTE: we don't allow partial match on short
+		      ;; names because that would make it too complicated to
+		      ;; distinguish abreviations, sticky arguments and stuff.
+		      (option (or (search-option (synopsis context)
+				    :short-name cmdline-name)
+				  ;; #### NOTE: when looking for a sticky
+				  ;; option, we stop at the first match, even
+				  ;; if, for instance, another option would
+				  ;; match a longer part of the argument. This
+				  ;; is probably not the best behavior: it
+				  ;; would be better to find the option
+				  ;; "closest" to the partial match.
+				  (search-sticky-option
+				   (synopsis context) cmdline-name))))
+		 (cond (option
+			;; We have an option. Let's retrieve its actual value,
+			;; maybe already with a sticky argument:
+			(let ((cmdline-value
+			       (when (not (string= cmdline-name
+						   (short-name option)))
+				 (subseq cmdline-name
+					 (length (short-name option))))))
+			  (multiple-value-bind (new-cmdline value status)
+			      (retrieve-from-short-call option cmdline
+							cmdline-value)
+			    (setq cmdline new-cmdline)
+			    (push-cmdline-option arglist
+			      :name (short-name option)
+			      :option option
+			      :value value
+			      :status status))))
+		       ((potential-pack (synopsis context))
+			;; Let's find out whether this is a minus pack:
+			(let ((trimmed (string-left-trim
+					(potential-pack (synopsis context))
+					cmdline-name)))
+			  (cond ((zerop (length trimmed))
+				 ;; We found a potential minus pack. Split it
+				 ;; into multiple short calls. Only the last
+				 ;; one gets a cmdline, though, because only
+				 ;; the last one is allowed to get an argument
+				 ;; from the next cmdline arg.
+				 (loop :for char
+				   :across (subseq cmdline-name
+						   0
+						   (1- (length cmdline-name)))
+				   :do
+				   (let* ((name (make-string 1
+						  :initial-element char))
+					  (option (search-option (synopsis context)
+						    :short-name name)))
+				     (assert option)
+				     (multiple-value-bind
+					   (new-cmdline value status)
+					 (retrieve-from-short-call option nil)
+				       (declare (ignore new-cmdline))
+				       (push-cmdline-option arglist
+					 :name (short-name option)
+					 :option option
+					 :value value
+					 :status status))))
+				 (let* ((name (subseq cmdline-name
+						      (1-
+						       (length cmdline-name))))
 					(option (search-option (synopsis context)
 						  :short-name name)))
 				   (assert option)
 				   (multiple-value-bind
 					 (new-cmdline value status)
-				       (retrieve-from-short-call option nil)
-				     (declare (ignore new-cmdline))
-				     (push (make-cmdline-option
-					    :name (short-name option)
-					    :option option
-					    :value value
-					    :status status)
-					   arglist))))
-			       (let* ((name (subseq cmdline-name
-						    (1-
-						     (length cmdline-name))))
-				      (option (search-option (synopsis context)
-						:short-name name)))
-				 (assert option)
-				 (multiple-value-bind (new-cmdline value status)
-				     (retrieve-from-short-call option cmdline)
-				   (setq cmdline new-cmdline)
-				   (push (make-cmdline-option
+				       (retrieve-from-short-call option cmdline)
+				     (setq cmdline new-cmdline)
+				     (push-cmdline-option arglist
+				       :name (short-name option)
+				       :option option
+				       :value value
+				       :status status))))
+				(t
+				 ;; This is not a minus pack, so we have an
+				 ;; unknown option. Don't mess with the rest
+				 ;; of the cmdline in order to avoid conflict
+				 ;; with the automatic remainder detection. Of
+				 ;; course, the next cmdline item might be an
+				 ;; argument for a misspelled option, but when
+				 ;; things are messed up, they're messed up,
+				 ;; that's all.
+				 (push-cmdline-option arglist
+				   :name cmdline-name)))))
+		       (t
+			;; There's no potential pack, so we have an unknown
+			;; option. Don't mess with the rest of the cmdline in
+			;; order to avoid conflict with the automatic
+			;; remainder detection. Of course, the next cmdline
+			;; item might be an argument for a misspelled option,
+			;; but when things are messed up, they're messed up,
+			;; that's all.
+			(push-cmdline-option arglist
+			  :name cmdline-name)))))
+	      ;; A short (possibly unknown) switch, or a plus pack.
+	      ((string-start arg "+")
+	       ;; #### FIXME: check invalid syntax +foo=val
+	       (let* ((cmdline-name (subseq arg 1))
+		      ;; #### NOTE: in theory, we could allow partial matches
+		      ;; on short names when they're used with the +-syntax,
+		      ;; because there's no sticky argument or whatever. But
+		      ;; we don't. That's all. Short names are not meant to be
+		      ;; long (otherwise, that would be long names right ?),
+		      ;; so they're not meant to be abbreviated.
+		      (option (search-option (synopsis context)
+				:short-name cmdline-name)))
+		 (cond (option
+			;; We found an option.
+			(multiple-value-bind (value status)
+			    (retrieve-from-plus-call option)
+			  (push-cmdline-option arglist
+			    :name (short-name option)
+			    :option option
+			    :value value
+			    :status status)))
+		       ((potential-pack (synopsis context))
+			;; Let's find out whether this is a plus pack:
+			(let ((trimmed (string-left-trim
+					(potential-pack (synopsis context))
+					cmdline-name)))
+			  (if (zerop (length trimmed))
+			      ;; We found a potential plus pack. Split the pack
+			      ;; into multiple option calls.
+			      (loop :for char :across cmdline-name
+				    :do
+				    (let* ((name (make-string 1
+						   :initial-element char))
+					   (option (search-option
+						       (synopsis context)
+						     :short-name name)))
+				      (multiple-value-bind (value status)
+					  (retrieve-from-plus-call option)
+					(push-cmdline-option arglist
 					  :name (short-name option)
 					  :option option
 					  :value value
-					  :status status)
-					 arglist))))
-			      (t
-			       ;; This is not a minus pack, so we have an
-			       ;; unknown option. Don't mess with the rest of
-			       ;; the cmdline in order to avoid conflict with
-			       ;; the automatic remainder detection. Of
-			       ;; course, the next cmdline item might be an
-			       ;; argument for a misspelled option, but when
-			       ;; things are messed up, they're messed up,
-			       ;; that's all.
-			       (push (make-cmdline-option :name cmdline-name)
-				     arglist)))))
+					  :status status))))
+			      ;; This is not a plus pack, so we have an
+			      ;; unknown option.
+			      (push-cmdline-option arglist :name cmdline-name))))
+		       (t
+			;; There's no potential pack, so we have an unknown
+			;; option.
+			(push-cmdline-option arglist :name cmdline-name)))))
+	      ;; Otherwise, it's junk.
+	      (t
+	       ;; #### FIXME: SBCL specific.
+	       (cond ((sb-ext:posix-getenv "POSIXLY_CORRECT")
+		      ;; That's the end of the Clon-specific part:
+		      (setq remainder (cons arg cmdline))
+		      (setq cmdline nil))
 		     (t
-		      ;; There's no potential pack, so we have an unknown
-		      ;; option. Don't mess with the rest of the cmdline in
-		      ;; order to avoid conflict with the automatic remainder
-		      ;; detection. Of course, the next cmdline item might be
-		      ;; an argument for a misspelled option, but when things
-		      ;; are messed up, they're messed up, that's all.
-		      (push (make-cmdline-option :name cmdline-name)
-			    arglist)))))
-	    ;; A short (possibly unknown) switch, or a plus pack.
-	    ((string-start arg "+")
-	     ;; #### FIXME: check invalid syntax +foo=val
-	     (let* ((cmdline-name (subseq arg 1))
-		    ;; #### NOTE: in theory, we could allow partial matches on
-		    ;; short names when they're used with the +-syntax,
-		    ;; because there's no sticky argument or whatever. But we
-		    ;; don't. That's all. Short names are not meant to be long
-		    ;; (otherwise, that would be long names right ?), so
-		    ;; they're not meant to be abbreviated.
-		    (option (search-option (synopsis context)
-			      :short-name cmdline-name)))
-	       (cond (option
-		      ;; We found an option.
-		      (multiple-value-bind (value status)
-			  (retrieve-from-plus-call option)
-			(push (make-cmdline-option
-			       :name (short-name option)
-			       :option option
-			       :value value
-			       :status status)
-			      arglist)))
-		     ((potential-pack (synopsis context))
-		      ;; Let's find out whether this is a plus pack:
-		      (let ((trimmed (string-left-trim
-				      (potential-pack (synopsis context))
-				      cmdline-name)))
-			(if (zerop (length trimmed))
-			    ;; We found a potential plus pack. Split the pack
-			    ;; into multiple option calls.
-			    (loop :for char :across cmdline-name
-				  :do
-				  (let* ((name (make-string 1
-						 :initial-element char))
-					 (option (search-option
-						     (synopsis context)
-						   :short-name name)))
-				    (multiple-value-bind (value status)
-					(retrieve-from-plus-call option)
-				      (push (make-cmdline-option
-					     :name (short-name option)
-					     :option option
-					     :value value
-					     :status status)
-					    arglist))))
-			    ;; This is not a plus pack, so we have an unknown
-			    ;; option.
-			    (push (make-cmdline-option :name cmdline-name)
-				  arglist))))
-		     (t
-		      ;; There's no potential pack, so we have an unknown
-		      ;; option.
-		      (push (make-cmdline-option :name cmdline-name)
-			    arglist)))))
-	    ;; Otherwise, it's junk.
-	    (t
-	     ;; #### FIXME: SBCL specific.
-	     (cond ((sb-ext:posix-getenv "POSIXLY_CORRECT")
-		    ;; That's the end of the Clon-specific part:
-		    (setq remainder (cons arg cmdline))
-		    (setq cmdline nil))
-		   (t
-		    ;; If there's no more option on the cmdline, consider this
-		    ;; as the remainder (implicit since no "--" has been
-		    ;; used). If there's still another option somewhere, then
-		    ;; this is really junk.
-		    (cond ((notany #'option-p cmdline)
-			   (setq remainder (cons arg cmdline))
-			   (setq cmdline nil))
-			  (t
-			   (push arg junk))))))))
-    (setf (arglist context) (nreverse arglist))
-    (setf (slot-value context 'remainder) remainder)
-    (setf (slot-value context 'junk) junk)))
+		      ;; If there's no more option on the cmdline, consider
+		      ;; this as the remainder (implicit since no "--" has
+		      ;; been used). If there's still another option
+		      ;; somewhere, then this is really junk.
+		      (cond ((notany #'option-p cmdline)
+			     (setq remainder (cons arg cmdline))
+			     (setq cmdline nil))
+			    (t
+			     (push arg junk))))))))
+      (setf (arglist context) (nreverse arglist))
+      (setf (slot-value context 'remainder) remainder)
+      (setf (slot-value context 'junk) junk))))
 
 ;; #### FIXME: SBCL-specific
 (defun make-context (&rest keys &key synopsis cmdline)

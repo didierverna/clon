@@ -35,7 +35,8 @@
 
 (dolist (symbol '(select-keys remove-keys
 		  add-to
-		  convert-value convert-environment))
+		  convert-value convert-environment
+		  push-cmdline-option))
   (put symbol 'common-lisp-indent-function 1))
 
 (dolist (symbol '(make-internal-stropt make-internal-switch convert-value))
