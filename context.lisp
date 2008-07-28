@@ -199,13 +199,12 @@ command-line options."))
 				   :do
 				   (let* ((name (make-string 1
 						  :initial-element char))
-					  (option (search-option (synopsis context)
+					  (option (search-option
+						      (synopsis context)
 						    :short-name name)))
 				     (assert option)
-				     (multiple-value-bind
-					   (value status new-cmdline)
+				     (multiple-value-bind (value status)
 					 (retrieve-from-short-call option nil)
-				       (declare (ignore new-cmdline))
 				       (push-cmdline-option arglist
 					 :name (short-name option)
 					 :option option
