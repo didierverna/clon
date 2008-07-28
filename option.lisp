@@ -228,19 +228,20 @@ Only, return OPTION's default value in case of conversion failure."
 		value)
 	    status)))
 
-(defgeneric retrieve-from-long-call (option cmdline &optional cmdline-value)
-  (:documentation "Retrieve OPTION's value from a long call in CMDLINE.
+(defgeneric retrieve-from-long-call (option &optional cmdline-value cmdline)
+  (:documentation "Retrieve OPTION's value from a long call.
 CMDLINE-VALUE is a potentially already parsed cmdline argument.
+Otherwise, CMDLINE is where to find an argument.
 This function returns three values:
 - the retrieved value,
 - the retrieval status,
 - the new cmdline (possibly with the first item popped if the option requires
   an argument)."))
 
-(defgeneric retrieve-from-short-call (option &optional cmdline cmdline-value)
+(defgeneric retrieve-from-short-call (option &optional cmdline-value cmdline)
   (:documentation "Retrieve OPTION's value from a short call.
-CMDLINE is where to find an argument, if needed.
 CMDLINE-VALUE is a potentially already parsed cmdline argument.
+Otherwise, CMDLINE is where to find an argument.
 This function returns three values:
 - the retrieved value,
 - the retrieval status,
@@ -319,8 +320,8 @@ This class implements options that don't take any argument."))
 ;; Conversion protocol
 ;; -------------------
 
-(defmethod retrieve-from-long-call ((flag flag) cmdline &optional cmdline-value)
-  "Retrieve FLAG's value from a long call in CMDLINE."
+(defmethod retrieve-from-long-call ((flag flag) &optional cmdline-value cmdline)
+  "Retrieve FLAG's value from a long call."
   ;; CMDLINE-VALUE might be non-nil when a flag was given an argument through
   ;; an =-syntax. However, we don't check whether the next cmdline item could
   ;; be a spurious arg, because that would mess with a possible automatic
@@ -331,7 +332,7 @@ This class implements options that don't take any argument."))
 	      t)
 	  cmdline))
 
-(defmethod retrieve-from-short-call ((flag flag) &optional cmdline cmdline-value)
+(defmethod retrieve-from-short-call ((flag flag) &optional cmdline-value cmdline)
   "Retrieve FLAG's value from a short call."
   ;; CMDLINE-VALUE might be non-nil when a flag was given a sticky argument.
   ;; However, we don't check whether the next cmdline item could be a spurious
@@ -434,8 +435,8 @@ This class implements is the base class for options accepting arguments."))
 ;; -------------------
 
 (defmethod retrieve-from-long-call
-    ((option valued-option) cmdline &optional cmdline-value)
-  "Retrieve OPTION's value from a long call in CMDLINE."
+    ((option valued-option) &optional cmdline-value cmdline)
+  "Retrieve OPTION's value from a long call."
   ;; If the option requires an argument, but none is provided by an =-syntax,
   ;; we might find it in the next cmdline item, unless it looks like an
   ;; option, in which case it is a missing argument error. Optional arguments
@@ -457,7 +458,7 @@ This class implements is the base class for options accepting arguments."))
 	     (values (default-value option) t cmdline)))))
 
 (defmethod retrieve-from-short-call
-    ((option valued-option) &optional cmdline cmdline-value)
+    ((option valued-option) &optional cmdline-value cmdline)
   "Retrieve OPTION's value from a short call."
   ;; If the option requires an argument, but none is provided by a sticky
   ;; syntax, we might find it in the next cmdline item, unless it looks like
@@ -590,8 +591,8 @@ Conformant arguments can be either yes/on/true/no/off/false."
 	   (values nil (list :invalid-value argument))))))
 
 (defmethod retrieve-from-long-call
-    ((switch switch) cmdline &optional cmdline-value)
-  "Retrieve SWITCH's value from a long call in CMDLINE."
+    ((switch switch) &optional cmdline-value cmdline)
+  "Retrieve SWITCH's value from a long call."
   ;; The difference with other valued options (see above) is that an omitted
   ;; optional argument stands for a "yes". Otherwise, it's pretty similar.
   (cond ((argument-required-p switch)
@@ -609,7 +610,7 @@ Conformant arguments can be either yes/on/true/no/off/false."
 	     (values t t cmdline)))))
 
 (defmethod retrieve-from-short-call
-    ((switch switch) &optional cmdline cmdline-value)
+    ((switch switch) &optional cmdline-value cmdline)
   "Retrieve SWITCH's value from a short call."
   ;; The difference with other valued options (see above) is that switches
   ;; don't take *any* argument in short form (whether optional or not), so we
