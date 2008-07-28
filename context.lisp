@@ -122,7 +122,7 @@ command-line options."))
 				  :partial-name cmdline-name))))
 	       (if option
 		   ;; We have an option. Let's retrieve its actual value.
-		   (destructuring-bind (new-cmdline value status)
+		   (multiple-value-bind (new-cmdline value status)
 		       (retrieve-from-long-call option cmdline cmdline-value)
 		     (setq cmdline new-cmdline)
 		     (push (make-cmdline-option
@@ -173,7 +173,7 @@ command-line options."))
 						 (short-name option)))
 			       (subseq cmdline-name
 				       (length (short-name option))))))
-			(destructuring-bind (new-cmdline value status)
+			(multiple-value-bind (new-cmdline value status)
 			    (retrieve-from-short-call option cmdline
 						      cmdline-value)
 			  (setq cmdline new-cmdline)
@@ -204,7 +204,8 @@ command-line options."))
 					(option (search-option (synopsis context)
 						  :short-name name)))
 				   (assert option)
-				   (destructuring-bind (new-cmdline value status)
+				   (multiple-value-bind
+					 (new-cmdline value status)
 				       (retrieve-from-short-call option nil)
 				     (declare (ignore new-cmdline))
 				     (push (make-cmdline-option
@@ -219,7 +220,7 @@ command-line options."))
 				      (option (search-option (synopsis context)
 						:short-name name)))
 				 (assert option)
-				 (destructuring-bind (new-cmdline value status)
+				 (multiple-value-bind (new-cmdline value status)
 				     (retrieve-from-short-call option cmdline)
 				   (setq cmdline new-cmdline)
 				   (push (make-cmdline-option
@@ -262,7 +263,7 @@ command-line options."))
 			      :short-name cmdline-name)))
 	       (cond (option
 		      ;; We found an option.
-		      (destructuring-bind (value status)
+		      (multiple-value-bind (value status)
 			  (retrieve-from-plus-call option)
 			(push (make-cmdline-option
 			       :name (short-name option)
@@ -285,7 +286,7 @@ command-line options."))
 					 (option (search-option
 						     (synopsis context)
 						   :short-name name)))
-				    (destructuring-bind (value status)
+				    (multiple-value-bind (value status)
 					(retrieve-from-plus-call option)
 				      (push (make-cmdline-option
 					     :name (short-name option)

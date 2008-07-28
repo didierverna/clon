@@ -214,7 +214,7 @@ If AS-STRING is not nil, return a string of that character.")
 
 (defgeneric convert (option argument)
   (:documentation "Try to convert ARGUMENT into OPTION's value.
-Return a list of that value, and the conversion status."))
+Return that value and the conversion status."))
 
 ;; #### NOTE: this is just to spare the burden of checking the conversion
 ;; status for people extending Clon. Maybe a simple macro and documenting that
@@ -222,16 +222,16 @@ Return a list of that value, and the conversion status."))
 (defun safe-convert (option argument)
   "Convert ARGUMENT into OPTION's value.
 Only, return OPTION's default value in case of conversion failure."
-  (destructuring-bind (value status) (convert option argument)
-    (list (if (consp status)
-	      (default-value option)
-	      value)
-	  status)))
+  (multiple-value-bind (value status) (convert option argument)
+    (values (if (consp status)
+		(default-value option)
+		value)
+	    status)))
 
 (defgeneric retrieve-from-long-call (option cmdline &optional cmdline-value)
   (:documentation "Retrieve OPTION's value from a long call in CMDLINE.
 CMDLINE-VALUE is a potentially already parsed cmdline argument.
-This function returns a list of three values:
+This function returns three values:
 - the new cmdline (possibly with the first item popped if the option requires
   an argument),
 - the retrieved value,
@@ -240,7 +240,7 @@ This function returns a list of three values:
 (defgeneric retrieve-from-short-call (option cmdline &optional cmdline-value)
   (:documentation "Retrieve OPTION's value from a short call in CMDLINE.
 CMDLINE-VALUE is a potentially already parsed cmdline argument.
-This function returns a list of three values:
+This function returns three values:
 - the new cmdline (possibly with the first item popped if the option requires
   an argument),
 - the retrieved value,
@@ -248,7 +248,7 @@ This function returns a list of three values:
 
 (defgeneric retrieve-from-plus-call (option)
   (:documentation "Retrieve OPTION's value from a plus call.
-This function returns a list of two values:
+This function returns two values:
 - the retrieved value,
 - the retrieval status."))
 
@@ -324,11 +324,11 @@ This class implements options that don't take any argument."))
   ;; an =-syntax. However, we don't check whether the next cmdline item could
   ;; be a spurious arg, because that would mess with a possible automatic
   ;; remainder detection.
-  (list cmdline
-	t
-	(if cmdline-value
-	    (list :extra-argument cmdline-value)
-	    t)))
+  (values cmdline
+	  t
+	  (if cmdline-value
+	      (list :extra-argument cmdline-value)
+	      t)))
 
 (defmethod retrieve-from-short-call ((flag flag) cmdline &optional cmdline-value)
   "Retrieve FLAG's value from a short call in CMDLINE."
@@ -336,16 +336,16 @@ This class implements options that don't take any argument."))
   ;; However, we don't check whether the next cmdline item could be a spurious
   ;; arg, because that would mess with a possible automatic remainder
   ;; detection.
-  (list cmdline
-	t
-	(if cmdline-value
-	    (list :extra-argument cmdline-value)
-	    t)))
+  (values cmdline
+	  t
+	  (if cmdline-value
+	      (list :extra-argument cmdline-value)
+	      t)))
 
 (defmethod retrieve-from-plus-call ((flag flag))
   "Return t and an invalid + syntax error."
   ;; t because FLAG was given on the command line anyway.
-  (list t (list :invalid-+-syntax)))
+  (values t (list :invalid-+-syntax)))
 
 
 ;; ============================================================================
@@ -444,14 +444,16 @@ This class implements is the base class for options accepting arguments."))
 	 (unless cmdline-value
 	   (setq cmdline-value (maybe-pop-arg cmdline)))
 	 (if cmdline-value
-	     (destructuring-bind (value status) (safe-convert option cmdline-value)
-	       (list cmdline value status))
-	     (list cmdline (default-value option) (list :missing-argument))))
+	     (multiple-value-bind (value status)
+		 (safe-convert option cmdline-value)
+	       (values cmdline value status))
+	     (values cmdline (default-value option) (list :missing-argument))))
 	(t
 	 (if cmdline-value
-	     (destructuring-bind (value status) (safe-convert option cmdline-value)
-	       (list cmdline value status))
-	     (list cmdline (default-value option) t)))))
+	     (multiple-value-bind (value status)
+		 (safe-convert option cmdline-value)
+	       (values cmdline value status))
+	     (values cmdline (default-value option) t)))))
 
 (defmethod retrieve-from-short-call
     ((option valued-option) cmdline &optional cmdline-value)
@@ -465,19 +467,21 @@ This class implements is the base class for options accepting arguments."))
 	 (unless cmdline-value
 	   (setq cmdline-value (maybe-pop-arg cmdline)))
 	 (if cmdline-value
-	     (destructuring-bind (value status) (safe-convert option cmdline-value)
-	       (list cmdline value status))
-	     (list cmdline (default-value option) (list :missing-argument))))
+	     (multiple-value-bind (value status)
+		 (safe-convert option cmdline-value)
+	       (values cmdline value status))
+	     (values cmdline (default-value option) (list :missing-argument))))
 	(t
 	 (if cmdline-value
-	     (destructuring-bind (value status) (safe-convert option cmdline-value)
-	       (list cmdline value status))
-	     (list cmdline (default-value option) t)))))
+	     (multiple-value-bind (value status)
+		 (safe-convert option cmdline-value)
+	       (values cmdline value status))
+	     (values cmdline (default-value option) t)))))
 
 ;; This method applies to all valued options but the switches.
 (defmethod retrieve-from-plus-call ((option valued-option))
   "Return OPTION's default value and an invalid + syntax error."
-  (list (default-value option) (list :invalid-+-syntax)))
+  (values (default-value option) (list :invalid-+-syntax)))
 
 
 ;; ============================================================================
@@ -578,11 +582,11 @@ This class implements boolean options."))
     "Convert ARGUMENT into a SWITCH value.
 Conformant arguments can be either yes/on/true/no/off/false."
     (cond ((member argument yes-values :test #'string=)
-	   (list t t))
+	   (values t t))
 	  ((member argument no-values :test #'string=)
-	   (list nil t))
+	   (values nil t))
 	  (t
-	   (list nil (list :invalid-value argument))))))
+	   (values nil (list :invalid-value argument))))))
 
 (defmethod retrieve-from-long-call
     ((switch switch) cmdline &optional cmdline-value)
@@ -593,14 +597,15 @@ Conformant arguments can be either yes/on/true/no/off/false."
 	 (unless cmdline-value
 	   (setq cmdline-value (maybe-pop-arg cmdline)))
 	 (if cmdline-value
-	     (destructuring-bind (value status) (safe-convert switch cmdline-value)
-	       (list cmdline value status))
-	     (list cmdline (default-value switch) (list :missing-argument))))
+	     (multiple-value-bind (value status)
+		 (safe-convert switch cmdline-value)
+	       (values cmdline value status))
+	     (values cmdline (default-value switch) (list :missing-argument))))
 	(t
 	 (if cmdline-value
-	     (destructuring-bind (value status)(safe-convert switch cmdline-value)
-	       (list cmdline value status))
-	     (list cmdline t t)))))
+	     (multiple-value-bind (value status)(safe-convert switch cmdline-value)
+	       (values cmdline value status))
+	     (values cmdline t t)))))
 
 (defmethod retrieve-from-short-call
     ((switch switch) cmdline &optional cmdline-value)
@@ -608,15 +613,15 @@ Conformant arguments can be either yes/on/true/no/off/false."
   ;; The difference with other valued options (see above) is that switches
   ;; don't take *any* argument in short form (whether optional or not), so we
   ;; don't check anything in CMDLINE. The minus form just means "yes".
-  (list cmdline
-	t
-	(if cmdline-value
-	    (list :extra-argument cmdline-value)
-	    t)))
+  (values cmdline
+	  t
+	  (if cmdline-value
+	      (list :extra-argument cmdline-value)
+	      t)))
 
 (defmethod retrieve-from-plus-call ((switch switch))
   "Retrieve SWITCH's value from a plus call in CMDLINE."
-  (list nil t))
+  (values nil t))
 
 
 ;; ============================================================================
@@ -682,6 +687,7 @@ This class implements options the values of which are strings."))
 
 (defmethod convert ((stropt stropt) argument)
   "Just return the argument as-is."
-  (list argument t))
+  (values argument t))
+
 
 ;;; option.lisp ends here
