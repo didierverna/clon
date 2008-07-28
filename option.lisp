@@ -232,19 +232,19 @@ Only, return OPTION's default value in case of conversion failure."
   (:documentation "Retrieve OPTION's value from a long call in CMDLINE.
 CMDLINE-VALUE is a potentially already parsed cmdline argument.
 This function returns three values:
-- the new cmdline (possibly with the first item popped if the option requires
-  an argument),
 - the retrieved value,
-- the retrieval status."))
+- the retrieval status,
+- the new cmdline (possibly with the first item popped if the option requires
+  an argument)."))
 
 (defgeneric retrieve-from-short-call (option cmdline &optional cmdline-value)
   (:documentation "Retrieve OPTION's value from a short call in CMDLINE.
 CMDLINE-VALUE is a potentially already parsed cmdline argument.
 This function returns three values:
-- the new cmdline (possibly with the first item popped if the option requires
-  an argument),
 - the retrieved value,
-- the retrieval status."))
+- the retrieval status,
+- the new cmdline (possibly with the first item popped if the option requires
+  an argument)."))
 
 (defgeneric retrieve-from-plus-call (option)
   (:documentation "Retrieve OPTION's value from a plus call.
@@ -324,11 +324,11 @@ This class implements options that don't take any argument."))
   ;; an =-syntax. However, we don't check whether the next cmdline item could
   ;; be a spurious arg, because that would mess with a possible automatic
   ;; remainder detection.
-  (values cmdline
-	  t
+  (values t
 	  (if cmdline-value
 	      (list :extra-argument cmdline-value)
-	      t)))
+	      t)
+	  cmdline))
 
 (defmethod retrieve-from-short-call ((flag flag) cmdline &optional cmdline-value)
   "Retrieve FLAG's value from a short call in CMDLINE."
@@ -336,11 +336,11 @@ This class implements options that don't take any argument."))
   ;; However, we don't check whether the next cmdline item could be a spurious
   ;; arg, because that would mess with a possible automatic remainder
   ;; detection.
-  (values cmdline
-	  t
+  (values t
 	  (if cmdline-value
 	      (list :extra-argument cmdline-value)
-	      t)))
+	      t)
+	  cmdline))
 
 (defmethod retrieve-from-plus-call ((flag flag))
   "Return t and an invalid + syntax error."
@@ -446,14 +446,14 @@ This class implements is the base class for options accepting arguments."))
 	 (if cmdline-value
 	     (multiple-value-bind (value status)
 		 (safe-convert option cmdline-value)
-	       (values cmdline value status))
-	     (values cmdline (default-value option) (list :missing-argument))))
+	       (values value status cmdline))
+	     (values (default-value option) (list :missing-argument) cmdline)))
 	(t
 	 (if cmdline-value
 	     (multiple-value-bind (value status)
 		 (safe-convert option cmdline-value)
-	       (values cmdline value status))
-	     (values cmdline (default-value option) t)))))
+	       (values value status cmdline))
+	     (values (default-value option) t cmdline)))))
 
 (defmethod retrieve-from-short-call
     ((option valued-option) cmdline &optional cmdline-value)
@@ -469,14 +469,14 @@ This class implements is the base class for options accepting arguments."))
 	 (if cmdline-value
 	     (multiple-value-bind (value status)
 		 (safe-convert option cmdline-value)
-	       (values cmdline value status))
-	     (values cmdline (default-value option) (list :missing-argument))))
+	       (values value status cmdline))
+	     (values (default-value option) (list :missing-argument) cmdline)))
 	(t
 	 (if cmdline-value
 	     (multiple-value-bind (value status)
 		 (safe-convert option cmdline-value)
-	       (values cmdline value status))
-	     (values cmdline (default-value option) t)))))
+	       (values value status cmdline))
+	     (values (default-value option) t cmdline)))))
 
 ;; This method applies to all valued options but the switches.
 (defmethod retrieve-from-plus-call ((option valued-option))
@@ -599,13 +599,13 @@ Conformant arguments can be either yes/on/true/no/off/false."
 	 (if cmdline-value
 	     (multiple-value-bind (value status)
 		 (safe-convert switch cmdline-value)
-	       (values cmdline value status))
-	     (values cmdline (default-value switch) (list :missing-argument))))
+	       (values value status cmdline))
+	     (values (default-value switch) (list :missing-argument) cmdline)))
 	(t
 	 (if cmdline-value
 	     (multiple-value-bind (value status)(safe-convert switch cmdline-value)
-	       (values cmdline value status))
-	     (values cmdline t t)))))
+	       (values value status cmdline))
+	     (values t t cmdline)))))
 
 (defmethod retrieve-from-short-call
     ((switch switch) cmdline &optional cmdline-value)
@@ -613,11 +613,11 @@ Conformant arguments can be either yes/on/true/no/off/false."
   ;; The difference with other valued options (see above) is that switches
   ;; don't take *any* argument in short form (whether optional or not), so we
   ;; don't check anything in CMDLINE. The minus form just means "yes".
-  (values cmdline
-	  t
+  (values t
 	  (if cmdline-value
 	      (list :extra-argument cmdline-value)
-	      t)))
+	      t)
+	  cmdline))
 
 (defmethod retrieve-from-plus-call ((switch switch))
   "Retrieve SWITCH's value from a plus call in CMDLINE."

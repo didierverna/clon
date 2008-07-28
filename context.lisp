@@ -124,7 +124,7 @@ command-line options."))
 				    :partial-name cmdline-name))))
 		 (if option
 		     ;; We have an option. Let's retrieve its actual value.
-		     (multiple-value-bind (new-cmdline value status)
+		     (multiple-value-bind (value status new-cmdline)
 			 (retrieve-from-long-call option cmdline cmdline-value)
 		       (setq cmdline new-cmdline)
 		       (push-cmdline-option arglist
@@ -172,7 +172,7 @@ command-line options."))
 						   (short-name option)))
 				 (subseq cmdline-name
 					 (length (short-name option))))))
-			  (multiple-value-bind (new-cmdline value status)
+			  (multiple-value-bind (value status new-cmdline)
 			      (retrieve-from-short-call option cmdline
 							cmdline-value)
 			    (setq cmdline new-cmdline)
@@ -203,7 +203,7 @@ command-line options."))
 						    :short-name name)))
 				     (assert option)
 				     (multiple-value-bind
-					   (new-cmdline value status)
+					   (value status new-cmdline)
 					 (retrieve-from-short-call option nil)
 				       (declare (ignore new-cmdline))
 				       (push-cmdline-option arglist
@@ -218,7 +218,7 @@ command-line options."))
 						  :short-name name)))
 				   (assert option)
 				   (multiple-value-bind
-					 (new-cmdline value status)
+					 (value status new-cmdline)
 				       (retrieve-from-short-call option cmdline)
 				     (setq cmdline new-cmdline)
 				     (push-cmdline-option arglist
