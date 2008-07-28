@@ -204,7 +204,7 @@ command-line options."))
 						    :short-name name)))
 				     (assert option)
 				     (multiple-value-bind (value status)
-					 (retrieve-from-short-call option nil)
+					 (retrieve-from-short-call option)
 				       (push-cmdline-option arglist
 					 :name (short-name option)
 					 :option option
