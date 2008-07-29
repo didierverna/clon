@@ -96,7 +96,40 @@ command-line options."))
 	(remainder (list))
 	(junk (list)))
     (macrolet ((push-cmdline-option (arglist &rest body)
-		 `(push (make-cmdline-option ,@body) ,arglist)))
+		 `(push (make-cmdline-option ,@body) ,arglist))
+	       (push-retrieved-option
+		   (func arglist option &optional cmdline-value cmdline name-form)
+		   (let* ((value (gensym "value"))
+			  (status (gensym "status"))
+			  (vars (list status value))
+			  (call (list option
+				      (find-symbol (concatenate 'string
+						     "RETRIEVE-FROM-"
+						     (symbol-name func)
+						     "-CALL")
+						   'clon)))
+			  new-cmdline)
+		     (unless name-form
+		       (setq name-form
+			     (ecase func
+			       (:long `(long-name ,option))
+			       (:short `(short-name ,option))
+			       (:plus `(short-name ,option)))))
+		     (when cmdline-value
+		       (push cmdline-value call))
+		     (when cmdline
+		       (setq new-cmdline (gensym "new-cmdline"))
+		       (push new-cmdline vars)
+		       (unless cmdline-value
+			 (push nil call))
+		       (push cmdline call))
+		     `(multiple-value-bind ,(reverse vars) ,(reverse call)
+		       ,(when cmdline `(setq ,cmdline ,new-cmdline))
+		       (push-cmdline-option ,arglist
+			 :name ,name-form
+			 :option ,option
+			 :value ,value
+			 :status ,status)))))
       (do ((arg (pop cmdline) (pop cmdline)))
 	  ((null arg))
 	(cond ((string= arg "--")
@@ -124,19 +157,14 @@ command-line options."))
 				    :partial-name cmdline-name))))
 		 (if option
 		     ;; We have an option. Let's retrieve its actual value.
-		     (multiple-value-bind (value status new-cmdline)
-			 (retrieve-from-long-call option cmdline-value cmdline)
-		       (setq cmdline new-cmdline)
-		       (push-cmdline-option arglist
+		     (push-retrieved-option
+			 :long arglist option cmdline-value cmdline
 			 ;; The cmdline option's name is the long one, but in
 			 ;; case of abbreviation (for instance --he instead of
 			 ;; --help), we will display it like this: he(lp). In
 			 ;; case of error report, this will help the user spot
 			 ;; where he did something wrong.
-			 :name (complete-string cmdline-name (long-name option))
-			 :option option
-			 :value value
-			 :status status))
+			 (complete-string cmdline-name (long-name option)))
 		     ;; We have an unknown option. Don't mess with the rest of
 		     ;; the cmdline in order to avoid conflict with the
 		     ;; automatic remainder detection. Of course, the next
@@ -172,15 +200,8 @@ command-line options."))
 						   (short-name option)))
 				 (subseq cmdline-name
 					 (length (short-name option))))))
-			  (multiple-value-bind (value status new-cmdline)
-			      (retrieve-from-short-call option cmdline-value
-							cmdline)
-			    (setq cmdline new-cmdline)
-			    (push-cmdline-option arglist
-			      :name (short-name option)
-			      :option option
-			      :value value
-			      :status status))))
+			  (push-retrieved-option
+			      :short arglist option cmdline-value cmdline)))
 		       ((potential-pack (synopsis context))
 			;; Let's find out whether this is a minus pack:
 			(let ((trimmed (string-left-trim
@@ -203,29 +224,16 @@ command-line options."))
 						      (synopsis context)
 						    :short-name name)))
 				     (assert option)
-				     (multiple-value-bind (value status)
-					 (retrieve-from-short-call option)
-				       (push-cmdline-option arglist
-					 :name (short-name option)
-					 :option option
-					 :value value
-					 :status status))))
+				     (push-retrieved-option
+					 :short arglist option)))
 				 (let* ((name (subseq cmdline-name
 						      (1-
 						       (length cmdline-name))))
 					(option (search-option (synopsis context)
 						  :short-name name)))
 				   (assert option)
-				   (multiple-value-bind
-					 (value status new-cmdline)
-				       (retrieve-from-short-call option nil
-								 cmdline)
-				     (setq cmdline new-cmdline)
-				     (push-cmdline-option arglist
-				       :name (short-name option)
-				       :option option
-				       :value value
-				       :status status))))
+				   (push-retrieved-option
+				       :short arglist option nil cmdline)))
 				(t
 				 ;; This is not a minus pack, so we have an
 				 ;; unknown option. Don't mess with the rest
@@ -261,21 +269,15 @@ command-line options."))
 				:short-name cmdline-name)))
 		 (cond (option
 			;; We found an option.
-			(multiple-value-bind (value status)
-			    (retrieve-from-plus-call option)
-			  (push-cmdline-option arglist
-			    :name (short-name option)
-			    :option option
-			    :value value
-			    :status status)))
+			(push-retrieved-option :plus arglist option))
 		       ((potential-pack (synopsis context))
 			;; Let's find out whether this is a plus pack:
 			(let ((trimmed (string-left-trim
 					(potential-pack (synopsis context))
 					cmdline-name)))
 			  (if (zerop (length trimmed))
-			      ;; We found a potential plus pack. Split the pack
-			      ;; into multiple option calls.
+			      ;; We found a potential plus pack. Split the
+			      ;; pack into multiple option calls.
 			      (loop :for char :across cmdline-name
 				    :do
 				    (let* ((name (make-string 1
@@ -283,13 +285,8 @@ command-line options."))
 					   (option (search-option
 						       (synopsis context)
 						     :short-name name)))
-				      (multiple-value-bind (value status)
-					  (retrieve-from-plus-call option)
-					(push-cmdline-option arglist
-					  :name (short-name option)
-					  :option option
-					  :value value
-					  :status status))))
+				      (push-retrieved-option
+					  :plus arglist option)))
 			      ;; This is not a plus pack, so we have an
 			      ;; unknown option.
 			      (push-cmdline-option arglist :name cmdline-name))))
