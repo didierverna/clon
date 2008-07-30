@@ -200,23 +200,29 @@ command-line hierarchy."))
 ;; The Option Searching Protocol
 ;; ============================================================================
 
-(defun search-option (container &rest keys &key short-name long-name partial-name)
-  "Search for option in CONTAINER.
+(defgeneric search-option
+    (there &rest keys &key short-name long-name partial-name)
+  (:documentation "Search for option in THERE.
 The search is done with SHORT-NAME, LONG-NAME, or PARTIAL-NAME.
 In case of a PARTIAL-NAME search, look for an option the long name of which
-begins with it."
-  (declare (ignore short-name long-name partial-name))
-  (do-options (option container)
-    (when (apply #'option-matches option
-		 (select-keys keys :short-name :long-name :partial-name))
-      (return-from search-option option))))
+begins with it.")
+  (:method
+      ((container container) &rest keys &key short-name long-name partial-name)
+    "Search for option in CONTAINER."
+    (declare (ignore short-name long-name partial-name))
+    (do-options (option container)
+      (when (apply #'option-matches option
+		   (select-keys keys :short-name :long-name :partial-name))
+	(return-from search-option option)))))
 
-(defun search-sticky-option (container namearg)
-  "Search for a sticky option in CONTAINER.
-NAMEARG is the concatenation of the option's name and its argument."
-  (do-options (option container)
-    (when (option-matches-sticky option namearg)
-      (return-from search-sticky-option option))))
+(defgeneric search-sticky-option (there namearg)
+  (:documentation "Search for a sticky option in THERE.
+NAMEARG is the concatenation of the option's name and its argument.")
+  (:method ((container container) namearg)
+    "Search for a sticky option in CONTAINER."
+    (do-options (option container)
+      (when (option-matches-sticky option namearg)
+	(return-from search-sticky-option option)))))
 
 
 ;;; container.lisp ends here

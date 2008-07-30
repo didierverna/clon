@@ -129,7 +129,7 @@ command-line options."))
 		       (name (gensym "name")))
 		   `(loop :for ,char :across ,pack
 		     :do (let* ((,name (make-string 1 :initial-element ,char))
-				(,option (search-option (synopsis ,context)
+				(,option (search-option ,context
 					   :short-name ,name)))
 			   (assert ,option)
 			   ,@body)))))
@@ -154,9 +154,9 @@ command-line options."))
 		      ;; --foo, but passing --fo will match --foobar. This is
 		      ;; probably not the best behavior: it would be better to
 		      ;; find the option "closest" to the partial match.
-		      (option (or (search-option (synopsis context)
+		      (option (or (search-option context
 				    :long-name cmdline-name)
-				  (search-option (synopsis context)
+				  (search-option context
 				    :partial-name cmdline-name))))
 		 (if option
 		     ;; We found an option. The cmdline option's name is the
@@ -183,7 +183,7 @@ command-line options."))
 		      ;; #### NOTE: we don't allow partial match on short
 		      ;; names because that would make it too complicated to
 		      ;; distinguish abreviations, sticky arguments and stuff.
-		      (option (or (search-option (synopsis context)
+		      (option (or (search-option context
 				    :short-name cmdline-name)
 				  ;; #### NOTE: when looking for a sticky
 				  ;; option, we stop at the first match, even
@@ -192,8 +192,7 @@ command-line options."))
 				  ;; is probably not the best behavior: it
 				  ;; would be better to find the option
 				  ;; "closest" to the partial match.
-				  (search-sticky-option
-				   (synopsis context) cmdline-name))))
+				  (search-sticky-option context cmdline-name))))
 		 (cond (option
 			;; We have an option. Let's retrieve its actual value,
 			;; maybe already with a sticky argument:
@@ -219,7 +218,7 @@ command-line options."))
 				 (push-retrieved-option :short arglist option))
 			       (let* ((name (subseq cmdline-name
 						    (1- (length cmdline-name))))
-				      (option (search-option (synopsis context)
+				      (option (search-option context
 						:short-name name)))
 				 (assert option)
 				 (push-retrieved-option :short arglist option
@@ -255,8 +254,7 @@ command-line options."))
 		      ;; we don't. That's all. Short names are not meant to be
 		      ;; long (otherwise, that would be long names right ?),
 		      ;; so they're not meant to be abbreviated.
-		      (option (search-option (synopsis context)
-				:short-name cmdline-name)))
+		      (option (search-option context :short-name cmdline-name)))
 		 (cond (option
 			;; We found an option.
 			(push-retrieved-option :plus arglist option))
@@ -313,6 +311,20 @@ command-line options."))
   "Return t if PACK (a string) is a potential pack in CONTEXT."
   (potential-pack-p pack (synopsis context)))
 
+
+;; -------------------------
+;; Option searching protocol
+;; -------------------------
+
+(defmethod search-option
+    ((context context) &rest keys &key short-name long-name partial-name)
+  "Search for option in CONTEXT."
+  (declare (ignore short-name long-name partial-name))
+  (apply #'search-option (synopsis context) keys))
+
+(defmethod search-sticky-option ((context context) namearg)
+  "Search for a sticky option in CONTEXT."
+  (search-sticky-option (synopsis context) namearg))
 
 
 ;; ============================================================================
