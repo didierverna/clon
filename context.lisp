@@ -86,12 +86,6 @@ command-line options."))
   "Parse CMDLINE."
   (declare (ignore synopsis))
   (setf (slot-value context 'progname) (pop cmdline))
-  ;; ### FIXME: all the stuff below is not very well abstracted.
-  ;; In order to parse the command line, we not only need a lexical and
-  ;; syntactic analysis, but also a bit of semantics: indeed, the parsing
-  ;; depends on the option type to some extent, and also on the argument
-  ;; status (required or optional). The rest of the semantic analysis (most
-  ;; notably value conversion) is done when options are actually retrieved.
   (let ((arglist (list))
 	(remainder (list))
 	(junk (list)))
@@ -129,7 +123,16 @@ command-line options."))
 			 :name ,name-form
 			 :option ,option
 			 :value ,value
-			 :status ,status)))))
+			 :status ,status))))
+	       (do-pack ((option pack context) &body body)
+		 (let ((char (gensym "char"))
+		       (name (gensym "name")))
+		   `(loop :for ,char :across ,pack
+		     :do (let* ((,name (make-string 1 :initial-element ,char))
+				(,option (search-option (synopsis ,context)
+					   :short-name ,name)))
+			   (assert ,option)
+			   ,@body)))))
       (do ((arg (pop cmdline) (pop cmdline)))
 	  ((null arg))
 	(cond ((string= arg "--")
@@ -144,10 +147,10 @@ command-line options."))
 				       (subseq arg (1+ value-start))))
 		      ;; #### NOTE: we authorize partial matching
 		      ;; (abreviations) for long names: an exact match is
-		      ;; search first. If that fails, we try partial matching,
-		      ;; and the first matching option is returned. For
-		      ;; instance, if you have --foobar and --foo options in
-		      ;; that order, passing --foo will match the option
+		      ;; searched first. If that fails, we try partial
+		      ;; matching, and the first matching option is returned.
+		      ;; For instance, if you have --foobar and --foo options
+		      ;; in that order, passing --foo will match the option
 		      ;; --foo, but passing --fo will match --foobar. This is
 		      ;; probably not the best behavior: it would be better to
 		      ;; find the option "closest" to the partial match.
@@ -156,15 +159,14 @@ command-line options."))
 				  (search-option (synopsis context)
 				    :partial-name cmdline-name))))
 		 (if option
-		     ;; We have an option. Let's retrieve its actual value.
-		     (push-retrieved-option
-			 :long arglist option cmdline-value cmdline
-			 ;; The cmdline option's name is the long one, but in
-			 ;; case of abbreviation (for instance --he instead of
-			 ;; --help), we will display it like this: he(lp). In
-			 ;; case of error report, this will help the user spot
-			 ;; where he did something wrong.
-			 (complete-string cmdline-name (long-name option)))
+		     ;; We found an option. The cmdline option's name is the
+		     ;; long one, but in case of abbreviation (for instance
+		     ;; --he instead of --help), we will register it like
+		     ;; this: he(lp). In case of error report, this will help
+		     ;; the user spot where he did something wrong.
+		     (push-retrieved-option :long arglist option
+		       cmdline-value cmdline
+		       (complete-string cmdline-name (long-name option)))
 		     ;; We have an unknown option. Don't mess with the rest of
 		     ;; the cmdline in order to avoid conflict with the
 		     ;; automatic remainder detection. Of course, the next
@@ -200,8 +202,8 @@ command-line options."))
 						   (short-name option)))
 				 (subseq cmdline-name
 					 (length (short-name option))))))
-			  (push-retrieved-option
-			      :short arglist option cmdline-value cmdline)))
+			  (push-retrieved-option :short arglist option
+			    cmdline-value cmdline)))
 		       ((potential-pack (synopsis context))
 			;; Let's find out whether this is a minus pack:
 			(let ((trimmed (string-left-trim
@@ -213,27 +215,20 @@ command-line options."))
 				 ;; one gets a cmdline, though, because only
 				 ;; the last one is allowed to get an argument
 				 ;; from the next cmdline arg.
-				 (loop :for char
-				   :across (subseq cmdline-name
+				 (do-pack (option
+					   (subseq cmdline-name
 						   0
 						   (1- (length cmdline-name)))
-				   :do
-				   (let* ((name (make-string 1
-						  :initial-element char))
-					  (option (search-option
-						      (synopsis context)
-						    :short-name name)))
-				     (assert option)
-				     (push-retrieved-option
-					 :short arglist option)))
+					   context)
+				   (push-retrieved-option :short arglist option))
 				 (let* ((name (subseq cmdline-name
 						      (1-
 						       (length cmdline-name))))
 					(option (search-option (synopsis context)
 						  :short-name name)))
 				   (assert option)
-				   (push-retrieved-option
-				       :short arglist option nil cmdline)))
+				   (push-retrieved-option :short arglist option
+				     nil cmdline)))
 				(t
 				 ;; This is not a minus pack, so we have an
 				 ;; unknown option. Don't mess with the rest
@@ -278,15 +273,8 @@ command-line options."))
 			  (if (zerop (length trimmed))
 			      ;; We found a potential plus pack. Split the
 			      ;; pack into multiple option calls.
-			      (loop :for char :across cmdline-name
-				    :do
-				    (let* ((name (make-string 1
-						   :initial-element char))
-					   (option (search-option
-						       (synopsis context)
-						     :short-name name)))
-				      (push-retrieved-option
-					  :plus arglist option)))
+			      (do-pack (option cmdline-name context)
+				(push-retrieved-option :plus arglist option))
 			      ;; This is not a plus pack, so we have an
 			      ;; unknown option.
 			      (push-cmdline-option arglist :name cmdline-name))))
