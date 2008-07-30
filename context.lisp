@@ -206,40 +206,35 @@ command-line options."))
 			    cmdline-value cmdline)))
 		       ((potential-pack (synopsis context))
 			;; Let's find out whether this is a minus pack:
-			(let ((trimmed (string-left-trim
-					(potential-pack (synopsis context))
-					cmdline-name)))
-			  (cond ((zerop (length trimmed))
-				 ;; We found a potential minus pack. Split it
-				 ;; into multiple short calls. Only the last
-				 ;; one gets a cmdline, though, because only
-				 ;; the last one is allowed to get an argument
-				 ;; from the next cmdline arg.
-				 (do-pack (option
-					   (subseq cmdline-name
-						   0
-						   (1- (length cmdline-name)))
-					   context)
-				   (push-retrieved-option :short arglist option))
-				 (let* ((name (subseq cmdline-name
-						      (1-
-						       (length cmdline-name))))
-					(option (search-option (synopsis context)
-						  :short-name name)))
-				   (assert option)
-				   (push-retrieved-option :short arglist option
-				     nil cmdline)))
-				(t
-				 ;; This is not a minus pack, so we have an
-				 ;; unknown option. Don't mess with the rest
-				 ;; of the cmdline in order to avoid conflict
-				 ;; with the automatic remainder detection. Of
-				 ;; course, the next cmdline item might be an
-				 ;; argument for a misspelled option, but when
-				 ;; things are messed up, they're messed up,
-				 ;; that's all.
-				 (push-cmdline-option arglist
-				   :name cmdline-name)))))
+			(cond ((potential-pack-p cmdline-name context)
+			       ;; We found a potential minus pack. Split it
+			       ;; into multiple short calls. Only the last one
+			       ;; gets a cmdline, though, because only the
+			       ;; last one is allowed to get an argument from
+			       ;; the next cmdline arg.
+			       (do-pack (option
+					 (subseq cmdline-name
+						 0 (1- (length cmdline-name)))
+					 context)
+				 (push-retrieved-option :short arglist option))
+			       (let* ((name (subseq cmdline-name
+						    (1- (length cmdline-name))))
+				      (option (search-option (synopsis context)
+						:short-name name)))
+				 (assert option)
+				 (push-retrieved-option :short arglist option
+				   nil cmdline)))
+			      (t
+			       ;; This is not a minus pack, so we have an
+			       ;; unknown option. Don't mess with the rest of
+			       ;; the cmdline in order to avoid conflict with
+			       ;; the automatic remainder detection. Of
+			       ;; course, the next cmdline item might be an
+			       ;; argument for a misspelled option, but when
+			       ;; things are messed up, they're messed up,
+			       ;; that's all.
+			       (push-cmdline-option arglist
+				 :name cmdline-name))))
 		       (t
 			;; There's no potential pack, so we have an unknown
 			;; option. Don't mess with the rest of the cmdline in
@@ -267,17 +262,14 @@ command-line options."))
 			(push-retrieved-option :plus arglist option))
 		       ((potential-pack (synopsis context))
 			;; Let's find out whether this is a plus pack:
-			(let ((trimmed (string-left-trim
-					(potential-pack (synopsis context))
-					cmdline-name)))
-			  (if (zerop (length trimmed))
-			      ;; We found a potential plus pack. Split the
-			      ;; pack into multiple option calls.
-			      (do-pack (option cmdline-name context)
-				(push-retrieved-option :plus arglist option))
-			      ;; This is not a plus pack, so we have an
-			      ;; unknown option.
-			      (push-cmdline-option arglist :name cmdline-name))))
+			(if (potential-pack-p cmdline-name context)
+			    ;; We found a potential plus pack. Split the pack
+			    ;; into multiple option calls.
+			    (do-pack (option cmdline-name context)
+			      (push-retrieved-option :plus arglist option))
+			    ;; This is not a plus pack, so we have an unknown
+			    ;; option.
+			    (push-cmdline-option arglist :name cmdline-name)))
 		       (t
 			;; There's no potential pack, so we have an unknown
 			;; option.
@@ -311,6 +303,16 @@ command-line options."))
   It defaults to a POSIX conformant argv."
   (declare (ignore synopsis cmdline))
   (apply #'make-instance 'context keys))
+
+
+;; -----------------------
+;; Potential pack protocol
+;; -----------------------
+
+(defmethod potential-pack-p (pack (context context))
+  "Return t if PACK (a string) is a potential pack in CONTEXT."
+  (potential-pack-p pack (synopsis context)))
+
 
 
 ;; ============================================================================

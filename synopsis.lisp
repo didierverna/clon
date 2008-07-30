@@ -142,4 +142,16 @@ otherwise."
     (setf (slot-value synopsis 'minus-pack) minus-pack)
     (setf (slot-value synopsis 'plus-pack) plus-pack)))
 
+
+;; ============================================================================
+;; The Potential Pack Protocol
+;; ============================================================================
+
+(defgeneric potential-pack-p (pack there)
+  (:documentation "Return t if PACK (a string) is a potential pack in THERE.")
+  (:method (pack (synopsis synopsis))
+    "Return t if PACK (a string) is a potential pack for SYNOPSIS."
+    (zerop (length (string-left-trim (potential-pack synopsis) pack)))))
+
+
 ;;; synopsis.lisp ends here
