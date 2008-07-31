@@ -200,6 +200,15 @@ command-line hierarchy."))
 ;; The Option Searching Protocol
 ;; ============================================================================
 
+;; #### NOTE: when partial matching is requested, the first matching option is
+;; returned. For instance, if you have --foobar and --foo options in that
+;; order, passing --foo will match the option --foo, but passing --fo will
+;; match --foobar. This is probably not the best behavior: it would be better
+;; to find the option "closest" to the partial match.
+;; #### NOTE: partial matches are not allowed on short options. I didn't think
+;; this through, but it would probably make things very difficult wrt sticky
+;; options for instance. Think about it again at some point.
+
 (defgeneric search-option
     (there &rest keys &key short-name long-name partial-name)
   (:documentation "Search for option in THERE.
@@ -215,6 +224,10 @@ begins with it.")
 		   (select-keys keys :short-name :long-name :partial-name))
 	(return-from search-option option)))))
 
+;; #### NOTE: when looking for a sticky option, we stop at the first match,
+;; even if, for instance, another option would match a longer part of the
+;; argument. This is probably not the best behavior: it would be better to
+;; find the option "closest" to the sticky match.
 (defgeneric search-sticky-option (there namearg)
   (:documentation "Search for a sticky option in THERE.
 NAMEARG is the concatenation of the option's name and its argument.")

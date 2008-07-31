@@ -151,6 +151,9 @@ otherwise."
   (:documentation "Return t if PACK (a string) is a potential pack in THERE.")
   (:method (pack (synopsis synopsis))
     "Return t if PACK (a string) is a potential pack for SYNOPSIS."
+    ;; #### NOTE: if there's no potential pack in SYNOPSIS, the call to
+    ;; STRING-LEFT-TRIM gets a nil CHAR-BAG which is ok and gives the expected
+    ;; result.
     (zerop (length (string-left-trim (potential-pack synopsis) pack)))))
 
 

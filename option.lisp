@@ -156,13 +156,6 @@ This class is the base class for all options."))
 ;; The Option Search protocol
 ;; ============================================================================
 
-;; #### NOTE: partial matches are not allowed on short options. I didn't think
-;; this through, but it would probably make things very difficult wrt sticky
-;; options for instance. Think about it again at some point.
-;; #### NOTE: also, in the C version, I had a BOOLEAN-ONLY flag which I now
-;; think is useless: it was used only for '+' syntax, that is, for short
-;; names, and thus requires a full match, as mentioned above. So I don't think
-;; that there's any ambiguity.
 (defun option-matches (option &key short-name long-name partial-name)
   "Return t if OPTION's names match.
 OPTION's names must match either SHORT-NAME, LONG-NAME, or PARTIAL-(long)-NAME."

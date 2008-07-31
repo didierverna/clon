@@ -145,15 +145,6 @@ command-line options."))
 		      (cmdline-name (subseq arg 2 value-start))
 		      (cmdline-value (when value-start
 				       (subseq arg (1+ value-start))))
-		      ;; #### NOTE: we authorize partial matching
-		      ;; (abreviations) for long names: an exact match is
-		      ;; searched first. If that fails, we try partial
-		      ;; matching, and the first matching option is returned.
-		      ;; For instance, if you have --foobar and --foo options
-		      ;; in that order, passing --foo will match the option
-		      ;; --foo, but passing --fo will match --foobar. This is
-		      ;; probably not the best behavior: it would be better to
-		      ;; find the option "closest" to the partial match.
 		      (option (or (search-option context
 				    :long-name cmdline-name)
 				  (search-option context
@@ -180,18 +171,11 @@ command-line options."))
 	      ((string-start arg "-")
 	       ;; #### FIXME: check invalid syntax -foo=val
 	       (let* ((cmdline-name (subseq arg 1))
-		      ;; #### NOTE: we don't allow partial match on short
-		      ;; names because that would make it too complicated to
-		      ;; distinguish abreviations, sticky arguments and stuff.
 		      (option (or (search-option context
 				    :short-name cmdline-name)
-				  ;; #### NOTE: when looking for a sticky
-				  ;; option, we stop at the first match, even
-				  ;; if, for instance, another option would
-				  ;; match a longer part of the argument. This
-				  ;; is probably not the best behavior: it
-				  ;; would be better to find the option
-				  ;; "closest" to the partial match.
+				  ;; #### FIXME: have search-sticky-option
+				  ;; return 2 values: the option and the
+				  ;; argument.
 				  (search-sticky-option context cmdline-name))))
 		 (cond (option
 			;; We have an option. Let's retrieve its actual value,
@@ -203,47 +187,31 @@ command-line options."))
 					 (length (short-name option))))))
 			  (push-retrieved-option :short arglist option
 			    cmdline-value cmdline)))
-		       ((potential-pack (synopsis context))
-			;; Let's find out whether this is a minus pack:
-			(cond ((potential-pack-p cmdline-name context)
-			       ;; We found a potential minus pack. Split it
-			       ;; into multiple short calls. Only the last one
-			       ;; gets a cmdline, though, because only the
-			       ;; last one is allowed to get an argument from
-			       ;; the next cmdline arg.
-			       (do-pack (option
-					 (subseq cmdline-name
+		       ((potential-pack-p cmdline-name context)
+			;; We found a potential minus pack. Split it into
+			;; multiple short calls. Only the last one gets a
+			;; cmdline, though, because only the last one is
+			;; allowed to get an argument from the next cmdline
+			;; arg.
+			(do-pack (option (subseq cmdline-name
 						 0 (1- (length cmdline-name)))
 					 context)
-				 (push-retrieved-option :short arglist option))
-			       (let* ((name (subseq cmdline-name
-						    (1- (length cmdline-name))))
-				      (option (search-option context
-						:short-name name)))
-				 (assert option)
-				 (push-retrieved-option :short arglist option
-				   nil cmdline)))
-			      (t
-			       ;; This is not a minus pack, so we have an
-			       ;; unknown option. Don't mess with the rest of
-			       ;; the cmdline in order to avoid conflict with
-			       ;; the automatic remainder detection. Of
-			       ;; course, the next cmdline item might be an
-			       ;; argument for a misspelled option, but when
-			       ;; things are messed up, they're messed up,
-			       ;; that's all.
-			       (push-cmdline-option arglist
-				 :name cmdline-name))))
+			  (push-retrieved-option :short arglist option))
+			(let* ((name (subseq cmdline-name
+					     (1- (length cmdline-name))))
+			       (option (search-option context :short-name name)))
+			  (assert option)
+			  (push-retrieved-option :short arglist option
+			    nil cmdline)))
 		       (t
-			;; There's no potential pack, so we have an unknown
-			;; option. Don't mess with the rest of the cmdline in
-			;; order to avoid conflict with the automatic
-			;; remainder detection. Of course, the next cmdline
-			;; item might be an argument for a misspelled option,
-			;; but when things are messed up, they're messed up,
-			;; that's all.
-			(push-cmdline-option arglist
-			  :name cmdline-name)))))
+			;; This is not a minus pack (or there is none), so we
+			;; have an unknown option. Don't mess with the rest of
+			;; the cmdline in order to avoid conflict with the
+			;; automatic remainder detection. Of course, the next
+			;; cmdline item might be an argument for a misspelled
+			;; option, but when things are messed up, they're
+			;; messed up, that's all.
+			(push-cmdline-option arglist :name cmdline-name)))))
 	      ;; A short (possibly unknown) switch, or a plus pack.
 	      ((string-start arg "+")
 	       ;; #### FIXME: check invalid syntax +foo=val
@@ -258,19 +226,13 @@ command-line options."))
 		 (cond (option
 			;; We found an option.
 			(push-retrieved-option :plus arglist option))
-		       ((potential-pack (synopsis context))
-			;; Let's find out whether this is a plus pack:
-			(if (potential-pack-p cmdline-name context)
-			    ;; We found a potential plus pack. Split the pack
-			    ;; into multiple option calls.
-			    (do-pack (option cmdline-name context)
-			      (push-retrieved-option :plus arglist option))
-			    ;; This is not a plus pack, so we have an unknown
-			    ;; option.
-			    (push-cmdline-option arglist :name cmdline-name)))
-		       (t
-			;; There's no potential pack, so we have an unknown
-			;; option.
+		       ((potential-pack-p cmdline-name context)
+			;; We found a potential plus pack. Split the pack into
+			;; multiple option calls.
+			(do-pack (option cmdline-name context)
+			  (push-retrieved-option :plus arglist option))
+			;; This is not a plus pack (or there is none), so we
+			;; have an unknown option.
 			(push-cmdline-option arglist :name cmdline-name)))))
 	      ;; Otherwise, it's junk.
 	      (t
