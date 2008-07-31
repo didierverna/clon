@@ -179,23 +179,16 @@ CONTEXT is where to look for the options."
 	      ;; A short (possibly unknown) option or a minus pack:
 	      ((string-start arg "-")
 	       ;; #### FIXME: check invalid syntax -foo=val
-	       (let* ((cmdline-name (subseq arg 1))
-		      (option (or (search-option context
-				    :short-name cmdline-name)
-				  ;; #### FIXME: have search-sticky-option
-				  ;; return 2 values: the option and the
-				  ;; argument.
-				  (search-sticky-option context cmdline-name))))
+	       (let ((cmdline-name (subseq arg 1))
+		     option cmdline-value)
+		 (multiple-value-setq (option cmdline-value)
+		   (or (search-option context :short-name cmdline-name)
+		       (search-sticky-option context cmdline-name)))
 		 (cond (option
 			;; We have an option. Let's retrieve its actual value,
 			;; maybe already with a sticky argument:
-			(let ((cmdline-value
-			       (when (not (string= cmdline-name
-						   (short-name option)))
-				 (subseq cmdline-name
-					 (length (short-name option))))))
-			  (push-retrieved-option :short arglist option
-			    cmdline-value cmdline)))
+			(push-retrieved-option :short arglist option
+			  cmdline-value cmdline))
 		       ((potential-pack-p cmdline-name context)
 			;; We found a potential minus pack. Split it into
 			;; multiple short calls. Only the last one gets a

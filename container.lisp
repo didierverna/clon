@@ -229,13 +229,17 @@ begins with it.")
 ;; argument. This is probably not the best behavior: it would be better to
 ;; find the option "closest" to the sticky match.
 (defgeneric search-sticky-option (there namearg)
-  (:documentation "Search for a sticky option in THERE.
-NAMEARG is the concatenation of the option's name and its argument.")
+  (:documentation "Search for a sticky option in THERE, matching NAMEARG.
+NAMEARG is the concatenation of the option's name and its argument.
+When such an option exists, return two values:
+- the option itself,
+- the argument part of NAMEARG.")
   (:method ((container container) namearg)
     "Search for a sticky option in CONTAINER."
     (do-options (option container)
-      (when (option-matches-sticky option namearg)
-	(return-from search-sticky-option option)))))
+      (let ((argument (option-matches-sticky option namearg)))
+	(when argument
+	  (return-from search-sticky-option (values option argument)))))))
 
 
 ;;; container.lisp ends here
