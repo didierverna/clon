@@ -60,9 +60,9 @@
 	     "The program name, as it appears on the command line."
 	     :type string
 	     :reader progname)
-   (arglist :documentation "The argument list to process."
-	    :type list
-	    :accessor arglist)
+   (calls :documentation "The option calls."
+	  :type list
+	  :accessor calls)
    (remainder :documentation "The non-Clon part of the argument list."
 	      :type list
 	      :reader remainder)
@@ -86,15 +86,15 @@ command-line options."))
   "Parse CMDLINE."
   (declare (ignore synopsis))
   (setf (slot-value context 'progname) (pop cmdline))
-  (let ((arglist (list))
+  (let ((calls (list))
 	(remainder (list))
 	(junk (list)))
-    (macrolet ((push-cmdline-option (arglist &rest body)
-		 "Push a new CMDLINE-OPTION created with BODY onto ARGLIST."
-		 `(push (make-cmdline-option ,@body) ,arglist))
+    (macrolet ((push-cmdline-option (calls &rest body)
+		 "Push a new CMDLINE-OPTION created with BODY onto CALLS."
+		 `(push (make-cmdline-option ,@body) ,calls))
 	       (push-retrieved-option
-		   (func arglist option &optional cmdline-value cmdline name-form)
-		   "Retrieve OPTION from a FUNC call and push it onto ARGLIST.
+		   (func calls option &optional cmdline-value cmdline name-form)
+		   "Retrieve OPTION from a FUNC call and push it onto CALLS.
 - FUNC must be either :long, :short or :plus,
 - CMDLINE-VALUE is a potentially already parsed option argument,
 - CMDILNE is where to find a potentially required argument,
@@ -126,7 +126,7 @@ command-line options."))
 		       (push cmdline call))
 		     `(multiple-value-bind ,(reverse vars) ,(reverse call)
 		       ,(when cmdline `(setq ,cmdline ,new-cmdline))
-		       (push-cmdline-option ,arglist
+		       (push-cmdline-option ,calls
 			 :name ,name-form
 			 :option ,option
 			 :value ,value
@@ -159,9 +159,9 @@ CONTEXT is where to look for the options."
 		   (or (search-option context :long-name cmdline-name)
 		       (search-option context :partial-name cmdline-name)))
 		 (if option
-		     (push-retrieved-option :long arglist option
+		     (push-retrieved-option :long calls option
 		       cmdline-value cmdline name)
-		     (push-cmdline-option arglist
+		     (push-cmdline-option calls
 		       :name cmdline-name
 		       :value cmdline-value))))
 	      ;; A short call, or a minus pack.
@@ -173,7 +173,7 @@ CONTEXT is where to look for the options."
 		   (or (search-option context :short-name cmdline-name)
 		       (search-sticky-option context cmdline-name)))
 		 (cond (option
-			(push-retrieved-option :short arglist option
+			(push-retrieved-option :short calls option
 			  cmdline-value cmdline))
 		       ((potential-pack-p cmdline-name context)
 			;; #### NOTE: When parsing a minus pack, only the last
@@ -184,15 +184,15 @@ CONTEXT is where to look for the options."
 				  (subseq cmdline-name 0
 					  (1- (length cmdline-name)))
 				  context)
-			  (push-retrieved-option :short arglist option))
+			  (push-retrieved-option :short calls option))
 			(let* ((name (subseq cmdline-name
 					     (1- (length cmdline-name))))
 			       (option (search-option context :short-name name)))
 			  (assert option)
-			  (push-retrieved-option :short arglist option
+			  (push-retrieved-option :short calls option
 			    nil cmdline)))
 		       (t
-			(push-cmdline-option arglist :name cmdline-name)))))
+			(push-cmdline-option calls :name cmdline-name)))))
 	      ;; A plus call or a plus pack.
 	      ((string-start arg "+")
 	       ;; #### FIXME: check invalid syntax +foo=val
@@ -205,12 +205,12 @@ CONTEXT is where to look for the options."
 		      ;; they're not meant to be abbreviated.
 		      (option (search-option context :short-name cmdline-name)))
 		 (cond (option
-			(push-retrieved-option :plus arglist option))
+			(push-retrieved-option :plus calls option))
 		       ((potential-pack-p cmdline-name context)
 			(do-pack (option cmdline-name context)
-			  (push-retrieved-option :plus arglist option)))
+			  (push-retrieved-option :plus calls option)))
 		       (t
-			(push-cmdline-option arglist :name cmdline-name)))))
+			(push-cmdline-option calls :name cmdline-name)))))
 	      (t
 	       ;; Not an option call.
 	       ;; #### FIXME: SBCL specific.
@@ -228,7 +228,7 @@ CONTEXT is where to look for the options."
 			     (setq cmdline nil))
 			    (t
 			     (push arg junk))))))))
-      (setf (arglist context) (nreverse arglist))
+      (setf (calls context) (nreverse calls))
       (setf (slot-value context 'remainder) remainder)
       (setf (slot-value context 'junk) junk))))
 
@@ -275,50 +275,29 @@ CONTEXT is where to look for the options."
 The option can be specified either by SHORT-NAME, LONG-NAME, or directly via
 an OPTION object."
   (unless option
-    (setq option (apply #'search-option (synopsis context) keys)))
+    (setq option (apply #'search-option context keys)))
   (unless option
     (error "Getting option ~S from synopsis ~A in context ~A: unknown option."
 	   (or short-name long-name)
 	   (synopsis context)
 	   context))
-  (let ((arglist (list)))
-    (do ((arg (pop (arglist context)) (pop (arglist context))))
-	((null arg))
+  ;; Try the command line:
+  (let ((calls (list)))
+    (do ((call (pop (calls context)) (pop (calls context))))
+	((null call))
       ;; #### NOTE: actually, I *do* have a use for nreconc, he he ;-)
-      (cond ((and (cmdline-option-p arg) (eq (cmdline-option-option arg) option))
-	     (setf (arglist context) (nreconc arglist (arglist context)))
-	     (return-from getopt (values (cmdline-option-value arg)
-					 (if (eq (cmdline-option-status arg)
-						 t)
-					     t
-					     (cons (cmdline-option-name arg)
-						   (cmdline-option-status
-						    arg)))
+      (cond ((eq (cmdline-option-option call) option)
+	     (setf (calls context) (nreconc calls (calls context)))
+	     (return-from getopt (values (cmdline-option-value call)
+					 (or (eq (cmdline-option-status call) t)
+					     (cons (cmdline-option-name call)
+						   (cmdline-option-status call)))
 					 :cmdline)))
 	    (t
-	     (push arg arglist))))
-    (setf (arglist context) (nreverse arglist)))
-  ;; Not found: try an env var
-  ;; #### FIXME: SBCL-specific
-  (let ((value (sb-posix:getenv (env-var option))))
-    (if value
-	(cond ((eq (type-of option) 'flag)
-	       (return-from getopt
-		 (values t t (list :environment (env-var option)))))
-	      (t
-	       (destructuring-bind (value status) (retrieve option value)
-		 (if (eq status t)
-		     (return-from getopt
-		       (values value t (list :environment (env-var option))))
-		     (return-from getopt
-		       (values (default-value option)
-			       (cons (or (long-name option)
-					 (short-name option))
-				     status)
-			       (list :environment (env-var option))))))))
-	(return-from getopt (values (if (eq (type-of option) 'flag)
-					nil
-					(default-value option))
-				    nil)))))
+	     (push call calls))))
+    (setf (calls context) (nreverse calls)))
+  ;; Otherwise, fallback to the environment or a default value:
+  (fallback-retrieval option))
+
 
 ;;; context.lisp ends here

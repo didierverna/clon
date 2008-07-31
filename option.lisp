@@ -266,6 +266,9 @@ This function returns two values:
 - the retrieved value,
 - the retrieval status."))
 
+(defgeneric fallback-retrieval (option)
+  (:documentation "Retrieve OPTION's value from an env var, or a default value."))
+
 
 ;; ============================================================================
 ;; The Flag Class
@@ -360,6 +363,17 @@ This class implements options that don't take any argument."))
   "Return t and an invalid + syntax error."
   ;; t because FLAG was given on the command line anyway.
   (values t (list :invalid-+-syntax)))
+
+(defmethod fallback-retrieval ((flag flag))
+  "Retrieve FLAG from an env var if present."
+  ;; #### NOTE: there's no way of providing an env var /without/ a value (the
+  ;; value is at least the empty string). Consequently, we decide that the
+  ;; presence of the env var, regardless of its value, stands for the presence
+  ;; of the flag.
+  ;; #### FIXME: SBCL-specific
+  (let ((env-value (sb-posix:getenv (env-var flag))))
+    (when env-value
+      (values t t (list :environment (env-var flag))))))
 
 
 ;; ============================================================================
@@ -499,6 +513,18 @@ This class implements is the base class for options accepting arguments."))
 (defmethod retrieve-from-plus-call ((option valued-option))
   "Return OPTION's default value and an invalid + syntax error."
   (values (default-value option) (list :invalid-+-syntax)))
+
+(defmethod fallback-retrieval ((option valued-option))
+  "Retrieve OPTION from an env var or its default value."
+  ;; #### FIXME: SBCL-specific
+  (let ((env-value (sb-posix:getenv (env-var option))))
+    (if env-value
+	(multiple-value-bind (value status) (safe-convert option env-value)
+	  (values value
+		  (or (eq status t)
+		      (cons option status))
+		  (list :environment (env-var option))))
+	(default-value option))))
 
 
 ;; ============================================================================
