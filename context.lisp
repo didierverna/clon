@@ -145,11 +145,11 @@ CONTEXT is where to look for the options."
       (do ((arg (pop cmdline) (pop cmdline)))
 	  ((null arg))
 	(cond ((string= arg "--")
-	       ;; The Clon separator: isolate the rest of the command line.
+	       ;; The Clon separator.
 	       (setq remainder cmdline)
 	       (setq cmdline nil))
-	      ;; A long (possibly unknown) option:
 	      ((string-start arg "--")
+	       ;; A long call.
 	       (let* ((value-start (position #\= arg :start 2))
 		      (cmdline-name (subseq arg 2 value-start))
 		      (cmdline-value (when value-start
@@ -161,16 +161,10 @@ CONTEXT is where to look for the options."
 		 (if option
 		     (push-retrieved-option :long arglist option
 		       cmdline-value cmdline name)
-		     ;; We have an unknown option. Don't mess with the rest of
-		     ;; the cmdline in order to avoid conflict with the
-		     ;; automatic remainder detection. Of course, the next
-		     ;; cmdline item might be an argument for a misspelled
-		     ;; option, but when things are messed up, they're messed
-		     ;; up, that's all.
 		     (push-cmdline-option arglist
 		       :name cmdline-name
 		       :value cmdline-value))))
-	      ;; A short (possibly unknown) option or a minus pack:
+	      ;; A short call, or a minus pack.
 	      ((string-start arg "-")
 	       ;; #### FIXME: check invalid syntax -foo=val
 	       (let ((cmdline-name (subseq arg 1))
@@ -179,19 +173,17 @@ CONTEXT is where to look for the options."
 		   (or (search-option context :short-name cmdline-name)
 		       (search-sticky-option context cmdline-name)))
 		 (cond (option
-			;; We have an option. Let's retrieve its actual value,
-			;; maybe already with a sticky argument:
 			(push-retrieved-option :short arglist option
 			  cmdline-value cmdline))
 		       ((potential-pack-p cmdline-name context)
-			;; We found a potential minus pack. Split it into
-			;; multiple short calls. Only the last one gets a
-			;; cmdline, though, because only the last one is
-			;; allowed to get an argument from the next cmdline
-			;; arg.
-			(do-pack (option (subseq cmdline-name
-						 0 (1- (length cmdline-name)))
-					 context)
+			;; #### NOTE: When parsing a minus pack, only the last
+			;; option gets a cmdline argument because only the
+			;; last one is allowed to retrieve an argument from
+			;; there.
+			(do-pack (option
+				  (subseq cmdline-name 0
+					  (1- (length cmdline-name)))
+				  context)
 			  (push-retrieved-option :short arglist option))
 			(let* ((name (subseq cmdline-name
 					     (1- (length cmdline-name))))
@@ -200,15 +192,8 @@ CONTEXT is where to look for the options."
 			  (push-retrieved-option :short arglist option
 			    nil cmdline)))
 		       (t
-			;; This is not a minus pack (or there is none), so we
-			;; have an unknown option. Don't mess with the rest of
-			;; the cmdline in order to avoid conflict with the
-			;; automatic remainder detection. Of course, the next
-			;; cmdline item might be an argument for a misspelled
-			;; option, but when things are messed up, they're
-			;; messed up, that's all.
 			(push-cmdline-option arglist :name cmdline-name)))))
-	      ;; A short (possibly unknown) switch, or a plus pack.
+	      ;; A plus call or a plus pack.
 	      ((string-start arg "+")
 	       ;; #### FIXME: check invalid syntax +foo=val
 	       (let* ((cmdline-name (subseq arg 1))
@@ -216,22 +201,18 @@ CONTEXT is where to look for the options."
 		      ;; on short names when they're used with the +-syntax,
 		      ;; because there's no sticky argument or whatever. But
 		      ;; we don't. That's all. Short names are not meant to be
-		      ;; long (otherwise, that would be long names right ?),
-		      ;; so they're not meant to be abbreviated.
+		      ;; long (otherwise, that would be long names right?), so
+		      ;; they're not meant to be abbreviated.
 		      (option (search-option context :short-name cmdline-name)))
 		 (cond (option
-			;; We found an option.
 			(push-retrieved-option :plus arglist option))
 		       ((potential-pack-p cmdline-name context)
-			;; We found a potential plus pack. Split the pack into
-			;; multiple option calls.
 			(do-pack (option cmdline-name context)
-			  (push-retrieved-option :plus arglist option))
-			;; This is not a plus pack (or there is none), so we
-			;; have an unknown option.
+			  (push-retrieved-option :plus arglist option)))
+		       (t
 			(push-cmdline-option arglist :name cmdline-name)))))
-	      ;; Otherwise, it's junk.
 	      (t
+	       ;; Not an option call.
 	       ;; #### FIXME: SBCL specific.
 	       (cond ((sb-ext:posix-getenv "POSIXLY_CORRECT")
 		      ;; That's the end of the Clon-specific part:
