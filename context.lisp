@@ -90,9 +90,16 @@ command-line options."))
 	(remainder (list))
 	(junk (list)))
     (macrolet ((push-cmdline-option (arglist &rest body)
+		 "Push a new CMDLINE-OPTION created with BODY onto ARGLIST."
 		 `(push (make-cmdline-option ,@body) ,arglist))
 	       (push-retrieved-option
 		   (func arglist option &optional cmdline-value cmdline name-form)
+		   "Retrieve OPTION from a FUNC call and push it onto ARGLIST.
+- FUNC must be either :long, :short or :plus,
+- CMDLINE-VALUE is a potentially already parsed option argument,
+- CMDILNE is where to find a potentially required argument,
+- NAME-FORM is how to compute the :name slot of the CMDLINE-OPTION structure.
+  If not given, the option's long or short name will be used as appropriate."
 		   (let* ((value (gensym "value"))
 			  (status (gensym "status"))
 			  (vars (list status value))
@@ -125,6 +132,8 @@ command-line options."))
 			 :value ,value
 			 :status ,status))))
 	       (do-pack ((option pack context) &body body)
+		 "Evaluate BODY with OPTION bound to each option from PACK.
+CONTEXT is where to look for the options."
 		 (let ((char (gensym "char"))
 		       (name (gensym "name")))
 		   `(loop :for ,char :across ,pack
