@@ -156,12 +156,30 @@ This class is the base class for all options."))
 ;; The Option Search protocol
 ;; ============================================================================
 
+;; In case of long name abbreviation (for instance --he instead of --help), we
+;; register the name used like this: he(lp). In case of error report, this
+;; will help the user spot where he did something wrong.
+(defun complete-string (start full)
+  "Complete START with the rest of FULL in parentheses.
+START must be the beginning of FULL.
+For instance, completing 'he' with 'help' will produce 'he(lp)'."
+  (assert (string-start full start))
+  (assert (not (string= full start)))
+  (concatenate 'string start "(" (subseq full (length start)) ")"))
+
 (defun option-matches (option &key short-name long-name partial-name)
-  "Return t if OPTION's names match.
-OPTION's names must match either SHORT-NAME, LONG-NAME, or PARTIAL-(long)-NAME."
-  (cond (short-name (string= short-name (short-name option)))
-	(long-name (string= long-name (long-name option)))
-	(partial-name (string-start (long-name option) partial-name))))
+  "Check whether SHORT-NAME, LONG-NAME or PARTIAL-(long)NAME matches OPTION.
+If that is the case, return the name used to perform the matching, possibly
+completed in case of a PARTIAL match."
+  (cond (short-name
+	 (when (string= short-name (short-name option))
+	   short-name))
+	(long-name
+	 (when (string= long-name (long-name option))
+	   long-name))
+	(partial-name
+	 (when (string-start (long-name option) partial-name)
+	   (complete-string partial-name (long-name option))))))
 
 (defgeneric option-matches-sticky (option namearg)
   (:documentation "Check whether NAMEARG matches OPTION with a sticky argument.

@@ -154,19 +154,13 @@ CONTEXT is where to look for the options."
 		      (cmdline-name (subseq arg 2 value-start))
 		      (cmdline-value (when value-start
 				       (subseq arg (1+ value-start))))
-		      (option (or (search-option context
-				    :long-name cmdline-name)
-				  (search-option context
-				    :partial-name cmdline-name))))
+		      option name)
+		 (multiple-value-setq (option name)
+		   (or (search-option context :long-name cmdline-name)
+		       (search-option context :partial-name cmdline-name)))
 		 (if option
-		     ;; We found an option. The cmdline option's name is the
-		     ;; long one, but in case of abbreviation (for instance
-		     ;; --he instead of --help), we will register it like
-		     ;; this: he(lp). In case of error report, this will help
-		     ;; the user spot where he did something wrong.
 		     (push-retrieved-option :long arglist option
-		       cmdline-value cmdline
-		       (complete-string cmdline-name (long-name option)))
+		       cmdline-value cmdline name)
 		     ;; We have an unknown option. Don't mess with the rest of
 		     ;; the cmdline in order to avoid conflict with the
 		     ;; automatic remainder detection. Of course, the next
