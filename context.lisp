@@ -247,7 +247,6 @@ CONTEXT is where to look for the options."
       (setf (unknown-options context) (nreverse unknown-options))
       (setf (slot-value context 'junk) (nreverse junk)))))
 
-;; #### FIXME: SBCL-specific
 (defun make-context (&rest keys &key synopsis cmdline)
   "Make a new context.
 - SYNOPSIS is the program synopsis to use in that context.
@@ -316,5 +315,18 @@ an OPTION object."
   ;; Otherwise, fallback to the environment or a default value:
   (fallback-retrieval option))
 
+
+;; ============================================================================
+;; The Unknown Option Protocol
+;; ============================================================================
+
+(defun getopt-unknown (context)
+  "Get the next unknown option in CONTEXT.
+This function returns the unknown option's name, and possibly a given argument
+as the second value."
+  (let ((unknown-option (pop (unknown-options context))))
+    (when unknown-option
+      (values (unknown-option-name unknown-option)
+	      (unknown-option-value unknown-option)))))
 
 ;;; context.lisp ends here
