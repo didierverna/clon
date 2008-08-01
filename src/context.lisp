@@ -324,14 +324,14 @@ an OPTION object."
   "Evaluate BODY over all cmdline options from CONTEXT.
 NAME, VALUE and STATUS are bound to each known option's name, value and
 retrieval status."
-  (let ((option (gensym "option")))
-    `(do ((,option
-	   (setq ,option (pop (cmdline-options ,context)))
-	   (setq ,option (pop (cmdline-options ,context)))))
-      ((null ,option))
-      (let ((,name (cmdline-option-name ,option))
-	    (,value (cmdline-option-value ,option))
-	    (,status (cmdline-option-status ,option)))
+  (let ((cmdline-option (gensym "cmdline-option")))
+    `(do ((,cmdline-option
+	   (setq ,cmdline-option (pop (cmdline-options ,context)))
+	   (setq ,cmdline-option (pop (cmdline-options ,context)))))
+      ((null ,cmdline-option))
+      (let ((,name (cmdline-option-name ,cmdline-option))
+	    (,value (cmdline-option-value ,cmdline-option))
+	    (,status (cmdline-option-status ,cmdline-option)))
 	,@body))))
 
 
