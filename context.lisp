@@ -329,4 +329,16 @@ as the second value."
       (values (unknown-option-name unknown-option)
 	      (unknown-option-value unknown-option)))))
 
+(defmacro do-unknown-options ((name value) context &body body)
+  "Evaluate BODY over all unknown options from CONTEXT.
+NAME and VALUE are bound to each unknown option's name and value."
+  (let ((unknown-option (gensym "unknown-option")))
+    `(do ((,unknown-option
+	   (setq ,unknown-option (pop (unknown-options ,context)))
+	   (setq ,unknown-option (pop (unknown-options ,context)))))
+      ((null ,unknown-option))
+      (let ((,name (unknown-option-name ,unknown-option))
+	    (,value (unknown-option-value ,unknown-option)))
+	,@body))))
+
 ;;; context.lisp ends here
