@@ -132,7 +132,9 @@
   "This program's main function."
   ;; This context will use the POSIX command line:
   (let ((context (clon::make-context :synopsis *synopsis*)))
-    )
+    (clon::do-cmdline-options (name value status) context
+			      (print (list name value status))
+			      (terpri)))
   (quit))
 
 ;; #### FIXME: SBCL-specific

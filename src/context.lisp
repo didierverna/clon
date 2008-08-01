@@ -318,6 +318,21 @@ an OPTION object."
   (fallback-retrieval option))
 
 
+(defmacro do-cmdline-options ((name value status) context &body body)
+  "Evaluate BODY over all cmdline options from CONTEXT.
+NAME, VALUE and STATUS are bound to each known option's name, value and
+retrieval status."
+  (let ((option (gensym "option")))
+    `(do ((,option
+	   (setq ,option (pop (known-options ,context)))
+	   (setq ,option (pop (known-options ,context)))))
+      ((null ,option))
+      (let ((,name (cmdline-option-name ,option))
+	    (,value (cmdline-option-value ,option))
+	    (,status (cmdline-option-status ,option)))
+	,@body))))
+
+
 ;; ============================================================================
 ;; The Unknown Option Protocol
 ;; ============================================================================
