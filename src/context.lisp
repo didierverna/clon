@@ -319,11 +319,22 @@ an OPTION object."
   ;; Otherwise, fallback to the environment or a default value:
   (fallback-retrieval option))
 
+(defun getopt-cmdline (context)
+  "Get the next cmdline option in CONTEXT.
+This function returns three values:
+- the option's name (as it appears on the command line,
+- the option's retrieved value,
+- the value retrieval status."
+  (let ((cmdline-option (pop (cmdline-options context))))
+    (when cmdline-option
+      (values (cmdline-option-name cmdline-option)
+	      (cmdline-option-value cmdline-option)
+	      (cmdline-option-status cmdline-option)))))
 
 (defmacro do-cmdline-options ((name value status) context &body body)
   "Evaluate BODY over all cmdline options from CONTEXT.
-NAME, VALUE and STATUS are bound to each known option's name, value and
-retrieval status."
+NAME, VALUE and STATUS are bound to each option's name (as it appears on the
+command line), retrieved value and retrieval status."
   (let ((cmdline-option (gensym "cmdline-option")))
     `(do ((,cmdline-option
 	   (setq ,cmdline-option (pop (cmdline-options ,context)))
