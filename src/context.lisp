@@ -65,9 +65,9 @@
 	     "The program name, as it appears on the command line."
 	     :type string
 	     :reader progname)
-   (known-options :documentation "The option calls."
+   (cmdline-options :documentation "The options on the command line."
 	  :type list
-	  :accessor known-options)
+	  :accessor cmdline-options)
    (remainder :documentation "The non-Clon part of the command line."
 	      :type list
 	      :reader remainder)
@@ -94,19 +94,19 @@ command-line options."))
   "Parse CMDLINE."
   (declare (ignore synopsis))
   (setf (slot-value context 'progname) (pop cmdline))
-  (let ((known-options (list))
+  (let ((cmdline-options (list))
 	(remainder (list))
 	(unknown-options (list))
 	(junk (list)))
-    (macrolet ((push-cmdline-option (known-options &rest body)
-		 "Push a new CMDLINE-OPTION created with BODY onto KNOWN-OPTIONS."
-		 `(push (make-cmdline-option ,@body) ,known-options))
-	       (push-unknown-option (unknown-options &rest body)
-		 "Push a new UNKNOWN-OPTION created with BODY onto UNKNOWN-OPTIONS."
-		 `(push (make-unknown-option ,@body) ,unknown-options))
+    (macrolet ((push-cmdline-option (place &rest body)
+		 "Push a new CMDLINE-OPTION created with BODY onto PLACE."
+		 `(push (make-cmdline-option ,@body) ,place))
+	       (push-unknown-option (place &rest body)
+		 "Push a new UNKNOWN-OPTION created with BODY onto PLACE."
+		 `(push (make-unknown-option ,@body) ,place))
 	       (push-retrieved-option
-		   (func known-options option &optional cmdline-value cmdline name-form)
-		   "Retrieve OPTION from a FUNC call and push it onto KNOWN-OPTIONS.
+		   (func place option &optional cmdline-value cmdline name-form)
+		   "Retrieve OPTION from a FUNC call and push it onto PLACE.
 - FUNC must be either :long, :short or :plus,
 - CMDLINE-VALUE is a potentially already parsed option argument,
 - CMDILNE is where to find a potentially required argument,
@@ -138,7 +138,7 @@ command-line options."))
 		       (push cmdline call))
 		     `(multiple-value-bind ,(reverse vars) ,(reverse call)
 		       ,(when cmdline `(setq ,cmdline ,new-cmdline))
-		       (push-cmdline-option ,known-options
+		       (push-cmdline-option ,place
 			 :name ,name-form
 			 :option ,option
 			 :value ,value
@@ -172,7 +172,7 @@ CONTEXT is where to look for the options."
 		   (multiple-value-setq (option name)
 		     (search-option context :partial-name cmdline-name)))
 		 (if option
-		     (push-retrieved-option :long known-options option
+		     (push-retrieved-option :long cmdline-options option
 		       cmdline-value cmdline name)
 		     (push-unknown-option unknown-options
 		       :name cmdline-name
@@ -187,7 +187,7 @@ CONTEXT is where to look for the options."
 		   (multiple-value-setq (option cmdline-value)
 		     (search-sticky-option context cmdline-name)))
 		 (cond (option
-			(push-retrieved-option :short known-options option
+			(push-retrieved-option :short cmdline-options option
 			  cmdline-value cmdline))
 		       ((potential-pack-p cmdline-name context)
 			;; #### NOTE: When parsing a minus pack, only the last
@@ -198,12 +198,12 @@ CONTEXT is where to look for the options."
 				  (subseq cmdline-name 0
 					  (1- (length cmdline-name)))
 				  context)
-			  (push-retrieved-option :short known-options option))
+			  (push-retrieved-option :short cmdline-options option))
 			(let* ((name (subseq cmdline-name
 					     (1- (length cmdline-name))))
 			       (option (search-option context :short-name name)))
 			  (assert option)
-			  (push-retrieved-option :short known-options option
+			  (push-retrieved-option :short cmdline-options option
 			    nil cmdline)))
 		       (t
 			(push-unknown-option unknown-options
@@ -220,10 +220,10 @@ CONTEXT is where to look for the options."
 		      ;; they're not meant to be abbreviated.
 		      (option (search-option context :short-name cmdline-name)))
 		 (cond (option
-			(push-retrieved-option :plus known-options option))
+			(push-retrieved-option :plus cmdline-options option))
 		       ((potential-pack-p cmdline-name context)
 			(do-pack (option cmdline-name context)
-			  (push-retrieved-option :plus known-options option)))
+			  (push-retrieved-option :plus cmdline-options option)))
 		       (t
 			(push-unknown-option unknown-options
 			  :name cmdline-name)))))
@@ -244,7 +244,7 @@ CONTEXT is where to look for the options."
 			     (setq cmdline nil))
 			    (t
 			     (push arg junk))))))))
-      (setf (known-options context) (nreverse known-options))
+      (setf (cmdline-options context) (nreverse cmdline-options))
       (setf (slot-value context 'remainder) remainder)
       (setf (unknown-options context) (nreverse unknown-options))
       (setf (slot-value context 'junk) (nreverse junk)))))
@@ -298,22 +298,24 @@ an OPTION object."
 	   (synopsis context)
 	   context))
   ;; Try the command line:
-  (let ((known-options (list)))
-    (do ((known-option (pop (known-options context)) (pop (known-options context))))
-	((null known-option))
+  (let ((cmdline-options (list)))
+    (do ((cmdline-option
+	  (pop (cmdline-options context))
+	  (pop (cmdline-options context))))
+	((null cmdline-option))
       ;; #### NOTE: actually, I *do* have a use for nreconc, he he ;-)
-      (cond ((eq (cmdline-option-option known-option) option)
-	     (setf (known-options context)
-		   (nreconc known-options (known-options context)))
+      (cond ((eq (cmdline-option-option cmdline-option) option)
+	     (setf (cmdline-options context)
+		   (nreconc cmdline-options (cmdline-options context)))
 	     (return-from getopt
-	       (values (cmdline-option-value known-option)
-		       (or (eq (cmdline-option-status known-option) t)
-			   (cons (cmdline-option-name known-option)
-				 (cmdline-option-status known-option)))
+	       (values (cmdline-option-value cmdline-option)
+		       (or (eq (cmdline-option-status cmdline-option) t)
+			   (cons (cmdline-option-name cmdline-option)
+				 (cmdline-option-status cmdline-option)))
 		       :cmdline)))
 	    (t
-	     (push known-option known-options))))
-    (setf (known-options context) (nreverse known-options)))
+	     (push cmdline-option cmdline-options))))
+    (setf (cmdline-options context) (nreverse cmdline-options)))
   ;; Otherwise, fallback to the environment or a default value:
   (fallback-retrieval option))
 
@@ -324,8 +326,8 @@ NAME, VALUE and STATUS are bound to each known option's name, value and
 retrieval status."
   (let ((option (gensym "option")))
     `(do ((,option
-	   (setq ,option (pop (known-options ,context)))
-	   (setq ,option (pop (known-options ,context)))))
+	   (setq ,option (pop (cmdline-options ,context)))
+	   (setq ,option (pop (cmdline-options ,context)))))
       ((null ,option))
       (let ((,name (cmdline-option-name ,option))
 	    (,value (cmdline-option-value ,option))
