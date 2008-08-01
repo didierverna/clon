@@ -217,6 +217,7 @@ If AS-STRING is not nil, return a string of that character."))
 If AS-STRING is not nil, return a string of that character.")
   (:method ((option option) &optional as-string)
     "Return nil (only switches are plus-packable)."
+    (declare (ignore as-string))
     nil))
 
 
@@ -412,7 +413,7 @@ This class implements is the base class for options accepting arguments."))
 (defmethod initialize-instance :before
     ((option valued-option) &key argument-name argument-type default-value env-var)
   "Check consistency of OPTION's value-related initargs."
-  (declare (ignore env-var))
+  (declare (ignore default-value env-var))
   (when (or (null argument-name)
 	    (and argument-name (zerop (length argument-name))))
     (error "option ~A: empty argument name." option))
