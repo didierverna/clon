@@ -166,10 +166,11 @@ CONTEXT is where to look for the options."
 		      (cmdline-name (subseq arg 2 value-start))
 		      (cmdline-value (when value-start
 				       (subseq arg (1+ value-start))))
-		      option name)
-		 (multiple-value-setq (option name)
-		   (or (search-option context :long-name cmdline-name)
-		       (search-option context :partial-name cmdline-name)))
+		      (option (search-option context :long-name cmdline-name))
+		      (name cmdline-name))
+		 (unless option
+		   (multiple-value-setq (option name)
+		     (search-option context :partial-name cmdline-name)))
 		 (if option
 		     (push-retrieved-option :long known-options option
 		       cmdline-value cmdline name)
@@ -179,11 +180,12 @@ CONTEXT is where to look for the options."
 	      ;; A short call, or a minus pack.
 	      ((string-start arg "-")
 	       ;; #### FIXME: check invalid syntax -foo=val
-	       (let ((cmdline-name (subseq arg 1))
-		     option cmdline-value)
-		 (multiple-value-setq (option cmdline-value)
-		   (or (search-option context :short-name cmdline-name)
-		       (search-sticky-option context cmdline-name)))
+	       (let* ((cmdline-name (subseq arg 1))
+		      (option (search-option context :short-name cmdline-name))
+		      cmdline-value)
+		 (unless option
+		   (multiple-value-setq (option cmdline-value)
+		     (search-sticky-option context cmdline-name)))
 		 (cond (option
 			(push-retrieved-option :short known-options option
 			  cmdline-value cmdline))
