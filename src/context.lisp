@@ -105,7 +105,7 @@ command-line options."))
 		 "Push a new UNKNOWN-OPTION created with BODY onto PLACE."
 		 `(push (make-unknown-option ,@body) ,place))
 	       (push-retrieved-option
-		   (func place option &optional cmdline-value cmdline name-form)
+		   (place func option &optional cmdline-value cmdline name-form)
 		   "Retrieve OPTION from a FUNC call and push it onto PLACE.
 - FUNC must be either :long, :short or :plus,
 - CMDLINE-VALUE is a potentially already parsed option argument,
@@ -172,7 +172,7 @@ CONTEXT is where to look for the options."
 		   (multiple-value-setq (option name)
 		     (search-option context :partial-name cmdline-name)))
 		 (if option
-		     (push-retrieved-option :long cmdline-options option
+		     (push-retrieved-option cmdline-options :long option
 		       cmdline-value cmdline name)
 		     (push-unknown-option unknown-options
 		       :name cmdline-name
@@ -187,7 +187,7 @@ CONTEXT is where to look for the options."
 		   (multiple-value-setq (option cmdline-value)
 		     (search-sticky-option context cmdline-name)))
 		 (cond (option
-			(push-retrieved-option :short cmdline-options option
+			(push-retrieved-option cmdline-options :short option
 			  cmdline-value cmdline))
 		       ((potential-pack-p cmdline-name context)
 			;; #### NOTE: When parsing a minus pack, only the last
@@ -198,12 +198,12 @@ CONTEXT is where to look for the options."
 				  (subseq cmdline-name 0
 					  (1- (length cmdline-name)))
 				  context)
-			  (push-retrieved-option :short cmdline-options option))
+			  (push-retrieved-option cmdline-options :short option))
 			(let* ((name (subseq cmdline-name
 					     (1- (length cmdline-name))))
 			       (option (search-option context :short-name name)))
 			  (assert option)
-			  (push-retrieved-option :short cmdline-options option
+			  (push-retrieved-option cmdline-options :short option
 			    nil cmdline)))
 		       (t
 			(push-unknown-option unknown-options
@@ -220,10 +220,10 @@ CONTEXT is where to look for the options."
 		      ;; they're not meant to be abbreviated.
 		      (option (search-option context :short-name cmdline-name)))
 		 (cond (option
-			(push-retrieved-option :plus cmdline-options option))
+			(push-retrieved-option cmdline-options :plus option))
 		       ((potential-pack-p cmdline-name context)
 			(do-pack (option cmdline-name context)
-			  (push-retrieved-option :plus cmdline-options option)))
+			  (push-retrieved-option cmdline-options :plus option)))
 		       (t
 			(push-unknown-option unknown-options
 			  :name cmdline-name)))))
