@@ -60,7 +60,8 @@
     (clon::make-switch :short-name "d"
 		       :long-name "debug"
 		       :description
-		       "both names, optional argument yes/no (the default)"))
+		       "both names, optional argument yes/no (the default)"
+		       :env-var "DEBUG"))
   (clon::add-to grp
     (clon::make-switch :short-name "i"
 		       :long-name "interactive"
@@ -132,6 +133,9 @@
   "This program's main function."
   ;; This context will use the POSIX command line:
   (let ((context (clon::make-context :synopsis *synopsis*)))
+    (multiple-value-bind (value status source)
+	(clon::getopt context :short-name "d")
+      (print (list value status source))(terpri))
     (clon::do-cmdline-options (name value status) context
       (print (list name value status))
       (terpri)))
