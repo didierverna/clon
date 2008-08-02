@@ -289,7 +289,11 @@ CONTEXT is where to look for the options."
 (defun getopt (context &rest keys &key short-name long-name option)
   "Get an option's value in CONTEXT.
 The option can be specified either by SHORT-NAME, LONG-NAME, or directly via
-an OPTION object."
+an OPTION object.
+This function returns three values:
+- the option's retrieved value,
+- the retrieval status,
+- the value's source."
   (unless option
     (setq option (apply #'search-option context keys)))
   (unless option
