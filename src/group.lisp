@@ -57,4 +57,17 @@ implementing hierarchical program command-line."))
   "Seal GROUP."
   (call-next-method)) ;; this calls the CONTAINER sealing method
 
+
+;; ============================================================================
+;; Convenience group definition
+;; ============================================================================
+
+(defmacro define-group (group &body body)
+  `(let ((,group (make-group)))
+    ,@body
+    (seal ,group)
+    ,group))
+
+
+
 ;;; group.lisp ends here

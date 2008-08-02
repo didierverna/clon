@@ -157,4 +157,15 @@ otherwise."
     (zerop (length (string-left-trim (potential-pack synopsis) pack)))))
 
 
+;; ============================================================================
+;; Convenience group definition
+;; ============================================================================
+
+(defmacro define-synopsis (synopsis (&rest keys) &body body)
+  `(let ((,synopsis (apply #'make-synopsis ',keys)))
+    ,@body
+    (seal ,synopsis)
+    ,synopsis))
+
+
 ;;; synopsis.lisp ends here

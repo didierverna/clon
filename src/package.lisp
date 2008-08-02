@@ -40,8 +40,8 @@
 	   :add-to :seal
 	   :make-text
 	   :make-flag :make-switch :make-stropt
-	   :make-group
-	   :make-synopsis
+	   :make-group :define-group
+	   :make-synopsis :define-synopsis
 	   :make-context
 	   :getopt
 	   :getopt-cmdline :do-cmdline-options
