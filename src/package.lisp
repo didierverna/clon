@@ -36,6 +36,15 @@
 (defpackage :clon
     (:use :cl)
   (:import-from :clon-system :+version+)
-  (:export :+version+))
+  (:export :+version+
+	   :add-to :seal
+	   :make-text
+	   :make-flag :make-switch :make-stropt
+	   :make-group
+	   :make-synopsis
+	   :make-context
+	   :getopt
+	   :getopt-cmdline :do-cmdline-options
+	   :getopt-unknown :do-unknown-options))
 
 ;;; package.lisp ends here
