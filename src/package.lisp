@@ -40,7 +40,7 @@
 	   :add-to :seal
 	   :make-text
 	   :make-flag :make-switch :make-stropt
-	   :make-group :define-group
+	   :make-group :define-group :declare-group
 	   :make-synopsis :define-synopsis
 	   :make-context
 	   :getopt

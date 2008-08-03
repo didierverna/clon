@@ -68,6 +68,15 @@ implementing hierarchical program command-line."))
     (seal ,group)
     ,group))
 
+(defmacro declare-group (&body body)
+  (let* ((group (gensym "group"))
+	 (body (mapcar (lambda (form)
+			 (list (intern "ADD-TO" 'clon) group form))
+		       body)))
+    `(let ((,group (make-group)))
+      ,@body
+      (seal ,group)
+      ,group)))
 
 
 ;;; group.lisp ends here
