@@ -162,10 +162,26 @@ otherwise."
 ;; ============================================================================
 
 (defmacro define-synopsis (synopsis (&rest keys) &body body)
+  "Evaluate BODY with SYNOPSIS bound to a new synopsis, and return it.
+KEYS are passed to `make-synopsis'.
+SYNOPSIS is automatically sealed after BODY is evaluated."
   `(let ((,synopsis (apply #'make-synopsis ',keys)))
     ,@body
     (seal ,synopsis)
     ,synopsis))
+
+(defmacro declare-synopsis ((&rest keys) &body body)
+  "Create a new synopsis, evaluate BODY and return the synopsis.
+The result of every form in BODY is automatically added to the synopsis.
+The synopsis is automatically sealed after BODY is avaluated."
+  (let* ((synopsis (gensym "synopsis"))
+	 (body (mapcar (lambda (form)
+			 (list (intern "ADD-TO" 'clon) synopsis form))
+		       body)))
+    `(let ((,synopsis (apply #'make-synopsis ',keys)))
+      ,@body
+      (seal ,synopsis)
+      ,synopsis)))
 
 
 ;;; synopsis.lisp ends here

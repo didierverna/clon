@@ -41,7 +41,7 @@
 	   :make-text
 	   :make-flag :make-switch :make-stropt
 	   :make-group :define-group :declare-group
-	   :make-synopsis :define-synopsis
+	   :make-synopsis :define-synopsis :declare-synopsis
 	   :make-context
 	   :getopt
 	   :getopt-cmdline :do-cmdline-options
