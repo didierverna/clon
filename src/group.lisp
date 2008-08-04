@@ -74,14 +74,24 @@ GROUP is automatically sealed after BODY is evaluated."
   "Create a new group, evaluate BODY and return the group.
 The result of every form in BODY is automatically added to the group.
 The group is automatically sealed after BODY is avaluated."
-  (let* ((group (gensym "group"))
+  (let* ((grp (gensym "grp"))
 	 (body (mapcar (lambda (form)
-			 (list (intern "ADD-TO" 'clon) group form))
-		       body)))
-    `(let ((,group (make-group)))
-      ,@body
-      (seal ,group)
-      ,group)))
+			 (list (intern "ADD-TO" 'clon) grp form))
+		       body))
+	 (text (intern "TEXT"))
+	 (flag (intern "FLAG"))
+	 (switch (intern "SWITCH"))
+	 (stropt (intern "STROPT"))
+	 (group (intern "GROUP")))
+    `(macrolet ((,text (&rest args) `(make-text ,@args))
+		(,flag (&rest args) `(make-flag ,@args))
+		(,switch (&rest args) `(make-switch ,@args))
+		(,stropt (&rest args) `(make-stropt ,@args))
+		(,group (&rest args) `(declare-group ,@args)))
+      (let ((,grp (make-group)))
+	,@body
+	(seal ,grp)
+	,grp))))
 
 
 ;;; group.lisp ends here
