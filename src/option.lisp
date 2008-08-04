@@ -432,7 +432,7 @@ This class implements is the base class for options accepting arguments."))
     (:optional
      (setf (slot-value option 'argument-required-p) nil))))
 
-(defmacro defopt (class superclasses slots &rest options)
+(defmacro defoption (class superclasses slots &rest options)
   "Wrapper around defclass for defining a new Clon option class."
   `(defclass ,class ,(cons 'valued-option superclasses) ,slots
     ,@options))
@@ -558,7 +558,7 @@ This class implements is the base class for options accepting arguments."))
 ;; value is given by the -/+ call. When the argument is optional, omitting it
 ;; is equivalent to saying yes.
 
-(defopt switch ()
+(defoption switch ()
   ()
   (:default-initargs
     :argument-name "yes(no)"
@@ -695,7 +695,7 @@ Conformant arguments can be either yes/on/true/no/off/false."
 ;; but that's all.
 
 ;; #### FIXME: make final. #### Why ??
-(defopt stropt ()
+(defoption stropt ()
   ()
   (:default-initargs :argument-name "STR")
   (:documentation "The STROPT class.
