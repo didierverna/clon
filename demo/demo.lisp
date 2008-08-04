@@ -42,65 +42,45 @@
     (text :string "Demonstration of Clon.")
     (group
      (text :string "Flags:")
-     (flag :short-name "h" :long-name "help"
-	   :description "both names.")
-     (flag :short-name "v"
-	   :description "short name.")
-     (flag :long-name "version"
-	   :description "long name."))
+     (flag :short-name "h" :long-name "help" :description "both names.")
+     (flag :short-name "v" :description "short name.")
+     (flag :long-name "version" :description "long name."))
     (group
      (text :string "Switches:")
-     (switch :short-name "d"
-	     :long-name "debug"
-	     :description
-	     "both names, optional argument yes/no (the default)"
+     (switch :short-name "d" :long-name "debug"
+	     :description "both names, optional argument yes/no (the default)"
 	     :env-var "DEBUG")
-     (switch :short-name "i"
-	     :long-name "interactive"
-	     :description
-	     "both names, argument required, another name"
+     (switch :short-name "i" :long-name "interactive"
+	     :description "both names, argument required, another name"
 	     :argument-name "on(off)"
 	     :argument-type :required
 	     :default-value t)
-     (switch :short-name "n"
-	     :description "short name, whatever the argument")
+     (switch :short-name "n" :description "short name, whatever the argument")
      (switch  :long-name "verbose"
-	      :description
-	      "long name, optional argument, yet another name"
+	      :description "long name, optional argument, yet another name"
 	      :argument-name "true(false)")
      (switch  :long-name "simulate"
 	      :description "long name, required argument"
 	      :argument-type :required))
     (group
-     (stropt :short-name "f"
-	     :long-name "first-name"
-	     :description
-	     "both names, required argument (default)")
-     (stropt :short-name "F"
-	     :long-name "family-name"
-	     :description
-	     "both names, optional argument, another name"
+     (stropt :short-name "f" :long-name "first-name"
+	     :description "both names, required argument (default)")
+     (stropt :short-name "F" :long-name "family-name"
+	     :description "both names, optional argument, another name"
 	     :argument-type :optional
 	     :argument-name "NAME"
 	     :default-value "unknown")
-     (stropt :short-name "a"
-	     :description
-	     "short name, required argument")
+     (stropt :short-name "a" :description "short name, required argument")
      (stropt :short-name "c"
-	     :description
-	     "short name, optional argument"
+	     :description "short name, optional argument"
 	     :argument-type :optional)
-     (stropt :long-name "phone"
-	     :description
-	     "long name, required argument")
+     (stropt :long-name "phone" :description "long name, required argument")
      (stropt :long-name "fax"
-	     :description
-	     "long name, optional argument"
+	     :description "long name, optional argument"
 	     :argument-type :optional))
     (group
      (group
-      (text
-       :string "This is a demo of the group imbrication feature."))))
+      (text :string "This is a demo of the group imbrication feature."))))
   "This program's synopsis .")
 
 (defun main ()
