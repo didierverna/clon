@@ -165,7 +165,8 @@ otherwise."
   "Evaluate BODY with SYNOPSIS bound to a new synopsis, and return it.
 KEYS are passed to `make-synopsis'.
 SYNOPSIS is automatically sealed after BODY is evaluated."
-  `(let ((,synopsis (apply #'make-synopsis ',keys)))
+  (push 'make-synopsis keys)
+  `(let ((,synopsis ,keys))
     ,@body
     (seal ,synopsis)
     ,synopsis))
@@ -190,10 +191,8 @@ The synopsis is automatically sealed after BODY is avaluated."
 		(,switch (&rest args) `(make-switch ,@args))
 		(,stropt (&rest args) `(make-stropt ,@args))
 		(,group (&rest args) `(declare-group ,@args)))
-      (let ((,synopsis (apply #'make-synopsis ',keys)))
-	,@body
-	(seal ,synopsis)
-	,synopsis))))
+      (define-synopsis ,synopsis ,keys
+	,@body))))
 
 
 ;;; synopsis.lisp ends here

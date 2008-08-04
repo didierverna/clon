@@ -88,10 +88,8 @@ The group is automatically sealed after BODY is avaluated."
 		(,switch (&rest args) `(make-switch ,@args))
 		(,stropt (&rest args) `(make-stropt ,@args))
 		(,group (&rest args) `(declare-group ,@args)))
-      (let ((,grp (make-group)))
-	,@body
-	(seal ,grp)
-	,grp))))
+      (define-group ,grp
+	,@body))))
 
 
 ;;; group.lisp ends here

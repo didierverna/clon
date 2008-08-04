@@ -341,8 +341,8 @@ NAME, VALUE and STATUS are bound to each option's name (as it appears on the
 command line), retrieved value and retrieval status."
   (let ((cmdline-option (gensym "cmdline-option")))
     `(do ((,cmdline-option
-	   (setq ,cmdline-option (pop (cmdline-options ,context)))
-	   (setq ,cmdline-option (pop (cmdline-options ,context)))))
+	   (pop (cmdline-options ,context))
+	   (pop (cmdline-options ,context))))
       ((null ,cmdline-option))
       (let ((,name (cmdline-option-name ,cmdline-option))
 	    (,value (cmdline-option-value ,cmdline-option))
@@ -368,8 +368,8 @@ as the second value."
 NAME and VALUE are bound to each unknown option's name and value."
   (let ((unknown-option (gensym "unknown-option")))
     `(do ((,unknown-option
-	   (setq ,unknown-option (pop (unknown-options ,context)))
-	   (setq ,unknown-option (pop (unknown-options ,context)))))
+	   (pop (unknown-options ,context))
+	   (pop (unknown-options ,context))))
       ((null ,unknown-option))
       (let ((,name (unknown-option-name ,unknown-option))
 	    (,value (unknown-option-value ,unknown-option)))
