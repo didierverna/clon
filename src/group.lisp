@@ -78,16 +78,24 @@ The group is automatically sealed after BODY is avaluated."
 	 (body (mapcar (lambda (form)
 			 (list (intern "ADD-TO" 'clon) grp form))
 		       body))
+	 (group (intern "GROUP"))
 	 (text (intern "TEXT"))
 	 (flag (intern "FLAG"))
 	 (switch (intern "SWITCH"))
 	 (stropt (intern "STROPT"))
-	 (group (intern "GROUP")))
-    `(macrolet ((,text (&rest args) `(make-text ,@args))
+	 #|(option-macros
+	  (mapcar
+	   (lambda (name)
+	     (let ((macro-name (intern name))
+		   (make-name (intern (concatenate 'string "MAKE-" name) 'clon)))
+	       `(,macro-name (&rest args) `(,make-name ,@args))))
+	   (option-names (find-class 'valued-option))))|#)
+    `(macrolet ((,group (&rest args) `(declare-group ,@args))
+		(,text (&rest args) `(make-text ,@args))
 		(,flag (&rest args) `(make-flag ,@args))
 		(,switch (&rest args) `(make-switch ,@args))
 		(,stropt (&rest args) `(make-stropt ,@args))
-		(,group (&rest args) `(declare-group ,@args)))
+		#|,@option-macros|#)
       (define-group ,grp
 	,@body))))
 

@@ -390,6 +390,26 @@ This class implements options that don't take any argument."))
 ;; the fact that we want to see it probably rather belongs to the user
 ;; preferences. Like, an option to display help in short form or something.
 
+;; #### WARNING: I'm not convinced by this approach for registering all new
+;; valued option classes. A specific metaclass for valued options seems the
+;; right place to store that information, but on the other hand, calling the
+;; MOP for such a simple thing might be overkill.
+(defclass valued-option-class (standard-class)
+  ((option-names :documentation "The list of valued option names."
+		 :initform nil
+		 :accessor option-names))
+  (:documentation "The VALUED-OPTION-CLASS metaclass."))
+
+;; #### FIXME: SBCL-specific
+(defmethod sb-mop:validate-superclass
+    ((class standard-class) (superclass valued-option-class))
+  t)
+
+;; #### FIXME: SBCL-specific
+(defmethod sb-mop:validate-superclass
+    ((class valued-option-class) (superclass standard-class))
+  t)
+
 ;; #### FIXME: make abstract
 (defclass valued-option (option)
   ((argument-name :documentation "The option's argument display name."
@@ -403,6 +423,7 @@ This class implements options that don't take any argument."))
    (default-value :documentation "The option's default value."
 		 :reader default-value
 		 :initarg :default-value))
+  (:metaclass valued-option-class)
   (:default-initargs
     :argument-name "ARG"
     :argument-type :required
@@ -434,8 +455,10 @@ This class implements is the base class for options accepting arguments."))
 
 (defmacro defoption (class superclasses slots &rest options)
   "Wrapper around defclass for defining a new Clon option class."
-  `(defclass ,class ,(cons 'valued-option superclasses) ,slots
-    ,@options))
+  `(progn
+    (push (symbol-name ',class) (option-names (find-class 'valued-option)))
+    (defclass ,class ,(cons 'valued-option superclasses) ,slots
+	      ,@options)))
 
 
 ;; -------------------------
