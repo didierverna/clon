@@ -283,7 +283,7 @@ CONTEXT is where to look for the options."
 
 
 ;; ============================================================================
-;; The Option retrieval Protocol
+;; The Option Retrieval Protocol
 ;; ============================================================================
 
 (defun getopt (context &rest keys &key short-name long-name option)
@@ -291,7 +291,7 @@ CONTEXT is where to look for the options."
 The option can be specified either by SHORT-NAME, LONG-NAME, or directly via
 an OPTION object.
 This function returns three values:
-- the option's retrieved value,
+- the retrieved value,
 - the retrieval status,
 - the value's source."
   (unless option
@@ -314,8 +314,9 @@ This function returns three values:
 	     (return-from getopt
 	       (values (cmdline-option-value cmdline-option)
 		       (or (eq (cmdline-option-status cmdline-option) t)
-			   (cons (cmdline-option-name cmdline-option)
-				 (cmdline-option-status cmdline-option)))
+			   (list* (cmdline-option-option cmdline-option)
+				  (cmdline-option-name cmdline-option)
+				  (cmdline-option-status cmdline-option)))
 		       :cmdline)))
 	    (t
 	     (push cmdline-option cmdline-options))))
@@ -325,29 +326,34 @@ This function returns three values:
 
 (defun getopt-cmdline (context)
   "Get the next cmdline option in CONTEXT.
-This function returns three values:
-- the option's name (as it appears on the command line,
-- the option's retrieved value,
-- the value retrieval status."
+This function returns four values:
+- the option object,
+- the option's name used on the command line,
+- the retrieved value,
+- the retrieval status."
   (let ((cmdline-option (pop (cmdline-options context))))
     (when cmdline-option
-      (values (cmdline-option-name cmdline-option)
+      (values (cmdline-option-option cmdline-option)
+	      (cmdline-option-name cmdline-option)
 	      (cmdline-option-value cmdline-option)
 	      (cmdline-option-status cmdline-option)))))
 
-(defmacro do-cmdline-options ((name value status) context &body body)
-  "Evaluate BODY over all cmdline options from CONTEXT.
-NAME, VALUE and STATUS are bound to each option's name (as it appears on the
-command line), retrieved value and retrieval status."
-  (let ((cmdline-option (gensym "cmdline-option")))
-    `(do ((,cmdline-option
-	   (pop (cmdline-options ,context))
-	   (pop (cmdline-options ,context))))
-      ((null ,cmdline-option))
-      (let ((,name (cmdline-option-name ,cmdline-option))
-	    (,value (cmdline-option-value ,cmdline-option))
-	    (,status (cmdline-option-status ,cmdline-option)))
-	,@body))))
+(defmacro multiple-value-getopt-cmdline
+    ((option name value status) context &body body)
+  "Evaluate BODY on the next command line option.
+OPTION, NAME, VALUE and STATUS are bound to the option's object, name used on
+the command line), retrieved value and retrieval status."
+  `(multiple-value-bind (,option ,name ,value ,status)
+    (getopt-cmdline ,context)
+    ,@body))
+
+(defmacro do-cmdline-options ((option name value status) context &body body)
+  "Evaluate BODY over all command line options from CONTEXT.
+OPTION, NAME, VALUE and STATUS are bound to each option's object, name used on
+the command line), retrieved value and retrieval status."
+  `(do () ((null (cmdline-options ,context)))
+    (multiple-value-getopt-cmdline (,option ,name ,value ,status) ,context
+     ,@body)))
 
 
 ;; ============================================================================
@@ -356,24 +362,30 @@ command line), retrieved value and retrieval status."
 
 (defun getopt-unknown (context)
   "Get the next unknown option in CONTEXT.
-This function returns the unknown option's name, and possibly a given argument
-as the second value."
+This function returns two values:
+- the option's name used on the command line,
+- possibly a provided argument."
   (let ((unknown-option (pop (unknown-options context))))
     (when unknown-option
       (values (unknown-option-name unknown-option)
 	      (unknown-option-value unknown-option)))))
 
+(defmacro multiple-value-getopt-unknown
+    ((name value) context &body body)
+  "Evaluate BODY on the next unknown option.
+NAME and VALUE are bound to the option's name used on the command line, and
+possibly a provided value."
+  `(multiple-value-bind (,name ,value)
+    (getopt-unknown ,context)
+    ,@body))
+
 (defmacro do-unknown-options ((name value) context &body body)
   "Evaluate BODY over all unknown options from CONTEXT.
-NAME and VALUE are bound to each unknown option's name and value."
-  (let ((unknown-option (gensym "unknown-option")))
-    `(do ((,unknown-option
-	   (pop (unknown-options ,context))
-	   (pop (unknown-options ,context))))
-      ((null ,unknown-option))
-      (let ((,name (unknown-option-name ,unknown-option))
-	    (,value (unknown-option-value ,unknown-option)))
-	,@body))))
+NAME and VALUE are bound to each option's name used on the command line, and
+possibly a provided value."
+  `(do () ((null (unknown-options ,context)))
+    (multiple-value-getopt-unknown (,name ,value) ,context
+     ,@body)))
 
 
 ;;; context.lisp ends here

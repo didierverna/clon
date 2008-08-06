@@ -36,7 +36,6 @@
 
 
 ;; Create and fill the program synopsis:
-
 (defvar *synopsis*
   (clon:declare-synopsis (:postfix "FILES...")
     (text :string "Demonstration of Clon.")
@@ -90,8 +89,11 @@
     (multiple-value-bind (value status source)
 	(clon:getopt context :short-name "d")
       (print (list value status source))(terpri))
-    (clon:do-cmdline-options (name value status) context
-      (print (list name value status))
+    (clon:do-cmdline-options (option name value status) context
+      (print (list option name value status))
+      (terpri))
+    (clon:do-unknown-options (name value) context
+      (print (list name value))
       (terpri)))
   (quit))
 
