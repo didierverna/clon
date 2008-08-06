@@ -420,6 +420,9 @@ This class implements options that don't take any argument."))
 			;; This slot will be initialized afterwards, according
 			;; to the :argument-type initarg.
 			:reader argument-required-p)
+   ;; #### NOTE: currently, there's no way to make a distinction between not
+   ;; providing a default value, and providing a null one. I don't think
+   ;; that's useful, but maybe this will change someday.
    (default-value :documentation "The option's default value."
 		 :reader default-value
 		 :initarg :default-value))

@@ -315,9 +315,8 @@ This function returns three values:
 	       (values (cmdline-option-value cmdline-option)
 		       (or (eq (cmdline-option-status cmdline-option) t)
 			   (list* (cmdline-option-option cmdline-option)
-				  (cmdline-option-name cmdline-option)
 				  (cmdline-option-status cmdline-option)))
-		       :cmdline)))
+		       (list :cmdline (cmdline-option-name cmdline-option)))))
 	    (t
 	     (push cmdline-option cmdline-options))))
     (setf (cmdline-options context) (nreverse cmdline-options)))
