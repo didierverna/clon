@@ -88,13 +88,14 @@
   (let ((context (clon:make-context :synopsis *synopsis*)))
     (multiple-value-bind (value status source)
 	(clon:getopt context :short-name "d")
-      (print (list value status source))(terpri))
+      (print (list value status source)))
+    (format t "~%~%Other options:")
     (clon:do-cmdline-options (option name value status) context
-      (print (list option name value status))
-      (terpri))
+      (print (list option name value status)))
+    (format t "~%~%Unknown options:")
     (clon:do-unknown-options (name value) context
-      (print (list name value))
-      (terpri)))
+      (print (list name value))))
+  (terpri)
   (quit))
 
 ;; #### FIXME: SBCL-specific
