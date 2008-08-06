@@ -281,7 +281,6 @@ This function returns two values:
 ;; -f                                   short name
 ;; --flag                               long name
 
-;; #### FIXME: make final
 (defclass flag (option)
   ()
   (:documentation "The FLAG class.
@@ -720,7 +719,6 @@ Conformant arguments can be either yes/on/true/no/off/false."
 ;; an equal sign for long names, or as a sticky argument after a short name,
 ;; but that's all.
 
-;; #### FIXME: make final. #### Why ??
 (defoption stropt ()
   ()
   (:default-initargs :argument-name "STR")
