@@ -380,7 +380,7 @@ This class implements options that don't take any argument."))
 ;; The Valued Option Class
 ;; ============================================================================
 
-;; #### FIXME: we should distinguish between the argument's display name, in
+;; #### NOTE: we should distinguish between the argument's display name, in
 ;; itself, and the fact that we want to actually use it. For instance, we
 ;; might want to display an option as just --color, but still declare that the
 ;; argument name is CLR so that one day, it is possible to implement escape
@@ -562,13 +562,10 @@ This class implements is the base class for options accepting arguments."))
 ;; The Switch Class
 ;; ============================================================================
 
-;; #### FIXME: provide :yes/no, :on/off and :true/false special
-;; initargs for the argument name, because that's the only ones Clon is able
-;; to recognize.
-
-;; #### NOTE: this makes me think that maybe people would like to subclass the
-;; switches in order to use other true/false values (I don't know, black/white
-;; or something) and have Clon still recognize this as a boolean option.
+;; #### NOTE: people might want to subclass the switches in order to use other
+;; true/false values (I don't know, black/white or something) and have Clon
+;; still recognize them as a boolean option. But this won't work with the
+;; argument-style consistency check. Think again about this.
 
 ;; A switch can appear in the following forms:
 ;;
@@ -583,32 +580,53 @@ This class implements is the base class for options accepting arguments."))
 ;; value is given by the -/+ call. When the argument is optional, omitting it
 ;; is equivalent to saying yes.
 
+;; #### FIXME: I'm not very satisfied with the argument-style stuff. This
+;; implies that the argument-name slot from the valued-option class is ignored
+;; in switches. The design could probably be improved.
 (defoption switch ()
-  ()
+  ((argument-style :documentation "The style of the argument (on/off etc.)."
+		   :type symbol
+		   :reader argument-style
+		   :initarg :argument-style))
   (:default-initargs
-    :argument-name "yes(no)"
+    ;; No :argument-name
+    :argument-style :yes/no
     :argument-type :optional
     :default-value nil
     :env-var nil)
   (:documentation "The SWITCH class.
 This class implements boolean options."))
 
-(defun make-switch (&rest keys
-		    &key short-name long-name description
-			 argument-name argument-type
-			 default-value env-var)
-  "Make a new switch."
+(defmethod initialize-instance :before ((switch switch)
+					&key short-name long-name description
+					     argument-name argument-type
+					     default-value env-var
+					     argument-style)
   (declare (ignore short-name long-name description
 		   argument-name argument-type
 		   default-value env-var))
+  (unless (member argument-style '(:yes/no :on/off :true/false))
+    (error "invalid switch argument style ~S." argument-style)))
+
+(defun make-switch (&rest keys
+		    &key short-name long-name description
+			 argument-name argument-type
+			 default-value env-var
+			 argument-style)
+  "Make a new switch."
+  (declare (ignore short-name long-name description
+		   argument-name argument-type
+		   default-value env-var
+		   argument-style))
   (apply 'make-instance 'switch keys))
 
 (defun make-internal-switch (long-name description
 			     &rest keys
 			     &key argument-name argument-type
-				  default-value env-var)
+				  default-value env-var
+				  argument-style)
   "Make a new internal switch."
-  (declare (ignore argument-name argument-type default-value))
+  (declare (ignore argument-name argument-type default-value argument-style))
   (when env-var
     ;; #### NOTE: this works because the default-initargs option for env-var
     ;; is actually nil, so I don't risk missing a concatenation later.

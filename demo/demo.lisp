@@ -51,13 +51,13 @@
 	     :env-var "DEBUG")
      (switch :short-name "i" :long-name "interactive"
 	     :description "both names, argument required, another name"
-	     :argument-name "on(off)"
+	     :argument-style :on/off
 	     :argument-type :required
 	     :default-value t)
      (switch :short-name "n" :description "short name, whatever the argument")
      (switch  :long-name "verbose"
 	      :description "long name, optional argument, yet another name"
-	      :argument-name "true(false)")
+	      :argument-style :true/false)
      (switch  :long-name "simulate"
 	      :description "long name, required argument"
 	      :argument-type :required))
