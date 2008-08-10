@@ -115,8 +115,8 @@ This class is the base class for all options."))
   (unless (cadr (member :internal keys))
     (dolist (name (list short-name long-name))
       (when (and name (or (string= name "clon")
-			  (string-start name "clon-"))
-	(error "Option ~A: name ~S reserved by Clon." option name))))))
+			  (string-start name "clon-")))
+	(error "Option ~A: name ~S reserved by Clon." option name)))))
 
 
 ;; -------------------------
