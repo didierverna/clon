@@ -99,6 +99,7 @@
   (quit))
 
 ;; #### FIXME: SBCL-specific
+(sb-ext:disable-debugger)
 (save-lisp-and-die "demo" :toplevel #'main :executable t)
 
 ;;; demo.lisp ends here
