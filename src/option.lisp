@@ -238,6 +238,9 @@ If AS-STRING is not nil, return a string of that character.")
 	    :type string
 	    :initarg :comment
 	    :reader comment))
+  (:report (lambda (error stream)
+	     (format stream "Option ~A: invalid argument ~S.~@[~%~A~]"
+		     (option error) (argument error) (comment error))))
   (:documentation "Report a conversion error (invalid option argument)."))
 
 
