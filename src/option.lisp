@@ -701,7 +701,7 @@ ARGUMENT must be either yes, on, true, no, off or false."
 		  :option switch
 		  :argument argument
 		  :comment
-		  "Valid arguments are: yes,on,true,no,off or false.")))))
+		  "Valid arguments are: yes, on, true, no, off or false.")))))
 ;;	   (values nil (list :invalid-value argument))))))
 
 (defmethod retrieve-from-long-call
