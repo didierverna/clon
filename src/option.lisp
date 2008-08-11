@@ -608,7 +608,7 @@ This class implements is the base class for options accepting arguments."))
 		   :reader argument-style
 		   :initarg :argument-style))
   (:default-initargs
-    ;; No :argument-name
+    ;; No :argument-name -- not used
     :argument-style :yes/no
     :argument-type :optional
     :default-value nil
