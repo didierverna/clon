@@ -606,7 +606,22 @@ This class implements is the base class for options accepting arguments."))
   ((argument-style :documentation "The style of the argument (on/off etc.)."
 		   :type symbol
 		   :reader argument-style
-		   :initarg :argument-style))
+		   :initarg :argument-style)
+   (argument-styles :documentation "The possible argument styles."
+		    :type list
+		    :initform '(:yes/no :on/off :true/false :okay/nope)
+		    :accessor argument-styles
+		    :allocation :class)
+   (yes-values :documentation "The possible 'yes' values."
+	       :type list
+	       :initform '("yes" "on" "true" "okay")
+	       :accessor yes-values
+	       :allocation :class)
+   (no-values :documentation "The possible 'no' values."
+	      :type list
+	      :initform '("no" "off" "false" "nope")
+	      :accessor no-values
+	      :allocation :class))
   (:default-initargs
     ;; No :argument-name -- not used
     :argument-style :yes/no
@@ -624,7 +639,7 @@ This class implements boolean options."))
   (declare (ignore short-name long-name description
 		   argument-name argument-type
 		   default-value env-var))
-  (unless (member argument-style '(:yes/no :on/off :true/false))
+  (unless (member argument-style (argument-styles switch))
     (error "invalid switch argument style ~S." argument-style)))
 
 (defun make-switch (&rest keys
@@ -687,21 +702,24 @@ This class implements boolean options."))
 ;; Conversion protocol
 ;; -------------------
 
-(let ((yes-values (list "yes" "on" "true" "okay"))
-      (no-values (list "no" "off" "false" "nope")))
-  (defmethod convert ((switch switch) argument)
-    "Convert ARGUMENT to a SWITCH value.
-ARGUMENT must be either yes, on, true, no, off or false."
-    (cond ((member argument yes-values :test #'string=)
-	   t)
-	  ((member argument no-values :test #'string=)
-	   nil)
-	  (t
-	   (error 'conversion-error
-		  :option switch
-		  :argument argument
-		  :comment
-		  "Valid arguments are: yes, on, true, no, off or false.")))))
+(defmethod convert ((switch switch) argument)
+  "Convert ARGUMENT to a SWITCH value.
+If ARGUMENT is not valid for a switch, raise a conversion error."
+  (cond ((member argument (yes-values switch) :test #'string=)
+	 t)
+	((member argument (no-values switch) :test #'string=)
+	 nil)
+	(t
+	 (error 'conversion-error
+		:option switch
+		:argument argument
+		:comment
+		(concatenate 'string
+		  "Valid arguments are: "
+		  (reduce (lambda (str1 str2)
+			    (concatenate 'string str1 ", " str2))
+			  (append (yes-values switch) (no-values switch)))
+		  ".")))))
 ;;	   (values nil (list :invalid-value argument))))))
 
 (defmethod retrieve-from-long-call
