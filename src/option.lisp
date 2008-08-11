@@ -225,9 +225,25 @@ If AS-STRING is not nil, return a string of that character.")
 ;; The Conversion Protocol
 ;; ============================================================================
 
+(define-condition conversion-error (error)
+  ((option :documentation "The concerned option."
+	   :type option
+	   :initarg :option
+	   :reader option)
+   (argument :documentation "The invalid argument."
+	     :type string
+	     :initarg :argument
+	     :reader argument)
+   (comment :documentation "An additional comment about the conversion error."
+	    :type string
+	    :initarg :comment
+	    :reader comment))
+  (:documentation "Report a conversion error (invalid option argument)."))
+
+
 (defgeneric convert (option argument)
-  (:documentation "Try to convert ARGUMENT into OPTION's value.
-Return that value and the conversion status."))
+  (:documentation "Convert ARGUMENT to OPTION's value.
+If ARGUMENT is invalid, raise a conversion error."))
 
 ;; #### NOTE: this is just to spare the burden of checking the conversion
 ;; status for people extending Clon. Maybe a simple macro and documenting that
@@ -668,17 +684,22 @@ This class implements boolean options."))
 ;; Conversion protocol
 ;; -------------------
 
-(let ((yes-values (list "yes" "on" "true"))
-      (no-values (list "no" "off" "false")))
+(let ((yes-values (list "yes" "on" "true" "okay"))
+      (no-values (list "no" "off" "false" "nope")))
   (defmethod convert ((switch switch) argument)
-    "Convert ARGUMENT into a SWITCH value.
-Conformant arguments can be either yes/on/true/no/off/false."
+    "Convert ARGUMENT to a SWITCH value.
+ARGUMENT must be either yes, on, true, no, off or false."
     (cond ((member argument yes-values :test #'string=)
-	   (values t t))
+	   t)
 	  ((member argument no-values :test #'string=)
-	   (values nil t))
+	   nil)
 	  (t
-	   (values nil (list :invalid-value argument))))))
+	   (error 'conversion-error
+		  :option switch
+		  :argument argument
+		  :comment
+		  "Valid arguments are: yes,on,true,no,off or false.")))))
+;;	   (values nil (list :invalid-value argument))))))
 
 (defmethod retrieve-from-long-call
     ((switch switch) &optional cmdline-value cmdline)
@@ -777,8 +798,8 @@ This class implements options the values of which are strings."))
 ;; -------------------
 
 (defmethod convert ((stropt stropt) argument)
-  "Just return the argument as-is."
-  (values argument t))
+  "Return ARGUMENT."
+  argument)
 
 
 ;;; option.lisp ends here
