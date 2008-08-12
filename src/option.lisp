@@ -654,12 +654,12 @@ This class implements is the base class for options accepting arguments."))
 		   :initarg :argument-style)
    (argument-styles :documentation "The possible argument styles."
 		    :type list
-		    :initform '(:yes/no :on/off :true/false :okay/nope)
+		    :initform '(:yes/no :on/off :true/false :yup/nope)
 		    :accessor argument-styles
 		    :allocation :class)
    (yes-values :documentation "The possible 'yes' values."
 	       :type list
-	       :initform '("yes" "on" "true" "okay")
+	       :initform '("yes" "on" "true" "yup")
 	       :accessor yes-values
 	       :allocation :class)
    (no-values :documentation "The possible 'no' values."
