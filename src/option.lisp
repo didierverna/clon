@@ -243,22 +243,67 @@ If AS-STRING is not nil, return a string of that character.")
 		     (option error) (argument error) (comment error))))
   (:documentation "Report a conversion error (invalid option argument)."))
 
+(define-condition value-error (error)
+  ((option :documentation "The concerned option."
+	   :type option
+	   :initarg :option
+	   :reader option)
+   (value :documentation "The invalid value."
+	  :initarg :value
+	  :reader value)
+   (comment :documentation "An additional comment about the value error."
+	    :type string
+	    :initarg :comment
+	    :reader comment))
+  (:report (lambda (error stream)
+	     (format stream "Option ~A: invalid value ~S.~@[~%~A~]"
+		     (option error) (value error) (comment error))))
+  (:documentation "Report a value error (invalid option value)."))
+
+
+(defun read-argument ()
+  "Read an option argument from standard input."
+  (format t "Please type in the new argument:~%")
+  (list (read-line)))
+
+(defun read-value ()
+  "Read an option value from standard input."
+  (format t "Please type in the new value:~%")
+  (list (read)))
+
+(defgeneric check-value (option value)
+  (:documentation "Check that VALUE is a valid one for OPTION.
+If VALUE is valid, return it. Otherwise, raise a value error."))
+
+(defun restartable-check-value (option value)
+  "Restartably check that VALUE is a valid one for OPTION."
+  (restart-case (check-value option value)
+    (use-value (value)
+      :report "Use another value."
+      :interactive read-value
+      (restartable-check-value option value))))
+
 
 (defgeneric convert (option argument)
   (:documentation "Convert ARGUMENT to OPTION's value.
 If ARGUMENT is invalid, raise a conversion error."))
 
-;; #### NOTE: this is just to spare the burden of checking the conversion
-;; status for people extending Clon. Maybe a simple macro and documenting that
-;; they have to use it would be sufficient.
-(defun safe-convert (option argument)
-  "Convert ARGUMENT into OPTION's value.
-Only, return OPTION's default value in case of conversion failure."
-  (multiple-value-bind (value status) (convert option argument)
-    (values (if (consp status)
-		(default-value option)
-		value)
-	    status)))
+(defun restartable-convert (option argument)
+  "Restartably convert ARGUMENT to OPTION's value."
+  (restart-case (convert option argument)
+    (use-default-value ()
+      :report (lambda (stream)
+		(format stream "Use option's default value (~S)."
+			(default-value option)))
+      (default-value option))
+    (use-value (value)
+      :report "Use another value."
+      :interactive read-value
+      (restartable-check-value option value))
+    (use-argument (argument)
+      :report "Use another argument."
+      :interactive read-argument
+      (restartable-convert option argument))))
 
 (defgeneric retrieve-from-long-call (option &optional cmdline-value cmdline)
   (:documentation "Retrieve OPTION's value from a long call.
@@ -526,13 +571,13 @@ This class implements is the base class for options accepting arguments."))
 	   (setq cmdline-value (maybe-pop-arg cmdline)))
 	 (if cmdline-value
 	     (multiple-value-bind (value status)
-		 (safe-convert option cmdline-value)
+		 (restartable-convert option cmdline-value)
 	       (values value status cmdline))
 	     (values (default-value option) (list :missing-argument) cmdline)))
 	(t
 	 (if cmdline-value
 	     (multiple-value-bind (value status)
-		 (safe-convert option cmdline-value)
+		 (restartable-convert option cmdline-value)
 	       (values value status cmdline))
 	     (values (default-value option) t cmdline)))))
 
@@ -549,13 +594,13 @@ This class implements is the base class for options accepting arguments."))
 	   (setq cmdline-value (maybe-pop-arg cmdline)))
 	 (if cmdline-value
 	     (multiple-value-bind (value status)
-		 (safe-convert option cmdline-value)
+		 (restartable-convert option cmdline-value)
 	       (values value status cmdline))
 	     (values (default-value option) (list :missing-argument) cmdline)))
 	(t
 	 (if cmdline-value
 	     (multiple-value-bind (value status)
-		 (safe-convert option cmdline-value)
+		 (restartable-convert option cmdline-value)
 	       (values value status cmdline))
 	     (values (default-value option) t cmdline)))))
 
@@ -569,7 +614,7 @@ This class implements is the base class for options accepting arguments."))
   ;; #### FIXME: SBCL-specific
   (let ((env-value (sb-posix:getenv (env-var option))))
     (if env-value
-	(multiple-value-bind (value status) (safe-convert option env-value)
+	(multiple-value-bind (value status) (restartable-convert option env-value)
 	  (values value
 		  (or (eq status t)
 		      (cons option status))
@@ -702,6 +747,11 @@ This class implements boolean options."))
 ;; Conversion protocol
 ;; -------------------
 
+(defmethod check-value ((switch switch) value)
+  "Return VALUE.
+All values are valid for switches: everything but nil means 'yes'."
+  value)
+
 (defmethod convert ((switch switch) argument)
   "Convert ARGUMENT to a SWITCH value.
 If ARGUMENT is not valid for a switch, raise a conversion error."
@@ -732,12 +782,12 @@ If ARGUMENT is not valid for a switch, raise a conversion error."
 	   (setq cmdline-value (maybe-pop-arg cmdline)))
 	 (if cmdline-value
 	     (multiple-value-bind (value status)
-		 (safe-convert switch cmdline-value)
+		 (restartable-convert switch cmdline-value)
 	       (values value status cmdline))
 	     (values (default-value switch) (list :missing-argument) cmdline)))
 	(t
 	 (if cmdline-value
-	     (multiple-value-bind (value status)(safe-convert switch cmdline-value)
+	     (multiple-value-bind (value status)(restartable-convert switch cmdline-value)
 	       (values value status cmdline))
 	     (values t t cmdline)))))
 
@@ -817,6 +867,15 @@ This class implements options the values of which are strings."))
 ;; -------------------
 ;; Conversion protocol
 ;; -------------------
+
+(defmethod check-value ((stropt stropt) value)
+  "Check that VALUE is a string."
+  (if (stringp value)
+      value
+      (error 'value-error
+	     :option stropt
+	     :value value
+	     :comment "Value must be a string.")))
 
 (defmethod convert ((stropt stropt) argument)
   "Return ARGUMENT."
