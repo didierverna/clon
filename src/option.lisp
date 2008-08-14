@@ -261,8 +261,10 @@ If AS-STRING is not nil, return a string of that character.")
 	     (format stream "Option '~A': missing argument." (name error))))
   (:documentation "Report a missing argument error."))
 
-(defgeneric retrieve-from-long-call (option &optional cmdline-value cmdline)
+(defgeneric retrieve-from-long-call
+    (option cmdline-name &optional cmdline-value cmdline)
   (:documentation "Retrieve OPTION's value from a long call.
+CMDLINE-NAME is the name used on the command-line.
 CMDLINE-VALUE is a potentially already parsed cmdline argument.
 Otherwise, CMDLINE is where to find an argument.
 This function returns two values:
@@ -350,7 +352,8 @@ This class implements options that don't take any argument."))
 ;; Retrieval protocol
 ;; -------------------
 
-(defmethod retrieve-from-long-call ((flag flag) &optional cmdline-value cmdline)
+(defmethod retrieve-from-long-call
+    ((flag flag) cmdline-name  &optional cmdline-value cmdline)
   "Retrieve FLAG's value from a long call."
   ;; CMDLINE-VALUE might be non-nil when a flag was given an argument through
   ;; an =-syntax. However, we don't check whether the next cmdline item could
@@ -358,10 +361,7 @@ This class implements options that don't take any argument."))
   ;; remainder detection.
   (if cmdline-value
       (error 'spurious-argument
-	     :option flag
-	     ;; #### FIXME: handle abbreviated cmdline name
-	     :name (long-name flag)
-	     :argument cmdline-value)
+	     :option flag :name cmdline-name :argument cmdline-value)
       (values t cmdline)))
 
 (defmethod retrieve-from-short-call ((flag flag) &optional cmdline-value cmdline)
@@ -616,7 +616,7 @@ If ARGUMENT is invalid, raise a conversion error."))
 	     :comment (comment error)))))
 
 (defmethod retrieve-from-long-call
-    ((option valued-option) &optional cmdline-value cmdline)
+    ((option valued-option) cmdline-name &optional cmdline-value cmdline)
   "Retrieve OPTION's value from a long call."
   ;; If the option requires an argument, but none is provided by an =-syntax,
   ;; we might find it in the next cmdline item, unless it looks like an
@@ -627,13 +627,12 @@ If ARGUMENT is invalid, raise a conversion error."))
 	 (unless cmdline-value
 	   (setq cmdline-value (maybe-pop-arg cmdline)))
 	 (if cmdline-value
-	     (values (cmdline-convert option (long-name option) cmdline-value)
+	     (values (cmdline-convert option cmdline-name cmdline-value)
 		     cmdline)
-	     ;; #### FIXME: handle abbreviated long name
-	     (error 'missing-argument :option option :name (long-name option))))
+	     (error 'missing-argument :option option :name cmdline-name)))
 	(t
 	 (if cmdline-value
-	     (values (cmdline-convert option (long-name option) cmdline-value)
+	     (values (cmdline-convert option cmdline-name cmdline-value)
 		     cmdline)
 	     (values (default-value option) cmdline)))))
 
@@ -825,7 +824,7 @@ If ARGUMENT is not valid for a switch, raise a conversion error."
 ;;	   (values nil (list :invalid-value argument))))))
 
 (defmethod retrieve-from-long-call
-    ((switch switch) &optional cmdline-value cmdline)
+    ((switch switch) cmdline-name &optional cmdline-value cmdline)
   "Retrieve SWITCH's value from a long call."
   ;; The difference with other valued options (see above) is that an omitted
   ;; optional argument stands for a "yes". Otherwise, it's pretty similar.
@@ -833,13 +832,12 @@ If ARGUMENT is not valid for a switch, raise a conversion error."
 	 (unless cmdline-value
 	   (setq cmdline-value (maybe-pop-arg cmdline)))
 	 (if cmdline-value
-	     (values (cmdline-convert switch (long-name switch) cmdline-value)
+	     (values (cmdline-convert switch cmdline-name cmdline-value)
 		     cmdline)
-	     ;; #### FIXME: handle abbreviated name
-	     (error 'missing-argument :option switch :name (long-name switch))))
+	     (error 'missing-argument :option switch :name cmdline-name)))
 	(t
 	 (if cmdline-value
-	     (values (cmdline-convert switch (long-name switch) cmdline-value)
+	     (values (cmdline-convert switch cmdline-name cmdline-value)
 		     cmdline)
 	     (values t cmdline)))))
 

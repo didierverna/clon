@@ -128,6 +128,8 @@ command-line options."))
 			       (:long `(long-name ,option))
 			       (:short `(short-name ,option))
 			       (:plus `(short-name ,option)))))
+		     (when (eq func :long)
+		       (push name-form call))
 		     (when cmdline-value
 		       (push cmdline-value call))
 		     (when cmdline
