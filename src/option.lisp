@@ -232,26 +232,33 @@ If AS-STRING is not nil, return a string of that character.")
 	   :reader option))
   (:documentation "An error related to an option."))
 
-(define-condition spurious-argument (option-error)
+(define-condition cmdline-option-error (option-error)
+  ((name :documentation "The option's name as it appears on the command-line."
+	 :type string
+	 :initarg :name
+	 :reader name))
+  (:documentation "An error related to a command-line option."))
+
+(define-condition spurious-argument (cmdline-option-error)
   ((argument :documentation "The spurious argument."
 	     :type string
 	     :initarg :argument
 	     :reader argument))
   (:report (lambda (error stream)
-	     (format stream "Option ~A: spurious argument ~S."
-		     (option error) (argument error))))
+	     (format stream "Option '~A': spurious argument ~S."
+		     (name error) (argument error))))
   (:documentation "Report a spurious argument error."))
 
-(define-condition invalid-+-syntax (option-error)
+(define-condition invalid-+-syntax (cmdline-option-error)
   ()
   (:report (lambda (error stream)
-	     (format stream "Option ~A: invalid +-syntax." (option error))))
+	     (format stream "Option '~A': invalid +-syntax." (name error))))
   (:documentation "Report an invalid +-syntax error."))
 
-(define-condition missing-argument (option-error)
+(define-condition missing-argument (cmdline-option-error)
   ()
   (:report (lambda (error stream)
-	     (format stream "Option ~A: missing argument." (option error))))
+	     (format stream "Option '~A': missing argument." (name error))))
   (:documentation "Report a missing argument error."))
 
 (defgeneric retrieve-from-long-call (option &optional cmdline-value cmdline)
@@ -350,7 +357,11 @@ This class implements options that don't take any argument."))
   ;; be a spurious arg, because that would mess with a possible automatic
   ;; remainder detection.
   (if cmdline-value
-      (error 'spurious-argument :option flag :argument cmdline-value)
+      (error 'spurious-argument
+	     :option flag
+	     ;; #### FIXME: handle abbreviated cmdline name
+	     :name (long-name flag)
+	     :argument cmdline-value)
       (values t cmdline)))
 
 (defmethod retrieve-from-short-call ((flag flag) &optional cmdline-value cmdline)
@@ -360,13 +371,16 @@ This class implements options that don't take any argument."))
   ;; arg, because that would mess with a possible automatic remainder
   ;; detection.
   (if cmdline-value
-      (error 'spurious-argument :option flag :argument cmdline-value)
+      (error 'spurious-argument
+	     :option flag
+	     :name (short-name flag)
+	     :argument cmdline-value)
       (values t cmdline)))
 
 (defmethod retrieve-from-plus-call ((flag flag))
   "Return t and an invalid + syntax error."
   ;; t because FLAG was given on the command line anyway.
-  (error 'invalid-+-syntax :option flag))
+  (error 'invalid-+-syntax :option flag :name (short-name flag)))
 
 (defmethod fallback-retrieval ((flag flag))
   "Retrieve FLAG from an env var if present."
@@ -577,6 +591,30 @@ If ARGUMENT is invalid, raise a conversion error."))
 ;; Retrieval protocol
 ;; ----------------
 
+(define-condition invalid-cmdline-argument (cmdline-option-error)
+  ((argument :documentation "The invalid argument."
+	     :type string
+	     :initarg :argument
+	     :reader argument)
+   (comment :documentation "An additional comment about the conversion error."
+	    :type string
+	    :initarg :comment
+	    :reader comment))
+  (:report (lambda (error stream)
+	     (format stream "Option '~A': invalid argument ~S.~@[~%~A~]"
+		     (name error) (argument error) (comment error))))
+  (:documentation "Report an invalid command-line argument error."))
+
+(defun cmdline-convert (option cmdline-name cmdline-value)
+  "Convert CMDLINE-VALUE to OPTION's value."
+  (handler-case (convert option cmdline-value)
+    (invalid-argument (error)
+      (error 'invalid-cmdline-argument
+	     :option option
+	     :name cmdline-name
+	     :argument cmdline-value
+	     :comment (comment error)))))
+
 (defmethod retrieve-from-long-call
     ((option valued-option) &optional cmdline-value cmdline)
   "Retrieve OPTION's value from a long call."
@@ -589,11 +627,14 @@ If ARGUMENT is invalid, raise a conversion error."))
 	 (unless cmdline-value
 	   (setq cmdline-value (maybe-pop-arg cmdline)))
 	 (if cmdline-value
-	     (values (convert option cmdline-value) cmdline)
-	     (error 'missing-argument :option option)))
+	     (values (cmdline-convert option (long-name option) cmdline-value)
+		     cmdline)
+	     ;; #### FIXME: handle abbreviated long name
+	     (error 'missing-argument :option option :name (long-name option))))
 	(t
 	 (if cmdline-value
-	     (values (convert option cmdline-value) cmdline)
+	     (values (cmdline-convert option (long-name option) cmdline-value)
+		     cmdline)
 	     (values (default-value option) cmdline)))))
 
 (defmethod retrieve-from-short-call
@@ -608,17 +649,19 @@ If ARGUMENT is invalid, raise a conversion error."))
 	 (unless cmdline-value
 	   (setq cmdline-value (maybe-pop-arg cmdline)))
 	 (if cmdline-value
-	     (values (convert option cmdline-value) cmdline)
-	     (error 'missing-argument :option option)))
+	     (values (cmdline-convert option (short-name option) cmdline-value)
+		     cmdline)
+	     (error 'missing-argument :option option :name (short-name option))))
 	(t
 	 (if cmdline-value
-	     (values (convert option cmdline-value) cmdline)
+	     (values (cmdline-convert option (short-name option) cmdline-value)
+		     cmdline)
 	     (values (default-value option) cmdline)))))
 
 ;; This method applies to all valued options but the switches.
 (defmethod retrieve-from-plus-call ((option valued-option))
   "Return OPTION's default value and an invalid + syntax error."
-  (error 'invalid-+-syntax :option option))
+  (error 'invalid-+-syntax :option option :name (short-name option)))
 
 (defmethod fallback-retrieval ((option valued-option))
   "Retrieve OPTION from an env var or its default value."
@@ -790,11 +833,14 @@ If ARGUMENT is not valid for a switch, raise a conversion error."
 	 (unless cmdline-value
 	   (setq cmdline-value (maybe-pop-arg cmdline)))
 	 (if cmdline-value
-	     (values (convert switch cmdline-value) cmdline)
-	     (error 'missing-argument :option switch)))
+	     (values (cmdline-convert switch (long-name switch) cmdline-value)
+		     cmdline)
+	     ;; #### FIXME: handle abbreviated name
+	     (error 'missing-argument :option switch :name (long-name switch))))
 	(t
 	 (if cmdline-value
-	     (values (convert switch cmdline-value) cmdline)
+	     (values (cmdline-convert switch (long-name switch) cmdline-value)
+		     cmdline)
 	     (values t cmdline)))))
 
 (defmethod retrieve-from-short-call
@@ -804,7 +850,10 @@ If ARGUMENT is not valid for a switch, raise a conversion error."
   ;; don't take *any* argument in short form (whether optional or not), so we
   ;; don't check anything in CMDLINE. The minus form just means "yes".
   (if cmdline-value
-      (error 'spurious-argument :option switch :argument cmdline-value)
+      (error 'spurious-argument
+	     :option switch
+	     :argument cmdline-value
+	     :name (short-name switch))
       (values t cmdline)))
 
 (defmethod retrieve-from-plus-call ((switch switch))
