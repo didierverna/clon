@@ -49,6 +49,9 @@ This check also protects against too short strings."
     (and (>= (length string) length)
 	 (string= string start :end1 length))))
 
+#|(defmacro define-restart-function (symbol)
+  `(defun ,symbol (c)
+    (invoke-restart |#
 
 ;; ============================================================================
 ;; Key-Value pairs manipulation

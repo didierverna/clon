@@ -222,96 +222,44 @@ If AS-STRING is not nil, return a string of that character.")
 
 
 ;; ============================================================================
-;; The Conversion Protocol
+;; The Retrieval Protocol
 ;; ============================================================================
 
-(define-condition conversion-error (error)
+(define-condition option-error (error)
   ((option :documentation "The concerned option."
 	   :type option
 	   :initarg :option
-	   :reader option)
-   (argument :documentation "The invalid argument."
+	   :reader option))
+  (:documentation "An error related to an option."))
+
+(define-condition spurious-argument (option-error)
+  ((argument :documentation "The spurious argument."
 	     :type string
 	     :initarg :argument
-	     :reader argument)
-   (comment :documentation "An additional comment about the conversion error."
-	    :type string
-	    :initarg :comment
-	    :reader comment))
+	     :reader argument))
   (:report (lambda (error stream)
-	     (format stream "Option ~A: invalid argument ~S.~@[~%~A~]"
-		     (option error) (argument error) (comment error))))
-  (:documentation "Report a conversion error (invalid option argument)."))
+	     (format stream "Option ~A: spurious argument ~S."
+		     (option error) (argument error))))
+  (:documentation "Report a spurious argument error."))
 
-(define-condition value-error (error)
-  ((option :documentation "The concerned option."
-	   :type option
-	   :initarg :option
-	   :reader option)
-   (value :documentation "The invalid value."
-	  :initarg :value
-	  :reader value)
-   (comment :documentation "An additional comment about the value error."
-	    :type string
-	    :initarg :comment
-	    :reader comment))
+(define-condition invalid-+-syntax (option-error)
+  ()
   (:report (lambda (error stream)
-	     (format stream "Option ~A: invalid value ~S.~@[~%~A~]"
-		     (option error) (value error) (comment error))))
-  (:documentation "Report a value error (invalid option value)."))
+	     (format stream "Option ~A: invalid +-syntax." (option error))))
+  (:documentation "Report an invalid +-syntax error."))
 
-
-(defun read-argument ()
-  "Read an option argument from standard input."
-  (format t "Please type in the new argument:~%")
-  (list (read-line)))
-
-(defun read-value ()
-  "Read an option value from standard input."
-  (format t "Please type in the new value:~%")
-  (list (read)))
-
-(defgeneric check-value (option value)
-  (:documentation "Check that VALUE is a valid one for OPTION.
-If VALUE is valid, return it. Otherwise, raise a value error."))
-
-(defun restartable-check-value (option value)
-  "Restartably check that VALUE is a valid one for OPTION."
-  (restart-case (check-value option value)
-    (use-value (value)
-      :report "Use another value."
-      :interactive read-value
-      (restartable-check-value option value))))
-
-
-(defgeneric convert (option argument)
-  (:documentation "Convert ARGUMENT to OPTION's value.
-If ARGUMENT is invalid, raise a conversion error."))
-
-(defun restartable-convert (option argument)
-  "Restartably convert ARGUMENT to OPTION's value."
-  (restart-case (convert option argument)
-    (use-default-value ()
-      :report (lambda (stream)
-		(format stream "Use option's default value (~S)."
-			(default-value option)))
-      (default-value option))
-    (use-value (value)
-      :report "Use another value."
-      :interactive read-value
-      (restartable-check-value option value))
-    (use-argument (argument)
-      :report "Use another argument."
-      :interactive read-argument
-      (restartable-convert option argument))))
+(define-condition missing-argument (option-error)
+  ()
+  (:report (lambda (error stream)
+	     (format stream "Option ~A: missing argument." (option error))))
+  (:documentation "Report a missing argument error."))
 
 (defgeneric retrieve-from-long-call (option &optional cmdline-value cmdline)
   (:documentation "Retrieve OPTION's value from a long call.
 CMDLINE-VALUE is a potentially already parsed cmdline argument.
 Otherwise, CMDLINE is where to find an argument.
-This function returns three values:
+This function returns two values:
 - the retrieved value,
-- the retrieval status,
 - the new cmdline (possibly with the first item popped if the option requires
   an argument)."))
 
@@ -319,17 +267,13 @@ This function returns three values:
   (:documentation "Retrieve OPTION's value from a short call.
 CMDLINE-VALUE is a potentially already parsed cmdline argument.
 Otherwise, CMDLINE is where to find an argument.
-This function returns three values:
+This function returns two values:
 - the retrieved value,
-- the retrieval status,
 - the new cmdline (possibly with the first item popped if the option requires
   an argument)."))
 
 (defgeneric retrieve-from-plus-call (option)
-  (:documentation "Retrieve OPTION's value from a plus call.
-This function returns two values:
-- the retrieved value,
-- the retrieval status."))
+  (:documentation "Retrieve OPTION's value from a plus call and return it."))
 
 (defgeneric fallback-retrieval (option)
   (:documentation "Retrieve OPTION's value from an env var, or a default value."))
@@ -396,7 +340,7 @@ This class implements options that don't take any argument."))
 
 
 ;; -------------------
-;; Conversion protocol
+;; Retrieval protocol
 ;; -------------------
 
 (defmethod retrieve-from-long-call ((flag flag) &optional cmdline-value cmdline)
@@ -405,11 +349,9 @@ This class implements options that don't take any argument."))
   ;; an =-syntax. However, we don't check whether the next cmdline item could
   ;; be a spurious arg, because that would mess with a possible automatic
   ;; remainder detection.
-  (values t
-	  (if cmdline-value
-	      (list :extra-argument cmdline-value)
-	      t)
-	  cmdline))
+  (if cmdline-value
+      (error 'spurious-argument :option flag :argument cmdline-value)
+      (values t cmdline)))
 
 (defmethod retrieve-from-short-call ((flag flag) &optional cmdline-value cmdline)
   "Retrieve FLAG's value from a short call."
@@ -417,16 +359,14 @@ This class implements options that don't take any argument."))
   ;; However, we don't check whether the next cmdline item could be a spurious
   ;; arg, because that would mess with a possible automatic remainder
   ;; detection.
-  (values t
-	  (if cmdline-value
-	      (list :extra-argument cmdline-value)
-	      t)
-	  cmdline))
+  (if cmdline-value
+      (error 'spurious-argument :option flag :argument cmdline-value)
+      (values t cmdline)))
 
 (defmethod retrieve-from-plus-call ((flag flag))
   "Return t and an invalid + syntax error."
   ;; t because FLAG was given on the command line anyway.
-  (values t (list :invalid-+-syntax)))
+  (error 'invalid-+-syntax :option flag))
 
 (defmethod fallback-retrieval ((flag flag))
   "Retrieve FLAG from an env var if present."
@@ -554,9 +494,88 @@ This class implements is the base class for options accepting arguments."))
     (potential-pack-char option as-string)))
 
 
-;; -------------------
-;; Conversion protocol
-;; -------------------
+;; ===========================================================================
+;; The Conversion Protocol
+;; ===========================================================================
+
+(define-condition invalid-argument (option-error)
+  ((argument :documentation "The invalid argument."
+	     :type string
+	     :initarg :argument
+	     :reader argument)
+   (comment :documentation "An additional comment about the conversion error."
+	    :type string
+	    :initarg :comment
+	    :reader comment))
+  (:report (lambda (error stream)
+	     (format stream "Option ~A: invalid argument ~S.~@[~%~A~]"
+		     (option error) (argument error) (comment error))))
+  (:documentation "Report an invalid argument error."))
+
+#|
+(define-condition invalid-value (option-error)
+  ((value :documentation "The invalid value."
+	  :initarg :value
+	  :reader value)
+   (comment :documentation "An additional comment about the value error."
+	    :type string
+	    :initarg :comment
+	    :reader comment))
+  (:report (lambda (error stream)
+	     (format stream "Option ~A: invalid value ~S.~@[~%~A~]"
+		     (option error) (value error) (comment error))))
+  (:documentation "Report an invalid value error."))
+
+
+(defun read-argument ()
+  "Read an option argument from standard input."
+  (format t "Please type in the new argument:~%")
+  (list (read-line)))
+
+(defun read-value ()
+  "Read an option value from standard input."
+  (format t "Please type in the new value:~%")
+  (list (read)))
+
+(defgeneric check-value (option value)
+  (:documentation "Check that VALUE is a valid one for OPTION.
+If VALUE is valid, return it. Otherwise, raise a value error."))
+
+(defun restartable-check-value (option value)
+  "Restartably check that VALUE is a valid one for OPTION."
+  (restart-case (check-value option value)
+    (use-value (value)
+      :report "Use another value."
+      :interactive read-value
+      (restartable-check-value option value))))
+|#
+
+(defgeneric convert (option argument)
+  (:documentation "Convert ARGUMENT to OPTION's value.
+If ARGUMENT is invalid, raise a conversion error."))
+
+#|
+(defun restartable-convert (option argument)
+  "Restartably convert ARGUMENT to OPTION's value."
+  (restart-case (convert option argument)
+    (use-default-value ()
+      :report (lambda (stream)
+		(format stream "Use option's default value (~S)."
+			(default-value option)))
+      (default-value option))
+    (use-value (value)
+      :report "Use another value."
+      :interactive read-value
+      (restartable-check-value option value))
+    (use-argument (argument)
+      :report "Use another argument."
+      :interactive read-argument
+      (restartable-convert option argument))))
+|#
+
+;; ----------------
+;; Retrieval protocol
+;; ----------------
 
 (defmethod retrieve-from-long-call
     ((option valued-option) &optional cmdline-value cmdline)
@@ -570,16 +589,12 @@ This class implements is the base class for options accepting arguments."))
 	 (unless cmdline-value
 	   (setq cmdline-value (maybe-pop-arg cmdline)))
 	 (if cmdline-value
-	     (multiple-value-bind (value status)
-		 (restartable-convert option cmdline-value)
-	       (values value status cmdline))
-	     (values (default-value option) (list :missing-argument) cmdline)))
+	     (values (convert option cmdline-value) cmdline)
+	     (error 'missing-argument :option option)))
 	(t
 	 (if cmdline-value
-	     (multiple-value-bind (value status)
-		 (restartable-convert option cmdline-value)
-	       (values value status cmdline))
-	     (values (default-value option) t cmdline)))))
+	     (values (convert option cmdline-value) cmdline)
+	     (values (default-value option) cmdline)))))
 
 (defmethod retrieve-from-short-call
     ((option valued-option) &optional cmdline-value cmdline)
@@ -593,32 +608,24 @@ This class implements is the base class for options accepting arguments."))
 	 (unless cmdline-value
 	   (setq cmdline-value (maybe-pop-arg cmdline)))
 	 (if cmdline-value
-	     (multiple-value-bind (value status)
-		 (restartable-convert option cmdline-value)
-	       (values value status cmdline))
-	     (values (default-value option) (list :missing-argument) cmdline)))
+	     (values (convert option cmdline-value) cmdline)
+	     (error 'missing-argument :option option)))
 	(t
 	 (if cmdline-value
-	     (multiple-value-bind (value status)
-		 (restartable-convert option cmdline-value)
-	       (values value status cmdline))
-	     (values (default-value option) t cmdline)))))
+	     (values (convert option cmdline-value) cmdline)
+	     (values (default-value option) cmdline)))))
 
 ;; This method applies to all valued options but the switches.
 (defmethod retrieve-from-plus-call ((option valued-option))
   "Return OPTION's default value and an invalid + syntax error."
-  (values (default-value option) (list :invalid-+-syntax)))
+  (error 'invalid-+-syntax :option option))
 
 (defmethod fallback-retrieval ((option valued-option))
   "Retrieve OPTION from an env var or its default value."
   ;; #### FIXME: SBCL-specific
   (let ((env-value (sb-posix:getenv (env-var option))))
     (if env-value
-	(multiple-value-bind (value status) (restartable-convert option env-value)
-	  (values value
-		  (or (eq status t)
-		      (cons option status))
-		  (list :environment (env-var option))))
+	(convert option env-value)
 	(default-value option))))
 
 
@@ -747,10 +754,12 @@ This class implements boolean options."))
 ;; Conversion protocol
 ;; -------------------
 
+#|
 (defmethod check-value ((switch switch) value)
   "Return VALUE.
 All values are valid for switches: everything but nil means 'yes'."
   value)
+|#
 
 (defmethod convert ((switch switch) argument)
   "Convert ARGUMENT to a SWITCH value.
@@ -760,7 +769,7 @@ If ARGUMENT is not valid for a switch, raise a conversion error."
 	((member argument (no-values switch) :test #'string=)
 	 nil)
 	(t
-	 (error 'conversion-error
+	 (error 'invalid-argument
 		:option switch
 		:argument argument
 		:comment
@@ -781,15 +790,12 @@ If ARGUMENT is not valid for a switch, raise a conversion error."
 	 (unless cmdline-value
 	   (setq cmdline-value (maybe-pop-arg cmdline)))
 	 (if cmdline-value
-	     (multiple-value-bind (value status)
-		 (restartable-convert switch cmdline-value)
-	       (values value status cmdline))
-	     (values (default-value switch) (list :missing-argument) cmdline)))
+	     (values (convert switch cmdline-value) cmdline)
+	     (error 'missing-argument :option switch)))
 	(t
 	 (if cmdline-value
-	     (multiple-value-bind (value status)(restartable-convert switch cmdline-value)
-	       (values value status cmdline))
-	     (values t t cmdline)))))
+	     (values (convert switch cmdline-value) cmdline)
+	     (values t cmdline)))))
 
 (defmethod retrieve-from-short-call
     ((switch switch) &optional cmdline-value cmdline)
@@ -797,15 +803,13 @@ If ARGUMENT is not valid for a switch, raise a conversion error."
   ;; The difference with other valued options (see above) is that switches
   ;; don't take *any* argument in short form (whether optional or not), so we
   ;; don't check anything in CMDLINE. The minus form just means "yes".
-  (values t
-	  (if cmdline-value
-	      (list :extra-argument cmdline-value)
-	      t)
-	  cmdline))
+  (if cmdline-value
+      (error 'spurious-argument :option switch :argument cmdline-value)
+      (values t cmdline)))
 
 (defmethod retrieve-from-plus-call ((switch switch))
   "Retrieve SWITCH's value from a plus call in CMDLINE."
-  (values nil t))
+  nil)
 
 
 ;; ============================================================================
@@ -868,14 +872,16 @@ This class implements options the values of which are strings."))
 ;; Conversion protocol
 ;; -------------------
 
+#|
 (defmethod check-value ((stropt stropt) value)
   "Check that VALUE is a string."
   (if (stringp value)
       value
-      (error 'value-error
+      (error 'invalid-value
 	     :option stropt
 	     :value value
 	     :comment "Value must be a string.")))
+|#
 
 (defmethod convert ((stropt stropt) argument)
   "Return ARGUMENT."
