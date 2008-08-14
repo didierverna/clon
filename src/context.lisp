@@ -76,23 +76,30 @@
 		    :accessor unknown-options)
    (junk :documentation "The unidentified part of the command line."
 	 :type list
-	 :accessor junk))
+	 :accessor junk)
+   (error-handler :documentation "The behavior to adopt on errors."
+		  :type symbol
+		  :initarg :error-handler
+		  :reader error-handler))
   (:default-initargs
-      ;; #### FIXME: SBCL specific
-      :cmdline sb-ext:*posix-argv*)
+    ;; #### FIXME: SBCL specific
+    :cmdline sb-ext:*posix-argv*
+    :error-handler :quit)
   (:documentation "The CONTEXT class.
 This class holds the necessary information to process a particular set of
 command-line options."))
 
-(defmethod initialize-instance :before ((context context) &key synopsis cmdline)
+(defmethod initialize-instance :before
+    ((context context) &key synopsis cmdline error-handler)
   "Ensure that SYNOPSIS is sealed."
-  (declare (ignore cmdline))
+  (declare (ignore cmdline error-handler))
   (unless (sealedp synopsis)
     (error "Initializing context ~A: synopsis ~A not sealed." context synopsis)))
 
-(defmethod initialize-instance :after ((context context) &key synopsis cmdline)
+(defmethod initialize-instance :after
+    ((context context) &key synopsis cmdline error-handler)
   "Parse CMDLINE."
-  (declare (ignore synopsis))
+  (declare (ignore synopsis error-handler))
   (setf (slot-value context 'progname) (pop cmdline))
   (let ((cmdline-options (list))
 	(remainder (list))
@@ -156,106 +163,120 @@ CONTEXT is where to look for the options."
 					   :short-name ,name)))
 			   (assert ,option)
 			   ,@body)))))
-      (do ((arg (pop cmdline) (pop cmdline)))
-	  ((null arg))
-	(cond ((string= arg "--")
-	       ;; The Clon separator.
-	       (setq remainder cmdline)
-	       (setq cmdline nil))
-	      ((string-start arg "--")
-	       ;; A long call.
-	       (let* ((value-start (position #\= arg :start 2))
-		      (cmdline-name (subseq arg 2 value-start))
-		      (cmdline-value (when value-start
-				       (subseq arg (1+ value-start))))
-		      (option (search-option context :long-name cmdline-name))
-		      (name cmdline-name))
-		 (unless option
-		   (multiple-value-setq (option name)
-		     (search-option context :partial-name cmdline-name)))
-		 (if option
-		     (push-retrieved-option cmdline-options :long option
-		       cmdline-value cmdline name)
-		     (push-unknown-option unknown-options
-		       :name cmdline-name
-		       :value cmdline-value))))
-	      ;; A short call, or a minus pack.
-	      ((string-start arg "-")
-	       ;; #### FIXME: check invalid syntax -foo=val
-	       (let* ((cmdline-name (subseq arg 1))
-		      (option (search-option context :short-name cmdline-name))
-		      cmdline-value)
-		 (unless option
-		   (multiple-value-setq (option cmdline-value)
-		     (search-sticky-option context cmdline-name)))
-		 (cond (option
-			(push-retrieved-option cmdline-options :short option
-			  cmdline-value cmdline))
-		       ((potential-pack-p cmdline-name context)
-			;; #### NOTE: When parsing a minus pack, only the last
-			;; option gets a cmdline argument because only the
-			;; last one is allowed to retrieve an argument from
-			;; there.
-			(do-pack (option
-				  (subseq cmdline-name 0
-					  (1- (length cmdline-name)))
-				  context)
-			  (push-retrieved-option cmdline-options :short option))
-			(let* ((name (subseq cmdline-name
-					     (1- (length cmdline-name))))
-			       (option (search-option context :short-name name)))
-			  (assert option)
+      (handler-bind ((option-error
+		      (lambda (error)
+			(ecase (error-handler context)
+			  (:quit
+			   (let (*print-escape*) (print-object error t))
+			   (terpri)
+			   ;; #### FIXME: SBCL-specific
+			   (sb-ext:quit :unix-status 1))
+			  (:none)))))
+	(do ((arg (pop cmdline) (pop cmdline)))
+	    ((null arg))
+	  (cond ((string= arg "--")
+		 ;; The Clon separator.
+		 (setq remainder cmdline)
+		 (setq cmdline nil))
+		((string-start arg "--")
+		 ;; A long call.
+		 (let* ((value-start (position #\= arg :start 2))
+			(cmdline-name (subseq arg 2 value-start))
+			(cmdline-value (when value-start
+					 (subseq arg (1+ value-start))))
+			(option (search-option context :long-name cmdline-name))
+			(name cmdline-name))
+		   (unless option
+		     (multiple-value-setq (option name)
+		       (search-option context :partial-name cmdline-name)))
+		   (if option
+		       (push-retrieved-option cmdline-options :long option
+					      cmdline-value cmdline name)
+		       (push-unknown-option unknown-options
+					    :name cmdline-name
+					    :value cmdline-value))))
+		;; A short call, or a minus pack.
+		((string-start arg "-")
+		 ;; #### FIXME: check invalid syntax -foo=val
+		 (let* ((cmdline-name (subseq arg 1))
+			(option (search-option context :short-name cmdline-name))
+			cmdline-value)
+		   (unless option
+		     (multiple-value-setq (option cmdline-value)
+		       (search-sticky-option context cmdline-name)))
+		   (cond (option
 			  (push-retrieved-option cmdline-options :short option
-			    nil cmdline)))
+						 cmdline-value cmdline))
+			 ((potential-pack-p cmdline-name context)
+			  ;; #### NOTE: When parsing a minus pack, only the
+			  ;; last option gets a cmdline argument because only
+			  ;; the last one is allowed to retrieve an argument
+			  ;; from there.
+			  (do-pack (option
+				    (subseq cmdline-name 0
+					    (1- (length cmdline-name)))
+				    context)
+			    (push-retrieved-option cmdline-options :short option))
+			  (let* ((name (subseq cmdline-name
+					       (1- (length cmdline-name))))
+				 (option (search-option context
+							:short-name name)))
+			    (assert option)
+			    (push-retrieved-option
+			     cmdline-options :short option nil cmdline)))
+			 (t
+			  (push-unknown-option unknown-options
+					       :name cmdline-name)))))
+		;; A plus call or a plus pack.
+		((string-start arg "+")
+		 ;; #### FIXME: check invalid syntax +foo=val
+		 (let* ((cmdline-name (subseq arg 1))
+			;; #### NOTE: in theory, we could allow partial
+			;; matches on short names when they're used with the
+			;; +-syntax, because there's no sticky argument or
+			;; whatever. But we don't. That's all. Short names are
+			;; not meant to be long (otherwise, that would be long
+			;; names right?), so they're not meant to be
+			;; abbreviated.
+			(option (search-option context :short-name cmdline-name)))
+		   (cond (option
+			  (push-retrieved-option cmdline-options :plus option))
+			 ((potential-pack-p cmdline-name context)
+			  (do-pack (option cmdline-name context)
+			    (push-retrieved-option cmdline-options :plus option)))
+			 (t
+			  (push-unknown-option unknown-options
+					       :name cmdline-name)))))
+		(t
+		 ;; Not an option call.
+		 ;; #### FIXME: SBCL specific.
+		 (cond ((sb-ext:posix-getenv "POSIXLY_CORRECT")
+			;; That's the end of the Clon-specific part:
+			(setq remainder (cons arg cmdline))
+			(setq cmdline nil))
 		       (t
-			(push-unknown-option unknown-options
-			  :name cmdline-name)))))
-	      ;; A plus call or a plus pack.
-	      ((string-start arg "+")
-	       ;; #### FIXME: check invalid syntax +foo=val
-	       (let* ((cmdline-name (subseq arg 1))
-		      ;; #### NOTE: in theory, we could allow partial matches
-		      ;; on short names when they're used with the +-syntax,
-		      ;; because there's no sticky argument or whatever. But
-		      ;; we don't. That's all. Short names are not meant to be
-		      ;; long (otherwise, that would be long names right?), so
-		      ;; they're not meant to be abbreviated.
-		      (option (search-option context :short-name cmdline-name)))
-		 (cond (option
-			(push-retrieved-option cmdline-options :plus option))
-		       ((potential-pack-p cmdline-name context)
-			(do-pack (option cmdline-name context)
-			  (push-retrieved-option cmdline-options :plus option)))
-		       (t
-			(push-unknown-option unknown-options
-			  :name cmdline-name)))))
-	      (t
-	       ;; Not an option call.
-	       ;; #### FIXME: SBCL specific.
-	       (cond ((sb-ext:posix-getenv "POSIXLY_CORRECT")
-		      ;; That's the end of the Clon-specific part:
-		      (setq remainder (cons arg cmdline))
-		      (setq cmdline nil))
-		     (t
-		      ;; If there's no more option on the cmdline, consider
-		      ;; this as the remainder (implicit since no "--" has
-		      ;; been used). If there's still another option
-		      ;; somewhere, then this is really junk.
-		      (cond ((notany #'option-p cmdline)
-			     (setq remainder (cons arg cmdline))
-			     (setq cmdline nil))
-			    (t
-			     (push arg junk))))))))
+			;; If there's no more option on the cmdline, consider
+			;; this as the remainder (implicit since no "--" has
+			;; been used). If there's still another option
+			;; somewhere, then this is really junk.
+			(cond ((notany #'option-p cmdline)
+			       (setq remainder (cons arg cmdline))
+			       (setq cmdline nil))
+			      (t
+			       (push arg junk)))))))))
       (setf (cmdline-options context) (nreverse cmdline-options))
       (setf (slot-value context 'remainder) remainder)
       (setf (unknown-options context) (nreverse unknown-options))
       (setf (slot-value context 'junk) (nreverse junk)))))
 
-(defun make-context (&rest keys &key synopsis cmdline)
+(defun make-context (&rest keys &key synopsis cmdline error-handler)
   "Make a new context.
 - SYNOPSIS is the program synopsis to use in that context.
 - CMDLINE is the argument list (strings) to process.
-  It defaults to a POSIX conformant argv."
+  It defaults to a POSIX conformant argv.
+- ERROR-HANDLER is the behavior to adopt on errors. It can be one of:
+  * :quit, meaning print the error and abort execution,
+  * :none, meaning let the debugger handle the situation."
   (declare (ignore synopsis cmdline))
   (apply #'make-instance 'context keys))
 
