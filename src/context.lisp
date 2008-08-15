@@ -277,7 +277,7 @@ CONTEXT is where to look for the options."
 - ERROR-HANDLER is the behavior to adopt on errors. It can be one of:
   * :quit, meaning print the error and abort execution,
   * :none, meaning let the debugger handle the situation."
-  (declare (ignore synopsis cmdline))
+  (declare (ignore synopsis cmdline error-handler))
   (apply #'make-instance 'context keys))
 
 
