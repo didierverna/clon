@@ -512,21 +512,6 @@ This class implements is the base class for options accepting arguments."))
 ;; The Conversion Protocol
 ;; ===========================================================================
 
-(define-condition invalid-argument (option-error)
-  ((argument :documentation "The invalid argument."
-	     :type string
-	     :initarg :argument
-	     :reader argument)
-   (comment :documentation "An additional comment about the conversion error."
-	    :type string
-	    :initarg :comment
-	    :reader comment))
-  (:report (lambda (error stream)
-	     (format stream "Option ~A: invalid argument ~S.~@[~%~A~]"
-		     (option error) (argument error) (comment error))))
-  (:documentation "Report an invalid argument error."))
-
-#|
 (define-condition invalid-value (option-error)
   ((value :documentation "The invalid value."
 	  :initarg :value
@@ -539,12 +524,6 @@ This class implements is the base class for options accepting arguments."))
 	     (format stream "Option ~A: invalid value ~S.~@[~%~A~]"
 		     (option error) (value error) (comment error))))
   (:documentation "Report an invalid value error."))
-
-
-(defun read-argument ()
-  "Read an option argument from standard input."
-  (format t "Please type in the new argument:~%")
-  (list (read-line)))
 
 (defun read-value ()
   "Read an option value from standard input."
@@ -559,33 +538,53 @@ If VALUE is valid, return it. Otherwise, raise a value error."))
   "Restartably check that VALUE is a valid one for OPTION."
   (restart-case (check-value option value)
     (use-value (value)
-      :report "Use another value."
+      :report "Use another value instead."
       :interactive read-value
       (restartable-check-value option value))))
-|#
+
+(define-condition invalid-argument (option-error)
+  ((argument :documentation "The invalid argument."
+	     :type string
+	     :initarg :argument
+	     :reader argument)
+   (comment :documentation "An additional comment about the conversion error."
+	    :type string
+	    :initarg :comment
+	    :reader comment))
+  (:report (lambda (error stream)
+	     (format stream "Option ~A: invalid argument ~S.~@[~%~A~]"
+		     (option error) (argument error) (comment error))))
+  (:documentation "Report an invalid argument error."))
+
+(defun read-argument ()
+  "Read an option argument from standard input."
+  (format t "Please type in the new argument:~%")
+  (list (read-line)))
 
 (defgeneric convert (option argument)
   (:documentation "Convert ARGUMENT to OPTION's value.
-If ARGUMENT is invalid, raise a conversion error."))
+If ARGUMENT is invalid, raise an invalid-argument error."))
 
-#|
+;; #### NOTE: the restarts provided here are actually not used because
+;; conversion errors are caught by a handler-case in the retrieval routines,
+;; which provide higher-level errors and restarts.
 (defun restartable-convert (option argument)
   "Restartably convert ARGUMENT to OPTION's value."
   (restart-case (convert option argument)
     (use-default-value ()
       :report (lambda (stream)
-		(format stream "Use option's default value (~S)."
+		(format stream "Use option's default value (~S) instead."
 			(default-value option)))
       (default-value option))
     (use-value (value)
-      :report "Use another value."
+      :report "Use another value (pretend the conversion lead to that)."
       :interactive read-value
       (restartable-check-value option value))
     (use-argument (argument)
-      :report "Use another argument."
+      :report "Use another argument (pretend the argument was something else)."
       :interactive read-argument
       (restartable-convert option argument))))
-|#
+
 
 ;; ----------------
 ;; Retrieval protocol
@@ -607,7 +606,7 @@ If ARGUMENT is invalid, raise a conversion error."))
 
 (defun cmdline-convert (option cmdline-name cmdline-value)
   "Convert CMDLINE-VALUE to OPTION's value."
-  (handler-case (convert option cmdline-value)
+  (handler-case (restartable-convert option cmdline-value)
     (invalid-argument (error)
       (error 'invalid-cmdline-argument
 	     :option option
