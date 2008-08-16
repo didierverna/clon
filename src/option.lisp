@@ -577,11 +577,11 @@ If ARGUMENT is invalid, raise an invalid-argument error."))
 			(default-value option)))
       (default-value option))
     (use-value (value)
-      :report "Use another value (pretend the conversion lead to that)."
+      :report "Use another (already converted) value."
       :interactive read-value
       (restartable-check-value option value))
     (use-argument (argument)
-      :report "Use another argument (pretend the argument was something else)."
+      :report "Use another (to be converted) argument."
       :interactive read-argument
       (restartable-convert option argument))))
 
@@ -623,11 +623,11 @@ If ARGUMENT is invalid, raise an invalid-argument error."))
 			(default-value option)))
       (default-value option))
     (use-value (value)
-      :report "Use another value (pretend the conversion lead to that)."
+      :report "Use another (already converted) value."
       :interactive read-value
       (restartable-check-value option value))
     (use-argument (cmdline-argument)
-      :report "Use another argument (pretend the argument was something else)."
+      :report "Use another (to be converted) argument."
       :interactive read-argument
       (restartable-cmdline-convert option cmdline-name cmdline-argument))))
 
