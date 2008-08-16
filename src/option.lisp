@@ -614,6 +614,23 @@ If ARGUMENT is invalid, raise an invalid-argument error."))
 	     :argument cmdline-value
 	     :comment (comment error)))))
 
+(defun restartable-cmdline-convert (option cmdline-name cmdline-value)
+  "Restartably convert CMDLINE-VALUE to OPTION's value."
+  (restart-case (cmdline-convert option cmdline-name cmdline-value)
+    (use-default-value ()
+      :report (lambda (stream)
+		(format stream "Use option's default value (~S) instead."
+			(default-value option)))
+      (default-value option))
+    (use-value (value)
+      :report "Use another value (pretend the conversion lead to that)."
+      :interactive read-value
+      (restartable-check-value option value))
+    (use-argument (cmdline-argument)
+      :report "Use another argument (pretend the argument was something else)."
+      :interactive read-argument
+      (restartable-cmdline-convert option cmdline-name cmdline-argument))))
+
 (defmethod retrieve-from-long-call
     ((option valued-option) cmdline-name &optional cmdline-value cmdline)
   "Retrieve OPTION's value from a long call."
@@ -626,13 +643,15 @@ If ARGUMENT is invalid, raise an invalid-argument error."))
 	 (unless cmdline-value
 	   (setq cmdline-value (maybe-pop-arg cmdline)))
 	 (if cmdline-value
-	     (values (cmdline-convert option cmdline-name cmdline-value)
-		     cmdline)
+	     (values
+	      (restartable-cmdline-convert option cmdline-name cmdline-value)
+	      cmdline)
 	     (error 'missing-argument :option option :name cmdline-name)))
 	(t
 	 (if cmdline-value
-	     (values (cmdline-convert option cmdline-name cmdline-value)
-		     cmdline)
+	     (values
+	      (restartable-cmdline-convert option cmdline-name cmdline-value)
+	      cmdline)
 	     (values (default-value option) cmdline)))))
 
 (defmethod retrieve-from-short-call
@@ -647,12 +666,14 @@ If ARGUMENT is invalid, raise an invalid-argument error."))
 	 (unless cmdline-value
 	   (setq cmdline-value (maybe-pop-arg cmdline)))
 	 (if cmdline-value
-	     (values (cmdline-convert option (short-name option) cmdline-value)
+	     (values (restartable-cmdline-convert option (short-name option)
+						  cmdline-value)
 		     cmdline)
 	     (error 'missing-argument :option option :name (short-name option))))
 	(t
 	 (if cmdline-value
-	     (values (cmdline-convert option (short-name option) cmdline-value)
+	     (values (restartable-cmdline-convert option (short-name option)
+						  cmdline-value)
 		     cmdline)
 	     (values (default-value option) cmdline)))))
 
@@ -795,12 +816,10 @@ This class implements boolean options."))
 ;; Conversion protocol
 ;; -------------------
 
-#|
 (defmethod check-value ((switch switch) value)
   "Return VALUE.
 All values are valid for switches: everything but nil means 'yes'."
   value)
-|#
 
 (defmethod convert ((switch switch) argument)
   "Convert ARGUMENT to a SWITCH value.
@@ -820,7 +839,6 @@ If ARGUMENT is not valid for a switch, raise a conversion error."
 			    (concatenate 'string str1 ", " str2))
 			  (append (yes-values switch) (no-values switch)))
 		  ".")))))
-;;	   (values nil (list :invalid-value argument))))))
 
 (defmethod retrieve-from-long-call
     ((switch switch) cmdline-name &optional cmdline-value cmdline)
@@ -831,13 +849,15 @@ If ARGUMENT is not valid for a switch, raise a conversion error."
 	 (unless cmdline-value
 	   (setq cmdline-value (maybe-pop-arg cmdline)))
 	 (if cmdline-value
-	     (values (cmdline-convert switch cmdline-name cmdline-value)
-		     cmdline)
+	     (values
+	      (restartable-cmdline-convert switch cmdline-name cmdline-value)
+	      cmdline)
 	     (error 'missing-argument :option switch :name cmdline-name)))
 	(t
 	 (if cmdline-value
-	     (values (cmdline-convert switch cmdline-name cmdline-value)
-		     cmdline)
+	     (values
+	      (restartable-cmdline-convert switch cmdline-name cmdline-value)
+	      cmdline)
 	     (values t cmdline)))))
 
 (defmethod retrieve-from-short-call
@@ -918,7 +938,6 @@ This class implements options the values of which are strings."))
 ;; Conversion protocol
 ;; -------------------
 
-#|
 (defmethod check-value ((stropt stropt) value)
   "Check that VALUE is a string."
   (if (stringp value)
@@ -927,7 +946,6 @@ This class implements options the values of which are strings."))
 	     :option stropt
 	     :value value
 	     :comment "Value must be a string.")))
-|#
 
 (defmethod convert ((stropt stropt) argument)
   "Return ARGUMENT."
