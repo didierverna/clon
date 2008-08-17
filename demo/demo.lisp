@@ -87,7 +87,7 @@
   ;; This context will use the POSIX command line:
   (let ((context (clon:make-context :synopsis *synopsis* :error-handler :none)))
     (multiple-value-bind (value status source)
-	(clon:getopt context :short-name "d")
+	(clon:getopt context :long-name "version")
       (print (list value status source)))
     (format t "~%~%Other options:")
     (clon:do-cmdline-options (option name value status) context

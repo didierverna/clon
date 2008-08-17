@@ -249,6 +249,17 @@ If AS-STRING is not nil, return a string of that character.")
 		     (name error) (argument error))))
   (:documentation "Report a spurious argument error."))
 
+;; #### NOTE: this macro is currently used only once.
+(defmacro restartable-spurious-argument-error
+    ((option name argument) &body body)
+  `(restart-case (error 'spurious-argument
+		  :option ,option
+		  :name ,name
+		  :argument ,argument)
+    (discard-argument ()
+     :report "Discard spurious argument."
+     ,@body)))
+
 (define-condition invalid-+-syntax (cmdline-option-error)
   ()
   (:report (lambda (error stream)
@@ -336,6 +347,15 @@ This class implements options that don't take any argument."))
 
 (defmethod option-matches-sticky ((flag flag) namearg)
   "Return nil (flags don't have any argument)."
+  ;; #### NOTE: there is something a bit shaky here: this function is called
+  ;; during cmdline parsing (so this is really a lexico-syntactic analysis
+  ;; stage), but we return nil because of a semantic point concerning flags:
+  ;; they don't take arguments. In the current scheme where the *first* sticky
+  ;; option matching is returned (not the longest match), this is probably
+  ;; better (another question which remains unclear is what to do when a
+  ;; sticky argument leads to ambiguity). The consequence is that flags won't
+  ;; ever get a cmdline-value in retrieve-from-short-call, hence the assertion
+  ;; there.
   nil)
 
 
@@ -356,26 +376,21 @@ This class implements options that don't take any argument."))
     ((flag flag) cmdline-name  &optional cmdline-value cmdline)
   "Retrieve FLAG's value from a long call."
   ;; CMDLINE-VALUE might be non-nil when a flag was given an argument through
-  ;; an =-syntax. However, we don't check whether the next cmdline item could
-  ;; be a spurious arg, because that would mess with a possible automatic
-  ;; remainder detection.
+  ;; an =-syntax.
   (if cmdline-value
-      (error 'spurious-argument
-	     :option flag :name cmdline-name :argument cmdline-value)
+      (restartable-spurious-argument-error (flag cmdline-name cmdline-value)
+	(values t cmdline))
+      ;; Flags don't take arguments, so leave the cmdline alone (don't mess
+      ;; with automatic remainder detection).
       (values t cmdline)))
 
 (defmethod retrieve-from-short-call ((flag flag) &optional cmdline-value cmdline)
   "Retrieve FLAG's value from a short call."
-  ;; CMDLINE-VALUE might be non-nil when a flag was given a sticky argument.
-  ;; However, we don't check whether the next cmdline item could be a spurious
-  ;; arg, because that would mess with a possible automatic remainder
-  ;; detection.
-  (if cmdline-value
-      (error 'spurious-argument
-	     :option flag
-	     :name (short-name flag)
-	     :argument cmdline-value)
-      (values t cmdline)))
+  ;; See comment about this assertion in option-matches-sticky.
+  (assert (null cmdline-value))
+  ;; Flags don't take arguments, so leave the cmdline alone (don't mess with
+  ;; automatic remainder detection).
+  (values t cmdline))
 
 (defmethod retrieve-from-plus-call ((flag flag))
   "Return t and an invalid + syntax error."
@@ -794,6 +809,7 @@ This class implements boolean options."))
 
 (defmethod option-matches-sticky ((switch switch) namearg)
   "Return nil (switches can't be sticky because of their short syntax)."
+  ;; #### NOTE: see related comment in the FLAG method.
   nil)
 
 
@@ -863,15 +879,11 @@ If ARGUMENT is not valid for a switch, raise a conversion error."
 (defmethod retrieve-from-short-call
     ((switch switch) &optional cmdline-value cmdline)
   "Retrieve SWITCH's value from a short call."
-  ;; The difference with other valued options (see above) is that switches
-  ;; don't take *any* argument in short form (whether optional or not), so we
-  ;; don't check anything in CMDLINE. The minus form just means "yes".
-  (if cmdline-value
-      (error 'spurious-argument
-	     :option switch
-	     :argument cmdline-value
-	     :name (short-name switch))
-      (values t cmdline)))
+  ;; See comment about this assertion in search-sticky-option.
+  (assert (null cmdline-value))
+  ;; Switches don't take arguments in short form, so leave the cmdline alone
+  ;; (don't mess with automatic remainder detection).
+  (values t cmdline))
 
 (defmethod retrieve-from-plus-call ((switch switch))
   "Retrieve SWITCH's value from a plus call in CMDLINE."
