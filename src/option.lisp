@@ -267,6 +267,15 @@ If AS-STRING is not nil, return a string of that character.")
 	     (format stream "Option '~A': invalid +-syntax." (name error))))
   (:documentation "Report an invalid +-syntax error."))
 
+(defmacro restartable-invalid-+-syntax-error ((option) &body body)
+  "Restartably throw an invalid-+-syntax error."
+  `(restart-case (error 'invalid-+-syntax
+		  :option ,option
+		  :name (short-name ,option))
+    (use-normal-short-call ()
+     :report "Fake a normal dash-syntax."
+     ,@body)))
+
 (define-condition missing-argument (cmdline-option-error)
   ()
   (:report (lambda (error stream)
@@ -394,9 +403,8 @@ This class implements options that don't take any argument."))
   (values t cmdline))
 
 (defmethod retrieve-from-plus-call ((flag flag))
-  "Return t and an invalid + syntax error."
-  ;; t because FLAG was given on the command line anyway.
-  (error 'invalid-+-syntax :option flag :name (short-name flag)))
+  "Throw an invalid-+-syntax error."
+  (restartable-invalid-+-syntax-error (flag) t))
 
 (defmethod fallback-retrieval ((flag flag))
   "Retrieve FLAG from an env var if present."
@@ -695,8 +703,9 @@ If ARGUMENT is invalid, raise an invalid-argument error."))
 
 ;; This method applies to all valued options but the switches.
 (defmethod retrieve-from-plus-call ((option valued-option))
-  "Return OPTION's default value and an invalid + syntax error."
-  (error 'invalid-+-syntax :option option :name (short-name option)))
+  "Throw an invalid-+-syntax error."
+  (restartable-invalid-+-syntax-error (option)
+    (retrieve-from-short-call option)))
 
 (defmethod fallback-retrieval ((option valued-option))
   "Retrieve OPTION from an env var or its default value."
