@@ -252,6 +252,7 @@ If AS-STRING is not nil, return a string of that character.")
 ;; #### NOTE: this macro is currently used only once.
 (defmacro restartable-spurious-argument-error
     ((option name argument) &body body)
+  "Restartably throw a spurious-argument error."
   `(restart-case (error 'spurious-argument
 		  :option ,option
 		  :name ,name
