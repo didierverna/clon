@@ -252,7 +252,10 @@ If AS-STRING is not nil, return a string of that character.")
 ;; #### NOTE: this macro is currently used only once.
 (defmacro restartable-spurious-argument-error
     ((option name argument) &body body)
-  "Restartably throw a spurious-argument error."
+  "Restartably throw a spurious-argument error.
+The error relates to the command line use of OPTION called by NAME with ARGUMENT.
+BODY constitutes the body of the only restart available, discard-argument, and
+should act as if ARGUMENT had not been provided."
   `(restart-case (error 'spurious-argument
 		  :option ,option
 		  :name ,name
@@ -268,7 +271,11 @@ If AS-STRING is not nil, return a string of that character.")
   (:documentation "Report an invalid +-syntax error."))
 
 (defmacro restartable-invalid-+-syntax-error ((option) &body body)
-  "Restartably throw an invalid-+-syntax error."
+  "Restartably throw an invalid-+-syntax error.
+The error relates to the command line use of OPTION.
+BODY constitutes the body of the only restart available,
+use-normal-short-call, and should act as if OPTION had been called by normal
+short-name form: -<short name>."
   `(restart-case (error 'invalid-+-syntax
 		  :option ,option
 		  :name (short-name ,option))
@@ -555,11 +562,12 @@ This class implements is the base class for options accepting arguments."))
   (list (read)))
 
 (defgeneric check-value (option value)
-  (:documentation "Check that VALUE is a valid one for OPTION.
-If VALUE is valid, return it. Otherwise, raise a value error."))
+  (:documentation "Check that VALUE is valid for OPTION.
+If VALUE is valid, return it. Otherwise, raise an invalid-value error."))
 
 (defun restartable-check-value (option value)
-  "Restartably check that VALUE is a valid one for OPTION."
+  "Restartably check that VALUE is valid for OPTION.
+The only restart available, use-value, offers to try another value instead."
   (restart-case (check-value option value)
     (use-value (value)
       :report "Use another value instead."
@@ -593,7 +601,11 @@ If ARGUMENT is invalid, raise an invalid-argument error."))
 ;; conversion errors are caught by a handler-case in the retrieval routines,
 ;; which provide higher-level errors and restarts.
 (defun restartable-convert (option argument)
-  "Restartably convert ARGUMENT to OPTION's value."
+  "Restartably convert ARGUMENT to OPTION's value.
+Available restarts are:
+- use-default-value: return OPTION's default value,
+- use-value: return another (already converted) value,
+- use-argument: return the conversion of another argument."
   (restart-case (convert option argument)
     (use-default-value ()
       :report (lambda (stream)
@@ -639,7 +651,11 @@ If ARGUMENT is invalid, raise an invalid-argument error."))
 	     :comment (comment error)))))
 
 (defun restartable-cmdline-convert (option cmdline-name cmdline-value)
-  "Restartably convert CMDLINE-VALUE to OPTION's value."
+  "Restartably convert CMDLINE-VALUE to OPTION's value.
+Available restarts are:
+- use-default-value: return OPTION's default value,
+- use-value: return another (already converted) value,
+- use-argument: return the conversion of another argument."
   (restart-case (cmdline-convert option cmdline-name cmdline-value)
     (use-default-value ()
       :report (lambda (stream)
