@@ -485,14 +485,18 @@ This class implements is the base class for options accepting arguments."))
 (defmethod initialize-instance :before
     ((option valued-option) &key argument-name argument-type default-value env-var)
   "Check consistency of OPTION's value-related initargs."
-  (declare (ignore default-value env-var))
+  (declare (ignore env-var))
   (when (or (null argument-name)
 	    (and argument-name (zerop (length argument-name))))
     (error "option ~A: empty argument name." option))
   (unless (or (eq argument-type :required)
 	      (eq argument-type :mandatory)
 	      (eq argument-type :optional))
-    (error "Option ~A: invalid argument type ~S." option argument-type)))
+    (error "Option ~A: invalid argument type ~S." option argument-type))
+  (when default-value
+    (handler-case (check-value option default-value)
+      (invalid-value ()
+	(error "Option ~A: invalid default value ~S." option default-value)))))
 
 (defmethod initialize-instance :after
     ((option valued-option) &key argument-name argument-type default-value env-var)
