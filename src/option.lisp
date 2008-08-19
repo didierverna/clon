@@ -33,27 +33,36 @@
 
 (in-package :clon)
 
+
 ;; ============================================================================
 ;; Utilities
 ;; ============================================================================
 
-;; The following 3 routines are used in the retrieval methods.
-(defun option-call-p (arg)
-  "Returns t if ARG looks like an option call."
-  (or (eq (elt arg 0) #\-)
-      (eq (elt arg 0) #\+)))
+;; #### NOTE: Yuck. There are places in this file, like right here, where some
+;; notion of the command-line syntax is needed. This is not very nice because
+;; the command-line syntax should ideally be known only to context.lisp.
+;; However, since the retrieval process changes according to the option
+;; classes, it is still reasonable to have it here.
 
-(defmacro maybe-pop-cmdline-argument (cmdline)
-  "Pop argument from CMDLINE if it doesn't look like an option."
-  `(when (and (car ,cmdline) (not (option-call-p (car ,cmdline))))
-    (pop ,cmdline)))
+(defun option-call-p (str)
+  "Return t if STR looks like an option call."
+  (declare (type string str))
+  (or (eq (elt str 0) #\-)
+      (eq (elt str 0) #\+)))
 
-(defmacro maybe-pop-required-argument (option cmdline-value cmdline)
-  "Fetch OPTION's required argument from CMDLINE if needed.
-The argument might already be in CMDLINE-VALUE. Otherwise, store it there."
-  `(when (argument-required-p ,option)
-    (unless ,cmdline-value
-      (setq ,cmdline-value (maybe-pop-cmdline-argument ,cmdline)))))
+(defmacro maybe-pop-argument (cmdline option cmdline-argument)
+  "Pop OPTION's argument from CMDLINE if needed, and if so, store it into
+CMDLINE-ARGUMENT."
+  ;; At the time this macro is called, CMDLINE-ARGUMENT may already contain
+  ;; something, provided by either a sticky argument from a short call, or an
+  ;; =-syntax from a long call. Remember that these are the only 2 ways to
+  ;; provide optional arguments, so the need to pop something occurs only
+  ;; when an argument is mandatory, and it is still missing.
+  `(when (and (null ,cmdline-argument)
+	      (argument-required-p ,option)
+	      (car ,cmdline)
+	      (not (option-call-p (car ,cmdline))))
+     (setq ,cmdline-argument (pop ,cmdline))))
 
 
 ;; ============================================================================
@@ -197,7 +206,7 @@ If that is the case, return the argument part of NAMEARG."))
 ;; The Char Packs  Protocol
 ;; ============================================================================
 
-;; When examining the command line, we first try to spot an option, then a
+;; When examining the command-line, we first try to spot an option, then a
 ;; minus or plus pack, and then fall back to an unknown option. When things
 ;; are messed up, we prefer to try to spot options misplaced in a pack rather
 ;; than directly an unknown option. That's what a "potential" pack is: a pack
@@ -260,7 +269,7 @@ If AS-STRING is not nil, return a string of that character.")
 (defmacro restartable-spurious-argument-error
     ((option name argument) &body body)
   "Restartably throw a spurious-argument error.
-The error relates to the command line use of OPTION called by NAME with ARGUMENT.
+The error relates to the command-line use of OPTION called by NAME with ARGUMENT.
 BODY constitutes the body of the only restart available, discard-argument, and
 should act as if ARGUMENT had not been provided."
   `(restart-case (error 'spurious-argument
@@ -279,7 +288,7 @@ should act as if ARGUMENT had not been provided."
 
 (defmacro restartable-invalid-+-syntax-error ((option) &body body)
   "Restartably throw an invalid-+-syntax error.
-The error relates to the command line use of OPTION.
+The error relates to the command-line use of OPTION.
 BODY constitutes the body of the only restart available,
 use-normal-short-call, and should act as if OPTION had been called by normal
 short-name form: -<short name>."
@@ -291,19 +300,19 @@ short-name form: -<short name>."
      ,@body)))
 
 (defgeneric retrieve-from-long-call
-    (option cmdline-name &optional cmdline-value cmdline)
+    (option cmdline-name &optional cmdline-argument cmdline)
   (:documentation "Retrieve OPTION's value from a long call.
 CMDLINE-NAME is the name used on the command-line.
-CMDLINE-VALUE is a potentially already parsed cmdline argument.
+CMDLINE-ARGUMENT is a potentially already parsed cmdline argument.
 Otherwise, CMDLINE is where to find an argument.
 This function returns two values:
 - the retrieved value,
 - the new cmdline (possibly with the first item popped if the option requires
   an argument)."))
 
-(defgeneric retrieve-from-short-call (option &optional cmdline-value cmdline)
+(defgeneric retrieve-from-short-call (option &optional cmdline-argument cmdline)
   (:documentation "Retrieve OPTION's value from a short call.
-CMDLINE-VALUE is a potentially already parsed cmdline argument.
+CMDLINE-ARGUMENT is a potentially already parsed cmdline argument.
 Otherwise, CMDLINE is where to find an argument.
 This function returns two values:
 - the retrieved value,
@@ -372,7 +381,7 @@ This class implements options that don't take any argument."))
   ;; option matching is returned (not the longest match), this is probably
   ;; better (another question which remains unclear is what to do when a
   ;; sticky argument leads to ambiguity). The consequence is that flags won't
-  ;; ever get a cmdline-value in retrieve-from-short-call, hence the assertion
+  ;; ever get a cmdline-argument in retrieve-from-short-call, hence the assertion
   ;; there.
   nil)
 
@@ -391,21 +400,21 @@ This class implements options that don't take any argument."))
 ;; -------------------
 
 (defmethod retrieve-from-long-call
-    ((flag flag) cmdline-name  &optional cmdline-value cmdline)
+    ((flag flag) cmdline-name  &optional cmdline-argument cmdline)
   "Retrieve FLAG's value from a long call."
-  ;; CMDLINE-VALUE might be non-nil when a flag was given an argument through
+  ;; CMDLINE-ARGUMENT might be non-nil when a flag was given an argument through
   ;; an =-syntax.
-  (if cmdline-value
-      (restartable-spurious-argument-error (flag cmdline-name cmdline-value)
+  (if cmdline-argument
+      (restartable-spurious-argument-error (flag cmdline-name cmdline-argument)
 	(values t cmdline))
       ;; Flags don't take arguments, so leave the cmdline alone (don't mess
       ;; with automatic remainder detection).
       (values t cmdline)))
 
-(defmethod retrieve-from-short-call ((flag flag) &optional cmdline-value cmdline)
+(defmethod retrieve-from-short-call ((flag flag) &optional cmdline-argument cmdline)
   "Retrieve FLAG's value from a short call."
   ;; See comment about this assertion in option-matches-sticky.
-  (assert (null cmdline-value))
+  (assert (null cmdline-argument))
   ;; Flags don't take arguments, so leave the cmdline alone (don't mess with
   ;; automatic remainder detection).
   (values t cmdline))
@@ -645,28 +654,28 @@ Available restarts are:
 		     (name error) (argument error) (comment error))))
   (:documentation "Report an invalid command-line argument error."))
 
-(defun cmdline-convert (option cmdline-name cmdline-value)
-  "Convert CMDLINE-VALUE for OPTION called by CMDLINE-NAME.
+(defun cmdline-convert (option cmdline-name cmdline-argument)
+  "Convert CMDLINE-ARGUMENT for OPTION called by CMDLINE-NAME.
 This function intercepts invalid-argument errors and raises the higher level
 invalid-cmdline-argument instead."
-  (handler-case (restartable-convert option cmdline-value)
+  (handler-case (restartable-convert option cmdline-argument)
     (invalid-argument (error)
       (error 'invalid-cmdline-argument
 	     :option option
 	     :name cmdline-name
-	     :argument cmdline-value
+	     :argument cmdline-argument
 	     :comment (comment error)))))
 
-(define-condition missing-argument (cmdline-option-error)
+(define-condition missing-cmdline-argument (cmdline-option-error)
   ()
   (:report (lambda (error stream)
 	     (format stream "Option '~A': missing argument." (name error))))
-  (:documentation "Report a missing argument error."))
+  (:documentation "Report a missing command-line argument error."))
 
 (defun restartable-cmdline-convert
-    (option cmdline-name cmdline-value
+    (option cmdline-name cmdline-argument
      &optional (fallback-value (default-value option)))
-  "Restartably convert CMDLINE-VALUE for OPTION called by CMDLINE-NAME.
+  "Restartably convert CMDLINE-ARGUMENT for OPTION called by CMDLINE-NAME.
 FALLBACK-VALUE is what to return when an optional argument is not provided. It
 defaults to OPTION's default value.
 
@@ -676,11 +685,12 @@ Available restarts are:
 - use-argument: return the conversion of another argument."
   (restart-case
       (cond ((argument-required-p option)
-	     (if cmdline-value
-		 (cmdline-convert option cmdline-name cmdline-value)
-		 (error 'missing-argument :option option :name cmdline-name)))
-	    (cmdline-value
-	     (cmdline-convert option cmdline-name cmdline-value))
+	     (if cmdline-argument
+		 (cmdline-convert option cmdline-name cmdline-argument)
+		 (error 'missing-cmdline-argument
+			:option option :name cmdline-name)))
+	    (cmdline-argument
+	     (cmdline-convert option cmdline-name cmdline-argument))
 	    (t
 	     fallback-value))
     (use-default-value ()
@@ -699,27 +709,22 @@ Available restarts are:
        option cmdline-name cmdline-argument fallback-value))))
 
 (defmethod retrieve-from-long-call
-    ((option valued-option) cmdline-name &optional cmdline-value cmdline)
+    ((option valued-option) cmdline-name &optional cmdline-argument cmdline)
   "Retrieve OPTION's value from a long call."
-  ;; If the option requires an argument, but none is provided by an =-syntax,
-  ;; we might find it in the next cmdline item, unless it looks like an
-  ;; option, in which case it is a missing argument error. Optional arguments
-  ;; are only available through the =-syntax, so we don't look into the next
-  ;; cmdline item.
-  (maybe-pop-required-argument option cmdline-value cmdline)
-  (values (restartable-cmdline-convert option cmdline-name cmdline-value)
+  (maybe-pop-argument cmdline option cmdline-argument)
+  (values (restartable-cmdline-convert option cmdline-name cmdline-argument)
 	  cmdline))
 
 (defmethod retrieve-from-short-call
-    ((option valued-option) &optional cmdline-value cmdline)
+    ((option valued-option) &optional cmdline-argument cmdline)
   "Retrieve OPTION's value from a short call."
   ;; If the option requires an argument, but none is provided by a sticky
   ;; syntax, we might find it in the next cmdline item, unless it looks like
   ;; an option, in which case it is a missing argument error. Optional
   ;; arguments are only available through the sticky syntax, so we don't look
   ;; into the next cmdline item.
-  (maybe-pop-required-argument option cmdline-value cmdline)
-  (values (restartable-cmdline-convert option (short-name option) cmdline-value)
+  (maybe-pop-argument cmdline option cmdline-argument)
+  (values (restartable-cmdline-convert option (short-name option) cmdline-argument)
 	  cmdline))
 
 ;; This method applies to all valued options but the switches.
@@ -888,19 +893,19 @@ If ARGUMENT is not valid for a switch, raise a conversion error."
 		  ".")))))
 
 (defmethod retrieve-from-long-call
-    ((switch switch) cmdline-name &optional cmdline-value cmdline)
+    ((switch switch) cmdline-name &optional cmdline-argument cmdline)
   "Retrieve SWITCH's value from a long call."
   ;; The difference with other valued options (see above) is that an omitted
   ;; optional argument stands for a "yes". Otherwise, it's pretty similar.
-  (maybe-pop-required-argument switch cmdline-value cmdline)
-  (values (restartable-cmdline-convert switch cmdline-name cmdline-value t)
+  (maybe-pop-argument cmdline switch cmdline-argument)
+  (values (restartable-cmdline-convert switch cmdline-name cmdline-argument t)
 	  cmdline))
 
 (defmethod retrieve-from-short-call
-    ((switch switch) &optional cmdline-value cmdline)
+    ((switch switch) &optional cmdline-argument cmdline)
   "Retrieve SWITCH's value from a short call."
   ;; See comment about this assertion in search-sticky-option.
-  (assert (null cmdline-value))
+  (assert (null cmdline-argument))
   ;; Switches don't take arguments in short form, so leave the cmdline alone
   ;; (don't mess with automatic remainder detection).
   (values t cmdline))
