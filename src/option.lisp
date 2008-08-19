@@ -283,12 +283,6 @@ short-name form: -<short name>."
      :report "Fake a normal dash-syntax."
      ,@body)))
 
-(define-condition missing-argument (cmdline-option-error)
-  ()
-  (:report (lambda (error stream)
-	     (format stream "Option '~A': missing argument." (name error))))
-  (:documentation "Report a missing argument error."))
-
 (defgeneric retrieve-from-long-call
     (option cmdline-name &optional cmdline-value cmdline)
   (:documentation "Retrieve OPTION's value from a long call.
@@ -675,6 +669,34 @@ Available restarts are:
       :interactive read-argument
       (restartable-cmdline-convert option cmdline-name cmdline-argument))))
 
+(define-condition missing-argument (cmdline-option-error)
+  ()
+  (:report (lambda (error stream)
+	     (format stream "Option '~A': missing argument." (name error))))
+  (:documentation "Report a missing argument error."))
+
+(defun restartable-cmdline-convert-required-argument
+    (option cmdline-name cmdline-value)
+  "Restartably convert required CMDLINE-VALUE to OPTION's value.
+This function is like restartable-cmdline-convert with the addition that if
+CMDLINE-VALUE is not provided, it raises a restartable missing-argument error."
+  (restart-case (if cmdline-value
+		    (cmdline-convert option cmdline-name cmdline-value)
+		    (error 'missing-argument :option option :name cmdline-name))
+    (use-default-value ()
+      :report (lambda (stream)
+		(format stream "Use option's default value (~S) instead."
+			(default-value option)))
+      (default-value option))
+    (use-value (value)
+      :report "Use another (already converted) value."
+      :interactive read-value
+      (restartable-check-value option value))
+    (use-argument (cmdline-argument)
+      :report "Use another (to be converted) argument."
+      :interactive read-argument
+      (restartable-cmdline-convert option cmdline-name cmdline-argument))))
+
 (defmethod retrieve-from-long-call
     ((option valued-option) cmdline-name &optional cmdline-value cmdline)
   "Retrieve OPTION's value from a long call."
@@ -686,11 +708,10 @@ Available restarts are:
   (cond ((argument-required-p option)
 	 (unless cmdline-value
 	   (setq cmdline-value (maybe-pop-arg cmdline)))
-	 (if cmdline-value
 	     (values
-	      (restartable-cmdline-convert option cmdline-name cmdline-value)
-	      cmdline)
-	     (error 'missing-argument :option option :name cmdline-name)))
+	      (restartable-cmdline-convert-required-argument
+	       option cmdline-name cmdline-value)
+	      cmdline))
 	(t
 	 (if cmdline-value
 	     (values
@@ -709,16 +730,16 @@ Available restarts are:
   (cond ((argument-required-p option)
 	 (unless cmdline-value
 	   (setq cmdline-value (maybe-pop-arg cmdline)))
-	 (if cmdline-value
-	     (values (restartable-cmdline-convert option (short-name option)
-						  cmdline-value)
-		     cmdline)
-	     (error 'missing-argument :option option :name (short-name option))))
+	 (values
+	  (restartable-cmdline-convert-required-argument
+	   option (short-name option) cmdline-value)
+	  cmdline))
 	(t
 	 (if cmdline-value
-	     (values (restartable-cmdline-convert option (short-name option)
-						  cmdline-value)
-		     cmdline)
+	     (values
+	      (restartable-cmdline-convert
+	       option (short-name option) cmdline-value)
+	      cmdline)
 	     (values (default-value option) cmdline)))))
 
 ;; This method applies to all valued options but the switches.
@@ -894,11 +915,10 @@ If ARGUMENT is not valid for a switch, raise a conversion error."
   (cond ((argument-required-p switch)
 	 (unless cmdline-value
 	   (setq cmdline-value (maybe-pop-arg cmdline)))
-	 (if cmdline-value
-	     (values
-	      (restartable-cmdline-convert switch cmdline-name cmdline-value)
-	      cmdline)
-	     (error 'missing-argument :option switch :name cmdline-name)))
+	 (values
+	  (restartable-cmdline-convert-required-argument
+	   switch cmdline-name cmdline-value)
+	  cmdline))
 	(t
 	 (if cmdline-value
 	     (values
