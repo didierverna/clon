@@ -646,7 +646,9 @@ Available restarts are:
   (:documentation "Report an invalid command-line argument error."))
 
 (defun cmdline-convert (option cmdline-name cmdline-value)
-  "Convert CMDLINE-VALUE to OPTION's value."
+  "Convert CMDLINE-VALUE for OPTION called by CMDLINE-NAME.
+This function intercepts invalid-argument errors and raises the higher level
+invalid-cmdline-argument instead."
   (handler-case (restartable-convert option cmdline-value)
     (invalid-argument (error)
       (error 'invalid-cmdline-argument
@@ -655,54 +657,46 @@ Available restarts are:
 	     :argument cmdline-value
 	     :comment (comment error)))))
 
-(defun restartable-cmdline-convert (option cmdline-name cmdline-value)
-  "Restartably convert CMDLINE-VALUE to OPTION's value.
-Available restarts are:
-- use-default-value: return OPTION's default value,
-- use-value: return another (already converted) value,
-- use-argument: return the conversion of another argument."
-  (restart-case (cmdline-convert option cmdline-name cmdline-value)
-    (use-default-value ()
-      :report (lambda (stream)
-		(format stream "Use option's default value (~S) instead."
-			(default-value option)))
-      (default-value option))
-    (use-value (value)
-      :report "Use another (already converted) value."
-      :interactive read-value
-      (restartable-check-value option value))
-    (use-argument (cmdline-argument)
-      :report "Use another (to be converted) argument."
-      :interactive read-argument
-      (restartable-cmdline-convert option cmdline-name cmdline-argument))))
-
 (define-condition missing-argument (cmdline-option-error)
   ()
   (:report (lambda (error stream)
 	     (format stream "Option '~A': missing argument." (name error))))
   (:documentation "Report a missing argument error."))
 
-(defun restartable-cmdline-convert-required-argument
-    (option cmdline-name cmdline-value)
-  "Restartably convert required CMDLINE-VALUE to OPTION's value.
-This function is like restartable-cmdline-convert with the addition that if
-CMDLINE-VALUE is not provided, it raises a restartable missing-argument error."
-  (restart-case (if cmdline-value
-		    (cmdline-convert option cmdline-name cmdline-value)
-		    (error 'missing-argument :option option :name cmdline-name))
+(defun restartable-cmdline-convert
+    (option cmdline-name cmdline-value
+     &optional (fallback-value (default-value option)))
+  "Restartably convert CMDLINE-VALUE for OPTION called by CMDLINE-NAME.
+FALLBACK-VALUE is what to return when an optional argument is not provided. It
+defaults to OPTION's default value.
+
+Available restarts are:
+- use-default-value: return OPTION's default value,
+- use-value: return another (already converted) value,
+- use-argument: return the conversion of another argument."
+  (restart-case
+      (cond ((argument-required-p option)
+	     (if cmdline-value
+		 (cmdline-convert option cmdline-name cmdline-value)
+		 (error 'missing-argument :option option :name cmdline-name)))
+	    (cmdline-value
+	     (cmdline-convert option cmdline-name cmdline-value))
+	    (t
+	     fallback-value))
     (use-default-value ()
       :report (lambda (stream)
-		(format stream "Use option's default value (~S) instead."
+		(format stream "Use option's default value (~S)."
 			(default-value option)))
       (default-value option))
     (use-value (value)
-      :report "Use another (already converted) value."
+      :report "Use an already converted value."
       :interactive read-value
       (restartable-check-value option value))
     (use-argument (cmdline-argument)
-      :report "Use another (to be converted) argument."
+      :report "Use the conversion of an argument."
       :interactive read-argument
-      (restartable-cmdline-convert option cmdline-name cmdline-argument))))
+      (restartable-cmdline-convert
+       option cmdline-name cmdline-argument fallback-value))))
 
 (defmethod retrieve-from-long-call
     ((option valued-option) cmdline-name &optional cmdline-value cmdline)
@@ -713,15 +707,8 @@ CMDLINE-VALUE is not provided, it raises a restartable missing-argument error."
   ;; are only available through the =-syntax, so we don't look into the next
   ;; cmdline item.
   (maybe-pop-required-argument option cmdline-value cmdline)
-  (values
-   (cond ((argument-required-p option)
-	  (restartable-cmdline-convert-required-argument
-	   option cmdline-name cmdline-value))
-	 (cmdline-value
-	  (restartable-cmdline-convert option cmdline-name cmdline-value))
-	 (t
-	  (default-value option)))
-   cmdline))
+  (values (restartable-cmdline-convert option cmdline-name cmdline-value)
+	  cmdline))
 
 (defmethod retrieve-from-short-call
     ((option valued-option) &optional cmdline-value cmdline)
@@ -732,16 +719,8 @@ CMDLINE-VALUE is not provided, it raises a restartable missing-argument error."
   ;; arguments are only available through the sticky syntax, so we don't look
   ;; into the next cmdline item.
   (maybe-pop-required-argument option cmdline-value cmdline)
-  (values
-   (cond ((argument-required-p option)
-	  (restartable-cmdline-convert-required-argument
-	   option (short-name option) cmdline-value))
-	 (cmdline-value
-	  (restartable-cmdline-convert
-	   option (short-name option) cmdline-value))
-	 (t
-	  (default-value option)))
-   cmdline))
+  (values (restartable-cmdline-convert option (short-name option) cmdline-value)
+	  cmdline))
 
 ;; This method applies to all valued options but the switches.
 (defmethod retrieve-from-plus-call ((option valued-option))
@@ -914,15 +893,8 @@ If ARGUMENT is not valid for a switch, raise a conversion error."
   ;; The difference with other valued options (see above) is that an omitted
   ;; optional argument stands for a "yes". Otherwise, it's pretty similar.
   (maybe-pop-required-argument switch cmdline-value cmdline)
-  (values
-   (cond ((argument-required-p switch)
-	  (restartable-cmdline-convert-required-argument
-	   switch cmdline-name cmdline-value))
-	 (cmdline-value
-	  (restartable-cmdline-convert switch cmdline-name cmdline-value))
-	 (t
-	  t))
-   cmdline))
+  (values (restartable-cmdline-convert switch cmdline-name cmdline-value t)
+	  cmdline))
 
 (defmethod retrieve-from-short-call
     ((switch switch) &optional cmdline-value cmdline)
