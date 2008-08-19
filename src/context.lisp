@@ -259,7 +259,7 @@ CONTEXT is where to look for the options."
 			;; this as the remainder (implicit since no "--" has
 			;; been used). If there's still another option
 			;; somewhere, then this is really junk.
-			(cond ((notany #'option-p cmdline)
+			(cond ((notany #'option-call-p cmdline)
 			       (setq remainder (cons arg cmdline))
 			       (setq cmdline nil))
 			      (t

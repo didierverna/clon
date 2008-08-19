@@ -38,14 +38,14 @@
 ;; ============================================================================
 
 ;; The following 3 routines are used in the retrieval methods.
-(defun option-p (arg)
-  "Returns t if ARG looks like an option."
+(defun option-call-p (arg)
+  "Returns t if ARG looks like an option call."
   (or (eq (elt arg 0) #\-)
       (eq (elt arg 0) #\+)))
 
-(defmacro maybe-pop-arg (cmdline)
+(defmacro maybe-pop-cmdline-argument (cmdline)
   "Pop argument from CMDLINE if it doesn't look like an option."
-  `(when (and (car ,cmdline) (not (option-p (car ,cmdline))))
+  `(when (and (car ,cmdline) (not (option-call-p (car ,cmdline))))
     (pop ,cmdline)))
 
 (defmacro maybe-pop-required-argument (option cmdline-value cmdline)
@@ -53,7 +53,7 @@
 The argument might already be in CMDLINE-VALUE. Otherwise, store it there."
   `(when (argument-required-p ,option)
     (unless ,cmdline-value
-      (setq ,cmdline-value (maybe-pop-arg ,cmdline)))))
+      (setq ,cmdline-value (maybe-pop-cmdline-argument ,cmdline)))))
 
 
 ;; ============================================================================
