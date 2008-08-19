@@ -708,16 +708,16 @@ CMDLINE-VALUE is not provided, it raises a restartable missing-argument error."
   (cond ((argument-required-p option)
 	 (unless cmdline-value
 	   (setq cmdline-value (maybe-pop-arg cmdline)))
-	     (values
-	      (restartable-cmdline-convert-required-argument
-	       option cmdline-name cmdline-value)
-	      cmdline))
+	 (values
+	  (restartable-cmdline-convert-required-argument
+	   option cmdline-name cmdline-value)
+	  cmdline))
 	(t
-	 (if cmdline-value
-	     (values
+	 (values
+	  (if cmdline-value
 	      (restartable-cmdline-convert option cmdline-name cmdline-value)
-	      cmdline)
-	     (values (default-value option) cmdline)))))
+	      (default-value option))
+	  cmdline))))
 
 (defmethod retrieve-from-short-call
     ((option valued-option) &optional cmdline-value cmdline)
@@ -735,12 +735,12 @@ CMDLINE-VALUE is not provided, it raises a restartable missing-argument error."
 	   option (short-name option) cmdline-value)
 	  cmdline))
 	(t
-	 (if cmdline-value
-	     (values
+	 (values
+	  (if cmdline-value
 	      (restartable-cmdline-convert
 	       option (short-name option) cmdline-value)
-	      cmdline)
-	     (values (default-value option) cmdline)))))
+	      (default-value option))
+	  cmdline))))
 
 ;; This method applies to all valued options but the switches.
 (defmethod retrieve-from-plus-call ((option valued-option))
@@ -920,11 +920,11 @@ If ARGUMENT is not valid for a switch, raise a conversion error."
 	   switch cmdline-name cmdline-value)
 	  cmdline))
 	(t
-	 (if cmdline-value
-	     (values
+	 (values
+	  (if cmdline-value
 	      (restartable-cmdline-convert switch cmdline-name cmdline-value)
-	      cmdline)
-	     (values t cmdline)))))
+	      t)
+	  cmdline))))
 
 (defmethod retrieve-from-short-call
     ((switch switch) &optional cmdline-value cmdline)
