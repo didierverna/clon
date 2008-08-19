@@ -120,8 +120,7 @@ command-line options."))
 - NAME-FORM is how to compute the :name slot of the CMDLINE-OPTION structure.
   If not given, the option's long or short name will be used as appropriate."
 		   (let* ((value (gensym "value"))
-			  (status (gensym "status"))
-			  (vars (list status value))
+			  (vars (list value))
 			  (call (list option
 				      (find-symbol (concatenate 'string
 						     "RETRIEVE-FROM-"
@@ -151,7 +150,7 @@ command-line options."))
 			 :name ,name-form
 			 :option ,option
 			 :value ,value
-			 :status ,status))))
+			 :status nil))))
 	       (do-pack ((option pack context) &body body)
 		 "Evaluate BODY with OPTION bound to each option from PACK.
 CONTEXT is where to look for the options."
