@@ -34,10 +34,10 @@
 (in-package :clon)
 
 ;; ============================================================================
-;; utilities
+;; Utilities
 ;; ============================================================================
 
-;; The following two routines are used in the retrieval methods.
+;; The following 3 routines are used in the retrieval methods.
 (defun option-p (arg)
   "Returns t if ARG looks like an option."
   (or (eq (elt arg 0) #\-)
@@ -47,6 +47,13 @@
   "Pop argument from CMDLINE if it doesn't look like an option."
   `(when (and (car ,cmdline) (not (option-p (car ,cmdline))))
     (pop ,cmdline)))
+
+(defmacro maybe-pop-required-argument (option cmdline-value cmdline)
+  "Fetch OPTION's required argument from CMDLINE if needed.
+The argument might already be in CMDLINE-VALUE. Otherwise, store it there."
+  `(when (argument-required-p ,option)
+    (unless ,cmdline-value
+      (setq ,cmdline-value (maybe-pop-arg ,cmdline)))))
 
 
 ;; ============================================================================
@@ -705,19 +712,16 @@ CMDLINE-VALUE is not provided, it raises a restartable missing-argument error."
   ;; option, in which case it is a missing argument error. Optional arguments
   ;; are only available through the =-syntax, so we don't look into the next
   ;; cmdline item.
-  (cond ((argument-required-p option)
-	 (unless cmdline-value
-	   (setq cmdline-value (maybe-pop-arg cmdline)))
-	 (values
+  (maybe-pop-required-argument option cmdline-value cmdline)
+  (values
+   (cond ((argument-required-p option)
 	  (restartable-cmdline-convert-required-argument
-	   option cmdline-name cmdline-value)
-	  cmdline))
-	(t
-	 (values
-	  (if cmdline-value
-	      (restartable-cmdline-convert option cmdline-name cmdline-value)
-	      (default-value option))
-	  cmdline))))
+	   option cmdline-name cmdline-value))
+	 (cmdline-value
+	  (restartable-cmdline-convert option cmdline-name cmdline-value))
+	 (t
+	  (default-value option)))
+   cmdline))
 
 (defmethod retrieve-from-short-call
     ((option valued-option) &optional cmdline-value cmdline)
@@ -727,20 +731,17 @@ CMDLINE-VALUE is not provided, it raises a restartable missing-argument error."
   ;; an option, in which case it is a missing argument error. Optional
   ;; arguments are only available through the sticky syntax, so we don't look
   ;; into the next cmdline item.
-  (cond ((argument-required-p option)
-	 (unless cmdline-value
-	   (setq cmdline-value (maybe-pop-arg cmdline)))
-	 (values
+  (maybe-pop-required-argument option cmdline-value cmdline)
+  (values
+   (cond ((argument-required-p option)
 	  (restartable-cmdline-convert-required-argument
-	   option (short-name option) cmdline-value)
-	  cmdline))
-	(t
-	 (values
-	  (if cmdline-value
-	      (restartable-cmdline-convert
-	       option (short-name option) cmdline-value)
-	      (default-value option))
-	  cmdline))))
+	   option (short-name option) cmdline-value))
+	 (cmdline-value
+	  (restartable-cmdline-convert
+	   option (short-name option) cmdline-value))
+	 (t
+	  (default-value option)))
+   cmdline))
 
 ;; This method applies to all valued options but the switches.
 (defmethod retrieve-from-plus-call ((option valued-option))
@@ -912,19 +913,16 @@ If ARGUMENT is not valid for a switch, raise a conversion error."
   "Retrieve SWITCH's value from a long call."
   ;; The difference with other valued options (see above) is that an omitted
   ;; optional argument stands for a "yes". Otherwise, it's pretty similar.
-  (cond ((argument-required-p switch)
-	 (unless cmdline-value
-	   (setq cmdline-value (maybe-pop-arg cmdline)))
-	 (values
+  (maybe-pop-required-argument switch cmdline-value cmdline)
+  (values
+   (cond ((argument-required-p switch)
 	  (restartable-cmdline-convert-required-argument
-	   switch cmdline-name cmdline-value)
-	  cmdline))
-	(t
-	 (values
-	  (if cmdline-value
-	      (restartable-cmdline-convert switch cmdline-name cmdline-value)
-	      t)
-	  cmdline))))
+	   switch cmdline-name cmdline-value))
+	 (cmdline-value
+	  (restartable-cmdline-convert switch cmdline-name cmdline-value))
+	 (t
+	  t))
+   cmdline))
 
 (defmethod retrieve-from-short-call
     ((switch switch) &optional cmdline-value cmdline)
