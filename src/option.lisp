@@ -45,14 +45,19 @@
 ;; classes, it is still reasonable to have it here.
 
 (defun option-call-p (str)
-  "Return t if STR looks like an option call."
+  "Return true if STR looks like an option call."
   (declare (type string str))
   (or (eq (elt str 0) #\-)
       (eq (elt str 0) #\+)))
 
+(defun argument-popable-p (cmdline)
+  "Return true if the first CMDLINE item is an argument."
+  (and (car cmdline)
+       (not (option-call-p (car cmdline)))))
+
 (defmacro maybe-pop-argument (cmdline option cmdline-argument)
-  "Pop OPTION's argument from CMDLINE if needed, and if so, store it into
-CMDLINE-ARGUMENT."
+  "Pop OPTION's argument from CMDLINE if needed.
+If so, store it into CMDLINE-ARGUMENT."
   ;; At the time this macro is called, CMDLINE-ARGUMENT may already contain
   ;; something, provided by either a sticky argument from a short call, or an
   ;; =-syntax from a long call. Remember that these are the only 2 ways to
@@ -60,8 +65,7 @@ CMDLINE-ARGUMENT."
   ;; when an argument is mandatory, and it is still missing.
   `(when (and (null ,cmdline-argument)
 	      (argument-required-p ,option)
-	      (car ,cmdline)
-	      (not (option-call-p (car ,cmdline))))
+	      (argument-popable-p ,cmdline))
      (setq ,cmdline-argument (pop ,cmdline))))
 
 
@@ -83,10 +87,6 @@ CMDLINE-ARGUMENT."
 		:type (or null string)
 		:reader description
 		:initarg :description)
-   ;; #### NOTE: this is here and not in the VALUED-OPTION class because even
-   ;; for flags, there can be an associated environment variable. The
-   ;; existence of such a variable acts as the presence of the option on the
-   ;; cmdline, regardless of its value.
    (env-var :documentation "The option's associated environment variable."
 	    :type (or null string)
 	    :reader env-var
