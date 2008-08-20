@@ -255,7 +255,7 @@ If AS-STRING is not nil, return a string of that character.")
 	 :reader name))
   (:documentation "An error related to a command-line option."))
 
-(define-condition spurious-argument (cmdline-option-error)
+(define-condition spurious-cmdline-argument (cmdline-option-error)
   ((argument :documentation "The spurious argument."
 	     :type string
 	     :initarg :argument
@@ -266,13 +266,13 @@ If AS-STRING is not nil, return a string of that character.")
   (:documentation "Report a spurious argument error."))
 
 ;; #### NOTE: this macro is currently used only once.
-(defmacro restartable-spurious-argument-error
+(defmacro restartable-spurious-cmdline-argument-error
     ((option name argument) &body body)
-  "Restartably throw a spurious-argument error.
+  "Restartably throw a spurious-cmdline-argument error.
 The error relates to the command-line use of OPTION called by NAME with ARGUMENT.
 BODY constitutes the body of the only restart available, discard-argument, and
 should act as if ARGUMENT had not been provided."
-  `(restart-case (error 'spurious-argument
+  `(restart-case (error 'spurious-cmdline-argument
 		  :option ,option
 		  :name ,name
 		  :argument ,argument)
@@ -402,16 +402,18 @@ This class implements options that don't take any argument."))
 (defmethod retrieve-from-long-call
     ((flag flag) cmdline-name  &optional cmdline-argument cmdline)
   "Retrieve FLAG's value from a long call."
-  ;; CMDLINE-ARGUMENT might be non-nil when a flag was given an argument through
-  ;; an =-syntax.
+  ;; CMDLINE-ARGUMENT might be non-nil when a flag was given an argument
+  ;; through an =-syntax.
   (if cmdline-argument
-      (restartable-spurious-argument-error (flag cmdline-name cmdline-argument)
-	(values t cmdline))
+      (restartable-spurious-cmdline-argument-error
+       (flag cmdline-name cmdline-argument)
+       (values t cmdline))
       ;; Flags don't take arguments, so leave the cmdline alone (don't mess
       ;; with automatic remainder detection).
       (values t cmdline)))
 
-(defmethod retrieve-from-short-call ((flag flag) &optional cmdline-argument cmdline)
+(defmethod retrieve-from-short-call
+    ((flag flag) &optional cmdline-argument cmdline)
   "Retrieve FLAG's value from a short call."
   ;; See comment about this assertion in option-matches-sticky.
   (assert (null cmdline-argument))
