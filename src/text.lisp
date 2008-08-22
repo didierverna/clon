@@ -44,7 +44,7 @@
 	   :initarg :string
 	   :reader text-string))
   (:documentation "The TEXT class.
-Program help can contain plain text as well as options or groups."))
+This class implements plain text objects appearing in a synopsis."))
 
 
 ;; #### FIXME: does it make sense to accept empty strings ?

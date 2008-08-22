@@ -99,7 +99,7 @@ If so, store it into CMDLINE-ARGUMENT."
     :description nil
     :env-var nil)
   (:documentation "The OPTION class.
-This class is the base class for all options."))
+This is the base class for all options."))
 
 (defmethod initialize-instance :before
     ((option option) &rest keys &key short-name long-name description env-var)
@@ -501,7 +501,7 @@ This class implements options that don't take any argument."))
     :argument-type :required
     :default-value nil)
   (:documentation "The VALUED-OPTION class.
-This class implements is the base class for options accepting arguments."))
+This is the base class for options accepting arguments."))
 
 (defmethod initialize-instance :before
     ((option valued-option) &key argument-name argument-type default-value)
