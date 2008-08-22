@@ -42,16 +42,16 @@
 (defclass container ()
   ((items :documentation "The items in the container."
 	  :type list
-	  :accessor container-items
-	  :initform nil)
+	  :initform nil
+	  :accessor container-items)
    (sealed :documentation "Whether the container is sealed."
-	   :accessor container-sealed
-	   :initform nil)
+	   :initform nil
+	   :accessor container-sealed)
    (traversed :documentation "Whether the container has been traversed."
-	      :accessor container-traversed
-	      :initform nil))
+	      :initform nil
+	      :accessor container-traversed))
   (:documentation "The CONTAINER class.
-This class is a mixin used in contexts and groups to represent the program's
+This class is a mixin used in synopsis and groups to represent the program's
 command-line hierarchy."))
 
 
@@ -107,7 +107,7 @@ command-line hierarchy."))
 (defgeneric add-to (container item)
   (:documentation "Add ITEM to CONTAINER.")
   ;; There is currently no need to further specialize this function, as
-  ;;everything is done below.
+  ;; everything is done below.
   (:method :before ((container container) item)
     "Ensure that ITEM is sealed and CONTAINER is not."
     (when (sealedp container)
@@ -162,7 +162,7 @@ command-line hierarchy."))
     "Do nothing by default."
     (values))
   (:method ((container container))
-    "Untraverse CONTAINER's items."
+    "Reset the traversal state of all CONTAINER items."
     (dolist (item (container-items container))
       (untraverse item)))
   (:method :after ((container container))
@@ -170,12 +170,12 @@ command-line hierarchy."))
     (setf (container-traversed container) nil)))
 
 (defgeneric next-option (item)
-  (:documentation "Return the next untraversed option in ITEM.")
+  (:documentation "Return the next option in a traversal process.")
   (:method (item)
-    "Return nil (ITEM doesn't contain or is not an option by default."
+    "Return nil by default (when ITEM doesn't contain or is not an option)."
     nil)
   (:method ((container container))
-    "Return the next option in CONTAINER or one of its sub-containers."
+    "Try to find the next option in a traversal process in CONTAINER."
     (unless (container-traversed container)
       (dolist (item (container-items container))
 	(let ((opt (next-option item)))
@@ -235,12 +235,13 @@ When such an option exists, return wo values:
 ;; find the option "closest" to the sticky match.
 (defgeneric search-sticky-option (there namearg)
   (:documentation "Search for a sticky option in THERE, matching NAMEARG.
-NAMEARG is the concatenation of the option's name and its argument.
+NAMEARG is the concatenation of the option's short name and its argument.
 When such an option exists, return two values:
 - the option itself,
 - the argument part of NAMEARG.")
   (:method ((container container) namearg)
-    "Search for a sticky option in CONTAINER."
+    "Search for a sticky option in CONTAINER matching NAMEARG."
+    (declare (type string namearg))
     (do-options (option container)
       (let ((argument (option-matches-sticky option namearg)))
 	(when argument

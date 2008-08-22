@@ -78,23 +78,23 @@ If so, store it into CMDLINE-ARGUMENT."
 (defclass option ()
   ((short-name :documentation "The option's short name."
 	       :type (or null string)
-	       :reader short-name
-	       :initarg :short-name)
+	       :initarg :short-name
+	       :reader short-name)
    (long-name :documentation "The option's long name."
 	      :type (or null string)
-	      :reader long-name
-	      :initarg :long-name)
+	      :initarg :long-name
+	      :reader long-name)
    (description :documentation "The option's description."
 		:type (or null string)
-		:reader description
-		:initarg :description)
+		:initarg :description
+		:reader description)
    (env-var :documentation "The option's associated environment variable."
 	    :type (or null string)
-	    :reader env-var
-	    :initarg :env-var)
+	    :initarg :env-var
+	    :reader env-var)
    (traversed :documentation "The option's traversal state."
-	      :accessor option-traversed
-	      :initform nil))
+	      :initform nil
+	      :accessor option-traversed))
   (:default-initargs
     :short-name nil
     :long-name nil
@@ -490,18 +490,17 @@ This class implements options that don't take any argument."))
 (defclass valued-option (option)
   ((argument-name :documentation "The option's argument display name."
 		  :type string
-		  :reader argument-name
-		  :initarg :argument-name)
+		  :initarg :argument-name
+		  :reader argument-name)
    (argument-required-p :documentation "Whether the option's argument is required."
-			;; This slot will be initialized afterwards, according
-			;; to the :argument-type initarg.
+			;; Initialization :after wards by :argument-type
 			:reader argument-required-p)
    ;; #### WARNING: currently, there's no way to make a distinction between
    ;; not providing a default value, and providing a null one. I don't think
    ;; that's useful, but maybe this will change someday.
    (default-value :documentation "The option's default value."
-		 :reader default-value
-		 :initarg :default-value))
+		 :initarg :default-value
+		 :reader default-value))
   (:metaclass valued-option-class)
   (:default-initargs
     :argument-name "ARG"
@@ -813,23 +812,23 @@ Available restarts are:
 (defoption switch ()
   ((argument-style :documentation "The style of the argument (on/off etc.)."
 		   :type symbol
-		   :reader argument-style
-		   :initarg :argument-style)
+		   :initarg :argument-style
+		   :reader argument-style)
    (argument-styles :documentation "The possible argument styles."
+		    :allocation :class
 		    :type list
 		    :initform '(:yes/no :on/off :true/false :yup/nope)
-		    :accessor argument-styles
-		    :allocation :class)
+		    :accessor argument-styles)
    (yes-values :documentation "The possible 'yes' values."
+	       :allocation :class
 	       :type list
 	       :initform '("yes" "on" "true" "yup")
-	       :accessor yes-values
-	       :allocation :class)
+	       :accessor yes-values)
    (no-values :documentation "The possible 'no' values."
+	      :allocation :class
 	      :type list
 	      :initform '("no" "off" "false" "nope")
-	      :accessor no-values
-	      :allocation :class))
+	      :accessor no-values))
   (:default-initargs
     ;; No :argument-name -- not used
     :argument-style :yes/no
