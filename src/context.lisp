@@ -59,8 +59,8 @@
 (defclass context ()
   ((synopsis :documentation "The program synopsis."
 	     :type synopsis
-	     :reader synopsis
-	     :initarg :synopsis)
+	     :initarg :synopsis
+	     :reader synopsis)
    (progname :documentation
 	     "The program name, as it appears on the command line."
 	     :type string
@@ -86,8 +86,8 @@
     :cmdline sb-ext:*posix-argv*
     :error-handler :quit)
   (:documentation "The CONTEXT class.
-This class holds the necessary information to process a particular set of
-command-line options."))
+This class represents the associatiion of a synopsis and a set of command-line
+options based on it."))
 
 (defmethod initialize-instance :before
     ((context context) &key synopsis cmdline error-handler)
@@ -286,6 +286,7 @@ CONTEXT is where to look for the options."
 
 (defmethod potential-pack-p (pack (context context))
   "Return t if PACK (a string) is a potential pack in CONTEXT."
+  (declare (type string pack))
   (potential-pack-p pack (synopsis context)))
 
 
@@ -295,12 +296,15 @@ CONTEXT is where to look for the options."
 
 (defmethod search-option
     ((context context) &rest keys &key short-name long-name partial-name)
-  "Search for option in CONTEXT."
+  "Search for an option in CONTEXT.
+The search is actually done in the CONTEXT'synopsis."
   (declare (ignore short-name long-name partial-name))
   (apply #'search-option (synopsis context) keys))
 
 (defmethod search-sticky-option ((context context) namearg)
-  "Search for a sticky option in CONTEXT."
+  "Search for a sticky option in CONTEXT.
+The search is actually done in the CONTEXT'synopsis."
+  (declare (type string namearg))
   (search-sticky-option (synopsis context) namearg))
 
 
