@@ -52,6 +52,7 @@
 
 (defun argument-popable-p (cmdline)
   "Return true if the first CMDLINE item is an argument."
+  (declare (type list cmdline))
   (and (car cmdline)
        (not (option-call-p (car cmdline)))))
 
@@ -91,7 +92,7 @@ If so, store it into CMDLINE-ARGUMENT."
 	    :type (or null string)
 	    :reader env-var
 	    :initarg :env-var)
-   (traversed :documentation "Whether the option's been traversed."
+   (traversed :documentation "The option's traversal state."
 	      :accessor option-traversed
 	      :initform nil))
   (:default-initargs
@@ -104,7 +105,7 @@ This class is the base class for all options."))
 
 (defmethod initialize-instance :before
     ((option option) &rest keys &key short-name long-name description env-var)
-  "Check consistency of OPTION's initargs."
+  "Check validity of the name-related initargs."
   (declare (ignore description env-var))
   (unless (or short-name long-name)
     (error "Option ~A: no name given." option))
@@ -160,9 +161,9 @@ This class is the base class for all options."))
   "Mark OPTION as untraversed."
   (setf (option-traversed option) nil))
 
-
 (defmethod next-option ((option option))
-  "Return OPTION is it is untraversed (and mark it as traversed)."
+  "Return OPTION if it is the next one in a traversal process.
+If so, mark it as traversed."
   (unless (option-traversed option)
     (setf (option-traversed option) t)
     option))
@@ -172,21 +173,23 @@ This class is the base class for all options."))
 ;; The Option Search protocol
 ;; ============================================================================
 
-;; In case of long name abbreviation (for instance --he instead of --help), we
-;; register the name used like this: he(lp). In case of error report, this
-;; will help the user spot where he did something wrong.
+;; When long names are abbreviated (for instance --he instead of --help), we
+;; register the command-line name like this: he(lp). In case of error report,
+;; this will help the user spot where he did something wrong.
 (defun complete-string (start full)
   "Complete START with the rest of FULL in parentheses.
-START must be the beginning of FULL.
 For instance, completing 'he' with 'help' will produce 'he(lp)'."
+  (declare (type string start full))
   (assert (string-start full start))
   (assert (not (string= full start)))
   (concatenate 'string start "(" (subseq full (length start)) ")"))
 
 (defun option-matches (option &key short-name long-name partial-name)
-  "Check whether SHORT-NAME, LONG-NAME or PARTIAL-(long)NAME matches OPTION.
-If that is the case, return the name used to perform the matching, possibly
-completed in case of a PARTIAL match."
+  "Check whether OPTION matches either SHORT-NAME, LONG-NAME or PARTIAL-NAME.
+PARTIAL-NAME is a possible long name abbreviation.
+If so, return the name that matched, possibly completed in case of a
+PARTIAL-NAME match."
+  (declare (type option option))
   (cond (short-name
 	 (when (string= short-name (short-name option))
 	   short-name))
@@ -198,8 +201,9 @@ completed in case of a PARTIAL match."
 	   (complete-string partial-name (long-name option))))))
 
 (defgeneric option-matches-sticky (option namearg)
-  (:documentation "Check whether NAMEARG matches OPTION with a sticky argument.
-If that is the case, return the argument part of NAMEARG."))
+  (:documentation
+   "Check whether NAMEARG matches OPTION's short-name with a sticky argument.
+If so, return the argument part of NAMEARG."))
 
 
 ;; ============================================================================
@@ -214,10 +218,9 @@ If that is the case, return the argument part of NAMEARG."))
 ;; Potential misuse means non-switches in a plus pack, options with mandatory
 ;; arguments in the middle of a pack and so on.
 (defun potential-pack-char (option &optional as-string)
-  "Return OPTION's potential pack character.
-If AS-STRING is not nil, return a string of that character."
-  ;; An option is potentially packable if its short name has a single
-  ;; character.
+  "Return OPTION's potential pack character, if any.
+If AS-STRING, return a string of that character."
+  (declare (type option option))
   (with-slots (short-name) option
     (when (and short-name (= (length short-name) 1))
       (if as-string
@@ -225,12 +228,12 @@ If AS-STRING is not nil, return a string of that character."
 	  (coerce short-name 'character)))))
 
 (defgeneric minus-pack-char (option &optional as-string)
-  (:documentation "Return OPTION's minus char, if any.
-If AS-STRING is not nil, return a string of that character."))
+  (:documentation "Return OPTION's minus pack character, if any.
+If AS-STRING, return a string of that character."))
 
 (defgeneric plus-pack-char (option &optional as-string)
-  (:documentation "Return OPTION's plus char, if any.
-If AS-STRING is not nil, return a string of that character.")
+  (:documentation "Return OPTION's plus pack character, if any.
+If AS-STRING, return a string of that character.")
   (:method ((option option) &optional as-string)
     "Return nil (only switches are plus-packable)."
     (declare (ignore as-string))
@@ -263,13 +266,14 @@ If AS-STRING is not nil, return a string of that character.")
   (:report (lambda (error stream)
 	     (format stream "Option '~A': spurious argument ~S."
 		     (name error) (argument error))))
-  (:documentation "Report a spurious argument error."))
+  (:documentation "A spurious command-line argument error."))
 
 ;; #### NOTE: this macro is currently used only once.
 (defmacro restartable-spurious-cmdline-argument-error
     ((option name argument) &body body)
   "Restartably throw a spurious-cmdline-argument error.
-The error relates to the command-line use of OPTION called by NAME with ARGUMENT.
+The error relates to the command-line use of OPTION called by NAME with
+ARGUMENT.
 BODY constitutes the body of the only restart available, discard-argument, and
 should act as if ARGUMENT had not been provided."
   `(restart-case (error 'spurious-cmdline-argument
@@ -284,19 +288,19 @@ should act as if ARGUMENT had not been provided."
   ()
   (:report (lambda (error stream)
 	     (format stream "Option '~A': invalid +-syntax." (name error))))
-  (:documentation "Report an invalid +-syntax error."))
+  (:documentation "An invalid +-syntax error."))
 
 (defmacro restartable-invalid-+-syntax-error ((option) &body body)
   "Restartably throw an invalid-+-syntax error.
 The error relates to the command-line use of OPTION.
 BODY constitutes the body of the only restart available,
-use-normal-short-call, and should act as if OPTION had been called by normal
-short-name form: -<short name>."
+use-short-call, and should act as if OPTION had been normally called by short
+name."
   `(restart-case (error 'invalid-+-syntax
 		  :option ,option
 		  :name (short-name ,option))
-    (use-normal-short-call ()
-     :report "Fake a normal dash-syntax."
+    (use-short-call ()
+     :report "Fake a normal call by short name."
      ,@body)))
 
 (defgeneric retrieve-from-long-call
@@ -307,8 +311,8 @@ CMDLINE-ARGUMENT is a potentially already parsed cmdline argument.
 Otherwise, CMDLINE is where to find an argument.
 This function returns two values:
 - the retrieved value,
-- the new cmdline (possibly with the first item popped if the option requires
-  an argument)."))
+- the new command-line (possibly with the first item popped if the option
+  requires an argument)."))
 
 (defgeneric retrieve-from-short-call (option &optional cmdline-argument cmdline)
   (:documentation "Retrieve OPTION's value from a short call.
@@ -316,11 +320,11 @@ CMDLINE-ARGUMENT is a potentially already parsed cmdline argument.
 Otherwise, CMDLINE is where to find an argument.
 This function returns two values:
 - the retrieved value,
-- the new cmdline (possibly with the first item popped if the option requires
-  an argument)."))
+- the new command-line (possibly with the first item popped if the option
+  requires an argument)."))
 
 (defgeneric retrieve-from-plus-call (option)
-  (:documentation "Retrieve OPTION's value from a plus call and return it."))
+  (:documentation "Retrieve OPTION's value from a plus call."))
 
 (defgeneric fallback-retrieval (option)
   (:documentation "Retrieve OPTION's value from an env var, or a default value."))
@@ -343,9 +347,9 @@ This class implements options that don't take any argument."))
 
 (defun make-flag (&rest keys &key short-name long-name description env-var)
   "Make a new flag.
-- SHORT-NAME is the option's short name without the dash.
+- SHORT-NAME is the option's short name (without the dash).
   It defaults to nil.
-- LONG-NAME is the option's long name, without the double-dash.
+- LONG-NAME is the option's long name (without the double-dash).
   It defaults to nil.
 - DESCRIPTION is the option's description appearing in help strings.
   It defaults to nil."
@@ -353,7 +357,19 @@ This class implements options that don't take any argument."))
   (apply #'make-instance 'flag keys))
 
 (defun make-internal-flag (long-name description &optional env-var)
-  "Make a new internal flag."
+  "Make a new internal (Clon-specific) flag.
+- LONG-NAME is the flag's long-name, minus the 'clon-' prefix.
+  (Internal options don't have short names.)
+- DESCRIPTION is the flag's description.
+- ENV-VAR is the flag's associated environment variable, minus the 'CLON_'
+  prefix. It defaults to nil."
+  (declare (type string long-name description))
+  (assert (not (or (zerop (length long-name))
+		   (zerop (length description)))))
+  (when env-var
+    ;; #### NOTE: this works because the default-initargs option for env-var
+    ;; is actually nil, so I don't risk missing a concatenation later.
+    (setq env-var (concatenate 'string "CLON_" env-var)))
   (make-instance 'flag
     :long-name (concatenate 'string "clon-" long-name)
     :description description
@@ -361,9 +377,10 @@ This class implements options that don't take any argument."))
     ;; #### FIXME: I'm not quite satisfied with this design here. Other
     ;; possibilities would be to:
     ;; - temporarily set a global variable like *internal*, but /yuck/.
-    ;; - temporarily define an additional :before method performing the clon-
-    ;; prefix check, but only for user-level options. Cleaner, but obviously
-    ;; more costly, although it certainly doesn't matter much.
+    ;; - temporarily define an additional :before method performing the
+    ;;   clon- prefix check, but only for user-level options. Cleaner,
+    ;;   but obviously more costly, although it certainly doesn't matter
+    ;;   much.
     :allow-other-keys t
     :internal t))
 
@@ -373,7 +390,7 @@ This class implements options that don't take any argument."))
 ;; -------------------------
 
 (defmethod option-matches-sticky ((flag flag) namearg)
-  "Return nil (flags don't have any argument)."
+  "Return nil (flags don't take any argument, sticky or not)."
   ;; #### NOTE: there is something a bit shaky here: this function is called
   ;; during cmdline parsing (so this is really a lexico-syntactic analysis
   ;; stage), but we return nil because of a semantic point concerning flags:
@@ -381,8 +398,9 @@ This class implements options that don't take any argument."))
   ;; option matching is returned (not the longest match), this is probably
   ;; better (another question which remains unclear is what to do when a
   ;; sticky argument leads to ambiguity). The consequence is that flags won't
-  ;; ever get a cmdline-argument in retrieve-from-short-call, hence the assertion
-  ;; there.
+  ;; ever get a cmdline-argument in retrieve-from-short-call, hence the
+  ;; assertion there.
+  (declare (ignore namearg))
   nil)
 
 
@@ -391,7 +409,9 @@ This class implements options that don't take any argument."))
 ;; -------------------
 
 (defmethod minus-pack-char ((flag flag) &optional as-string)
-  "Return FLAG's minus char."
+  "Return FLAG's minus pack character, if any."
+  ;; Since flags don't take any argument, being minus-packable is the same as
+  ;; being potentially packable.
   (potential-pack-char flag as-string))
 
 
@@ -402,14 +422,12 @@ This class implements options that don't take any argument."))
 (defmethod retrieve-from-long-call
     ((flag flag) cmdline-name  &optional cmdline-argument cmdline)
   "Retrieve FLAG's value from a long call."
-  ;; CMDLINE-ARGUMENT might be non-nil when a flag was given an argument
-  ;; through an =-syntax.
+  ;; CMDLINE-ARGUMENT might be non-nil when a flag was given a spurious
+  ;; argument through an =-syntax.
   (if cmdline-argument
       (restartable-spurious-cmdline-argument-error
-       (flag cmdline-name cmdline-argument)
-       (values t cmdline))
-      ;; Flags don't take arguments, so leave the cmdline alone (don't mess
-      ;; with automatic remainder detection).
+	  (flag cmdline-name cmdline-argument)
+	(values t cmdline))
       (values t cmdline)))
 
 (defmethod retrieve-from-short-call
@@ -417,8 +435,6 @@ This class implements options that don't take any argument."))
   "Retrieve FLAG's value from a short call."
   ;; See comment about this assertion in option-matches-sticky.
   (assert (null cmdline-argument))
-  ;; Flags don't take arguments, so leave the cmdline alone (don't mess with
-  ;; automatic remainder detection).
   (values t cmdline))
 
 (defmethod retrieve-from-plus-call ((flag flag))
@@ -480,8 +496,8 @@ This class implements options that don't take any argument."))
 			;; This slot will be initialized afterwards, according
 			;; to the :argument-type initarg.
 			:reader argument-required-p)
-   ;; #### NOTE: currently, there's no way to make a distinction between not
-   ;; providing a default value, and providing a null one. I don't think
+   ;; #### WARNING: currently, there's no way to make a distinction between
+   ;; not providing a default value, and providing a null one. I don't think
    ;; that's useful, but maybe this will change someday.
    (default-value :documentation "The option's default value."
 		 :reader default-value
@@ -495,25 +511,30 @@ This class implements options that don't take any argument."))
 This class implements is the base class for options accepting arguments."))
 
 (defmethod initialize-instance :before
-    ((option valued-option) &key argument-name argument-type default-value env-var)
-  "Check consistency of OPTION's value-related initargs."
-  (declare (ignore env-var))
+    ((option valued-option) &key argument-name argument-type default-value)
+  "Check validity of the value-related initargs."
   (when (or (null argument-name)
 	    (and argument-name (zerop (length argument-name))))
-    (error "option ~A: empty argument name." option))
+    (error "Option ~A: empty argument name." option))
   (unless (or (eq argument-type :required)
 	      (eq argument-type :mandatory)
 	      (eq argument-type :optional))
     (error "Option ~A: invalid argument type ~S." option argument-type))
+  ;; Here, we catch and convert a potential invalid-value error into a simple
+  ;; error because this check is intended for the Clon user, as opposed to the
+  ;; Clon end-user. In other words, a potential error here is in the program
+  ;; itself; not in the usage of the program.
   (when default-value
     (handler-case (check-value option default-value)
       (invalid-value ()
 	(error "Option ~A: invalid default value ~S." option default-value)))))
 
 (defmethod initialize-instance :after
-    ((option valued-option) &key argument-name argument-type default-value env-var)
-  "Compute values for uninitialized OPTION slots."
-  (declare (ignore argument-name default-value env-var))
+    ((option valued-option) &key argument-name argument-type default-value)
+  "Compute uninitialized OPTION slots with indirect initargs.
+This currently involves the conversion of the ARGUMENT-TYPE key to the
+ARGUMENT-REQUIRED-P slot."
+  (declare (ignore argument-name default-value))
   (case argument-type
     ((:required :mandatory)
      (setf (slot-value option 'argument-required-p) t))
@@ -533,7 +554,8 @@ This class implements is the base class for options accepting arguments."))
 ;; -------------------------
 
 (defmethod option-matches-sticky ((option valued-option) namearg)
-  "Check whether NAMEARG matches OPTION with a sticky argument."
+  "Check whether NAMEARG matches OPTION's short name with a sticky argument."
+  (declare (type string namearg))
   (with-slots (short-name) option
     (when (and short-name (string-start namearg short-name))
       ;; This case should not happen because we always look for a complete
@@ -548,9 +570,10 @@ This class implements is the base class for options accepting arguments."))
 
 ;; Options with a one-character short name and requiring an argument may
 ;; appear as the last option in a minus pack. However, we don't make them
-;; appear in the usage string.
+;; appear in the usage string. This is why this function filters out options
+;; with mandatory argument.
 (defmethod minus-pack-char ((option valued-option) &optional as-string)
-  "Return OPTION's minus char, if OPTION's argument is optional."
+  "Return OPTION's minus pack character if OPTION's argument is optional."
   (unless (argument-required-p option)
     (potential-pack-char option as-string)))
 
@@ -563,107 +586,115 @@ This class implements is the base class for options accepting arguments."))
   ((value :documentation "The invalid value."
 	  :initarg :value
 	  :reader value)
-   (comment :documentation "An additional comment about the value error."
+   (comment :documentation "An additional comment about the error."
 	    :type string
 	    :initarg :comment
 	    :reader comment))
   (:report (lambda (error stream)
 	     (format stream "Option ~A: invalid value ~S.~@[~%~A~]"
 		     (option error) (value error) (comment error))))
-  (:documentation "Report an invalid value error."))
+  (:documentation "An invalid value error."))
 
 (defun read-value ()
   "Read an option value from standard input."
   (format t "Please type in the new value:~%")
   (list (read)))
 
-(defgeneric check-value (option value)
-  (:documentation "Check that VALUE is valid for OPTION.
+(defgeneric check-value (valued-option value)
+  (:documentation "Check that VALUE is valid for VALUED-OPTION.
 If VALUE is valid, return it. Otherwise, raise an invalid-value error."))
 
-(defun restartable-check-value (option value)
-  "Restartably check that VALUE is valid for OPTION.
-The only restart available, use-value, offers to try another value instead."
-  (restart-case (check-value option value)
+(defun restartable-check-value (valued-option value)
+  "Restartably check that VALUE is valid for VALUED-OPTION.
+The only restart available, use-value, offers to try a different value from
+the one that was provided."
+  (declare (type valued-option valued-option))
+  (restart-case (check-value valued-option value)
     (use-value (value)
       :report "Use another value instead."
       :interactive read-value
-      (restartable-check-value option value))))
+      (restartable-check-value valued-option value))))
 
 (define-condition invalid-argument (option-error)
   ((argument :documentation "The invalid argument."
 	     :type string
 	     :initarg :argument
 	     :reader argument)
-   (comment :documentation "An additional comment about the conversion error."
+   (comment :documentation "An additional comment about the error."
 	    :type string
 	    :initarg :comment
 	    :reader comment))
   (:report (lambda (error stream)
 	     (format stream "Option ~A: invalid argument ~S.~@[~%~A~]"
 		     (option error) (argument error) (comment error))))
-  (:documentation "Report an invalid argument error."))
+  (:documentation "An invalid argument error."))
 
 (defun read-argument ()
   "Read an option argument from standard input."
   (format t "Please type in the new argument:~%")
   (list (read-line)))
 
-(defgeneric convert (option argument)
-  (:documentation "Convert ARGUMENT to OPTION's value.
+(defgeneric convert (valued-option argument)
+  (:documentation "Convert ARGUMENT to VALUED-OPTION's value.
 If ARGUMENT is invalid, raise an invalid-argument error."))
 
 ;; #### NOTE: the restarts provided here are actually not used because
 ;; conversion errors are caught by a handler-case in the retrieval routines,
-;; which provide higher-level errors and restarts.
-(defun restartable-convert (option argument)
-  "Restartably convert ARGUMENT to OPTION's value.
+;; which provide higher-level errors and restarts. I leave them here however,
+;; because they might be useful for debugging.
+(defun restartable-convert (valued-option argument)
+  "Restartably convert ARGUMENT to VALUED-OPTION's value.
 Available restarts are:
 - use-default-value: return OPTION's default value,
 - use-value: return another (already converted) value,
 - use-argument: return the conversion of another argument."
-  (restart-case (convert option argument)
+  (declare (type valued-option valued-option)
+	   (type string argument))
+  (restart-case (convert valued-option argument)
     (use-default-value ()
       :report (lambda (stream)
 		(format stream "Use option's default value (~S) instead."
-			(default-value option)))
-      (default-value option))
+			(default-value valued-option)))
+      (default-value valued-option))
     (use-value (value)
       :report "Use another (already converted) value."
       :interactive read-value
-      (restartable-check-value option value))
+      (restartable-check-value valued-option value))
     (use-argument (argument)
       :report "Use another (to be converted) argument."
       :interactive read-argument
-      (restartable-convert option argument))))
+      (restartable-convert valued-option argument))))
 
 
-;; ----------------
+;; ------------------
 ;; Retrieval protocol
-;; ----------------
+;; ------------------
 
 (define-condition invalid-cmdline-argument (cmdline-option-error)
   ((argument :documentation "The invalid argument."
 	     :type string
 	     :initarg :argument
 	     :reader argument)
-   (comment :documentation "An additional comment about the conversion error."
+   (comment :documentation "An additional comment about the error."
 	    :type string
 	    :initarg :comment
 	    :reader comment))
   (:report (lambda (error stream)
 	     (format stream "Option '~A': invalid argument ~S.~@[~%~A~]"
 		     (name error) (argument error) (comment error))))
-  (:documentation "Report an invalid command-line argument error."))
+  (:documentation "An invalid command-line argument error."))
 
-(defun cmdline-convert (option cmdline-name cmdline-argument)
-  "Convert CMDLINE-ARGUMENT for OPTION called by CMDLINE-NAME.
-This function intercepts invalid-argument errors and raises the higher level
-invalid-cmdline-argument instead."
-  (handler-case (restartable-convert option cmdline-argument)
+(defun cmdline-convert (valued-option cmdline-name cmdline-argument)
+  "Convert CMDLINE-ARGUMENT to VALUED-OPTION's value.
+This function is used when the conversion comes from a command-line usage of
+VALUED-OPTION, called by CMDLINE-NAME, and intercepts invalid-argument errors
+to raise the higher level invalid-cmdline-argument error instead."
+  (declare (type valued-option valued-option)
+	   (type string cmdline-name cmdline-argument))
+  (handler-case (restartable-convert valued-option cmdline-argument)
     (invalid-argument (error)
       (error 'invalid-cmdline-argument
-	     :option option
+	     :option valued-option
 	     :name cmdline-name
 	     :argument cmdline-argument
 	     :comment (comment error)))))
@@ -672,47 +703,62 @@ invalid-cmdline-argument instead."
   ()
   (:report (lambda (error stream)
 	     (format stream "Option '~A': missing argument." (name error))))
-  (:documentation "Report a missing command-line argument error."))
+  (:documentation "A missing command-line argument error."))
 
 (defun restartable-cmdline-convert
-    (option cmdline-name cmdline-argument
-     &optional (fallback-value (default-value option)))
-  "Restartably convert CMDLINE-ARGUMENT for OPTION called by CMDLINE-NAME.
-FALLBACK-VALUE is what to return when an optional argument is not provided. It
-defaults to OPTION's default value.
+    (valued-option cmdline-name cmdline-argument
+     &optional (fallback-value (default-value valued-option)))
+  "Restartably convert CMDLINE-ARGUMENT to VALUED-OPTION's value.
+This function is used when the conversion comes from a command-line usage of
+VALUED-OPTION, called by CMDLINE-NAME. FALLBACK-VALUE is what to return when
+an optional argument is not provided. It defaults to VALUED-OPTION's default
+value.
+
+As well as conversion errors, this function might raise a
+missing-cmdline-argument error if CMDLINE-ARGUMENT is nil and an argument is
+required.
 
 Available restarts are:
-- use-default-value: return OPTION's default value,
+- use-fallback-value: return FALLBACK-VALUE,
+- use-default-value: return VALUED-OPTION's default value,
 - use-value: return another (already converted) value,
 - use-argument: return the conversion of another argument."
+  (declare (type valued-option valued-option)
+	   (type string cmdline-name)
+	   (type (or null string) cmdline-argument))
   (restart-case
-      (cond ((argument-required-p option)
+      (cond ((argument-required-p valued-option)
 	     (if cmdline-argument
-		 (cmdline-convert option cmdline-name cmdline-argument)
+		 (cmdline-convert valued-option cmdline-name cmdline-argument)
 		 (error 'missing-cmdline-argument
-			:option option :name cmdline-name)))
+			:option valued-option :name cmdline-name)))
 	    (cmdline-argument
-	     (cmdline-convert option cmdline-name cmdline-argument))
+	     (cmdline-convert valued-option cmdline-name cmdline-argument))
 	    (t
 	     fallback-value))
+    (use-fallback-value ()
+      :report (lambda (stream)
+		(format stream "Use fallback value (~S)." fallback-value))
+      fallback-value)
     (use-default-value ()
       :report (lambda (stream)
 		(format stream "Use option's default value (~S)."
-			(default-value option)))
-      (default-value option))
+			(default-value valued-option)))
+      (default-value valued-option))
     (use-value (value)
       :report "Use an already converted value."
       :interactive read-value
-      (restartable-check-value option value))
+      (restartable-check-value valued-option value))
     (use-argument (cmdline-argument)
       :report "Use the conversion of an argument."
       :interactive read-argument
       (restartable-cmdline-convert
-       option cmdline-name cmdline-argument fallback-value))))
+       valued-option cmdline-name cmdline-argument fallback-value))))
 
 (defmethod retrieve-from-long-call
     ((option valued-option) cmdline-name &optional cmdline-argument cmdline)
   "Retrieve OPTION's value from a long call."
+  (declare (type string cmdline-name))
   (maybe-pop-argument cmdline option cmdline-argument)
   (values (restartable-cmdline-convert option cmdline-name cmdline-argument)
 	  cmdline))
@@ -720,11 +766,6 @@ Available restarts are:
 (defmethod retrieve-from-short-call
     ((option valued-option) &optional cmdline-argument cmdline)
   "Retrieve OPTION's value from a short call."
-  ;; If the option requires an argument, but none is provided by a sticky
-  ;; syntax, we might find it in the next cmdline item, unless it looks like
-  ;; an option, in which case it is a missing argument error. Optional
-  ;; arguments are only available through the sticky syntax, so we don't look
-  ;; into the next cmdline item.
   (maybe-pop-argument cmdline option cmdline-argument)
   (values (restartable-cmdline-convert option (short-name option) cmdline-argument)
 	  cmdline))
@@ -803,36 +844,70 @@ This class implements boolean options."))
 					     argument-name argument-type
 					     default-value env-var
 					     argument-style)
+  "Check validity of switch-specific initargs."
   (declare (ignore short-name long-name description
-		   argument-name argument-type
+		   argument-type
 		   default-value env-var))
+  (unless argument-name
+    (error "Argument name provided for a switch. Use argument style instead."))
   (unless (member argument-style (argument-styles switch))
-    (error "invalid switch argument style ~S." argument-style)))
+    (error "Invalid switch argument style ~S." argument-style)))
 
 (defun make-switch (&rest keys
 		    &key short-name long-name description
 			 argument-name argument-type
 			 default-value env-var
 			 argument-style)
-  "Make a new switch."
+  "Make a new switch.
+- SHORT-NAME is the switch's short name (without the dash).
+  It defaults to nil.
+- LONG-NAME is the switch's long name (without the double-dash).
+  It defaults to nil.
+- DESCRIPTION is the switch's description appearing in help strings.
+  It defaults to nil.
+- ARGUMENT-NAME shouldn't be used (use ARGUMENT-STYLE instead).
+- ARGUMENT-TYPE is one of :required, :mandatory or :optional (:required and
+  :mandatory are synonyms).
+  It defaults to :optional.
+- DEFAULT-VALUE is the switch's default value.
+  It defaults to nil.
+- ENV-VAR is the switch's associated environment variable.
+  It defaults to nil.
+- ARGUMENT-STYLE is the switch's argument display style. It can be one of
+  :yes/no, :on/off, :true/false, :yup/nope.
+  It defaults to :yes/no."
   (declare (ignore short-name long-name description
 		   argument-name argument-type
 		   default-value env-var
 		   argument-style))
-  (apply 'make-instance 'switch keys))
+  (apply #'make-instance 'switch keys))
 
 (defun make-internal-switch (long-name description
 			     &rest keys
 			     &key argument-name argument-type
 				  default-value env-var
 				  argument-style)
-  "Make a new internal switch."
+  "Make a new internal (Clon-specific) switch.
+- LONG-NAME is the switch's long-name, minus the 'clon-' prefix.
+  (Internal options don't have short names.)
+- DESCRIPTION is the switch's description.
+- ARGUMENT-NAME shouldn't be used (use ARGUMENT-STYLE instead).
+- ARGUMENT-TYPE is one of :required, :mandatory or :optional (:required and
+  :mandatory are synonyms).
+  It defaults to :optional.
+- DEFAULT-VALUE is the switch's default value.
+  It defaults to nil.
+- ENV-VAR is the switch's associated environment variable, minus the 'CLON_'
+  prefix. It defaults to nil.
+- ARGUMENT-STYLE is the switch's argument display style. It can be one of
+  :yes/no, :on/off, :true/false, :yup/nope.
+  It defaults to :yes/no."
   (declare (ignore argument-name argument-type default-value argument-style))
   (when env-var
     ;; #### NOTE: this works because the default-initargs option for env-var
     ;; is actually nil, so I don't risk missing a concatenation later.
     (setq env-var (concatenate 'string "CLON_" env-var)))
-  (apply 'make-instance 'switch
+  (apply #'make-instance 'switch
 	 :long-name (concatenate 'string "clon-" long-name)
 	 :description description
 	 :env-var env-var
@@ -846,8 +921,9 @@ This class implements boolean options."))
 ;; -------------------------
 
 (defmethod option-matches-sticky ((switch switch) namearg)
-  "Return nil (switches can't be sticky because of their short syntax)."
+  "Return nil (switches don't accept sticky arguments)."
   ;; #### NOTE: see related comment in the FLAG method.
+  (declare (type string namearg))
   nil)
 
 
@@ -856,49 +932,27 @@ This class implements boolean options."))
 ;; -------------------
 
 (defmethod minus-pack-char ((switch switch) &optional as-string)
-  "Return SWITCH's minus char."
-  ;; Regardless of the argument type, because this only applies to long-name
-  ;; calls.
+  "Return SWITCH's minus pack character, if any."
+  ;; Here, we don't need to look into the argument type (required or optional)
+  ;; as for other options, because for switches, the argument type only has an
+  ;;impact on long calls.
   (potential-pack-char switch as-string))
 
 (defmethod plus-pack-char ((switch switch) &optional as-string)
-  "Return OPTION's plus char (same as minus char for switches)."
+  "Return SWITCH's plus pack character, if any."
   (potential-pack-char switch as-string))
 
 
-;; -------------------
-;; Conversion protocol
-;; -------------------
-
-(defmethod check-value ((switch switch) value)
-  "Return VALUE.
-All values are valid for switches: everything but nil means 'yes'."
-  value)
-
-(defmethod convert ((switch switch) argument)
-  "Convert ARGUMENT to a SWITCH value.
-If ARGUMENT is not valid for a switch, raise a conversion error."
-  (cond ((member argument (yes-values switch) :test #'string=)
-	 t)
-	((member argument (no-values switch) :test #'string=)
-	 nil)
-	(t
-	 (error 'invalid-argument
-		:option switch
-		:argument argument
-		:comment
-		(concatenate 'string
-		  "Valid arguments are: "
-		  (reduce (lambda (str1 str2)
-			    (concatenate 'string str1 ", " str2))
-			  (append (yes-values switch) (no-values switch)))
-		  ".")))))
+;; ------------------
+;; Retrieval protocol
+;; ------------------
 
 (defmethod retrieve-from-long-call
     ((switch switch) cmdline-name &optional cmdline-argument cmdline)
   "Retrieve SWITCH's value from a long call."
-  ;; The difference with other valued options (see above) is that an omitted
-  ;; optional argument stands for a "yes". Otherwise, it's pretty similar.
+  ;; The difference with other valued options is that an omitted optional
+  ;; argument stands for a "yes". Otherwise, it's pretty similar.
+  (declare (type string cmdline-name))
   (maybe-pop-argument cmdline switch cmdline-argument)
   (values (restartable-cmdline-convert switch cmdline-name cmdline-argument t)
 	  cmdline))
@@ -915,6 +969,36 @@ If ARGUMENT is not valid for a switch, raise a conversion error."
 (defmethod retrieve-from-plus-call ((switch switch))
   "Retrieve SWITCH's value from a plus call in CMDLINE."
   nil)
+
+
+;; -------------------
+;; Conversion protocol
+;; -------------------
+
+(defmethod check-value ((switch switch) value)
+  "Return VALUE.
+All values are valid for switches: everything but nil means 'yes'."
+  value)
+
+(defmethod convert ((switch switch) argument)
+  "Convert ARGUMENT to SWITCH's value.
+If ARGUMENT is not valid for a switch, raise a conversion error."
+  (declare (type string argument))
+  (cond ((member argument (yes-values switch) :test #'string=)
+	 t)
+	((member argument (no-values switch) :test #'string=)
+	 nil)
+	(t
+	 (error 'invalid-argument
+		:option switch
+		:argument argument
+		:comment
+		(concatenate 'string
+		  "Valid arguments are: "
+		  (reduce (lambda (str1 str2)
+			    (concatenate 'string str1 ", " str2))
+			  (append (yes-values switch) (no-values switch)))
+		  ".")))))
 
 
 ;; ============================================================================
@@ -948,23 +1032,48 @@ This class implements options the values of which are strings."))
 		    &key short-name long-name description
 			 argument-name argument-type
 			 default-value env-var)
-  "Make a new string option."
+  "Make a new string option.
+- SHORT-NAME is the option's short name (without the dash).
+  It defaults to nil.
+- LONG-NAME is the option's long name (without the double-dash).
+  It defaults to nil.
+- DESCRIPTION is the option's description appearing in help strings.
+  It defaults to nil.
+- ARGUMENT-NAME is the option's argument name appearing in help strings.
+- ARGUMENT-TYPE is one of :required, :mandatory or :optional (:required and
+  :mandatory are synonyms).
+  It defaults to :optional.
+- DEFAULT-VALUE is the option's default value.
+  It defaults to nil.
+- ENV-VAR is the option's associated environment variable.
+  It defaults to nil."
   (declare (ignore short-name long-name description
 		   argument-name argument-type
 		   default-value env-var))
-  (apply 'make-instance 'stropt keys))
+  (apply #'make-instance 'stropt keys))
 
 (defun make-internal-stropt (long-name description
 			     &rest keys
 			     &key argument-name argument-type
 				  default-value env-var)
-  "Make a new built-in string option."
+  "Make a new internal (Clon-specific) string option.
+- LONG-NAME is the option's long-name, minus the 'clon-' prefix.
+  (Internal options don't have short names.)
+- DESCRIPTION is the options's description.
+- ARGUMENT-NAME is the option's argument name appearing in help strings.
+- ARGUMENT-TYPE is one of :required, :mandatory or :optional (:required and
+  :mandatory are synonyms).
+  It defaults to :optional.
+- DEFAULT-VALUE is the option's default value.
+  It defaults to nil.
+- ENV-VAR is the option's associated environment variable, minus the 'CLON_'
+  prefix. It defaults to nil."
   (declare (ignore argument-name argument-type default-value))
   (when env-var
     ;; #### NOTE: this works because the default-initargs option for env-var
     ;; is actually nil, so I don't risk missing a concatenation later.
     (setq env-var (concatenate 'string "CLON_" env-var)))
-  (apply 'make-instance 'stropt
+  (apply #'make-instance 'stropt
 	 :long-name (concatenate 'string "clon-" long-name)
 	 :description description
 	 :env-var env-var
@@ -988,6 +1097,7 @@ This class implements options the values of which are strings."))
 
 (defmethod convert ((stropt stropt) argument)
   "Return ARGUMENT."
+  (declare (type string argument))
   argument)
 
 
