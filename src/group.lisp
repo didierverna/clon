@@ -63,15 +63,14 @@ implementing hierarchical program command-line."))
 ;; ============================================================================
 
 (defmacro define-group (group &body body)
-  "Evaluate BODY with GROUP bound to a new group, then seal and return it.
-GROUP is automatically sealed after BODY is evaluated."
+  "Evaluate BODY with GROUP bound to a new group, seal and return it."
   `(let ((,group (make-group)))
     ,@body
     (seal ,group)
     ,group))
 
 (defmacro declare-group (&body forms)
-  "Define a new group adding FORMS to it, then seal and return it.
+  "Define a new group, add FORMS to it, seal and return it.
 FORMS should be a list of shortcut expressions matching calls to make-group,
 make-text, or make-<option>, only with the 'make-' prefix omitted. Each
 resulting group, text or option created will be automatically added to the group."

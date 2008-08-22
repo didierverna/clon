@@ -42,8 +42,8 @@
 (defclass synopsis (container)
   ((postfix :documentation "A postfix to the program synopsis."
 	    :type string
-	    :reader postfix
-	    :initarg :postfix)
+	    :initarg :postfix
+	    :reader postfix)
    (minus-pack :documentation "The minus pack string."
 	       :type (or null string)
 	       :reader minus-pack)
@@ -58,8 +58,8 @@
 
 (defun make-synopsis (&rest keys &key postfix)
   "Make a new SYNOPSIS.
-POSTFIX is a string to append to the program synopsis.
-It defaults to the empty string."
+- POSTFIX is a string to append to the program synopsis.
+  It defaults to the empty string."
   (declare (ignore postfix))
   (apply #'make-instance 'synopsis keys))
 
@@ -72,7 +72,7 @@ It defaults to the empty string."
 ;; Currently, only -- or the POSIXLY_CORRECT env var can allow that. if we
 ;; provide an option to force a POSIXLY_CORRECT behavior, for instance, we
 ;; will have a problem in the cmdline parsing process, as it would take the
-;; first non-option arguement as a potential argument to the previous option.
+;; first non-option argument as a potential argument to the previous option.
 ;; This shows that we have to do more than just syntax parsing at context
 ;; creation time.
 
@@ -125,7 +125,7 @@ otherwise."
   (call-next-method))
 
 (defmethod seal :after ((synopsis synopsis))
-  "Compute the minus and plus packs of SYNOPSIS."
+  "Compute the SYNOSPSIS' minus and plus packs."
   (let (potential-pack minus-pack plus-pack)
     (do-options (option synopsis)
       (let ((potential-pack-char (potential-pack-char option :as-string))
@@ -148,12 +148,13 @@ otherwise."
 ;; ============================================================================
 
 (defgeneric potential-pack-p (pack there)
-  (:documentation "Return t if PACK (a string) is a potential pack in THERE.")
+  (:documentation "Return t if PACK is a potential pack in THERE.")
   (:method (pack (synopsis synopsis))
-    "Return t if PACK (a string) is a potential pack for SYNOPSIS."
+    "Return t if PACK is a potential pack for SYNOPSIS."
     ;; #### NOTE: if there's no potential pack in SYNOPSIS, the call to
     ;; STRING-LEFT-TRIM gets a nil CHAR-BAG which is ok and gives the expected
     ;; result.
+    (declare (type string pack))
     (zerop (length (string-left-trim (potential-pack synopsis) pack)))))
 
 
@@ -162,9 +163,8 @@ otherwise."
 ;; ============================================================================
 
 (defmacro define-synopsis (synopsis (&rest keys) &body body)
-  "Evaluate BODY with SYNOPSIS bound to a new synopsis, and return it.
-KEYS are passed to `make-synopsis'.
-SYNOPSIS is automatically sealed after BODY is evaluated."
+  "Evaluate BODY with SYNOPSIS bound to a new synopsis, seal and return it.
+KEYS are passed to `make-synopsis'."
   (push 'make-synopsis keys)
   `(let ((,synopsis ,keys))
     ,@body
@@ -173,14 +173,16 @@ SYNOPSIS is automatically sealed after BODY is evaluated."
 
 ;; #### FIXME: do the macrolet stuff below automatically for all subclasses of
 ;; valued-option.
-(defmacro declare-synopsis ((&rest keys) &body body)
-  "Create a new synopsis, evaluate BODY and return the synopsis.
-The result of every form in BODY is automatically added to the synopsis.
-The synopsis is automatically sealed after BODY is avaluated."
+(defmacro declare-synopsis ((&rest keys) &body forms)
+  "Define a new synopsis, add FORMS to it, seal and return it.
+FORMS should be a list of shortcut expressions matching calls to make-group,
+make-text, or make-<option>, only with the 'make-' prefix omitted. Each
+resulting group, text or option created will be automatically added to the
+synopsis."
   (let* ((synopsis (gensym "synopsis"))
-	 (body (mapcar (lambda (form)
+	 (forms (mapcar (lambda (form)
 			 (list (intern "ADD-TO" 'clon) synopsis form))
-		       body))
+		       forms))
 	 (text (intern "TEXT"))
 	 (flag (intern "FLAG"))
 	 (switch (intern "SWITCH"))
@@ -192,7 +194,7 @@ The synopsis is automatically sealed after BODY is avaluated."
 		(,stropt (&rest args) `(make-stropt ,@args))
 		(,group (&rest args) `(declare-group ,@args)))
       (define-synopsis ,synopsis ,keys
-	,@body))))
+	,@forms))))
 
 
 ;;; synopsis.lisp ends here
