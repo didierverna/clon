@@ -63,21 +63,22 @@ implementing hierarchical program command-line."))
 ;; ============================================================================
 
 (defmacro define-group (group &body body)
-  "Evaluate BODY with GROUP bound to a new group, and return it.
+  "Evaluate BODY with GROUP bound to a new group, then seal and return it.
 GROUP is automatically sealed after BODY is evaluated."
   `(let ((,group (make-group)))
     ,@body
     (seal ,group)
     ,group))
 
-(defmacro declare-group (&body body)
-  "Create a new group, evaluate BODY and return the group.
-The result of every form in BODY is automatically added to the group.
-The group is automatically sealed after BODY is avaluated."
+(defmacro declare-group (&body forms)
+  "Define a new group adding FORMS to it, then seal and return it.
+FORMS should be a list of shortcut expressions matching calls to make-group,
+make-text, or make-<option>, only with the 'make-' prefix omitted. Each
+resulting group, text or option created will be automatically added to the group."
   (let* ((grp (gensym "grp"))
-	 (body (mapcar (lambda (form)
-			 (list (intern "ADD-TO" 'clon) grp form))
-		       body))
+	 (forms (mapcar (lambda (form)
+			  (list (intern "ADD-TO" 'clon) grp form))
+			forms))
 	 (group (intern "GROUP"))
 	 (text (intern "TEXT"))
 	 (flag (intern "FLAG"))
@@ -97,7 +98,7 @@ The group is automatically sealed after BODY is avaluated."
 		(,stropt (&rest args) `(make-stropt ,@args))
 		#|,@option-macros|#)
       (define-group ,grp
-	,@body))))
+	,@forms))))
 
 
 ;;; group.lisp ends here

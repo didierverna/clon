@@ -39,16 +39,19 @@
 ;; ============================================================================
 
 (defclass text ()
-  ((string :documentation "The actual text string"
+  ((string :documentation "The actual text string."
 	   :type string
-	   :reader text-string
-	   :initarg :string))
+	   :initarg :string
+	   :reader text-string))
   (:documentation "The TEXT class.
 Program help can contain plain text as well as options or groups."))
 
 
 ;; #### FIXME: does it make sense to accept empty strings ?
 (defun make-text (&key (string ""))
+  "Make a new text.
+- STRING is the actual text to display.
+  It defaults to the empty string."
   (make-instance 'text :string string))
 
 
