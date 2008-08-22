@@ -286,7 +286,6 @@ CONTEXT is where to look for the options."
 
 (defmethod potential-pack-p (pack (context context))
   "Return t if PACK (a string) is a potential pack in CONTEXT."
-  (declare (type string pack))
   (potential-pack-p pack (synopsis context)))
 
 
@@ -304,7 +303,6 @@ The search is actually done in the CONTEXT'synopsis."
 (defmethod search-sticky-option ((context context) namearg)
   "Search for a sticky option in CONTEXT.
 The search is actually done in the CONTEXT'synopsis."
-  (declare (type string namearg))
   (search-sticky-option (synopsis context) namearg))
 
 

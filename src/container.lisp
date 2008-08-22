@@ -241,7 +241,6 @@ When such an option exists, return two values:
 - the argument part of NAMEARG.")
   (:method ((container container) namearg)
     "Search for a sticky option in CONTAINER matching NAMEARG."
-    (declare (type string namearg))
     (do-options (option container)
       (let ((argument (option-matches-sticky option namearg)))
 	(when argument

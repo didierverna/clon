@@ -154,7 +154,6 @@ otherwise."
     ;; #### NOTE: if there's no potential pack in SYNOPSIS, the call to
     ;; STRING-LEFT-TRIM gets a nil CHAR-BAG which is ok and gives the expected
     ;; result.
-    (declare (type string pack))
     (zerop (length (string-left-trim (potential-pack synopsis) pack)))))
 
 

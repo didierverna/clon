@@ -46,13 +46,11 @@
 
 (defun option-call-p (str)
   "Return true if STR looks like an option call."
-  (declare (type string str))
   (or (eq (elt str 0) #\-)
       (eq (elt str 0) #\+)))
 
 (defun argument-popable-p (cmdline)
   "Return true if the first CMDLINE item is an argument."
-  (declare (type list cmdline))
   (and (car cmdline)
        (not (option-call-p (car cmdline)))))
 
@@ -179,7 +177,6 @@ If so, mark it as traversed."
 (defun complete-string (start full)
   "Complete START with the rest of FULL in parentheses.
 For instance, completing 'he' with 'help' will produce 'he(lp)'."
-  (declare (type string start full))
   (assert (string-start full start))
   (assert (not (string= full start)))
   (concatenate 'string start "(" (subseq full (length start)) ")"))
@@ -189,7 +186,6 @@ For instance, completing 'he' with 'help' will produce 'he(lp)'."
 PARTIAL-NAME is a possible long name abbreviation.
 If so, return the name that matched, possibly completed in case of a
 PARTIAL-NAME match."
-  (declare (type option option))
   (cond (short-name
 	 (when (string= short-name (short-name option))
 	   short-name))
@@ -220,7 +216,6 @@ If so, return the argument part of NAMEARG."))
 (defun potential-pack-char (option &optional as-string)
   "Return OPTION's potential pack character, if any.
 If AS-STRING, return a string of that character."
-  (declare (type option option))
   (with-slots (short-name) option
     (when (and short-name (= (length short-name) 1))
       (if as-string
@@ -363,7 +358,6 @@ This class implements options that don't take any argument."))
 - DESCRIPTION is the flag's description.
 - ENV-VAR is the flag's associated environment variable, minus the 'CLON_'
   prefix. It defaults to nil."
-  (declare (type string long-name description))
   (assert (not (or (zerop (length long-name))
 		   (zerop (length description)))))
   (when env-var
@@ -554,7 +548,6 @@ ARGUMENT-REQUIRED-P slot."
 
 (defmethod option-matches-sticky ((option valued-option) namearg)
   "Check whether NAMEARG matches OPTION's short name with a sticky argument."
-  (declare (type string namearg))
   (with-slots (short-name) option
     (when (and short-name (string-start namearg short-name))
       ;; This case should not happen because we always look for a complete
@@ -607,7 +600,6 @@ If VALUE is valid, return it. Otherwise, raise an invalid-value error."))
   "Restartably check that VALUE is valid for VALUED-OPTION.
 The only restart available, use-value, offers to try a different value from
 the one that was provided."
-  (declare (type valued-option valued-option))
   (restart-case (check-value valued-option value)
     (use-value (value)
       :report "Use another value instead."
@@ -647,8 +639,6 @@ Available restarts are:
 - use-default-value: return OPTION's default value,
 - use-value: return another (already converted) value,
 - use-argument: return the conversion of another argument."
-  (declare (type valued-option valued-option)
-	   (type string argument))
   (restart-case (convert valued-option argument)
     (use-default-value ()
       :report (lambda (stream)
@@ -688,8 +678,6 @@ Available restarts are:
 This function is used when the conversion comes from a command-line usage of
 VALUED-OPTION, called by CMDLINE-NAME, and intercepts invalid-argument errors
 to raise the higher level invalid-cmdline-argument error instead."
-  (declare (type valued-option valued-option)
-	   (type string cmdline-name cmdline-argument))
   (handler-case (restartable-convert valued-option cmdline-argument)
     (invalid-argument (error)
       (error 'invalid-cmdline-argument
@@ -722,9 +710,6 @@ Available restarts are:
 - use-default-value: return VALUED-OPTION's default value,
 - use-value: return another (already converted) value,
 - use-argument: return the conversion of another argument."
-  (declare (type valued-option valued-option)
-	   (type string cmdline-name)
-	   (type (or null string) cmdline-argument))
   (restart-case
       (cond ((argument-required-p valued-option)
 	     (if cmdline-argument
@@ -757,7 +742,6 @@ Available restarts are:
 (defmethod retrieve-from-long-call
     ((option valued-option) cmdline-name &optional cmdline-argument cmdline)
   "Retrieve OPTION's value from a long call."
-  (declare (type string cmdline-name))
   (maybe-pop-argument cmdline option cmdline-argument)
   (values (restartable-cmdline-convert option cmdline-name cmdline-argument)
 	  cmdline))
@@ -922,7 +906,6 @@ This class implements boolean options."))
 (defmethod option-matches-sticky ((switch switch) namearg)
   "Return nil (switches don't accept sticky arguments)."
   ;; #### NOTE: see related comment in the FLAG method.
-  (declare (type string namearg))
   nil)
 
 
@@ -951,7 +934,6 @@ This class implements boolean options."))
   "Retrieve SWITCH's value from a long call."
   ;; The difference with other valued options is that an omitted optional
   ;; argument stands for a "yes". Otherwise, it's pretty similar.
-  (declare (type string cmdline-name))
   (maybe-pop-argument cmdline switch cmdline-argument)
   (values (restartable-cmdline-convert switch cmdline-name cmdline-argument t)
 	  cmdline))
@@ -982,7 +964,6 @@ All values are valid for switches: everything but nil means 'yes'."
 (defmethod convert ((switch switch) argument)
   "Convert ARGUMENT to SWITCH's value.
 If ARGUMENT is not valid for a switch, raise a conversion error."
-  (declare (type string argument))
   (cond ((member argument (yes-values switch) :test #'string=)
 	 t)
 	((member argument (no-values switch) :test #'string=)
@@ -1096,7 +1077,6 @@ This class implements options the values of which are strings."))
 
 (defmethod convert ((stropt stropt) argument)
   "Return ARGUMENT."
-  (declare (type string argument))
   argument)
 
 
