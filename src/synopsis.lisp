@@ -80,7 +80,7 @@
   "Seal SYNOPSIS."
   ;; Add the Clon internal options group
   (let ((grp (make-group)))
-    (add-to grp (make-text :string "Clon specific options:"))
+    (add-to grp (make-text :contents "Clon specific options:"))
     (add-to grp (make-internal-flag "help" "Display Clon-specific help."))
     (add-to grp (make-internal-stropt "version" "Display Clon's version number.
 WHICH can be `number', `short' or `long'."
@@ -89,7 +89,7 @@ WHICH can be `number', `short' or `long'."
 		  :default-value "long"
 		  :env-var "VERSION_FORMAT"))
     (let ((subgrp (make-group)))
-      (add-to subgrp (make-text :string "Clon output:"))
+      (add-to subgrp (make-text :contents "Clon output:"))
       (add-to subgrp (make-internal-stropt "search-path" "Set Clon's search path.
 If you don't want any search path at all, use this option with no argument."
 		       :argument-name "PATH"

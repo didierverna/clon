@@ -39,20 +39,20 @@
 ;; ============================================================================
 
 (defclass text ()
-  ((string :documentation "The actual text string."
-	   :type string
-	   :initarg :string
-	   :reader text-string))
+  ((contents :documentation "The actual text string."
+	     :type string
+	     :initarg :contents
+	     :reader contents))
   (:documentation "The TEXT class.
 This class implements plain text objects appearing in a synopsis."))
 
 
 ;; #### FIXME: does it make sense to accept empty strings ?
-(defun make-text (&key (string ""))
+(defun make-text (&key (contents ""))
   "Make a new text.
-- STRING is the actual text to display.
+- CONTENTS is the actual text to display.
   It defaults to the empty string."
-  (make-instance 'text :string string))
+  (make-instance 'text :contents contents))
 
 
 ;;; text.lisp ends here

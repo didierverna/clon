@@ -38,14 +38,14 @@
 ;; Create and fill the program synopsis:
 (defvar *synopsis*
   (clon:declare-synopsis (:postfix "FILES...")
-    (text :string "Demonstration of Clon.")
+    (text :contents "Demonstration of Clon.")
     (group
-     (text :string "Flags:")
+     (text :contents "Flags:")
      (flag :short-name "h" :long-name "help" :description "both names.")
      (flag :short-name "v" :description "short name.")
      (flag :long-name "version" :description "long name."))
     (group
-     (text :string "Switches:")
+     (text :contents "Switches:")
      (switch :short-name "d" :long-name "debug"
 	     :description "both names, optional argument yes/no (the default)"
 	     :env-var "DEBUG")
@@ -79,7 +79,7 @@
 	     :argument-type :optional))
     (group
      (group
-      (text :string "This is a demo of the group imbrication feature."))))
+      (text :contents "This is a demo of the group imbrication feature."))))
   "This program's synopsis .")
 
 (defun main ()
