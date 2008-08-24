@@ -222,7 +222,7 @@ When such an option exists, return wo values:
     (declare (ignore short-name long-name partial-name))
     (do-options (option container)
       (let ((name
-	     (apply #'option-matches option
+	     (apply #'match-option option
 		    (select-keys keys :short-name :long-name :partial-name))))
 	(when name
 	  (return-from search-option (values option name)))))))
@@ -240,7 +240,7 @@ When such an option exists, return two values:
   (:method ((container container) namearg)
     "Search for a sticky option in CONTAINER matching NAMEARG."
     (do-options (option container)
-      (let ((argument (option-matches-sticky option namearg)))
+      (let ((argument (match-sticky-option option namearg)))
 	(when argument
 	  (return-from search-sticky-option (values option argument)))))))
 

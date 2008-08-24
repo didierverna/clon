@@ -181,11 +181,11 @@ For instance, completing 'he' with 'help' will produce 'he(lp)'."
   (assert (not (string= beginning complete)))
   (concatenate 'string beginning "(" (subseq complete (length beginning)) ")"))
 
-(defun option-matches (option &key short-name long-name partial-name)
-  "Check whether OPTION matches either SHORT-NAME, LONG-NAME or PARTIAL-NAME.
+(defun match-option (option &key short-name long-name partial-name)
+  "Try to match OPTION against SHORT-NAME, LONG-NAME or PARTIAL-NAME.
 PARTIAL-NAME is a possible long name abbreviation.
-If so, return the name that matched, possibly completed in case of a
-PARTIAL-NAME match."
+If OPTION matches, return the name that matched, possibly completed in case of
+a match by PARTIAL-NAME."
   (cond (short-name
 	 (when (string= short-name (short-name option))
 	   short-name))
@@ -196,10 +196,10 @@ PARTIAL-NAME match."
 	 (when (beginning-of-string-p partial-name (long-name option))
 	   (complete-string partial-name (long-name option))))))
 
-(defgeneric option-matches-sticky (option namearg)
+(defgeneric match-sticky-option (option namearg)
   (:documentation
-   "Check whether NAMEARG matches OPTION's short-name with a sticky argument.
-If so, return the argument part of NAMEARG."))
+   "Try to match OPTION's short name with a sticky argument against NAMEARG.
+If option matches, return the argument part of NAMEARG."))
 
 
 ;; ============================================================================
@@ -383,7 +383,7 @@ This class implements options that don't take any argument."))
 ;; Option searching protocol
 ;; -------------------------
 
-(defmethod option-matches-sticky ((flag flag) namearg)
+(defmethod match-sticky-option ((flag flag) namearg)
   "Return nil (flags don't take any argument, sticky or not)."
   ;; #### NOTE: there is something a bit shaky here: this function is called
   ;; during cmdline parsing (so this is really a lexico-syntactic analysis
@@ -427,7 +427,7 @@ This class implements options that don't take any argument."))
 (defmethod retrieve-from-short-call
     ((flag flag) &optional cmdline-argument cmdline)
   "Retrieve FLAG's value from a short call."
-  ;; See comment about this assertion in option-matches-sticky.
+  ;; See comment about this assertion in match-sticky-option.
   (assert (null cmdline-argument))
   (values t cmdline))
 
@@ -546,8 +546,8 @@ ARGUMENT-REQUIRED-P slot."
 ;; Option searching protocol
 ;; -------------------------
 
-(defmethod option-matches-sticky ((option valued-option) namearg)
-  "Check whether NAMEARG matches OPTION's short name with a sticky argument."
+(defmethod match-sticky-option ((option valued-option) namearg)
+  "Try to match OPTION's short name with a sticky argument against NAMEARG."
   (with-slots (short-name) option
     (when (and short-name (beginning-of-string-p short-name namearg))
       ;; This case should not happen because we always look for a complete
@@ -903,7 +903,7 @@ This class implements boolean options."))
 ;; Option searching protocol
 ;; -------------------------
 
-(defmethod option-matches-sticky ((switch switch) namearg)
+(defmethod match-sticky-option ((switch switch) namearg)
   "Return nil (switches don't accept sticky arguments)."
   ;; #### NOTE: see related comment in the FLAG method.
   nil)
