@@ -123,14 +123,14 @@ This is the base class for all options."))
     (error "Option ~A: short and long names identical." option))
   ;; Short names can't begin with a dash because that would conflict with
   ;; the long name syntax.
-  (when (and short-name (string-start short-name "-"))
+  (when (and short-name (beginning-of-string-p "-" short-name))
     (error "Option ~A: short name begins with a dash." option))
   ;; Clon uses only long names, not short ones. But it's preferable to
   ;; reserve the prefix in both cases.
   (unless (cadr (member :internal keys))
     (dolist (name (list short-name long-name))
       (when (and name (or (string= name "clon")
-			  (string-start name "clon-")))
+			  (beginning-of-string-p "clon-" name)))
 	(error "Option ~A: name ~S reserved by Clon." option name)))))
 
 
@@ -174,12 +174,12 @@ If so, mark it as traversed."
 ;; When long names are abbreviated (for instance --he instead of --help), we
 ;; register the command-line name like this: he(lp). In case of error report,
 ;; this will help the user spot where he did something wrong.
-(defun complete-string (start full)
-  "Complete START with the rest of FULL in parentheses.
+(defun complete-string (beginning complete)
+  "Complete BEGINNING with the rest of COMPLETE in parentheses.
 For instance, completing 'he' with 'help' will produce 'he(lp)'."
-  (assert (string-start full start))
-  (assert (not (string= full start)))
-  (concatenate 'string start "(" (subseq full (length start)) ")"))
+  (assert (beginning-of-string-p beginning complete))
+  (assert (not (string= beginning complete)))
+  (concatenate 'string beginning "(" (subseq complete (length beginning)) ")"))
 
 (defun option-matches (option &key short-name long-name partial-name)
   "Check whether OPTION matches either SHORT-NAME, LONG-NAME or PARTIAL-NAME.
@@ -193,7 +193,7 @@ PARTIAL-NAME match."
 	 (when (string= long-name (long-name option))
 	   long-name))
 	(partial-name
-	 (when (string-start (long-name option) partial-name)
+	 (when (beginning-of-string-p partial-name (long-name option))
 	   (complete-string partial-name (long-name option))))))
 
 (defgeneric option-matches-sticky (option namearg)
@@ -549,7 +549,7 @@ ARGUMENT-REQUIRED-P slot."
 (defmethod option-matches-sticky ((option valued-option) namearg)
   "Check whether NAMEARG matches OPTION's short name with a sticky argument."
   (with-slots (short-name) option
-    (when (and short-name (string-start namearg short-name))
+    (when (and short-name (beginning-of-string-p short-name namearg))
       ;; This case should not happen because we always look for a complete
       ;; match before looking for a sticky match.
       (assert (not (string= namearg short-name)))

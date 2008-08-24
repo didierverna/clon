@@ -177,7 +177,7 @@ CONTEXT is where to look for the options."
 		 ;; The Clon separator.
 		 (setq remainder cmdline)
 		 (setq cmdline nil))
-		((string-start arg "--")
+		((beginning-of-string-p "--" arg)
 		 ;; A long call.
 		 (let* ((value-start (position #\= arg :start 2))
 			(cmdline-name (subseq arg 2 value-start))
@@ -195,7 +195,7 @@ CONTEXT is where to look for the options."
 					    :name cmdline-name
 					    :value cmdline-value))))
 		;; A short call, or a minus pack.
-		((string-start arg "-")
+		((beginning-of-string-p "-" arg)
 		 ;; #### FIXME: check invalid syntax -foo=val
 		 (let* ((cmdline-name (subseq arg 1))
 			(option (search-option context :short-name cmdline-name))
@@ -227,7 +227,7 @@ CONTEXT is where to look for the options."
 			  (push-unknown-option unknown-options
 					       :name cmdline-name)))))
 		;; A plus call or a plus pack.
-		((string-start arg "+")
+		((beginning-of-string-p "+" arg)
 		 ;; #### FIXME: check invalid syntax +foo=val
 		 (let* ((cmdline-name (subseq arg 1))
 			;; #### NOTE: in theory, we could allow partial

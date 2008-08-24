@@ -42,12 +42,11 @@
   "Like push, but at the end."
   `(setf ,place (nconc ,place (list ,object))))
 
-(defun string-start (string start)
-  "Check that STRING starts with START.
-This check also protects against too short strings."
-  (let ((length (length start)))
+(defun beginning-of-string-p (beginning string)
+  "Check that STRING starts with BEGINNING."
+  (let ((length (length beginning)))
     (and (>= (length string) length)
-	 (string= string start :end1 length))))
+	 (string= beginning string :end2 length))))
 
 #|(defmacro define-restart-function (symbol)
   `(defun ,symbol (c)
