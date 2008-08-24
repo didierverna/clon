@@ -90,9 +90,9 @@ If so, store it into CMDLINE-ARGUMENT."
 	    :type (or null string)
 	    :initarg :env-var
 	    :reader env-var)
-   (traversed :documentation "The option's traversal state."
-	      :initform nil
-	      :accessor option-traversed))
+   (traversedp :documentation "The option's traversal state."
+	       :initform nil
+	       :accessor traversedp))
   (:default-initargs
     :short-name nil
     :long-name nil
@@ -157,13 +157,13 @@ This is the base class for all options."))
 
 (defmethod untraverse ((option option))
   "Mark OPTION as untraversed."
-  (setf (option-traversed option) nil))
+  (setf (traversedp option) nil))
 
 (defmethod next-option ((option option))
   "Return OPTION if it is the next one in a traversal process.
 If so, mark it as traversed."
-  (unless (option-traversed option)
-    (setf (option-traversed option) t)
+  (unless (traversedp option)
+    (setf (traversedp option) t)
     option))
 
 

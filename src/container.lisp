@@ -58,9 +58,9 @@
    (sealedp :documentation "Whether the container is sealed."
 	    :initform nil
 	    :accessor sealedp)
-   (traversed :documentation "Whether the container has been traversed."
-	      :initform nil
-	      :accessor container-traversed))
+   (traversedp :documentation "The container's traversal state."
+	       :initform nil
+	       :accessor traversedp))
   (:documentation "The CONTAINER class.
 This class is a mixin used in synopsis and groups to represent the program's
 command-line hierarchy."))
@@ -165,7 +165,7 @@ command-line hierarchy."))
       (untraverse item)))
   (:method :after ((container container))
     "Mark CONTAINER as untraversed."
-    (setf (container-traversed container) nil)))
+    (setf (traversedp container) nil)))
 
 (defgeneric next-option (item)
   (:documentation "Return the next option in a traversal process.")
@@ -174,12 +174,12 @@ command-line hierarchy."))
     nil)
   (:method ((container container))
     "Try to find the next option in a traversal process in CONTAINER."
-    (unless (container-traversed container)
+    (unless (traversedp container)
       (dolist (item (container-items container))
 	(let ((opt (next-option item)))
 	  (when opt
 	    (return-from next-option opt))))
-      (setf (container-traversed container) t)
+      (setf (traversedp container) t)
       nil)))
 
 (defmacro do-options ((val container) &body body)
