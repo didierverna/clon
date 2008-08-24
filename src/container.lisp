@@ -34,19 +34,30 @@
 (in-package :clon)
 
 
+;; #### NOTE: I don't like putting this function here (before the CONTAINER
+;; class, outside the sealing protocol section), but this lets me specify
+;; directly the :accessor in the class below.
+(defgeneric sealedp (item)
+  (:documentation "Returns t if ITEM is sealed.")
+  ;; This function is supposed to work even on non-container items (options
+  ;; and strings) because of the add-to function below, hence the following
+  ;; non-specialized default method:
+  (:method (item)
+    "Return t (consider non-container ITEMs as sealed)."
+    t))
+
 ;; ============================================================================
 ;; The Container Class
 ;; ============================================================================
 
-;; #### FIXME: make mixin
 (defclass container ()
   ((items :documentation "The items in the container."
 	  :type list
 	  :initform nil
 	  :accessor container-items)
-   (sealed :documentation "Whether the container is sealed."
-	   :initform nil
-	   :accessor container-sealed)
+   (sealedp :documentation "Whether the container is sealed."
+	    :initform nil
+	    :accessor sealedp)
    (traversed :documentation "Whether the container has been traversed."
 	      :initform nil
 	      :accessor container-traversed))
@@ -59,20 +70,7 @@ command-line hierarchy."))
 ;; The Sealing Protocol
 ;; ============================================================================
 
-;; #### FIXME: see about making this directly the accessor
-(defgeneric sealedp (item)
-  (:documentation "Returns t if ITEM is sealed.")
-  ;; This function is supposed to work even on non-container items (options
-  ;; and strings) because of the add-to function below, hence the following
-  ;; non-specialized default method:
-  (:method (item)
-    "Return t (consider non-container ITEMs as sealed)."
-    t)
-  (:method ((container container))
-    "Return t if CONTAINER is sealed."
-    (container-sealed container)))
-
-;; On the contrary, this function is not supposed to work on non-container
+;; Contrary to SEALEDP, this function is not supposed to work on non-container
 ;; items, because sealing is manual (so you're supposed to know what you're
 ;; doing).
 (defgeneric seal (container)
@@ -84,7 +82,7 @@ command-line hierarchy."))
   ;; progn method combination type.
   (:method :before ((container container))
     "Ensure that CONTAINER is not already sealed."
-    (when (container-sealed container)
+    (when (sealedp container)
       (error "Sealing container ~A: already sealed." container)))
   (:method ((container container))
     "Ensure that there is no name clash within CONTAINER's options."
@@ -95,7 +93,7 @@ command-line hierarchy."))
     container)
   (:method :after ((container container))
     "Mark CONTAINER as sealed."
-    (setf (container-sealed container) t)))
+    (setf (sealedp container) t)))
 
 
 ;; ============================================================================
