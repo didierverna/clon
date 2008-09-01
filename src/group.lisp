@@ -63,17 +63,19 @@ implementing hierarchical program command-line."))
 ;; ============================================================================
 
 (defmacro define-group (group &body body)
-  "Evaluate BODY with GROUP bound to a new group, seal and return it."
+  "Evaluate BODY with GROUP bound to a new group, seal it and return it."
   `(let ((,group (make-group)))
     ,@body
     (seal ,group)
     ,group))
 
 (defmacro declare-group (&body forms)
-  "Define a new group, add FORMS to it, seal and return it.
+  "Define a new group, add FORMS to it, seal it and return it.
 FORMS should be a list of shortcut expressions matching calls to make-group,
-make-text, or make-<option>, only with the 'make-' prefix omitted. Each
-resulting group, text or option created will be automatically added to the group."
+make-text, or make-<option> (<option> being an option class, either a Clon
+built-in one, or one defined with DEFOPTION), only with the 'make-' prefix
+omitted. Each resulting group, text or option created will be automatically
+added to the group."
   (let* ((grp (gensym "grp"))
 	 (forms (mapcar (lambda (form)
 			  (list (intern "ADD-TO" 'clon) grp form))

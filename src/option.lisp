@@ -535,7 +535,7 @@ ARGUMENT-REQUIRED-P slot."
      (setf (slot-value option 'argument-required-p) nil))))
 
 (defmacro defoption (class superclasses slots &rest options)
-  "Wrapper around defclass for defining a new Clon option class."
+  "Wrapper around defclass for defining a new Clon valued option class."
   `(progn
     (push (symbol-name ',class) (option-names (find-class 'valued-option)))
     (defclass ,class ,(cons 'valued-option superclasses) ,slots

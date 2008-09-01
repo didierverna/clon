@@ -162,7 +162,7 @@ otherwise."
 ;; ============================================================================
 
 (defmacro define-synopsis (synopsis (&rest keys) &body body)
-  "Evaluate BODY with SYNOPSIS bound to a new synopsis, seal and return it.
+  "Evaluate BODY with SYNOPSIS bound to a new synopsis, seal it and return it.
 KEYS are passed to `make-synopsis'."
   (push 'make-synopsis keys)
   `(let ((,synopsis ,keys))
@@ -173,7 +173,7 @@ KEYS are passed to `make-synopsis'."
 ;; #### FIXME: do the macrolet stuff below automatically for all subclasses of
 ;; valued-option.
 (defmacro declare-synopsis ((&rest keys) &body forms)
-  "Define a new synopsis, add FORMS to it, seal and return it.
+  "Define a new synopsis, add FORMS to it, seal it and return it.
 FORMS should be a list of shortcut expressions matching calls to make-group,
 make-text, or make-<option>, only with the 'make-' prefix omitted. Each
 resulting group, text or option created will be automatically added to the
