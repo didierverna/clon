@@ -170,8 +170,6 @@ KEYS are passed to `make-synopsis'."
     (seal ,synopsis)
     ,synopsis))
 
-;; #### FIXME: do the macrolet stuff below automatically for all subclasses of
-;; valued-option.
 (defmacro declare-synopsis ((&rest keys) &body forms)
   "Define a new synopsis, add FORMS to it, seal it and return it.
 FORMS should be a list of shortcut expressions matching calls to make-group,
@@ -182,16 +180,19 @@ synopsis."
 	 (forms (mapcar (lambda (form)
 			 (list (intern "ADD-TO" 'clon) synopsis form))
 		       forms))
+	 (group (intern "GROUP"))
 	 (text (intern "TEXT"))
-	 (flag (intern "FLAG"))
-	 (switch (intern "SWITCH"))
-	 (stropt (intern "STROPT"))
-	 (group (intern "GROUP")))
-    `(macrolet ((,text (&rest args) `(make-text ,@args))
+	 (flag (intern "FLAG")))
+    `(macrolet ((,group (&rest args) `(declare-group ,@args))
+		(,text (&rest args) `(make-text ,@args))
 		(,flag (&rest args) `(make-flag ,@args))
-		(,switch (&rest args) `(make-switch ,@args))
-		(,stropt (&rest args) `(make-stropt ,@args))
-		(,group (&rest args) `(declare-group ,@args)))
+		,@(mapcar
+		   (lambda (name)
+		     (let ((macro-name (intern name))
+			   (make-name (intern (concatenate 'string "MAKE-" name)
+					      'clon)))
+		       `(,macro-name (&rest args) `(,',make-name ,@args))))
+		   (option-names (find-class 'valued-option))))
       (define-synopsis ,synopsis ,keys
 	,@forms))))
 

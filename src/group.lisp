@@ -77,27 +77,23 @@ built-in one, or one defined with DEFOPTION), only with the 'make-' prefix
 omitted. Each resulting group, text or option created will be automatically
 added to the group."
   (let* ((grp (gensym "grp"))
-	 (forms (mapcar (lambda (form)
-			  (list (intern "ADD-TO" 'clon) grp form))
-			forms))
+	 (forms (mapcar
+		 (lambda (form)
+		   (list (intern "ADD-TO" 'clon) grp form))
+		 forms))
 	 (group (intern "GROUP"))
 	 (text (intern "TEXT"))
-	 (flag (intern "FLAG"))
-	 (switch (intern "SWITCH"))
-	 (stropt (intern "STROPT"))
-	 #|(option-macros
-	  (mapcar
-	   (lambda (name)
-	     (let ((macro-name (intern name))
-		   (make-name (intern (concatenate 'string "MAKE-" name) 'clon)))
-	       `(,macro-name (&rest args) `(,make-name ,@args))))
-	   (option-names (find-class 'valued-option))))|#)
+	 (flag (intern "FLAG")))
     `(macrolet ((,group (&rest args) `(declare-group ,@args))
 		(,text (&rest args) `(make-text ,@args))
 		(,flag (&rest args) `(make-flag ,@args))
-		(,switch (&rest args) `(make-switch ,@args))
-		(,stropt (&rest args) `(make-stropt ,@args))
-		#|,@option-macros|#)
+		,@(mapcar
+		   (lambda (name)
+		     (let ((macro-name (intern name))
+			   (make-name (intern (concatenate 'string "MAKE-" name)
+					      'clon)))
+		       `(,macro-name (&rest args) `(,',make-name ,@args))))
+		   (option-names (find-class 'valued-option))))
       (define-group ,grp
 	,@forms))))
 
