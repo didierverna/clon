@@ -408,7 +408,7 @@ This function returns two values:
 		     ;; #### FIXME: SBCL-specific
 		     (sb-ext:quit :unix-status 1)))
 	       (:none
-		;; #### FIXME: we have no restart here!
+		;; #### FIXME: we have no restarts here!
 		(error cmdline-item)))))
 	(cmdline-error
 	 (push cmdline-item cmdline-items))))
@@ -475,44 +475,6 @@ command-line) and retrieved value."
       (multiple-value-getopt-cmdline (,option ,name ,value)
 	  ,multiple-value-getopt-cmdline-2nd-arg
 	,@body))))
-
-
-;; ============================================================================
-;; The Unknown Option Protocol
-;; ============================================================================
-
-;; #### FIXME: this is shaky. I'm wondering if it wouldn't be better to
-;; harmonize all the different cmdline problems into a single scheme.
-;; Currenty, command-ilne options can trigger errors (syntax, conversion
-;; etc.). Maybe we should consider including junk and unknown options as
-;; errors as well.
-
-(defun getopt-unknown (context)
-  "Get the next unknown option in CONTEXT.
-This function returns two values:
-- the option's name used on the command-line,
-- possibly a provided argument."
-  (let ((unknown-option (pop (unknown-options context))))
-    (when unknown-option
-      (values (unknown-option-name unknown-option)
-	      (unknown-option-value unknown-option)))))
-
-(defmacro multiple-value-getopt-unknown
-    ((name value) context &body body)
-  "Evaluate BODY on the next unknown option.
-NAME and VALUE are bound to the option's name used on the command-line, and
-possibly a provided value."
-  `(multiple-value-bind (,name ,value)
-    (getopt-unknown ,context)
-    ,@body))
-
-(defmacro do-unknown-options ((name value) context &body body)
-  "Evaluate BODY over all unknown options from CONTEXT.
-NAME and VALUE are bound to each option's name used on the command-line, and
-possibly a provided value."
-  `(do () ((null (unknown-options ,context)))
-    (multiple-value-getopt-unknown (,name ,value) ,context
-     ,@body)))
 
 
 ;;; context.lisp ends here
