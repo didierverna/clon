@@ -42,7 +42,6 @@
   name ;; the option's name as used on the cmdline
   option ;; the corresponding option object
   value ;; the converted option's cmdline value
-  status ;; the conversion status
   )
 
 (defstruct unknown-option
@@ -158,8 +157,7 @@ options based on it."))
 			 (push-cmdline-option ,place
 			   :name ,name-form
 			   :option ,option
-			   :value ,value
-			   :status nil))
+			   :value ,value))
 		       (register (error)
 			(push error ,place)))))
 	       (do-pack ((option pack context) &body body)
@@ -341,9 +339,8 @@ an OPTION object.
 ERROR-HANDLER is the behavior to adopt when a command-line error has been
 registered for this option. Its default value depends on the CONTEXT. See
 `make-context' for a list of possible values.
-This function returns three values:
+This function returns two values:
 - the retrieved value,
-- the retrieval status,
 - the value's source."
   (unless option
     (setq option
@@ -367,9 +364,6 @@ This function returns three values:
 		      (nreconc cmdline-options (cmdline-options context)))
 		(return-from getopt
 		  (values (cmdline-option-value cmdline-option)
-			  (or (eq (cmdline-option-status cmdline-option) t)
-			      (list* (cmdline-option-option cmdline-option)
-				     (cmdline-option-status cmdline-option)))
 			  (list :cmdline (cmdline-option-name cmdline-option)))))
 	       (t
 		(push cmdline-option cmdline-options))))
@@ -393,19 +387,17 @@ This function returns three values:
 ERROR-HANDLER is the behavior to adopt when a command-line error has been
 registered for this option. Its default value depends on the CONTEXT. See
 `make-context' for a list of possible values.
-This function returns four values:
+This function returns three values:
 - the option object,
 - the option's name used on the command line,
-- the retrieved value,
-- the retrieval status."
+- the retrieved value."
   (let ((cmdline-option (pop (cmdline-options context))))
     (when cmdline-option
       (etypecase cmdline-option
 	(cmdline-option
 	 (values (cmdline-option-option cmdline-option)
 		 (cmdline-option-name cmdline-option)
-		 (cmdline-option-value cmdline-option)
-		 (cmdline-option-status cmdline-option)))
+		 (cmdline-option-value cmdline-option)))
 	(cmdline-option-error
 	 (ecase error-handler
 	   (:quit
@@ -418,10 +410,10 @@ This function returns four values:
 	    (error cmdline-option))))))))
 
 (defmacro multiple-value-getopt-cmdline
-    ((option name value status) (context &key error-handler) &body body)
+    ((option name value) (context &key error-handler) &body body)
   "Evaluate BODY on the next command line option in CONTEXT.
-OPTION, NAME, VALUE and STATUS are bound to the option's object, name used on
-the command line), retrieved value and retrieval status.
+OPTION, NAME and VALUE are bound to the option's object, name used on the
+command line) and retrieved value.
 ERROR-HANDLER is the behavior to adopt when a command-line error has been
 registered for this option. Its default value depends on the CONTEXT. See
 `make-context' for a list of possible values."
@@ -430,22 +422,22 @@ registered for this option. Its default value depends on the CONTEXT. See
       (push error-handler getopt-cmdline-args)
       (push :error-handler getopt-cmdline-args))
     (push context getopt-cmdline-args)
-    `(multiple-value-bind (,option ,name ,value ,status)
+    `(multiple-value-bind (,option ,name ,value)
       (getopt-cmdline ,@getopt-cmdline-args)
       ,@body)))
 
 (defmacro do-cmdline-options
-    ((option name value status) (context &key error-handler) &body body)
+    ((option name value) (context &key error-handler) &body body)
   "Evaluate BODY over all command line options in CONTEXT.
-OPTION, NAME, VALUE and STATUS are bound to each option's object, name used on
-the command line), retrieved value and retrieval status."
+OPTION, NAME and VALUE are bound to each option's object, name used on the
+command line) and retrieved value."
   (let ((multiple-value-getopt-cmdline-2nd-arg ()))
     (when error-handler
       (push error-handler multiple-value-getopt-cmdline-2nd-arg)
       (push :error-handler multiple-value-getopt-cmdline-2nd-arg))
     (push context multiple-value-getopt-cmdline-2nd-arg)
     `(do () ((null (cmdline-options ,context)))
-      (multiple-value-getopt-cmdline (,option ,name ,value ,status)
+      (multiple-value-getopt-cmdline (,option ,name ,value)
 	  ,multiple-value-getopt-cmdline-2nd-arg
 	,@body))))
 
