@@ -77,29 +77,37 @@
    (junk :documentation "The unidentified part of the command line."
 	 :type list
 	 :accessor junk)
-   (error-handler :documentation "The behavior to adopt on errors."
+   (error-handler :documentation
+		  "The behavior to adopt on errors at command-line parsing time."
 		  :type symbol
 		  :initarg :error-handler
-		  :reader error-handler))
+		  :reader error-handler)
+   (getopt-error-handler
+    :documentation
+    "The default behavior to adopt on errors in the getopt family of functions."
+    :type symbol
+    :initarg :getopt-error-handler
+    :reader getopt-error-handler))
   (:default-initargs
-    ;; #### FIXME: SBCL specific
-    :cmdline sb-ext:*posix-argv*
-    :error-handler :quit)
+      ;; #### FIXME: SBCL specific
+      :cmdline sb-ext:*posix-argv*
+    :error-handler :quit
+    :getopt-error-handler :quit)
   (:documentation "The CONTEXT class.
 This class represents the associatiion of a synopsis and a set of command-line
 options based on it."))
 
 (defmethod initialize-instance :before
-    ((context context) &key synopsis cmdline error-handler)
+    ((context context) &key synopsis cmdline error-handler getopt-error-handler)
   "Ensure that SYNOPSIS is sealed."
-  (declare (ignore cmdline error-handler))
+  (declare (ignore cmdline error-handler getopt-error-handler))
   (unless (sealedp synopsis)
     (error "Initializing context ~A: synopsis ~A not sealed." context synopsis)))
 
 (defmethod initialize-instance :after
-    ((context context) &key synopsis cmdline error-handler)
+    ((context context) &key synopsis cmdline error-handler getopt-error-handler)
   "Parse CMDLINE."
-  (declare (ignore synopsis error-handler))
+  (declare (ignore synopsis error-handler getopt-error-handler))
   (setf (slot-value context 'progname) (pop cmdline))
   (let ((cmdline-options (list))
 	(remainder (list))
@@ -144,13 +152,16 @@ options based on it."))
 		       (unless cmdline-value
 			 (push nil call))
 		       (push cmdline call))
-		     `(multiple-value-bind ,(reverse vars) ,(reverse call)
-		       ,(when cmdline `(setq ,cmdline ,new-cmdline))
-		       (push-cmdline-option ,place
-			 :name ,name-form
-			 :option ,option
-			 :value ,value
-			 :status nil))))
+		     `(restart-case
+		       (multiple-value-bind ,(reverse vars) ,(reverse call)
+			 ,(when cmdline `(setq ,cmdline ,new-cmdline))
+			 (push-cmdline-option ,place
+			   :name ,name-form
+			   :option ,option
+			   :value ,value
+			   :status nil))
+		       (register (error)
+			(push error ,place)))))
 	       (do-pack ((option pack context) &body body)
 		 "Evaluate BODY with OPTION bound to each option from PACK.
 CONTEXT is where to look for the options."
@@ -162,7 +173,7 @@ CONTEXT is where to look for the options."
 					   :short-name ,name)))
 			   (assert ,option)
 			   ,@body)))))
-      (handler-bind ((option-error
+      (handler-bind ((cmdline-option-error
 		      (lambda (error)
 			(ecase (error-handler context)
 			  (:quit
@@ -170,6 +181,8 @@ CONTEXT is where to look for the options."
 			   (terpri)
 			   ;; #### FIXME: SBCL-specific
 			   (sb-ext:quit :unix-status 1))
+			  (:register
+			   (invoke-restart 'register error))
 			  (:none)))))
 	(do ((arg (pop cmdline) (pop cmdline)))
 	    ((null arg))
@@ -268,15 +281,24 @@ CONTEXT is where to look for the options."
       (setf (unknown-options context) (nreverse unknown-options))
       (setf (slot-value context 'junk) (nreverse junk)))))
 
-(defun make-context (&rest keys &key synopsis cmdline error-handler)
+(defun make-context (&rest keys
+		     &key synopsis cmdline error-handler getopt-error-handler)
   "Make a new context.
 - SYNOPSIS is the program synopsis to use in that context.
 - CMDLINE is the argument list (strings) to process.
   It defaults to a POSIX conformant argv.
-- ERROR-HANDLER is the behavior to adopt on errors. It can be one of:
+- ERROR-HANDLER is the behavior to adopt on errors at command-line parsing time.
+  It can be one of:
+  * :quit, meaning print the error and abort execution,
+  * :none, meaning let the debugger handle the situation,
+  * :register, meaning silently register the error.
+- GETOPT-ERROR-HANDLER is the default behavior to adopt on command-line errors
+  in the GETOPT family of functions (note that this behavior can be overridden
+in the functions themselves). It is meaningful only if errors have been
+previously registered. It can be one of:
   * :quit, meaning print the error and abort execution,
   * :none, meaning let the debugger handle the situation."
-  (declare (ignore synopsis cmdline error-handler))
+  (declare (ignore synopsis cmdline error-handler getopt-error-handler))
   (apply #'make-instance 'context keys))
 
 
@@ -310,16 +332,22 @@ The search is actually done in the CONTEXT'synopsis."
 ;; The Option Retrieval Protocol
 ;; ============================================================================
 
-(defun getopt (context &rest keys &key short-name long-name option)
+(defun getopt (context
+	       &rest keys &key short-name long-name option
+			      (error-handler (getopt-error-handler context)))
   "Get an option's value in CONTEXT.
 The option can be specified either by SHORT-NAME, LONG-NAME, or directly via
 an OPTION object.
+ERROR-HANDLER is the behavior to adopt when a command-line error has been
+registered for this option. Its default value depends on the CONTEXT. See
+`make-context' for a list of possible values.
 This function returns three values:
 - the retrieved value,
 - the retrieval status,
 - the value's source."
   (unless option
-    (setq option (apply #'search-option context keys)))
+    (setq option
+	  (apply #'search-option context (remove-keys keys :error-handler))))
   (unless option
     (error "Getting option ~S from synopsis ~A in context ~A: unknown option."
 	   (or short-name long-name)
@@ -331,24 +359,40 @@ This function returns three values:
 	  (pop (cmdline-options context))
 	  (pop (cmdline-options context))))
 	((null cmdline-option))
-      ;; #### NOTE: actually, I *do* have a use for nreconc, he he ;-)
-      (cond ((eq (cmdline-option-option cmdline-option) option)
-	     (setf (cmdline-options context)
-		   (nreconc cmdline-options (cmdline-options context)))
-	     (return-from getopt
-	       (values (cmdline-option-value cmdline-option)
-		       (or (eq (cmdline-option-status cmdline-option) t)
-			   (list* (cmdline-option-option cmdline-option)
-				  (cmdline-option-status cmdline-option)))
-		       (list :cmdline (cmdline-option-name cmdline-option)))))
-	    (t
-	     (push cmdline-option cmdline-options))))
+      (etypecase cmdline-option
+	(cmdline-option
+	 ;; #### NOTE: actually, I *do* have a use for nreconc, he he ;-)
+	 (cond ((eq (cmdline-option-option cmdline-option) option)
+		(setf (cmdline-options context)
+		      (nreconc cmdline-options (cmdline-options context)))
+		(return-from getopt
+		  (values (cmdline-option-value cmdline-option)
+			  (or (eq (cmdline-option-status cmdline-option) t)
+			      (list* (cmdline-option-option cmdline-option)
+				     (cmdline-option-status cmdline-option)))
+			  (list :cmdline (cmdline-option-name cmdline-option)))))
+	       (t
+		(push cmdline-option cmdline-options))))
+	(cmdline-option-error
+	 (ecase error-handler
+	   (:quit
+	    (let (*print-escape*) (print-object cmdline-option t)
+		 (terpri)
+		 ;; #### FIXME: SBCL-specific
+		 (sb-ext:quit :unix-status 1)))
+	   (:none
+	    ;; #### FIXME: we have no restart here!
+	    (error cmdline-option))))))
     (setf (cmdline-options context) (nreverse cmdline-options)))
   ;; Otherwise, fallback to the environment or a default value:
   (fallback-retrieval option))
 
-(defun getopt-cmdline (context)
+(defun getopt-cmdline
+    (context &key (error-handler (getopt-error-handler context)))
   "Get the next cmdline option in CONTEXT.
+ERROR-HANDLER is the behavior to adopt when a command-line error has been
+registered for this option. Its default value depends on the CONTEXT. See
+`make-context' for a list of possible values.
 This function returns four values:
 - the option object,
 - the option's name used on the command line,
@@ -356,32 +400,65 @@ This function returns four values:
 - the retrieval status."
   (let ((cmdline-option (pop (cmdline-options context))))
     (when cmdline-option
-      (values (cmdline-option-option cmdline-option)
-	      (cmdline-option-name cmdline-option)
-	      (cmdline-option-value cmdline-option)
-	      (cmdline-option-status cmdline-option)))))
+      (etypecase cmdline-option
+	(cmdline-option
+	 (values (cmdline-option-option cmdline-option)
+		 (cmdline-option-name cmdline-option)
+		 (cmdline-option-value cmdline-option)
+		 (cmdline-option-status cmdline-option)))
+	(cmdline-option-error
+	 (ecase error-handler
+	   (:quit
+	    (let (*print-escape*) (print-object cmdline-option t)
+		 (terpri)
+		 ;; #### FIXME: SBCL-specific
+		 (sb-ext:quit :unix-status 1)))
+	   (:none
+	    ;; #### FIXME: we have no restart here!
+	    (error cmdline-option))))))))
 
 (defmacro multiple-value-getopt-cmdline
-    ((option name value status) context &body body)
-  "Evaluate BODY on the next command line option.
+    ((option name value status) (context &key error-handler) &body body)
+  "Evaluate BODY on the next command line option in CONTEXT.
 OPTION, NAME, VALUE and STATUS are bound to the option's object, name used on
-the command line), retrieved value and retrieval status."
-  `(multiple-value-bind (,option ,name ,value ,status)
-    (getopt-cmdline ,context)
-    ,@body))
+the command line), retrieved value and retrieval status.
+ERROR-HANDLER is the behavior to adopt when a command-line error has been
+registered for this option. Its default value depends on the CONTEXT. See
+`make-context' for a list of possible values."
+  (let ((getopt-cmdline-args ()))
+    (when error-handler
+      (push error-handler getopt-cmdline-args)
+      (push :error-handler getopt-cmdline-args))
+    (push context getopt-cmdline-args)
+    `(multiple-value-bind (,option ,name ,value ,status)
+      (getopt-cmdline ,@getopt-cmdline-args)
+      ,@body)))
 
-(defmacro do-cmdline-options ((option name value status) context &body body)
-  "Evaluate BODY over all command line options from CONTEXT.
+(defmacro do-cmdline-options
+    ((option name value status) (context &key error-handler) &body body)
+  "Evaluate BODY over all command line options in CONTEXT.
 OPTION, NAME, VALUE and STATUS are bound to each option's object, name used on
 the command line), retrieved value and retrieval status."
-  `(do () ((null (cmdline-options ,context)))
-    (multiple-value-getopt-cmdline (,option ,name ,value ,status) ,context
-     ,@body)))
+  (let ((multiple-value-getopt-cmdline-2nd-arg ()))
+    (when error-handler
+      (push error-handler multiple-value-getopt-cmdline-2nd-arg)
+      (push :error-handler multiple-value-getopt-cmdline-2nd-arg))
+    (push context multiple-value-getopt-cmdline-2nd-arg)
+    `(do () ((null (cmdline-options ,context)))
+      (multiple-value-getopt-cmdline (,option ,name ,value ,status)
+	  ,multiple-value-getopt-cmdline-2nd-arg
+	,@body))))
 
 
 ;; ============================================================================
 ;; The Unknown Option Protocol
 ;; ============================================================================
+
+;; #### FIXME: this is shaky. I'm wondering if it wouldn't be better to
+;; harmonize all the different cmdline problems into a single scheme.
+;; Currenty, command-ilne options can trigger errors (syntax, conversion
+;; etc.). Maybe we should consider including junk and unknown options as
+;; errors as well.
 
 (defun getopt-unknown (context)
   "Get the next unknown option in CONTEXT.
