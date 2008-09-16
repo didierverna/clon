@@ -73,9 +73,6 @@
    (unknown-options :documentation "The unknown options on the command line."
 		    :type list
 		    :accessor unknown-options)
-   (junk :documentation "The unidentified part of the command line."
-	 :type list
-	 :accessor junk)
    (error-handler :documentation
 		  "The behavior to adopt on errors at command-line parsing time."
 		  :type symbol
@@ -103,6 +100,15 @@ options based on it."))
   (unless (sealedp synopsis)
     (error "Initializing context ~A: synopsis ~A not sealed." context synopsis)))
 
+(define-condition cmdline-junk-error (cmdline-error)
+  ((item ;; inherited from the CMDLINE-ERROR condition
+    :documentation "The piece of junk appearing on the command-line."
+    :initarg :junk
+    :reader junk))
+  (:report (lambda (error stream)
+	     (format stream "Junk on the command-line: ~S." (junk error))))
+  (:documentation "An error related to a command-line piece of junk."))
+
 (defmethod initialize-instance :after
     ((context context) &key synopsis cmdline error-handler getopt-error-handler)
   "Parse CMDLINE."
@@ -110,8 +116,7 @@ options based on it."))
   (setf (slot-value context 'progname) (pop cmdline))
   (let ((cmdline-options (list))
 	(remainder (list))
-	(unknown-options (list))
-	(junk (list)))
+	(unknown-options (list)))
     (macrolet ((push-cmdline-option (place &rest body)
 		 "Push a new CMDLINE-OPTION created with BODY onto PLACE."
 		 `(push (make-cmdline-option ,@body) ,place))
@@ -273,11 +278,16 @@ CONTEXT is where to look for the options."
 			       (setq remainder (cons arg cmdline))
 			       (setq cmdline nil))
 			      (t
-			       (push arg junk)))))))))
+			       (restart-case
+				   (error 'cmdline-junk-error :junk arg)
+				 (discard ()
+				   :report "Discard junk."
+				   nil)
+				 (register (error)
+					   (push error cmdline-options)))))))))))
       (setf (cmdline-options context) (nreverse cmdline-options))
       (setf (slot-value context 'remainder) remainder)
-      (setf (unknown-options context) (nreverse unknown-options))
-      (setf (slot-value context 'junk) (nreverse junk)))))
+      (setf (unknown-options context) (nreverse unknown-options)))))
 
 (defun make-context (&rest keys
 		     &key synopsis cmdline error-handler getopt-error-handler)
@@ -367,7 +377,7 @@ This function returns two values:
 			  (list :cmdline (cmdline-option-name cmdline-option)))))
 	       (t
 		(push cmdline-option cmdline-options))))
-	(cmdline-option-error
+	(cmdline-error
 	 (ecase error-handler
 	   (:quit
 	    (let (*print-escape*) (print-object cmdline-option t)
@@ -398,7 +408,7 @@ This function returns three values:
 	 (values (cmdline-option-option cmdline-option)
 		 (cmdline-option-name cmdline-option)
 		 (cmdline-option-value cmdline-option)))
-	(cmdline-option-error
+	(cmdline-error
 	 (ecase error-handler
 	   (:quit
 	    (let (*print-escape*) (print-object cmdline-option t)
