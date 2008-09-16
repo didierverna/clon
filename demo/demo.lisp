@@ -85,7 +85,7 @@
 (defun main ()
   "This program's main function."
   ;; This context will use the POSIX command line:
-  (let ((context (clon:make-context :synopsis *synopsis* :error-handler :register)))
+  (let ((context (clon:make-context :synopsis *synopsis* :error-handler :none)))
 ;    (multiple-value-bind (value status source)
 ;	(clon:getopt context :short-name "f")
 ;      (print (list value status source)))

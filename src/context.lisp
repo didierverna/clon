@@ -35,7 +35,7 @@
 
 
 ;; ============================================================================
-;; The Command Line Option Structure
+;; The Command-Line Items
 ;; ============================================================================
 
 (defstruct cmdline-option
@@ -44,10 +44,29 @@
   value ;; the converted option's cmdline value
   )
 
-(defstruct unknown-option
-  name ;; the option's name as used on the cmdline
-  value ;; the option's value, as appearing on the cmdline
-  )
+(define-condition cmdline-junk-error (cmdline-error)
+  ((item ;; inherited from the CMDLINE-ERROR condition
+    :documentation "The piece of junk appearing on the command-line."
+    :initarg :junk
+    :reader junk))
+  (:report (lambda (error stream)
+	     (format stream "Junk on the command-line: ~S." (junk error))))
+  (:documentation "An error related to a command-line piece of junk."))
+
+(define-condition unknown-cmdline-option-error (cmdline-error)
+  ((item ;; inherited from the CMDLINE-ERROR condition
+    :documentation "The option's name as it appears on the command-line."
+    :initarg :name
+    :reader name)
+   (argument :documentation "The option's command-line argument."
+	     :initarg :argument
+	     :reader argument))
+  (:report (lambda (error stream)
+	     (format stream
+		     "Unknown command-line option ~S~@[ with argument ~S~]."
+		     (name error)
+		     (argument error))))
+  (:documentation "An error related to an unknown command-line option."))
 
 
 ;; ============================================================================
@@ -61,18 +80,15 @@
 	     :initarg :synopsis
 	     :reader synopsis)
    (progname :documentation
-	     "The program name, as it appears on the command line."
+	     "The program name, as it appears on the command-line."
 	     :type string
 	     :reader progname)
-   (cmdline-items :documentation "The options on the command line."
+   (cmdline-items :documentation "The items on the command-line."
 	  :type list
 	  :accessor cmdline-items)
-   (remainder :documentation "The non-Clon part of the command line."
+   (remainder :documentation "The non-Clon part of the command-line."
 	      :type list
 	      :reader remainder)
-   (unknown-options :documentation "The unknown options on the command line."
-		    :type list
-		    :accessor unknown-options)
    (error-handler :documentation
 		  "The behavior to adopt on errors at command-line parsing time."
 		  :type symbol
@@ -100,14 +116,21 @@ options based on it."))
   (unless (sealedp synopsis)
     (error "Initializing context ~A: synopsis ~A not sealed." context synopsis)))
 
-(define-condition cmdline-junk-error (cmdline-error)
-  ((item ;; inherited from the CMDLINE-ERROR condition
-    :documentation "The piece of junk appearing on the command-line."
-    :initarg :junk
-    :reader junk))
-  (:report (lambda (error stream)
-	     (format stream "Junk on the command-line: ~S." (junk error))))
-  (:documentation "An error related to a command-line piece of junk."))
+;; #### FIXME: we should offer more restarts, like modify the name of the
+;; option (handy in case of a typo for instance). But then, we will have to
+;; split the parsing process into several individual functions so that they
+;; can restart recursively (looking for the option etc).
+(defmacro restartable-unknown-cmdline-option-error
+    (place name &optional argument)
+  "Restartably throw an unknown-cmdline-option-error."
+  `(restart-case (error 'unknown-cmdline-option-error
+		  :name ,name :argument ,argument)
+    (discard ()
+     :report "Discard unknown option."
+     nil)
+    (register (error)
+     :report "Don't treat error right now, but remember it."
+     (push error ,place))))
 
 (defmethod initialize-instance :after
     ((context context) &key synopsis cmdline error-handler getopt-error-handler)
@@ -115,14 +138,10 @@ options based on it."))
   (declare (ignore synopsis error-handler getopt-error-handler))
   (setf (slot-value context 'progname) (pop cmdline))
   (let ((cmdline-items (list))
-	(remainder (list))
-	(unknown-options (list)))
+	(remainder (list)))
     (macrolet ((push-cmdline-option (place &rest body)
 		 "Push a new CMDLINE-OPTION created with BODY onto PLACE."
 		 `(push (make-cmdline-option ,@body) ,place))
-	       (push-unknown-option (place &rest body)
-		 "Push a new UNKNOWN-OPTION created with BODY onto PLACE."
-		 `(push (make-unknown-option ,@body) ,place))
 	       (push-retrieved-option
 		   (place func option &optional cmdline-value cmdline name-form)
 		   "Retrieve OPTION from a FUNC call and push it onto PLACE.
@@ -164,6 +183,7 @@ options based on it."))
 			   :option ,option
 			   :value ,value))
 		       (register (error)
+			:report "Don't treat error right now, but remember it."
 			(push error ,place)))))
 	       (do-pack ((option pack context) &body body)
 		 "Evaluate BODY with OPTION bound to each option from PACK.
@@ -207,9 +227,8 @@ CONTEXT is where to look for the options."
 		   (if option
 		       (push-retrieved-option cmdline-items :long option
 					      cmdline-value cmdline name)
-		       (push-unknown-option unknown-options
-					    :name cmdline-name
-					    :value cmdline-value))))
+		       (restartable-unknown-cmdline-option-error
+			cmdline-items cmdline-name cmdline-value))))
 		;; A short call, or a minus pack.
 		((beginning-of-string-p "-" arg)
 		 ;; #### FIXME: check invalid syntax -foo=val
@@ -240,8 +259,8 @@ CONTEXT is where to look for the options."
 			    (push-retrieved-option
 			     cmdline-items :short option nil cmdline)))
 			 (t
-			  (push-unknown-option unknown-options
-					       :name cmdline-name)))))
+			  (restartable-unknown-cmdline-option-error
+			   cmdline-items cmdline-name)))))
 		;; A plus call or a plus pack.
 		((beginning-of-string-p "+" arg)
 		 ;; #### FIXME: check invalid syntax +foo=val
@@ -260,8 +279,8 @@ CONTEXT is where to look for the options."
 			  (do-pack (option cmdline-name context)
 			    (push-retrieved-option cmdline-items :plus option)))
 			 (t
-			  (push-unknown-option unknown-options
-					       :name cmdline-name)))))
+			  (restartable-unknown-cmdline-option-error
+			   cmdline-items cmdline-name)))))
 		(t
 		 ;; Not an option call.
 		 ;; #### FIXME: SBCL specific.
@@ -284,10 +303,11 @@ CONTEXT is where to look for the options."
 				   :report "Discard junk."
 				   nil)
 				 (register (error)
-					   (push error cmdline-items)))))))))))
+				   :report
+				   "Don't treat error right now, but remember it."
+				   (push error cmdline-items)))))))))))
       (setf (cmdline-items context) (nreverse cmdline-items))
-      (setf (slot-value context 'remainder) remainder)
-      (setf (unknown-options context) (nreverse unknown-options)))))
+      (setf (slot-value context 'remainder) remainder))))
 
 (defun make-context (&rest keys
 		     &key synopsis cmdline error-handler getopt-error-handler)
@@ -360,7 +380,7 @@ This function returns two values:
 	   (or short-name long-name)
 	   (synopsis context)
 	   context))
-  ;; Try the command line:
+  ;; Try the command-line:
   (let ((cmdline-items (list)))
     (do ((cmdline-item
 	  (pop (cmdline-items context))
@@ -399,7 +419,7 @@ registered for this option. Its default value depends on the CONTEXT. See
 `make-context' for a list of possible values.
 This function returns three values:
 - the option object,
-- the option's name used on the command line,
+- the option's name used on the command-line,
 - the retrieved value."
   (let ((cmdline-item (pop (cmdline-items context))))
     (when cmdline-item
@@ -421,9 +441,9 @@ This function returns three values:
 
 (defmacro multiple-value-getopt-cmdline
     ((option name value) (context &key error-handler) &body body)
-  "Evaluate BODY on the next command line option in CONTEXT.
+  "Evaluate BODY on the next command-line option in CONTEXT.
 OPTION, NAME and VALUE are bound to the option's object, name used on the
-command line) and retrieved value.
+command-line) and retrieved value.
 ERROR-HANDLER is the behavior to adopt when a command-line error has been
 registered for this option. Its default value depends on the CONTEXT. See
 `make-context' for a list of possible values."
@@ -438,9 +458,9 @@ registered for this option. Its default value depends on the CONTEXT. See
 
 (defmacro do-cmdline-options
     ((option name value) (context &key error-handler) &body body)
-  "Evaluate BODY over all command line options in CONTEXT.
+  "Evaluate BODY over all command-line options in CONTEXT.
 OPTION, NAME and VALUE are bound to each option's object, name used on the
-command line) and retrieved value."
+command-line) and retrieved value."
   (let ((multiple-value-getopt-cmdline-2nd-arg ()))
     (when error-handler
       (push error-handler multiple-value-getopt-cmdline-2nd-arg)
@@ -465,7 +485,7 @@ command line) and retrieved value."
 (defun getopt-unknown (context)
   "Get the next unknown option in CONTEXT.
 This function returns two values:
-- the option's name used on the command line,
+- the option's name used on the command-line,
 - possibly a provided argument."
   (let ((unknown-option (pop (unknown-options context))))
     (when unknown-option
@@ -475,7 +495,7 @@ This function returns two values:
 (defmacro multiple-value-getopt-unknown
     ((name value) context &body body)
   "Evaluate BODY on the next unknown option.
-NAME and VALUE are bound to the option's name used on the command line, and
+NAME and VALUE are bound to the option's name used on the command-line, and
 possibly a provided value."
   `(multiple-value-bind (,name ,value)
     (getopt-unknown ,context)
@@ -483,7 +503,7 @@ possibly a provided value."
 
 (defmacro do-unknown-options ((name value) context &body body)
   "Evaluate BODY over all unknown options from CONTEXT.
-NAME and VALUE are bound to each option's name used on the command line, and
+NAME and VALUE are bound to each option's name used on the command-line, and
 possibly a provided value."
   `(do () ((null (unknown-options ,context)))
     (multiple-value-getopt-unknown (,name ,value) ,context
