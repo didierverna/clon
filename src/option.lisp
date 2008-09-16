@@ -239,6 +239,15 @@ If AS-STRING, return a string of that character.")
 ;; The Retrieval Protocol
 ;; ============================================================================
 
+;; #### NOTE: Yucky yucky yuck. Design fuckage. See comment in the Utilities
+;; section.
+(define-condition cmdline-error (error)
+  ((item :documentation "The concerned command-line item."
+	 :type string
+	 :initarg :item
+	 :reader item))
+  (:documentation "An error related to a command-line item."))
+
 (define-condition option-error (error)
   ((option :documentation "The concerned option."
 	   :type option
@@ -246,12 +255,12 @@ If AS-STRING, return a string of that character.")
 	   :reader option))
   (:documentation "An error related to an option."))
 
-(define-condition cmdline-option-error (option-error)
-  ((name :documentation "The option's name as it appears on the command-line."
-	 :type string
-	 :initarg :name
-	 :reader name))
-  (:documentation "An error related to a command-line option."))
+(define-condition cmdline-option-error (cmdline-error option-error)
+  ((item ;; inherited from the CMDLINE-ERROR condition
+    :documentation "The option's name as it appears on the command-line."
+    :initarg :name
+    :reader name))
+  (:documentation "An error related to a command-line (known) option."))
 
 (define-condition spurious-cmdline-argument (cmdline-option-error)
   ((argument :documentation "The spurious argument."

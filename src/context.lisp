@@ -171,7 +171,7 @@ CONTEXT is where to look for the options."
 					   :short-name ,name)))
 			   (assert ,option)
 			   ,@body)))))
-      (handler-bind ((cmdline-option-error
+      (handler-bind ((cmdline-error
 		      (lambda (error)
 			(ecase (error-handler context)
 			  (:quit
