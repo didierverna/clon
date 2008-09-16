@@ -388,25 +388,30 @@ This function returns two values:
 	((null cmdline-item))
       (etypecase cmdline-item
 	(cmdline-option
-	 ;; #### NOTE: actually, I *do* have a use for nreconc, he he ;-)
 	 (cond ((eq (cmdline-option-option cmdline-item) option)
 		(setf (cmdline-items context)
+		      ;; #### NOTE: actually, I *do* have a use for nreconc,
+		      ;; he he ;-)
 		      (nreconc cmdline-items (cmdline-items context)))
 		(return-from getopt
 		  (values (cmdline-option-value cmdline-item)
 			  (list :cmdline (cmdline-option-name cmdline-item)))))
 	       (t
 		(push cmdline-item cmdline-items))))
+	(cmdline-option-error
+	 (if (not (eq option (option cmdline-item)))
+	     (push cmdline-item cmdline-items)
+	     (ecase error-handler
+	       (:quit
+		(let (*print-escape*) (print-object cmdline-item t)
+		     (terpri)
+		     ;; #### FIXME: SBCL-specific
+		     (sb-ext:quit :unix-status 1)))
+	       (:none
+		;; #### FIXME: we have no restart here!
+		(error cmdline-item)))))
 	(cmdline-error
-	 (ecase error-handler
-	   (:quit
-	    (let (*print-escape*) (print-object cmdline-item t)
-		 (terpri)
-		 ;; #### FIXME: SBCL-specific
-		 (sb-ext:quit :unix-status 1)))
-	   (:none
-	    ;; #### FIXME: we have no restart here!
-	    (error cmdline-item))))))
+	 (push cmdline-item cmdline-items))))
     (setf (cmdline-items context) (nreverse cmdline-items)))
   ;; Otherwise, fallback to the environment or a default value:
   (fallback-retrieval option))
