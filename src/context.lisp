@@ -64,9 +64,9 @@
 	     "The program name, as it appears on the command line."
 	     :type string
 	     :reader progname)
-   (cmdline-options :documentation "The options on the command line."
+   (cmdline-items :documentation "The options on the command line."
 	  :type list
-	  :accessor cmdline-options)
+	  :accessor cmdline-items)
    (remainder :documentation "The non-Clon part of the command line."
 	      :type list
 	      :reader remainder)
@@ -114,7 +114,7 @@ options based on it."))
   "Parse CMDLINE."
   (declare (ignore synopsis error-handler getopt-error-handler))
   (setf (slot-value context 'progname) (pop cmdline))
-  (let ((cmdline-options (list))
+  (let ((cmdline-items (list))
 	(remainder (list))
 	(unknown-options (list)))
     (macrolet ((push-cmdline-option (place &rest body)
@@ -205,7 +205,7 @@ CONTEXT is where to look for the options."
 		     (multiple-value-setq (option name)
 		       (search-option context :partial-name cmdline-name)))
 		   (if option
-		       (push-retrieved-option cmdline-options :long option
+		       (push-retrieved-option cmdline-items :long option
 					      cmdline-value cmdline name)
 		       (push-unknown-option unknown-options
 					    :name cmdline-name
@@ -220,7 +220,7 @@ CONTEXT is where to look for the options."
 		     (multiple-value-setq (option cmdline-value)
 		       (search-sticky-option context cmdline-name)))
 		   (cond (option
-			  (push-retrieved-option cmdline-options :short option
+			  (push-retrieved-option cmdline-items :short option
 						 cmdline-value cmdline))
 			 ((potential-pack-p cmdline-name context)
 			  ;; #### NOTE: When parsing a minus pack, only the
@@ -231,14 +231,14 @@ CONTEXT is where to look for the options."
 				    (subseq cmdline-name 0
 					    (1- (length cmdline-name)))
 				    context)
-			    (push-retrieved-option cmdline-options :short option))
+			    (push-retrieved-option cmdline-items :short option))
 			  (let* ((name (subseq cmdline-name
 					       (1- (length cmdline-name))))
 				 (option (search-option context
 							:short-name name)))
 			    (assert option)
 			    (push-retrieved-option
-			     cmdline-options :short option nil cmdline)))
+			     cmdline-items :short option nil cmdline)))
 			 (t
 			  (push-unknown-option unknown-options
 					       :name cmdline-name)))))
@@ -255,10 +255,10 @@ CONTEXT is where to look for the options."
 			;; abbreviated.
 			(option (search-option context :short-name cmdline-name)))
 		   (cond (option
-			  (push-retrieved-option cmdline-options :plus option))
+			  (push-retrieved-option cmdline-items :plus option))
 			 ((potential-pack-p cmdline-name context)
 			  (do-pack (option cmdline-name context)
-			    (push-retrieved-option cmdline-options :plus option)))
+			    (push-retrieved-option cmdline-items :plus option)))
 			 (t
 			  (push-unknown-option unknown-options
 					       :name cmdline-name)))))
@@ -284,8 +284,8 @@ CONTEXT is where to look for the options."
 				   :report "Discard junk."
 				   nil)
 				 (register (error)
-					   (push error cmdline-options)))))))))))
-      (setf (cmdline-options context) (nreverse cmdline-options))
+					   (push error cmdline-items)))))))))))
+      (setf (cmdline-items context) (nreverse cmdline-items))
       (setf (slot-value context 'remainder) remainder)
       (setf (unknown-options context) (nreverse unknown-options)))))
 
@@ -361,33 +361,33 @@ This function returns two values:
 	   (synopsis context)
 	   context))
   ;; Try the command line:
-  (let ((cmdline-options (list)))
-    (do ((cmdline-option
-	  (pop (cmdline-options context))
-	  (pop (cmdline-options context))))
-	((null cmdline-option))
-      (etypecase cmdline-option
+  (let ((cmdline-items (list)))
+    (do ((cmdline-item
+	  (pop (cmdline-items context))
+	  (pop (cmdline-items context))))
+	((null cmdline-item))
+      (etypecase cmdline-item
 	(cmdline-option
 	 ;; #### NOTE: actually, I *do* have a use for nreconc, he he ;-)
-	 (cond ((eq (cmdline-option-option cmdline-option) option)
-		(setf (cmdline-options context)
-		      (nreconc cmdline-options (cmdline-options context)))
+	 (cond ((eq (cmdline-option-option cmdline-item) option)
+		(setf (cmdline-items context)
+		      (nreconc cmdline-items (cmdline-items context)))
 		(return-from getopt
-		  (values (cmdline-option-value cmdline-option)
-			  (list :cmdline (cmdline-option-name cmdline-option)))))
+		  (values (cmdline-option-value cmdline-item)
+			  (list :cmdline (cmdline-option-name cmdline-item)))))
 	       (t
-		(push cmdline-option cmdline-options))))
+		(push cmdline-item cmdline-items))))
 	(cmdline-error
 	 (ecase error-handler
 	   (:quit
-	    (let (*print-escape*) (print-object cmdline-option t)
+	    (let (*print-escape*) (print-object cmdline-item t)
 		 (terpri)
 		 ;; #### FIXME: SBCL-specific
 		 (sb-ext:quit :unix-status 1)))
 	   (:none
 	    ;; #### FIXME: we have no restart here!
-	    (error cmdline-option))))))
-    (setf (cmdline-options context) (nreverse cmdline-options)))
+	    (error cmdline-item))))))
+    (setf (cmdline-items context) (nreverse cmdline-items)))
   ;; Otherwise, fallback to the environment or a default value:
   (fallback-retrieval option))
 
@@ -401,23 +401,23 @@ This function returns three values:
 - the option object,
 - the option's name used on the command line,
 - the retrieved value."
-  (let ((cmdline-option (pop (cmdline-options context))))
-    (when cmdline-option
-      (etypecase cmdline-option
+  (let ((cmdline-item (pop (cmdline-items context))))
+    (when cmdline-item
+      (etypecase cmdline-item
 	(cmdline-option
-	 (values (cmdline-option-option cmdline-option)
-		 (cmdline-option-name cmdline-option)
-		 (cmdline-option-value cmdline-option)))
+	 (values (cmdline-option-option cmdline-item)
+		 (cmdline-option-name cmdline-item)
+		 (cmdline-option-value cmdline-item)))
 	(cmdline-error
 	 (ecase error-handler
 	   (:quit
-	    (let (*print-escape*) (print-object cmdline-option t)
+	    (let (*print-escape*) (print-object cmdline-item t)
 		 (terpri)
 		 ;; #### FIXME: SBCL-specific
 		 (sb-ext:quit :unix-status 1)))
 	   (:none
 	    ;; #### FIXME: we have no restart here!
-	    (error cmdline-option))))))))
+	    (error cmdline-item))))))))
 
 (defmacro multiple-value-getopt-cmdline
     ((option name value) (context &key error-handler) &body body)
@@ -446,7 +446,7 @@ command line) and retrieved value."
       (push error-handler multiple-value-getopt-cmdline-2nd-arg)
       (push :error-handler multiple-value-getopt-cmdline-2nd-arg))
     (push context multiple-value-getopt-cmdline-2nd-arg)
-    `(do () ((null (cmdline-options ,context)))
+    `(do () ((null (cmdline-items ,context)))
       (multiple-value-getopt-cmdline (,option ,name ,value)
 	  ,multiple-value-getopt-cmdline-2nd-arg
 	,@body))))
