@@ -526,22 +526,19 @@ This class implements options that don't take any argument."))
    (argument-required-p :documentation "Whether the option's argument is required."
 			;; Initialization :after wards by :argument-type
 			:reader argument-required-p)
-   ;; #### WARNING: currently, there's no way to make a distinction between
-   ;; not providing a default value, and providing a null one. I don't think
-   ;; that's useful, but maybe this will change someday.
    (default-value :documentation "The option's default value."
 		 :initarg :default-value
 		 :reader default-value))
   (:metaclass valued-option-class)
   (:default-initargs
     :argument-name "ARG"
-    :argument-type :required
-    :default-value nil)
+    :argument-type :required)
   (:documentation "The VALUED-OPTION class.
 This is the base class for options accepting arguments."))
 
 (defmethod initialize-instance :before
-    ((option valued-option) &key argument-name argument-type default-value)
+    ((option valued-option) &key argument-name argument-type
+			       (default-value nil default-value-supplied-p))
   "Check validity of the value-related initargs."
   (when (or (null argument-name)
 	    (and argument-name (zerop (length argument-name))))
@@ -550,11 +547,18 @@ This is the base class for options accepting arguments."))
 	      (eq argument-type :mandatory)
 	      (eq argument-type :optional))
     (error "Option ~A: invalid argument type ~S." option argument-type))
+  (when (and (eq argument-type :optional)
+	     ;; #### FIXME: yuck. What's the pattern for doing checks on "all
+	     ;; but some" subclasses?
+	     (not (typep option 'switch)))
+    (unless default-value-supplied-p
+      (error "Option ~A: default value required because argument is optional."
+	     option)))
   ;; Here, we catch and convert a potential invalid-value error into a simple
   ;; error because this check is intended for the Clon user, as opposed to the
   ;; Clon end-user. In other words, a potential error here is in the program
   ;; itself; not in the usage of the program.
-  (when default-value
+  (when default-value-supplied-p
     (handler-case (check-value option default-value)
       (invalid-value ()
 	(error "Option ~A: invalid default value ~S." option default-value)))))
@@ -678,6 +682,13 @@ Available restarts are:
 - use-argument: return the conversion of another argument."
   (restart-case (convert valued-option argument)
     (use-default-value ()
+      :test (lambda (error)
+	      ;; #### NOTE: which design is better here? Accessing the option
+	      ;; through ERROR or directly via VALUED-OPTION (from
+	      ;; RESTARTABLE-CONVERT's lexical environment)? The later seems
+	      ;; more readable to me.
+	      (declare (ignore error))
+	      (slot-boundp valued-option 'default-value))
       :report (lambda (stream)
 		(format stream "Use option's default value (~S) instead."
 			(default-value valued-option)))
@@ -722,14 +733,18 @@ to raise the higher level invalid-cmdline-argument error instead."
 	     (format stream "Option '~A': missing argument." (name error))))
   (:documentation "A missing command-line argument error."))
 
+;; #### NOTE: FALLBACK-VALUE is currently only used by switches (because of
+;; their special semantics for long call without argument).
 (defun restartable-cmdline-convert
     (valued-option cmdline-name cmdline-argument
-     &optional (fallback-value (default-value valued-option)))
+     &optional (fallback-value
+		(unless (argument-required-p valued-option)
+		  (default-value valued-option))))
   "Restartably convert CMDLINE-ARGUMENT to VALUED-OPTION's value.
 This function is used when the conversion comes from a command-line usage of
-VALUED-OPTION, called by CMDLINE-NAME. FALLBACK-VALUE is what to return when
-an optional argument is not provided. It defaults to VALUED-OPTION's default
-value.
+VALUED-OPTION, called by CMDLINE-NAME.
+FALLBACK-VALUE is what to return when VALUED-OPTION's argument is optional and
+not provided. It defaults to VALUED-OPTION's default value.
 
 As well as conversion errors, this function might raise a
 missing-cmdline-argument error if CMDLINE-ARGUMENT is nil and an argument is
@@ -751,10 +766,20 @@ Available restarts are:
 	    (t
 	     fallback-value))
     (use-fallback-value ()
+      :test (lambda (error)
+	      (declare (ignore error))
+	      (not (argument-required-p valued-option)))
       :report (lambda (stream)
 		(format stream "Use fallback value (~S)." fallback-value))
       fallback-value)
     (use-default-value ()
+      :test (lambda (error)
+	      ;; #### NOTE: which design is better here? Accessing the option
+	      ;; through ERROR or directly via VALUED-OPTION (from
+	      ;; RESTARTABLE-CONVERT's lexical environment)? The later seems
+	      ;; more readable to me.
+	      (declare (ignore error))
+	      (slot-boundp valued-option 'default-value))
       :report (lambda (stream)
 		(format stream "Use option's default value (~S)."
 			(default-value valued-option)))
@@ -842,6 +867,13 @@ Available restarts are:
 - modify-env: modify the environment variable's value."
   (restart-case (environment-convert valued-option env-val)
     (use-default-value ()
+      :test (lambda (error)
+	      ;; #### NOTE: which design is better here? Accessing the option
+	      ;; through ERROR or directly via VALUED-OPTION (from
+	      ;; RESTARTABLE-CONVERT's lexical environment)? The later seems
+	      ;; more readable to me.
+	      (declare (ignore error))
+	      (slot-boundp valued-option 'default-value))
       :report (lambda (stream)
 		(format stream "Use option's default value (~S)."
 			(default-value valued-option)))
@@ -915,7 +947,6 @@ Available restarts are:
     ;; No :argument-name -- not used
     :argument-style :yes/no
     :argument-type :optional
-    :default-value nil
     :env-var nil)
   (:documentation "The SWITCH class.
 This class implements boolean options."))
@@ -950,8 +981,7 @@ This class implements boolean options."))
 - ARGUMENT-TYPE is one of :required, :mandatory or :optional (:required and
   :mandatory are synonyms).
   It defaults to :optional.
-- DEFAULT-VALUE is the switch's default value.
-  It defaults to nil.
+- DEFAULT-VALUE is the switch's default value, if any.
 - ENV-VAR is the switch's associated environment variable.
   It defaults to nil.
 - ARGUMENT-STYLE is the switch's argument display style. It can be one of
@@ -976,8 +1006,7 @@ This class implements boolean options."))
 - ARGUMENT-TYPE is one of :required, :mandatory or :optional (:required and
   :mandatory are synonyms).
   It defaults to :optional.
-- DEFAULT-VALUE is the switch's default value.
-  It defaults to nil.
+- DEFAULT-VALUE is the switch's default value, if any.
 - ENV-VAR is the switch's associated environment variable, minus the 'CLON_'
   prefix. It defaults to nil.
 - ARGUMENT-STYLE is the switch's argument display style. It can be one of
@@ -1031,7 +1060,8 @@ This class implements boolean options."))
     ((switch switch) cmdline-name &optional cmdline-argument cmdline)
   "Retrieve SWITCH's value from a long call."
   ;; The difference with other valued options is that an omitted optional
-  ;; argument stands for a "yes". Otherwise, it's pretty similar.
+  ;; argument always stands for a "yes", *even* if the switch has a different
+  ;; default-value.
   (maybe-pop-argument cmdline switch cmdline-argument)
   (values (restartable-cmdline-convert switch cmdline-name cmdline-argument t)
 	  cmdline))
@@ -1121,8 +1151,7 @@ This class implements options the values of which are strings."))
 - ARGUMENT-TYPE is one of :required, :mandatory or :optional (:required and
   :mandatory are synonyms).
   It defaults to :optional.
-- DEFAULT-VALUE is the option's default value.
-  It defaults to nil.
+- DEFAULT-VALUE is the option's default value, if any.
 - ENV-VAR is the option's associated environment variable.
   It defaults to nil."
   (declare (ignore short-name long-name description
@@ -1142,8 +1171,7 @@ This class implements options the values of which are strings."))
 - ARGUMENT-TYPE is one of :required, :mandatory or :optional (:required and
   :mandatory are synonyms).
   It defaults to :optional.
-- DEFAULT-VALUE is the option's default value.
-  It defaults to nil.
+- DEFAULT-VALUE is the option's default value, if any.
 - ENV-VAR is the option's associated environment variable, minus the 'CLON_'
   prefix. It defaults to nil."
   (declare (ignore argument-name argument-type default-value))

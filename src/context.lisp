@@ -440,9 +440,9 @@ This function returns two values:
 	  (values (retrieve-from-environment option env-val)
 		  (list :environement env-var))))))
   ;; Try a default value:
-  (let ((default-value (default-value option)))
-    (when default-value
-      (values default-value (list :default-value)))))
+  (when (and (typep option 'valued-option)
+	     (slot-boundp option 'default-value))
+    (values (default-value option) (list :default-value))))
 
 (defun getopt-cmdline
     (context &key (error-handler (getopt-error-handler context)))

@@ -72,11 +72,13 @@
      (stropt :short-name "a" :description "short name, required argument")
      (stropt :short-name "c"
 	     :description "short name, optional argument"
-	     :argument-type :optional)
+	     :argument-type :optional
+	     :default-value "GNU GPL")
      (stropt :long-name "phone" :description "long name, required argument")
      (stropt :long-name "fax"
 	     :description "long name, optional argument"
-	     :argument-type :optional))
+	     :argument-type :optional
+	     :default-value "/same as phone/"))
     (group
      (group
       (text :contents "This is a demo of the group imbrication feature."))))
@@ -88,7 +90,7 @@
   (let ((context (clon:make-context :synopsis *synopsis* :error-handler :none
 				    :getopt-error-handler :none)))
     (multiple-value-bind (value source)
-	(clon:getopt context :short-name "d")
+	(clon:getopt context :short-name "F")
       (print (list value source)))
     (format t "~%~%Other options:")
     (clon:do-cmdline-options (option name value) (context :error-handler :quit)
