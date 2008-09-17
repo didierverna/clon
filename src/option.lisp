@@ -248,6 +248,22 @@ If AS-STRING, return a string of that character.")
 	 :reader item))
   (:documentation "An error related to a command-line item."))
 
+;; #### NOTE: currently, there is only one environment error: an invalid value
+;; for an environment variable associated with an option. This means that the
+;; ENV-VAR slot below is redundant, because the environment variable can be
+;; accessed through the option object. However, the design is cleaner this way
+;; (it is coherent with the command-line one), and maybe if one day I have to
+;; extend it, I'll be happy I got it right in the first place.
+;; #### NOTE: as a matter of fact, I just thought of something: what about
+;; supporting a /list/ of associated environment variables? This would
+;; perfectly justify the comment above.
+(define-condition environment-error (error)
+  ((env-var :documentation "The concerned environment variable."
+	    :type string
+	    :initarg :env-var
+	    :reader env-var))
+  (:documentation "An error related to an environment variable."))
+
 (define-condition option-error (error)
   ((option :documentation "The concerned option."
 	   :type option
@@ -261,6 +277,10 @@ If AS-STRING, return a string of that character.")
     :initarg :name
     :reader name))
   (:documentation "An error related to a command-line (known) option."))
+
+(define-condition environmental-option-error (environment-error option-error)
+  ()
+  (:documentation "An error related to an option's environment variable."))
 
 (define-condition spurious-cmdline-argument (cmdline-option-error)
   ((argument :documentation "The spurious argument."
@@ -330,6 +350,9 @@ This function returns two values:
 (defgeneric retrieve-from-plus-call (option)
   (:documentation "Retrieve OPTION's value from a plus call."))
 
+;; #### WARNING: given the idea of supporting a list of env vars, I would need
+;; to modify this function in order to pass the env-var itself. This protocol
+;; would become even more similar to the command-line one. Yummy...
 (defgeneric retrieve-from-environment (option env-val)
   (:documentation "Retrieve OPTION's value from the environment.
 ENV-VAL is the value stored in the associated environment variable.")
@@ -673,17 +696,8 @@ Available restarts are:
 ;; Retrieval protocol
 ;; ------------------
 
-;; #### FIXME: rework the error hierarchy: this one should inherit from
-;; invalid-argument.
-(define-condition invalid-cmdline-argument (cmdline-option-error)
-  ((argument :documentation "The invalid argument."
-	     :type string
-	     :initarg :argument
-	     :reader argument)
-   (comment :documentation "An additional comment about the error."
-	    :type string
-	    :initarg :comment
-	    :reader comment))
+(define-condition invalid-cmdline-argument (cmdline-option-error invalid-argument)
+  ()
   (:report (lambda (error stream)
 	     (format stream "Option '~A': invalid argument ~S.~@[~%~A~]"
 		     (name error) (argument error) (comment error))))
@@ -775,18 +789,25 @@ Available restarts are:
   (restartable-invalid-+-syntax-error (option)
     (retrieve-from-short-call option)))
 
-(define-condition invalid-environment-value (invalid-argument)
-  ()
+(define-condition invalid-environment-value
+    (environmental-option-error invalid-argument)
+  ((argument ;; inherited from the INVALID-ARGUMENT condition
+    :documentation "The invalid environment variable value."
+    :initarg :env-val
+    :reader env-val))
   (:report
    (lambda (error stream)
      (format stream
 	     "Environment variable ~A (for option ~S): invalid value ~S.~@[~%~A~]"
-	     (env-var (option error))
+	     (env-var error)
 	     (or (long-name (option error)) (short-name (option error)))
-	     (argument error)
+	     (env-val error)
 	     (comment error))))
   (:documentation "An invalid environment variable's value error."))
 
+;; #### WARNING: given the idea of supporting a list of env vars, I would need
+;; to modify this function in order to pass the env-var itself. This protocol
+;; would become even more similar to the command-line one. Yummy...
 (defun environment-convert (valued-option env-val)
   "Convert ENV-VAL to VALUED-OPTION's value.
 This function is used when the conversion comes from an environment variable
@@ -796,7 +817,8 @@ to raise the higher level invalid-environment-value error instead."
     (invalid-argument (error)
       (error 'invalid-environment-value
 	     :option valued-option
-	     :argument env-val
+	     :env-var (env-var valued-option)
+	     :env-val env-val
 	     :comment (comment error)))))
 
 (defun read-env-val (env-var)
@@ -805,6 +827,9 @@ to raise the higher level invalid-environment-value error instead."
 	  env-var)
   (list (read-line)))
 
+;; #### WARNING: given the idea of supporting a list of env vars, I would need
+;; to modify this function in order to pass the env-var itself. This protocol
+;; would become even more similar to the command-line one. Yummy...
 (defun restartable-environment-convert (valued-option env-val)
   "Restartably convert ENV-VAL to VALUED-OPTION's value.
 This function is used when the conversion comes from an environment variable

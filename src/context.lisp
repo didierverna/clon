@@ -424,7 +424,7 @@ This function returns two values:
 	 (push cmdline-item cmdline-items))))
     (setf (cmdline-items context) (nreverse cmdline-items)))
   ;; Try an environment variable:
-  (handler-bind ((invalid-environment-value ;; the only one right now
+  (handler-bind ((environment-error
 		  (lambda (error)
 		    (ecase error-handler
 		      (:quit
