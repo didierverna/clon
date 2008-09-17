@@ -130,6 +130,9 @@ options based on it."))
      nil)
     (register (error)
      :report "Don't treat error right now, but remember it."
+     :interactive (lambda ()
+		    ;; #### FIXME: SBCL specific
+		    (list sb-debug:*debug-condition*))
      (push error ,place))))
 
 (defmethod initialize-instance :after
@@ -184,6 +187,9 @@ options based on it."))
 			   :value ,value))
 		       (register (error)
 			:report "Don't treat error right now, but remember it."
+			:interactive (lambda ()
+				       ;; #### FIXME: SBCL specific
+				       (list sb-debug:*debug-condition*))
 			(push error ,place)))))
 	       (do-pack ((option pack context) &body body)
 		 "Evaluate BODY with OPTION bound to each option from PACK.
@@ -305,6 +311,10 @@ CONTEXT is where to look for the options."
 				 (register (error)
 				   :report
 				   "Don't treat error right now, but remember it."
+				   :interactive
+				   (lambda ()
+				     ;; #### FIXME: SBCL specific
+				     (list sb-debug:*debug-condition*))
 				   (push error cmdline-items)))))))))))
       (setf (cmdline-items context) (nreverse cmdline-items))
       (setf (slot-value context 'remainder) remainder))))
