@@ -1055,8 +1055,8 @@ This class implements boolean options."))
 ;; -------------------
 
 (defmethod check-value ((switch switch) value)
-  "Return VALUE.
-All values are valid for switches: everything but nil means 'yes'."
+  "Check that VALUE is valid for SWITCH."
+  ;; All values are valid for switches: everything but nil means 'yes'."
   value)
 
 (defmethod convert ((switch switch) argument)
@@ -1165,7 +1165,7 @@ This class implements options the values of which are strings."))
 ;; -------------------
 
 (defmethod check-value ((stropt stropt) value)
-  "Check that VALUE is a string."
+  "Check that VALUE is valid for STROPT."
   (if (stringp value)
       value
       (error 'invalid-value
