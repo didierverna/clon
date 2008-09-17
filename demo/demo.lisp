@@ -85,13 +85,14 @@
 (defun main ()
   "This program's main function."
   ;; This context will use the POSIX command line:
-  (let ((context (clon:make-context :synopsis *synopsis* :error-handler :register)))
+  (let ((context (clon:make-context :synopsis *synopsis* :error-handler :none
+				    :getopt-error-handler :none)))
     (multiple-value-bind (value source)
-	(clon:getopt context :short-name "f")
+	(clon:getopt context :short-name "d")
       (print (list value source)))
-;    (format t "~%~%Other options:")
-;    (clon:do-cmdline-options (option name value) (context :error-handler :none)
-;      (print (list option name value)))
+    (format t "~%~%Other options:")
+    (clon:do-cmdline-options (option name value) (context :error-handler :quit)
+			     (print (list option name value)))
 ;    (format t "~%~%Unknown options:")
 ;    (clon:do-unknown-options (name value) context
 ;      (print (list name value)))

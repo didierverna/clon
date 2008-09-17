@@ -423,8 +423,26 @@ This function returns two values:
 	(cmdline-error
 	 (push cmdline-item cmdline-items))))
     (setf (cmdline-items context) (nreverse cmdline-items)))
-  ;; Otherwise, fallback to the environment or a default value:
-  (fallback-retrieval option))
+  ;; Try an environment variable:
+  (handler-bind ((invalid-environment-value ;; the only one right now
+		  (lambda (error)
+		    (ecase error-handler
+		      (:quit
+		       (let (*print-escape*) (print-object error t))
+		       (terpri)
+		       ;; #### FIXME: SBCL-specific
+		       (sb-ext:quit :unix-status 1))
+		      (:none)))))
+    (let* ((env-var (env-var option))
+	   (env-val (sb-posix:getenv env-var)))
+      (when env-val
+	(return-from getopt
+	  (values (retrieve-from-environment option env-val)
+		  (list :environement env-var))))))
+  ;; Try a default value:
+  (let ((default-value (default-value option)))
+    (when default-value
+      (values default-value (list :default-value)))))
 
 (defun getopt-cmdline
     (context &key (error-handler (getopt-error-handler context)))

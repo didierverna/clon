@@ -330,8 +330,15 @@ This function returns two values:
 (defgeneric retrieve-from-plus-call (option)
   (:documentation "Retrieve OPTION's value from a plus call."))
 
-(defgeneric fallback-retrieval (option)
-  (:documentation "Retrieve OPTION's value from an env var, or a default value."))
+(defgeneric retrieve-from-environment (option env-val)
+  (:documentation "Retrieve OPTION's value from the environment.
+ENV-VAL is the value stored in the associated environment variable.")
+  (:method :before (option env-val)
+     "Assert that ENV-VAL is not null."
+     ;; That's because getopt is not supposed to call this function unless
+     ;; there is actually somethign to retrieve.
+    (assert env-val)))
+
 
 
 ;; ============================================================================
@@ -444,16 +451,14 @@ This class implements options that don't take any argument."))
   "Throw an invalid-+-syntax error."
   (restartable-invalid-+-syntax-error (flag) t))
 
-(defmethod fallback-retrieval ((flag flag))
-  "Retrieve FLAG from an env var if present."
+(defmethod retrieve-from-environment ((flag flag) env-val)
+  "Retrieve FLAG from the environment."
+  (declare (ignore env-val))
   ;; #### NOTE: there's no way of providing an env var /without/ a value (the
   ;; value is at least the empty string). Consequently, we decide that the
   ;; presence of the env var, regardless of its value, stands for the presence
   ;; of the flag.
-  ;; #### FIXME: SBCL-specific
-  (let ((env-value (sb-posix:getenv (env-var flag))))
-    (when env-value
-      (values t t (list :environment (env-var flag))))))
+  t)
 
 
 ;; ============================================================================
@@ -668,6 +673,8 @@ Available restarts are:
 ;; Retrieval protocol
 ;; ------------------
 
+;; #### FIXME: rework the error hierarchy: this one should inherit from
+;; invalid-argument.
 (define-condition invalid-cmdline-argument (cmdline-option-error)
   ((argument :documentation "The invalid argument."
 	     :type string
@@ -768,13 +775,70 @@ Available restarts are:
   (restartable-invalid-+-syntax-error (option)
     (retrieve-from-short-call option)))
 
-(defmethod fallback-retrieval ((option valued-option))
-  "Retrieve OPTION from an env var or its default value."
-  ;; #### FIXME: SBCL-specific
-  (let ((env-value (sb-posix:getenv (env-var option))))
-    (if env-value
-	(convert option env-value)
-	(default-value option))))
+(define-condition invalid-environment-value (invalid-argument)
+  ()
+  (:report
+   (lambda (error stream)
+     (format stream
+	     "Environment variable ~A (for option ~S): invalid value ~S.~@[~%~A~]"
+	     (env-var (option error))
+	     (or (long-name (option error)) (short-name (option error)))
+	     (argument error)
+	     (comment error))))
+  (:documentation "An invalid environment variable's value error."))
+
+(defun environment-convert (valued-option env-val)
+  "Convert ENV-VAL to VALUED-OPTION's value.
+This function is used when the conversion comes from an environment variable
+associated with VALUED-OPTION, and intercepts invalid-argument errors
+to raise the higher level invalid-environment-value error instead."
+  (handler-case (restartable-convert valued-option env-val)
+    (invalid-argument (error)
+      (error 'invalid-environment-value
+	     :option valued-option
+	     :argument env-val
+	     :comment (comment error)))))
+
+(defun read-env-val (env-var)
+  "Read ENV-VAR's new value from standard input."
+  (format t "Please type in a new value for the ~A environment variable:~%"
+	  env-var)
+  (list (read-line)))
+
+(defun restartable-environment-convert (valued-option env-val)
+  "Restartably convert ENV-VAL to VALUED-OPTION's value.
+This function is used when the conversion comes from an environment variable
+associated with VALUED-OPTION.
+
+Available restarts are:
+- use-default-value: return VALUED-OPTION's default value,
+- use-value: return another (already converted) value,
+- use-argument: return the conversion of another argument,
+- modify-env: modify the environment variable's value."
+  (restart-case (environment-convert valued-option env-val)
+    (use-default-value ()
+      :report (lambda (stream)
+		(format stream "Use option's default value (~S)."
+			(default-value valued-option)))
+      (default-value valued-option))
+    (use-value (value)
+      :report "Use an already converted value."
+      :interactive read-value
+      (restartable-check-value valued-option value))
+    (use-argument (argument)
+      :report "Use the conversion of an argument."
+      :interactive read-argument
+      (restartable-environment-convert valued-option argument))
+    (modify-environment (env-val)
+      :report "Modify the environment variable's value."
+      :interactive (lambda () (read-env-val (env-var valued-option)))
+      ;; #### FIXME: SBCL specific
+      (sb-posix:putenv (concatenate 'string (env-var valued-option) "=" env-val))
+      (restartable-environment-convert valued-option env-val))))
+
+(defmethod retrieve-from-environment ((option valued-option) env-val)
+  "Retrieve OPTION's value from the environment."
+  (restartable-environment-convert option env-val))
 
 
 ;; ============================================================================
