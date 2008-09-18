@@ -93,26 +93,24 @@
 		  "The behavior to adopt on errors at command-line parsing time."
 		  :type symbol
 		  :initarg :error-handler
+		  :initform :quit
 		  :reader error-handler)
    (getopt-error-handler
     :documentation
     "The default behavior to adopt on errors in the getopt family of functions."
     :type symbol
     :initarg :getopt-error-handler
+    :initform :quit
     :reader getopt-error-handler))
   (:default-initargs
       ;; #### FIXME: SBCL specific
-      :cmdline sb-ext:*posix-argv*
-    :error-handler :quit
-    :getopt-error-handler :quit)
+      :cmdline sb-ext:*posix-argv*)
   (:documentation "The CONTEXT class.
 This class represents the associatiion of a synopsis and a set of command-line
 options based on it."))
 
-(defmethod initialize-instance :before
-    ((context context) &key synopsis cmdline error-handler getopt-error-handler)
+(defmethod initialize-instance :before ((context context) &key synopsis)
   "Ensure that SYNOPSIS is sealed."
-  (declare (ignore cmdline error-handler getopt-error-handler))
   (unless (sealedp synopsis)
     (error "Initializing context ~A: synopsis ~A not sealed." context synopsis)))
 
@@ -135,10 +133,8 @@ options based on it."))
 		    (list sb-debug:*debug-condition*))
      (push error ,place))))
 
-(defmethod initialize-instance :after
-    ((context context) &key synopsis cmdline error-handler getopt-error-handler)
+(defmethod initialize-instance :after ((context context) &key cmdline)
   "Parse CMDLINE."
-  (declare (ignore synopsis error-handler getopt-error-handler))
   (setf (slot-value context 'progname) (pop cmdline))
   (let ((cmdline-items (list))
 	(remainder (list)))
@@ -319,8 +315,8 @@ CONTEXT is where to look for the options."
       (setf (cmdline-items context) (nreverse cmdline-items))
       (setf (slot-value context 'remainder) remainder))))
 
-(defun make-context (&rest keys
-		     &key synopsis cmdline error-handler getopt-error-handler)
+(defun make-context
+    (&rest keys &key synopsis cmdline error-handler getopt-error-handler)
   "Make a new context.
 - SYNOPSIS is the program synopsis to use in that context.
 - CMDLINE is the argument list (strings) to process.
@@ -370,9 +366,9 @@ The search is actually done in the CONTEXT'synopsis."
 ;; The Option Retrieval Protocol
 ;; ============================================================================
 
-(defun getopt (context
-	       &rest keys &key short-name long-name option
-			      (error-handler (getopt-error-handler context)))
+(defun getopt (context &rest keys
+		       &key short-name long-name option
+			    (error-handler (getopt-error-handler context)))
   "Get an option's value in CONTEXT.
 The option can be specified either by SHORT-NAME, LONG-NAME, or directly via
 an OPTION object.

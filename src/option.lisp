@@ -77,34 +77,32 @@ If so, store it into CMDLINE-ARGUMENT."
   ((short-name :documentation "The option's short name."
 	       :type (or null string)
 	       :initarg :short-name
+	       :initform nil
 	       :reader short-name)
    (long-name :documentation "The option's long name."
 	      :type (or null string)
 	      :initarg :long-name
+	      :initform nil
 	      :reader long-name)
    (description :documentation "The option's description."
 		:type (or null string)
 		:initarg :description
+		:initform nil
 		:reader description)
    (env-var :documentation "The option's associated environment variable."
 	    :type (or null string)
 	    :initarg :env-var
+	    :initform nil
 	    :reader env-var)
    (traversedp :documentation "The option's traversal state."
 	       :initform nil
 	       :accessor traversedp))
-  (:default-initargs
-    :short-name nil
-    :long-name nil
-    :description nil
-    :env-var nil)
   (:documentation "The OPTION class.
 This is the base class for all options."))
 
 (defmethod initialize-instance :before
-    ((option option) &rest keys &key short-name long-name description env-var)
+    ((option option) &rest keys &key short-name long-name)
   "Check validity of the name-related initargs."
-  (declare (ignore description env-var))
   (unless (or short-name long-name)
     (error "Option ~A: no name given." option))
   ;; #### FIXME: is this really necessary ? What about the day I would like
@@ -534,6 +532,9 @@ This class implements options that don't take any argument."))
 		 :reader default-value))
   (:metaclass valued-option-class)
   (:default-initargs
+    ;; #### NOTE: I'm using a default-initarg instead of an initform here
+    ;; because there are checks on the argument name in the before method
+    ;; below.
     :argument-name "ARG"
     :argument-type :required)
   (:documentation "The VALUED-OPTION class.
@@ -544,22 +545,18 @@ This is the base class for options accepting arguments."))
 			       (fallback-value nil fallback-value-supplied-p)
 			       (default-value nil default-value-supplied-p))
   "Check validity of the value-related initargs."
-  (when (or (null argument-name)
-	    (and argument-name (zerop (length argument-name))))
+  (when (zerop (length argument-name))
     (error "Option ~A: empty argument name." option))
-  (unless (or (eq argument-type :required)
-	      (eq argument-type :mandatory)
-	      (eq argument-type :optional))
+  (unless (member argument-type '(:required :mandatory :optional))
     (error "Option ~A: invalid argument type ~S." option argument-type))
   (when (and (not (eq argument-type :optional))
 	     fallback-value-supplied-p)
-    (warn "Option ~A: fallback value provided, but argument is mandatory." option))
+    (warn "Option ~A: fallback value supplied for required argument." option))
   (when (and (eq argument-type :optional)
 	     (not fallback-value-supplied-p)
 	     (not default-value-supplied-p))
-    (error
-     "Option ~A: fallback or default value required because argument is optional."
-     option))
+    (error "Option ~A: fallback or default value required for optional argument."
+	   option))
   ;; Here, we catch and convert a potential invalid-value error into a simple
   ;; error because this check is intended for the Clon user, as opposed to the
   ;; Clon end-user. In other words, a potential error here is in the program
@@ -574,12 +571,10 @@ This is the base class for options accepting arguments."))
 	(error "Option ~A: invalid default value ~S." option default-value)))))
 
 (defmethod initialize-instance :after
-    ((option valued-option) &key argument-name argument-type
-			       fallback-value default-value)
+    ((option valued-option) &key argument-type)
   "Compute uninitialized OPTION slots with indirect initargs.
 This currently involves the conversion of the ARGUMENT-TYPE key to the
 ARGUMENT-REQUIRED-P slot."
-  (declare (ignore argument-name fallback-value default-value))
   (ecase argument-type
     ((:required :mandatory)
      (setf (slot-value option 'argument-required-p) t))
@@ -929,7 +924,10 @@ Available restarts are:
 
 ;; #### FIXME: I'm not very satisfied with the argument-style stuff. This
 ;; implies that the argument-name slot from the valued-option class is ignored
-;; in switches. The design could probably be improved.
+;; in switches. The design could probably be improved. A better way to do it
+;; would probably be to re-use the argument name slot, but make its type
+;; dynamic (so that it can be a symbol for switches) and provide an additional
+;; "argument style" accessor.
 (defoption switch ()
   ((argument-style :documentation "The style of the argument (on/off etc.)."
 		   :type symbol
@@ -958,25 +956,15 @@ Available restarts are:
   (:documentation "The SWITCH class.
 This class implements boolean options."))
 
-(defmethod initialize-instance :before ((switch switch)
-					&key short-name long-name description
-					     argument-name argument-type
-					     default-value env-var
-					     argument-style)
+(defmethod initialize-instance :before ((switch switch) &key argument-style)
   "Check validity of switch-specific initargs."
-  (declare (ignore short-name long-name description
-		   argument-type
-		   default-value env-var))
-  (unless argument-name
-    (error "Argument name provided for a switch. Use argument style instead."))
   (unless (member argument-style (argument-styles switch))
     (error "Invalid switch argument style ~S." argument-style)))
 
-(defun make-switch (&rest keys
-		    &key short-name long-name description
-			 argument-name argument-type
-			 default-value env-var
-			 argument-style)
+(defun make-switch (&rest keys &key short-name long-name description
+				   argument-style argument-type
+				   default-value env-var
+			 )
   "Make a new switch.
 - SHORT-NAME is the switch's short name (without the dash).
   It defaults to nil.
@@ -984,20 +972,18 @@ This class implements boolean options."))
   It defaults to nil.
 - DESCRIPTION is the switch's description appearing in help strings.
   It defaults to nil.
-- ARGUMENT-NAME shouldn't be used (use ARGUMENT-STYLE instead).
+- ARGUMENT-STYLE is the switch's argument display style. It can be one of
+  :yes/no, :on/off, :true/false, :yup/nope.
+  It defaults to :yes/no.
 - ARGUMENT-TYPE is one of :required, :mandatory or :optional (:required and
   :mandatory are synonyms).
   It defaults to :optional.
 - DEFAULT-VALUE is the switch's default value, if any.
 - ENV-VAR is the switch's associated environment variable.
-  It defaults to nil.
-- ARGUMENT-STYLE is the switch's argument display style. It can be one of
-  :yes/no, :on/off, :true/false, :yup/nope.
-  It defaults to :yes/no."
+  It defaults to nil."
   (declare (ignore short-name long-name description
-		   argument-name
-		   default-value env-var
-		   argument-style))
+		   argument-style
+		   default-value env-var))
   ;; #### FIXME: Yuck! default argument-type initarg is known to be :optional.
   ;; This is dirty but I couldn't figure out a way to do this properly with
   ;; before or after methods.
@@ -1008,14 +994,13 @@ This class implements boolean options."))
 
 (defun make-internal-switch (long-name description
 			     &rest keys
-			     &key argument-name argument-type
+			     &key argument-style argument-type
 				  default-value env-var
-				  argument-style)
+				  )
   "Make a new internal (Clon-specific) switch.
 - LONG-NAME is the switch's long-name, minus the 'clon-' prefix.
   (Internal options don't have short names.)
 - DESCRIPTION is the switch's description.
-- ARGUMENT-NAME shouldn't be used (use ARGUMENT-STYLE instead).
 - ARGUMENT-TYPE is one of :required, :mandatory or :optional (:required and
   :mandatory are synonyms).
   It defaults to :optional.
@@ -1025,7 +1010,7 @@ This class implements boolean options."))
 - ARGUMENT-STYLE is the switch's argument display style. It can be one of
   :yes/no, :on/off, :true/false, :yup/nope.
   It defaults to :yes/no."
-  (declare (ignore argument-name default-value argument-style))
+  (declare (ignore argument-style default-value))
   ;; #### FIXME: Yuck! default argument-type initarg is known to be :optional.
   ;; This is dirty but I couldn't figure out a way to do this properly with
   ;; before or after methods.
