@@ -518,8 +518,8 @@ This class implements options that don't take any argument."))
 ;; #### FIXME: make abstract
 (defclass valued-option (option)
   ((argument-name :documentation "The option's argument display name."
-		  :type string
 		  :initarg :argument-name
+		  :initform "ARG"
 		  :reader argument-name)
    (argument-required-p :documentation "Whether the option's argument is required."
 			;; Initialization :after wards by :argument-type
@@ -532,21 +532,15 @@ This class implements options that don't take any argument."))
 		 :reader default-value))
   (:metaclass valued-option-class)
   (:default-initargs
-    ;; #### NOTE: I'm using a default-initarg instead of an initform here
-    ;; because there are checks on the argument name in the before method
-    ;; below.
-    :argument-name "ARG"
     :argument-type :required)
   (:documentation "The VALUED-OPTION class.
 This is the base class for options accepting arguments."))
 
 (defmethod initialize-instance :before
-    ((option valued-option) &key argument-name argument-type
+    ((option valued-option) &key argument-type
 			       (fallback-value nil fallback-value-supplied-p)
 			       (default-value nil default-value-supplied-p))
   "Check validity of the value-related initargs."
-  (when (zerop (length argument-name))
-    (error "Option ~A: empty argument name." option))
   (unless (member argument-type '(:required :mandatory :optional))
     (error "Option ~A: invalid argument type ~S." option argument-type))
   (when (and (not (eq argument-type :optional))
@@ -922,18 +916,8 @@ Available restarts are:
 ;; value is given by the -/+ call. When the argument is optional, omitting it
 ;; is equivalent to saying yes.
 
-;; #### FIXME: I'm not very satisfied with the argument-style stuff. This
-;; implies that the argument-name slot from the valued-option class is ignored
-;; in switches. The design could probably be improved. A better way to do it
-;; would probably be to re-use the argument name slot, but make its type
-;; dynamic (so that it can be a symbol for switches) and provide an additional
-;; "argument style" accessor.
 (defoption switch ()
-  ((argument-style :documentation "The style of the argument (on/off etc.)."
-		   :type symbol
-		   :initarg :argument-style
-		   :reader argument-style)
-   (argument-styles :documentation "The possible argument styles."
+  ((argument-styles :documentation "The possible argument styles."
 		    :allocation :class
 		    :type list
 		    :initform '(:yes/no :on/off :true/false :yup/nope)
@@ -947,9 +931,12 @@ Available restarts are:
 	      :allocation :class
 	      :type list
 	      :initform '("no" "off" "false" "nope")
-	      :accessor no-values))
+	      :accessor no-values)
+   (argument-name ;; inherited from the VALUED-OPTION class
+    :documentation "The option's argument style."
+    :initarg :argument-style
+    :reader argument-style))
   (:default-initargs
-    ;; No :argument-name -- not used
     :argument-style :yes/no
     :argument-type :optional
     :env-var nil)
