@@ -68,7 +68,7 @@
 	     :description "both names, optional argument, another name"
 	     :argument-type :optional
 	     :argument-name "NAME"
-	     :default-value "unknown")
+	     :fallback-value "unknown")
      (stropt :short-name "a" :description "short name, required argument")
      (stropt :short-name "c"
 	     :description "short name, optional argument"

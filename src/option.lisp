@@ -526,6 +526,9 @@ This class implements options that don't take any argument."))
    (argument-required-p :documentation "Whether the option's argument is required."
 			;; Initialization :after wards by :argument-type
 			:reader argument-required-p)
+   (fallback-value :documentation "The option's fallback value."
+		   :initarg :fallback-value
+		   :reader fallback-value)
    (default-value :documentation "The option's default value."
 		 :initarg :default-value
 		 :reader default-value))
@@ -538,6 +541,7 @@ This is the base class for options accepting arguments."))
 
 (defmethod initialize-instance :before
     ((option valued-option) &key argument-name argument-type
+			       (fallback-value nil fallback-value-supplied-p)
 			       (default-value nil default-value-supplied-p))
   "Check validity of the value-related initargs."
   (when (or (null argument-name)
@@ -547,29 +551,36 @@ This is the base class for options accepting arguments."))
 	      (eq argument-type :mandatory)
 	      (eq argument-type :optional))
     (error "Option ~A: invalid argument type ~S." option argument-type))
+  (when (and (not (eq argument-type :optional))
+	     fallback-value-supplied-p)
+    (warn "Option ~A: fallback value provided, but argument is mandatory." option))
   (when (and (eq argument-type :optional)
-	     ;; #### FIXME: yuck. What's the pattern for doing checks on "all
-	     ;; but some" subclasses?
-	     (not (typep option 'switch)))
-    (unless default-value-supplied-p
-      (error "Option ~A: default value required because argument is optional."
-	     option)))
+	     (not fallback-value-supplied-p)
+	     (not default-value-supplied-p))
+    (error
+     "Option ~A: fallback or default value required because argument is optional."
+     option))
   ;; Here, we catch and convert a potential invalid-value error into a simple
   ;; error because this check is intended for the Clon user, as opposed to the
   ;; Clon end-user. In other words, a potential error here is in the program
   ;; itself; not in the usage of the program.
+  (when fallback-value-supplied-p
+    (handler-case (check-value option fallback-value)
+      (invalid-value ()
+	(error "Option ~A: invalid fallback value ~S." option fallback-value))))
   (when default-value-supplied-p
     (handler-case (check-value option default-value)
       (invalid-value ()
 	(error "Option ~A: invalid default value ~S." option default-value)))))
 
 (defmethod initialize-instance :after
-    ((option valued-option) &key argument-name argument-type default-value)
+    ((option valued-option) &key argument-name argument-type
+			       fallback-value default-value)
   "Compute uninitialized OPTION slots with indirect initargs.
 This currently involves the conversion of the ARGUMENT-TYPE key to the
 ARGUMENT-REQUIRED-P slot."
-  (declare (ignore argument-name default-value))
-  (case argument-type
+  (declare (ignore argument-name fallback-value default-value))
+  (ecase argument-type
     ((:required :mandatory)
      (setf (slot-value option 'argument-required-p) t))
     (:optional
@@ -733,24 +744,16 @@ to raise the higher level invalid-cmdline-argument error instead."
 	     (format stream "Option '~A': missing argument." (name error))))
   (:documentation "A missing command-line argument error."))
 
-;; #### NOTE: FALLBACK-VALUE is currently only used by switches (because of
-;; their special semantics for long call without argument).
-(defun restartable-cmdline-convert
-    (valued-option cmdline-name cmdline-argument
-     &optional (fallback-value
-		(unless (argument-required-p valued-option)
-		  (default-value valued-option))))
+(defun restartable-cmdline-convert (valued-option cmdline-name cmdline-argument)
   "Restartably convert CMDLINE-ARGUMENT to VALUED-OPTION's value.
 This function is used when the conversion comes from a command-line usage of
 VALUED-OPTION, called by CMDLINE-NAME.
-FALLBACK-VALUE is what to return when VALUED-OPTION's argument is optional and
-not provided. It defaults to VALUED-OPTION's default value.
 
 As well as conversion errors, this function might raise a
 missing-cmdline-argument error if CMDLINE-ARGUMENT is nil and an argument is
 required.
 
-Available restarts are:
+Available restarts are (depending on the context):
 - use-fallback-value: return FALLBACK-VALUE,
 - use-default-value: return VALUED-OPTION's default value,
 - use-value: return another (already converted) value,
@@ -764,14 +767,18 @@ Available restarts are:
 	    (cmdline-argument
 	     (cmdline-convert valued-option cmdline-name cmdline-argument))
 	    (t
-	     fallback-value))
+	     (if (slot-boundp valued-option 'fallback-value)
+		 (fallback-value valued-option)
+		 (default-value valued-option))))
     (use-fallback-value ()
       :test (lambda (error)
 	      (declare (ignore error))
-	      (not (argument-required-p valued-option)))
+	      (and (not (argument-required-p valued-option))
+		   (slot-boundp valued-option 'fallback-value)))
       :report (lambda (stream)
-		(format stream "Use fallback value (~S)." fallback-value))
-      fallback-value)
+		(format stream "Use fallback value (~S)."
+			(fallback-value valued-option)))
+      (fallback-value valued-option))
     (use-default-value ()
       :test (lambda (error)
 	      ;; #### NOTE: which design is better here? Accessing the option
@@ -792,7 +799,7 @@ Available restarts are:
       :report "Use the conversion of an argument."
       :interactive read-argument
       (restartable-cmdline-convert
-       valued-option cmdline-name cmdline-argument fallback-value))))
+       valued-option cmdline-name cmdline-argument))))
 
 (defmethod retrieve-from-long-call
     ((option valued-option) cmdline-name &optional cmdline-argument cmdline)
@@ -988,9 +995,15 @@ This class implements boolean options."))
   :yes/no, :on/off, :true/false, :yup/nope.
   It defaults to :yes/no."
   (declare (ignore short-name long-name description
-		   argument-name argument-type
+		   argument-name
 		   default-value env-var
 		   argument-style))
+  ;; #### FIXME: Yuck! default argument-type initarg is known to be :optional.
+  ;; This is dirty but I couldn't figure out a way to do this properly with
+  ;; before or after methods.
+  (when (or (not argument-type)
+	    (eq argument-type :optional))
+    (setq keys (list* :fallback-value t keys)))
   (apply #'make-instance 'switch keys))
 
 (defun make-internal-switch (long-name description
@@ -1012,7 +1025,13 @@ This class implements boolean options."))
 - ARGUMENT-STYLE is the switch's argument display style. It can be one of
   :yes/no, :on/off, :true/false, :yup/nope.
   It defaults to :yes/no."
-  (declare (ignore argument-name argument-type default-value argument-style))
+  (declare (ignore argument-name default-value argument-style))
+  ;; #### FIXME: Yuck! default argument-type initarg is known to be :optional.
+  ;; This is dirty but I couldn't figure out a way to do this properly with
+  ;; before or after methods.
+  (when (or (not argument-type)
+	    (eq argument-type :optional))
+    (setq keys (list* :fallback-value t keys)))
   (when env-var
     ;; #### NOTE: this works because the default-initargs option for env-var
     ;; is actually nil, so I don't risk missing a concatenation later.
@@ -1055,16 +1074,6 @@ This class implements boolean options."))
 ;; ------------------
 ;; Retrieval protocol
 ;; ------------------
-
-(defmethod retrieve-from-long-call
-    ((switch switch) cmdline-name &optional cmdline-argument cmdline)
-  "Retrieve SWITCH's value from a long call."
-  ;; The difference with other valued options is that an omitted optional
-  ;; argument always stands for a "yes", *even* if the switch has a different
-  ;; default-value.
-  (maybe-pop-argument cmdline switch cmdline-argument)
-  (values (restartable-cmdline-convert switch cmdline-name cmdline-argument t)
-	  cmdline))
 
 (defmethod retrieve-from-short-call
     ((switch switch) &optional cmdline-argument cmdline)
@@ -1139,7 +1148,7 @@ This class implements options the values of which are strings."))
 (defun make-stropt (&rest keys
 		    &key short-name long-name description
 			 argument-name argument-type
-			 default-value env-var)
+			 fallback-value default-value env-var)
   "Make a new string option.
 - SHORT-NAME is the option's short name (without the dash).
   It defaults to nil.
@@ -1151,18 +1160,20 @@ This class implements options the values of which are strings."))
 - ARGUMENT-TYPE is one of :required, :mandatory or :optional (:required and
   :mandatory are synonyms).
   It defaults to :optional.
+- FALLBACK-VALUE is the option's fallback value (for missing optional
+  arguments), if any.
 - DEFAULT-VALUE is the option's default value, if any.
 - ENV-VAR is the option's associated environment variable.
   It defaults to nil."
   (declare (ignore short-name long-name description
 		   argument-name argument-type
-		   default-value env-var))
+		   fallback-value default-value env-var))
   (apply #'make-instance 'stropt keys))
 
 (defun make-internal-stropt (long-name description
 			     &rest keys
 			     &key argument-name argument-type
-				  default-value env-var)
+				  fallback-value default-value env-var)
   "Make a new internal (Clon-specific) string option.
 - LONG-NAME is the option's long-name, minus the 'clon-' prefix.
   (Internal options don't have short names.)
@@ -1171,10 +1182,12 @@ This class implements options the values of which are strings."))
 - ARGUMENT-TYPE is one of :required, :mandatory or :optional (:required and
   :mandatory are synonyms).
   It defaults to :optional.
+- FALLBACK-VALUE is the option's fallback value (for missing optional
+  arguments), if any.
 - DEFAULT-VALUE is the option's default value, if any.
 - ENV-VAR is the option's associated environment variable, minus the 'CLON_'
   prefix. It defaults to nil."
-  (declare (ignore argument-name argument-type default-value))
+  (declare (ignore argument-name argument-type fallback-value default-value))
   (when env-var
     ;; #### NOTE: this works because the default-initargs option for env-var
     ;; is actually nil, so I don't risk missing a concatenation later.
