@@ -952,6 +952,13 @@ This class implements boolean options."))
   (unless (member argument-style (argument-styles switch))
     (error "Invalid switch argument style ~S." argument-style)))
 
+(defmethod initialize-instance :around
+    ((switch switch) &rest keys &key argument-type)
+  "Provide a fallback value of t when SWITCH's argument is optional."
+  (when (eq argument-type :optional)
+    (setq keys (list* :fallback-value t keys)))
+  (apply #'call-next-method switch keys))
+
 (defun make-switch (&rest keys &key short-name long-name description env-var
 				   argument-type default-value
 				   argument-style)
@@ -974,12 +981,6 @@ This class implements boolean options."))
   (declare (ignore short-name long-name description env-var
 		   default-value
 		   argument-style))
-  ;; #### FIXME: Yuck! default argument-type initarg is known to be :optional.
-  ;; This is dirty but I couldn't figure out a way to do this properly with
-  ;; before or after methods.
-  (when (or (not argument-type)
-	    (eq argument-type :optional))
-    (setq keys (list* :fallback-value t keys)))
   (apply #'make-instance 'switch keys))
 
 (defun make-internal-switch (long-name description
@@ -999,13 +1000,7 @@ This class implements boolean options."))
 - ARGUMENT-STYLE is the switch's argument display style. It can be one of
   :yes/no, :on/off, :true/false, :yup/nope.
   It defaults to :yes/no."
-  (declare (ignore env-var default-value argument-style))
-  ;; #### FIXME: Yuck! default argument-type initarg is known to be :optional.
-  ;; This is dirty but I couldn't figure out a way to do this properly with
-  ;; before or after methods.
-  (when (or (not argument-type)
-	    (eq argument-type :optional))
-    (setq keys (list* :fallback-value t keys)))
+  (declare (ignore env-var argument-type default-value argument-style))
   (apply #'make-instance 'switch
 	 :long-name long-name
 	 :description description
