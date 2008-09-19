@@ -97,12 +97,17 @@ If so, store it into CMDLINE-ARGUMENT."
    (traversedp :documentation "The option's traversal state."
 	       :initform nil
 	       :accessor traversedp))
+  (:default-initargs
+    :internal nil)
   (:documentation "The OPTION class.
 This is the base class for all options."))
 
 (defmethod initialize-instance :before
-    ((option option) &rest keys &key short-name long-name)
+    ((option option) &key short-name long-name description internal)
   "Check validity of the name-related initargs."
+  (when internal
+    (assert (not (or (zerop (length long-name))
+		     (zerop (length description))))))
   (unless (or short-name long-name)
     (error "Option ~A: no name given." option))
   ;; #### FIXME: is this really necessary ? What about the day I would like
@@ -125,11 +130,23 @@ This is the base class for all options."))
     (error "Option ~A: short name begins with a dash." option))
   ;; Clon uses only long names, not short ones. But it's preferable to
   ;; reserve the prefix in both cases.
-  (unless (cadr (member :internal keys))
+  (unless internal
     (dolist (name (list short-name long-name))
       (when (and name (or (string= name "clon")
 			  (beginning-of-string-p "clon-" name)))
 	(error "Option ~A: name ~S reserved by Clon." option name)))))
+
+(defmethod initialize-instance
+    ((option option) &rest keys &key long-name env-var internal)
+  "Initialize OPTION.
+If INTERNAL, prefix LONG-NAME with \"clon-\" and ENV-VAR with \"CLON_\"."
+  (when internal
+    (setq long-name (concatenate 'string "clon-" long-name))
+    (setq keys (list* :long-name long-name (remove-keys keys :long-name)))
+    (when env-var
+      (setq env-var (concatenate 'string "CLON_" env-var))
+      (setq keys (list* :env-var env-var (remove-keys keys :env-var)))))
+  (apply #'call-next-method option keys))
 
 
 ;; -------------------------
@@ -395,24 +412,10 @@ This class implements options that don't take any argument."))
 - DESCRIPTION is the flag's description.
 - ENV-VAR is the flag's associated environment variable, minus the 'CLON_'
   prefix. It defaults to nil."
-  (assert (not (or (zerop (length long-name))
-		   (zerop (length description)))))
-  (when env-var
-    ;; #### NOTE: this works because the default-initargs option for env-var
-    ;; is actually nil, so I don't risk missing a concatenation later.
-    (setq env-var (concatenate 'string "CLON_" env-var)))
   (make-instance 'flag
-    :long-name (concatenate 'string "clon-" long-name)
+    :long-name long-name
     :description description
     :env-var env-var
-    ;; #### FIXME: I'm not quite satisfied with this design here. Other
-    ;; possibilities would be to:
-    ;; - temporarily set a global variable like *internal*, but /yuck/.
-    ;; - temporarily define an additional :before method performing the
-    ;;   clon- prefix check, but only for user-level options. Cleaner,
-    ;;   but obviously more costly, although it certainly doesn't matter
-    ;;   much.
-    :allow-other-keys t
     :internal t))
 
 
@@ -997,24 +1000,18 @@ This class implements boolean options."))
 - ARGUMENT-STYLE is the switch's argument display style. It can be one of
   :yes/no, :on/off, :true/false, :yup/nope.
   It defaults to :yes/no."
-  (declare (ignore argument-style default-value))
+  (declare (ignore argument-style default-value env-var))
   ;; #### FIXME: Yuck! default argument-type initarg is known to be :optional.
   ;; This is dirty but I couldn't figure out a way to do this properly with
   ;; before or after methods.
   (when (or (not argument-type)
 	    (eq argument-type :optional))
     (setq keys (list* :fallback-value t keys)))
-  (when env-var
-    ;; #### NOTE: this works because the default-initargs option for env-var
-    ;; is actually nil, so I don't risk missing a concatenation later.
-    (setq env-var (concatenate 'string "CLON_" env-var)))
   (apply #'make-instance 'switch
-	 :long-name (concatenate 'string "clon-" long-name)
+	 :long-name long-name
 	 :description description
-	 :env-var env-var
-	 :allow-other-keys t
 	 :internal t
-	 (remove-keys keys :env-var)))
+	 keys))
 
 
 ;; -------------------------
@@ -1159,18 +1156,14 @@ This class implements options the values of which are strings."))
 - DEFAULT-VALUE is the option's default value, if any.
 - ENV-VAR is the option's associated environment variable, minus the 'CLON_'
   prefix. It defaults to nil."
-  (declare (ignore argument-name argument-type fallback-value default-value))
-  (when env-var
-    ;; #### NOTE: this works because the default-initargs option for env-var
-    ;; is actually nil, so I don't risk missing a concatenation later.
-    (setq env-var (concatenate 'string "CLON_" env-var)))
+  (declare (ignore argument-name argument-type
+		   fallback-value default-value
+		   env-var))
   (apply #'make-instance 'stropt
-	 :long-name (concatenate 'string "clon-" long-name)
+	 :long-name long-name
 	 :description description
-	 :env-var env-var
-	 :allow-other-keys t
 	 :internal t
-	 (remove-keys keys :env-var)))
+	 keys))
 
 
 ;; -------------------

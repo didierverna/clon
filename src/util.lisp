@@ -48,9 +48,6 @@
     (and (>= (length string) length)
 	 (string= beginning string :end2 length))))
 
-#|(defmacro define-restart-function (symbol)
-  `(defun ,symbol (c)
-    (invoke-restart |#
 
 ;; ============================================================================
 ;; Key-Value pairs manipulation
@@ -70,5 +67,18 @@
 	:unless (member key removed)
 	:nconc (list key val)))
 
+
+;; ============================================================================
+;; CLOS utility routines
+;; ============================================================================
+
+#|
+(defmacro with-method (method-declaration &body body)
+  "Execute BODY with a temporary method defined by METHOD-DECLARATION."
+  (let ((method (gensym "method")))
+    `(let ((,method (defmethod ,@method-declaration)))
+      ,@body
+      (remove-method (function ,(car method-declaration)) ,method))))
+|#
 
 ;;; util.lisp ends here
