@@ -979,7 +979,7 @@ This class implements boolean options."))
   :yes/no, :on/off, :true/false, :yup/nope.
   It defaults to :yes/no."
   (declare (ignore short-name long-name description env-var
-		   default-value
+		   argument-type default-value
 		   argument-style))
   (apply #'make-instance 'switch keys))
 
