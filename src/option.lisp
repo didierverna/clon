@@ -136,10 +136,9 @@ This is the base class for all options."))
 			  (beginning-of-string-p "clon-" name)))
 	(error "Option ~A: name ~S reserved by Clon." option name)))))
 
-(defmethod initialize-instance
+(defmethod initialize-instance :around
     ((option option) &rest keys &key long-name env-var internal)
-  "Initialize OPTION.
-If INTERNAL, prefix LONG-NAME with \"clon-\" and ENV-VAR with \"CLON_\"."
+  "If INTERNAL, prefix LONG-NAME with \"clon-\" and ENV-VAR with \"CLON_\"."
   (when internal
     (setq long-name (concatenate 'string "clon-" long-name))
     (setq keys (list* :long-name long-name (remove-keys keys :long-name)))
