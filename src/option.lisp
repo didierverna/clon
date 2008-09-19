@@ -509,12 +509,12 @@ This class implements options that don't take any argument."))
 		 :accessor option-names))
   (:documentation "The VALUED-OPTION-CLASS metaclass."))
 
-;; #### FIXME: SBCL-specific
+;; #### PORTME.
 (defmethod sb-mop:validate-superclass
     ((class standard-class) (superclass valued-option-class))
   t)
 
-;; #### FIXME: SBCL-specific
+;; #### PORTME.
 (defmethod sb-mop:validate-superclass
     ((class valued-option-class) (superclass standard-class))
   t)
@@ -889,7 +889,7 @@ Available restarts are:
     (modify-environment (env-val)
       :report "Modify the environment variable's value."
       :interactive (lambda () (read-env-val (env-var valued-option)))
-      ;; #### FIXME: SBCL specific
+      ;; #### PORTME.
       (sb-posix:putenv (concatenate 'string (env-var valued-option) "=" env-val))
       (restartable-environment-convert valued-option env-val))))
 

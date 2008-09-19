@@ -103,7 +103,7 @@
     :initform :quit
     :reader getopt-error-handler))
   (:default-initargs
-      ;; #### FIXME: SBCL specific
+      ;; #### PORTME.
       :cmdline sb-ext:*posix-argv*)
   (:documentation "The CONTEXT class.
 This class represents the associatiion of a synopsis and a set of command-line
@@ -129,7 +129,7 @@ options based on it."))
     (register (error)
      :report "Don't treat error right now, but remember it."
      :interactive (lambda ()
-		    ;; #### FIXME: SBCL specific
+		    ;; #### PORTME.
 		    (list sb-debug:*debug-condition*))
      (push error ,place))))
 
@@ -184,7 +184,7 @@ options based on it."))
 		       (register (error)
 			:report "Don't treat error right now, but remember it."
 			:interactive (lambda ()
-				       ;; #### FIXME: SBCL specific
+				       ;; #### PORTME.
 				       (list sb-debug:*debug-condition*))
 			(push error ,place)))))
 	       (do-pack ((option pack context) &body body)
@@ -204,7 +204,7 @@ CONTEXT is where to look for the options."
 			  (:quit
 			   (let (*print-escape*) (print-object error t))
 			   (terpri)
-			   ;; #### FIXME: SBCL-specific
+			   ;; #### PORTME.
 			   (sb-ext:quit :unix-status 1))
 			  (:register
 			   (invoke-restart 'register error))
@@ -285,7 +285,7 @@ CONTEXT is where to look for the options."
 			   cmdline-items cmdline-name)))))
 		(t
 		 ;; Not an option call.
-		 ;; #### FIXME: SBCL specific.
+		 ;; #### PORTME.
 		 (cond ((sb-ext:posix-getenv "POSIXLY_CORRECT")
 			;; That's the end of the Clon-specific part:
 			(setq remainder (cons arg cmdline))
@@ -309,7 +309,7 @@ CONTEXT is where to look for the options."
 				   "Don't treat error right now, but remember it."
 				   :interactive
 				   (lambda ()
-				     ;; #### FIXME: SBCL specific
+				     ;; #### PORTME.
 				     (list sb-debug:*debug-condition*))
 				   (push error cmdline-items)))))))))))
       (setf (cmdline-items context) (nreverse cmdline-items))
@@ -411,7 +411,7 @@ This function returns two values:
 	       (:quit
 		(let (*print-escape*) (print-object cmdline-item t)
 		     (terpri)
-		     ;; #### FIXME: SBCL-specific
+		     ;; #### PORTME.
 		     (sb-ext:quit :unix-status 1)))
 	       (:none
 		;; #### FIXME: we have no restarts here!
@@ -426,7 +426,7 @@ This function returns two values:
 		      (:quit
 		       (let (*print-escape*) (print-object error t))
 		       (terpri)
-		       ;; #### FIXME: SBCL-specific
+		       ;; #### PORTME.
 		       (sb-ext:quit :unix-status 1))
 		      (:none)))))
     (let* ((env-var (env-var option))
@@ -462,7 +462,7 @@ This function returns three values:
 	   (:quit
 	    (let (*print-escape*) (print-object cmdline-item t)
 		 (terpri)
-		 ;; #### FIXME: SBCL-specific
+		 ;; #### PORTME.
 		 (sb-ext:quit :unix-status 1)))
 	   (:none
 	    ;; #### FIXME: we have no restart here!
