@@ -401,6 +401,8 @@ This class implements options that don't take any argument."))
 - LONG-NAME is the option's long name (without the double-dash).
   It defaults to nil.
 - DESCRIPTION is the option's description appearing in help strings.
+  It defaults to nil.
+- ENV-VAR is the flag's associated environment variable.
   It defaults to nil."
   (declare (ignore short-name long-name description env-var))
   (apply #'make-instance 'flag keys))
@@ -411,7 +413,7 @@ This class implements options that don't take any argument."))
   (Internal options don't have short names.)
 - DESCRIPTION is the flag's description.
 - ENV-VAR is the flag's associated environment variable, minus the 'CLON_'
-  prefix. It defaults to nil."
+  prefix. It default to nil."
   (make-instance 'flag
     :long-name long-name
     :description description
@@ -920,7 +922,11 @@ Available restarts are:
 ;; is equivalent to saying yes.
 
 (defoption switch ()
-  ((argument-styles :documentation "The possible argument styles."
+  ((argument-name ;; inherited from the VALUED-OPTION class
+    :documentation "The option's argument style."
+    :initarg :argument-style
+    :reader argument-style)
+   (argument-styles :documentation "The possible argument styles."
 		    :allocation :class
 		    :type list
 		    :initform '(:yes/no :on/off :true/false :yup/nope)
@@ -934,15 +940,10 @@ Available restarts are:
 	      :allocation :class
 	      :type list
 	      :initform '("no" "off" "false" "nope")
-	      :accessor no-values)
-   (argument-name ;; inherited from the VALUED-OPTION class
-    :documentation "The option's argument style."
-    :initarg :argument-style
-    :reader argument-style))
+	      :accessor no-values))
   (:default-initargs
-    :argument-style :yes/no
     :argument-type :optional
-    :env-var nil)
+    :argument-style :yes/no)
   (:documentation "The SWITCH class.
 This class implements boolean options."))
 
@@ -951,10 +952,9 @@ This class implements boolean options."))
   (unless (member argument-style (argument-styles switch))
     (error "Invalid switch argument style ~S." argument-style)))
 
-(defun make-switch (&rest keys &key short-name long-name description
-				   argument-style argument-type
-				   default-value env-var
-			 )
+(defun make-switch (&rest keys &key short-name long-name description env-var
+				   argument-type default-value
+				   argument-style)
   "Make a new switch.
 - SHORT-NAME is the switch's short name (without the dash).
   It defaults to nil.
@@ -962,18 +962,18 @@ This class implements boolean options."))
   It defaults to nil.
 - DESCRIPTION is the switch's description appearing in help strings.
   It defaults to nil.
-- ARGUMENT-STYLE is the switch's argument display style. It can be one of
-  :yes/no, :on/off, :true/false, :yup/nope.
-  It defaults to :yes/no.
+- ENV-VAR is the switch's associated environment variable.
+  It defaults to nil.
 - ARGUMENT-TYPE is one of :required, :mandatory or :optional (:required and
   :mandatory are synonyms).
   It defaults to :optional.
 - DEFAULT-VALUE is the switch's default value, if any.
-- ENV-VAR is the switch's associated environment variable.
-  It defaults to nil."
-  (declare (ignore short-name long-name description
-		   argument-style
-		   default-value env-var))
+- ARGUMENT-STYLE is the switch's argument display style. It can be one of
+  :yes/no, :on/off, :true/false, :yup/nope.
+  It defaults to :yes/no."
+  (declare (ignore short-name long-name description env-var
+		   default-value
+		   argument-style))
   ;; #### FIXME: Yuck! default argument-type initarg is known to be :optional.
   ;; This is dirty but I couldn't figure out a way to do this properly with
   ;; before or after methods.
@@ -983,24 +983,23 @@ This class implements boolean options."))
   (apply #'make-instance 'switch keys))
 
 (defun make-internal-switch (long-name description
-			     &rest keys
-			     &key argument-style argument-type
-				  default-value env-var
-				  )
+			     &rest keys &key env-var
+					    argument-type default-value
+					    argument-style)
   "Make a new internal (Clon-specific) switch.
 - LONG-NAME is the switch's long-name, minus the 'clon-' prefix.
   (Internal options don't have short names.)
 - DESCRIPTION is the switch's description.
+- ENV-VAR is the switch's associated environment variable, minus the 'CLON_'
+  prefix. It defaults to nil.
 - ARGUMENT-TYPE is one of :required, :mandatory or :optional (:required and
   :mandatory are synonyms).
   It defaults to :optional.
 - DEFAULT-VALUE is the switch's default value, if any.
-- ENV-VAR is the switch's associated environment variable, minus the 'CLON_'
-  prefix. It defaults to nil.
 - ARGUMENT-STYLE is the switch's argument display style. It can be one of
   :yes/no, :on/off, :true/false, :yup/nope.
   It defaults to :yes/no."
-  (declare (ignore argument-style default-value env-var))
+  (declare (ignore env-var default-value argument-style))
   ;; #### FIXME: Yuck! default argument-type initarg is known to be :optional.
   ;; This is dirty but I couldn't figure out a way to do this properly with
   ;; before or after methods.
@@ -1109,15 +1108,14 @@ If ARGUMENT is not valid for a switch, raise a conversion error."
 ;; but that's all.
 
 (defoption stropt ()
-  ()
-  (:default-initargs :argument-name "STR")
+  ((argument-name ;; inherited from the VALUED-OPTION class
+    :initform "STR"))
   (:documentation "The STROPT class.
 This class implements options the values of which are strings."))
 
 (defun make-stropt (&rest keys
-		    &key short-name long-name description
-			 argument-name argument-type
-			 fallback-value default-value env-var)
+		    &key short-name long-name description env-var
+			 argument-name argument-type fallback-value default-value)
   "Make a new string option.
 - SHORT-NAME is the option's short name (without the dash).
   It defaults to nil.
@@ -1125,40 +1123,39 @@ This class implements options the values of which are strings."))
   It defaults to nil.
 - DESCRIPTION is the option's description appearing in help strings.
   It defaults to nil.
+- ENV-VAR is the option's associated environment variable.
+  It defaults to nil.
 - ARGUMENT-NAME is the option's argument name appearing in help strings.
 - ARGUMENT-TYPE is one of :required, :mandatory or :optional (:required and
   :mandatory are synonyms).
   It defaults to :optional.
 - FALLBACK-VALUE is the option's fallback value (for missing optional
   arguments), if any.
-- DEFAULT-VALUE is the option's default value, if any.
-- ENV-VAR is the option's associated environment variable.
-  It defaults to nil."
-  (declare (ignore short-name long-name description
-		   argument-name argument-type
-		   fallback-value default-value env-var))
+- DEFAULT-VALUE is the option's default value, if any."
+  (declare (ignore short-name long-name description env-var
+		   argument-name argument-type fallback-value default-value))
   (apply #'make-instance 'stropt keys))
 
 (defun make-internal-stropt (long-name description
-			     &rest keys
-			     &key argument-name argument-type
-				  fallback-value default-value env-var)
+			      &rest keys
+			      &key env-var argument-name
+				   argument-type fallback-value default-value)
   "Make a new internal (Clon-specific) string option.
 - LONG-NAME is the option's long-name, minus the 'clon-' prefix.
   (Internal options don't have short names.)
 - DESCRIPTION is the options's description.
+- ENV-VAR is the option's associated environment variable, minus the 'CLON_'
+  prefix. It defaults to nil.
 - ARGUMENT-NAME is the option's argument name appearing in help strings.
 - ARGUMENT-TYPE is one of :required, :mandatory or :optional (:required and
   :mandatory are synonyms).
   It defaults to :optional.
 - FALLBACK-VALUE is the option's fallback value (for missing optional
   arguments), if any.
-- DEFAULT-VALUE is the option's default value, if any.
-- ENV-VAR is the option's associated environment variable, minus the 'CLON_'
-  prefix. It defaults to nil."
-  (declare (ignore argument-name argument-type
-		   fallback-value default-value
-		   env-var))
+- DEFAULT-VALUE is the option's default value, if any."
+  (declare (ignore env-var
+		   argument-name argument-type fallback-value default-value
+		   ))
   (apply #'make-instance 'stropt
 	 :long-name long-name
 	 :description description

@@ -46,13 +46,11 @@
   (:documentation "The TEXT class.
 This class implements plain text objects appearing in a synopsis."))
 
-
-;; #### FIXME: does it make sense to accept empty strings ?
-(defun make-text (&key (contents ""))
+(defun make-text (&rest keys &key contents)
   "Make a new text.
-- CONTENTS is the actual text to display.
-  It defaults to the empty string."
-  (make-instance 'text :contents contents))
+- CONTENTS is the actual text to display."
+  (declare (ignore contents))
+  (apply #'make-instance 'text keys))
 
 
 ;;; text.lisp ends here

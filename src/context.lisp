@@ -316,11 +316,9 @@ CONTEXT is where to look for the options."
       (setf (slot-value context 'remainder) remainder))))
 
 (defun make-context
-    (&rest keys &key synopsis cmdline error-handler getopt-error-handler)
+    (&rest keys &key synopsis error-handler getopt-error-handler cmdline)
   "Make a new context.
 - SYNOPSIS is the program synopsis to use in that context.
-- CMDLINE is the argument list (strings) to process.
-  It defaults to a POSIX conformant argv.
 - ERROR-HANDLER is the behavior to adopt on errors at command-line parsing time.
   It can be one of:
   * :quit, meaning print the error and abort execution,
@@ -331,8 +329,10 @@ CONTEXT is where to look for the options."
 in the functions themselves). It is meaningful only if errors have been
 previously registered. It can be one of:
   * :quit, meaning print the error and abort execution,
-  * :none, meaning let the debugger handle the situation."
-  (declare (ignore synopsis cmdline error-handler getopt-error-handler))
+  * :none, meaning let the debugger handle the situation.
+- CMDLINE is the argument list (strings) to process.
+  It defaults to a POSIX conformant argv."
+  (declare (ignore synopsis error-handler getopt-error-handler cmdline))
   (apply #'make-instance 'context keys))
 
 
