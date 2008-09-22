@@ -38,7 +38,6 @@
 ;; The Synopsis Class
 ;; ============================================================================
 
-;; #### FIXME: make final
 (defclass synopsis (container)
   ((postfix :documentation "A postfix to the program synopsis."
 	    :type string
@@ -68,13 +67,13 @@
 ;; Sealing protocol
 ;; ----------------
 
-;; #### FIXME: we need a way to express that a postfix exists syntactically.
-;; Currently, only -- or the POSIXLY_CORRECT env var can allow that. if we
-;; provide an option to force a POSIXLY_CORRECT behavior, for instance, we
-;; will have a problem in the cmdline parsing process, as it would take the
-;; first non-option argument as a potential argument to the previous option.
-;; This shows that we have to do more than just syntax parsing at context
-;; creation time.
+;; #### TODO: we need a way to declare explicitely that a postfix exists for
+;; this synopsis. Currently, only -- or the POSIXLY_CORRECT env var can allow
+;; that. If we provide an option to force a POSIXLY_CORRECT behavior, for
+;; instance, we will have a problem in the cmdline parsing process, as it
+;; would take the first non-option argument as a potential argument to the
+;; previous option. This shows that we have to do more than just syntax
+;; parsing at context creation time.
 
 (defmethod seal :around ((synopsis synopsis))
   "Add Clon specific options to SYNOPSIS."
@@ -89,12 +88,16 @@ WHICH can be `number', `short' or `long'."
 		  :env-var "VERSION_FORMAT"))
     (let ((subgrp (make-group)))
       (add-to subgrp (make-text :contents "Clon output:"))
+      ;; #### TODO: extend Clon with a search-path option type converting a
+      ;; search path as below into a path list.
       (add-to subgrp (make-internal-stropt "search-path" "Set Clon's search path.
 If you don't want any search path at all, use this option with no argument."
 		       :argument-name "PATH"
 		       :argument-type :optional
-		       ;; #### FIXME: port DATADIR from the C version
-		       :default-value "~/share/clon:"
+		       ;; #### TODO: maybe we could be more OS-friendly (read
+		       ;; OS-specific) in the default-value below.
+		       :default-value
+		      "~/.clon:~/share/clon:/usr/local/share/clon:/usr/share/clon"
 		       :env-var "SEARCH_PATH"))
       (add-to subgrp (make-internal-stropt "theme" "Set Clon's output theme.
 If you don't want any theme at all, use this option with no argument. Unless
