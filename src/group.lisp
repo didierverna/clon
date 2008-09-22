@@ -84,7 +84,7 @@ added to the group."
 			   (make-name (intern (concatenate 'string "MAKE-" name)
 					      'clon)))
 		       `(,macro-name (&rest args) `(,',make-name ,@args))))
-		   (option-names (find-class 'valued-option))))
+		   *valued-option-names*))
       (define-group ,grp
 	,@forms))))
 

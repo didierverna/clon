@@ -497,28 +497,7 @@ This class implements options that don't take any argument."))
 ;; the fact that we want to see it probably rather belongs to the user
 ;; preferences. Like, an option to display help in short form or something.
 
-;; #### WARNING: I'm not convinced by this approach for registering all new
-;; valued option classes. A specific metaclass for valued options seems the
-;; right place to store that information, but on the other hand, calling the
-;; MOP for such a simple thing might be overkill.
-(defclass valued-option-class (standard-class)
-  ((option-names :documentation "The list of valued option names."
-		 :initform nil
-		 :accessor option-names))
-  (:documentation "The VALUED-OPTION-CLASS metaclass."))
-
-;; #### PORTME.
-(defmethod sb-mop:validate-superclass
-    ((class standard-class) (superclass valued-option-class))
-  t)
-
-;; #### PORTME.
-(defmethod sb-mop:validate-superclass
-    ((class valued-option-class) (superclass standard-class))
-  t)
-
-;; #### FIXME: make abstract
-(defclass valued-option (option)
+(defabstract valued-option (option)
   ((argument-name :documentation "The option's argument display name."
 		  :initarg :argument-name
 		  :initform "ARG"
@@ -532,11 +511,34 @@ This class implements options that don't take any argument."))
    (default-value :documentation "The option's default value."
 		 :initarg :default-value
 		 :reader default-value))
-  (:metaclass valued-option-class)
   (:default-initargs
     :argument-type :required)
   (:documentation "The VALUED-OPTION class.
 This is the base class for options accepting arguments."))
+
+(defclass valued-option-class (standard-class)
+  ()
+  (:documentation "The VALUED-OPTION-CLASS class.
+This is the meta-class for all valued options, that is, for all
+subclasses of the VALUED-OPTION class."))
+
+(defvar *valued-option-names* nil
+  "The list of known valued option names.")
+
+(defmethod initialize-instance :after
+    ((class valued-option-class) &key direct-superclasses direct-slots)
+  "Register CLASS as a new valued option class."
+  (declare (ignore direct-superclasses direct-slots))
+  (pushnew (symbol-name (class-name class)) *valued-option-names*))
+
+(defmacro defoption (class superclasses slots &rest options)
+  "Wrapper around defclass for defining a new Clon valued option class."
+  (when (assoc :metaclass options)
+    (error "Defining valued option class ~S: explicit meta-class option." class))
+  `(defclass ,class ,(cons 'valued-option superclasses)
+    ,slots
+    ,@options
+    (:metaclass valued-option-class)))
 
 (defmethod initialize-instance :before
     ((option valued-option) &key argument-type
@@ -576,13 +578,6 @@ ARGUMENT-REQUIRED-P slot."
      (setf (slot-value option 'argument-required-p) t))
     (:optional
      (setf (slot-value option 'argument-required-p) nil))))
-
-(defmacro defoption (class superclasses slots &rest options)
-  "Wrapper around defclass for defining a new Clon valued option class."
-  `(progn
-    (pushnew (symbol-name ',class) (option-names (find-class 'valued-option)))
-    (defclass ,class ,(cons 'valued-option superclasses) ,slots
-	      ,@options)))
 
 
 ;; -------------------------
