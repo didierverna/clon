@@ -76,9 +76,8 @@
 ;; This shows that we have to do more than just syntax parsing at context
 ;; creation time.
 
-(defmethod seal ((synopsis synopsis))
-  "Seal SYNOPSIS."
-  ;; Add the Clon internal options group
+(defmethod seal :around ((synopsis synopsis))
+  "Add Clon specific options to SYNOPSIS."
   (let ((grp (make-group)))
     (add-to grp (make-text :contents "Clon specific options:"))
     (add-to grp (make-internal-flag "help" "Display Clon-specific help."))
@@ -120,8 +119,6 @@ otherwise."
       (add-to grp subgrp))
     (seal grp)
     (add-to synopsis grp))
-  ;; this calls the CONTAINER sealing method, hence performing name clash
-  ;; check.
   (call-next-method))
 
 (defmethod seal :after ((synopsis synopsis))

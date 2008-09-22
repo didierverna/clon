@@ -50,15 +50,6 @@ implementing hierarchical program command-line."))
 
 
 ;; ============================================================================
-;; Group sealing
-;; ============================================================================
-
-(defmethod seal ((group group))
-  "Seal GROUP."
-  (call-next-method)) ;; this calls the CONTAINER sealing method
-
-
-;; ============================================================================
 ;; Convenience group definition
 ;; ============================================================================
 

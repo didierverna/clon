@@ -75,23 +75,15 @@ command-line hierarchy."))
 ;; doing).
 (defgeneric seal (container)
   (:documentation "Seal CONTAINER.")
-  ;; Common work is provided below, but subclasses will likely implement their
-  ;; own primary method as well.
-  ;; #### FIXME:  specializers of this function need to (call-next-method)
-  ;; somewhere, but the exact place is their own choice, so we can't use a
-  ;; progn method combination type.
   (:method :before ((container container))
-    "Ensure that CONTAINER is not already sealed."
+    "Ensure that CONTAINER is not already sealed, and perform name clash check."
     (when (sealedp container)
-      (error "Sealing container ~A: already sealed." container)))
-  (:method ((container container))
-    "Ensure that there is no name clash within CONTAINER's options."
+      (error "Sealing container ~A: already sealed." container))
     (loop :for items :on (container-items container)
 	  :while (cdr items)
 	  :do (loop :for item2 in (cdr items)
-		    :do (check-name-clash (car items) item2)))
-    container)
-  (:method :after ((container container))
+		    :do (check-name-clash (car items) item2))))
+  (:method((container container))
     "Mark CONTAINER as sealed."
     (setf (sealedp container) t)))
 
@@ -127,7 +119,8 @@ command-line hierarchy."))
 
 ;; #### NOTE: currently, name clashes are considered on short and long names
 ;; independently. That is, it is possible to have a short name identical to a
-;; long one, although I don't see why you would want to do that.
+;; long one, although I don't see why you would want to do that, and I should
+;; probably prohibit it altogether.
 
 (defgeneric check-name-clash (item1 item2)
   (:documentation
