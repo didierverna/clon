@@ -73,7 +73,6 @@
 ;; The Context Class
 ;; ============================================================================
 
-;; #### FIXME: make final
 (defclass context ()
   ((synopsis :documentation "The program synopsis."
 	     :type synopsis
@@ -114,7 +113,7 @@ options based on it."))
   (unless (sealedp synopsis)
     (error "Initializing context ~A: synopsis ~A not sealed." context synopsis)))
 
-;; #### FIXME: we should offer more restarts, like modify the name of the
+;; #### TODO: we should offer more restarts, like modify the name of the
 ;; option (handy in case of a typo for instance). But then, we will have to
 ;; split the parsing process into several individual functions so that they
 ;; can restart recursively (looking for the option etc).

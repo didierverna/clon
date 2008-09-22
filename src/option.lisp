@@ -38,11 +38,18 @@
 ;; Utilities
 ;; ============================================================================
 
-;; #### NOTE: Yuck. There are places in this file, like right here, where some
+;; #### TODO: Yuck. There are places in this file, like right here, where some
 ;; notion of the command-line syntax is needed. This is not very nice because
 ;; the command-line syntax should ideally be known only to context.lisp.
 ;; However, since the retrieval process changes according to the option
 ;; classes, it is still reasonable to have it here.
+
+;; A better design would be a dialog between the context level and the option
+;; one. Like:
+;; - CONTEXT: retreive-from-long-call option arg-from-=-syntax [= nil],
+;; - OPTION: Hey, I need an argument, but you didn't give me one,
+;; - CONTEXT: Okay, lemme see what's next on the command-line...
+;;            ... Sorry, nothing for you. BARF.
 
 (defun option-call-p (str)
   "Return true if STR looks like an option call."
@@ -72,8 +79,7 @@ If so, store it into CMDLINE-ARGUMENT."
 ;; The Option Class
 ;; ============================================================================
 
-;; #### FIXME: make abstract
-(defclass option ()
+(defabstract option ()
   ((short-name :documentation "The option's short name."
 	       :type (or null string)
 	       :initarg :short-name
@@ -110,18 +116,10 @@ This is the base class for all options."))
 		     (zerop (length description))))))
   (unless (or short-name long-name)
     (error "Option ~A: no name given." option))
-  ;; #### FIXME: is this really necessary ? What about the day I would like
-  ;; to add new syntax like -= etc ?
-  ;; Empty long names are forbidden because of the special syntax -- (for
-  ;; terminating options). However, it *is* possible to have *one* option with
-  ;; an empty (that's different from NIL) short name. This option will just
-  ;; appear as `-'. Note that this special option can't appear in a minus or
-  ;; plus pack (of course :-). However (and contrary to what I had in my C
-  ;; version), it can have a sticky argument if it's not a flag or a boolean.
-  ;; In such a case, note that Clon will never detect unknown short options,
-  ;; because it will detect the - option with a sticky argument instead.
   (when (and long-name (zerop (length long-name)))
     (error "Option ~A: empty long name." option))
+  (when (and short-name (zerop (length short-name)))
+    (error "Option ~A: empty short name." option))
   (when (and short-name long-name (string= short-name long-name))
     (error "Option ~A: short and long names identical." option))
   ;; Short names can't begin with a dash because that would conflict with
@@ -253,7 +251,7 @@ If AS-STRING, return a string of that character.")
 ;; The Retrieval Protocol
 ;; ============================================================================
 
-;; #### NOTE: Yucky yucky yuck. Design fuckage. See comment in the Utilities
+;; #### TODO: Yucky yucky yuck. Design fuckage. See comment in the Utilities
 ;; section.
 (define-condition cmdline-error (error)
   ((item :documentation "The concerned command-line item."
@@ -687,10 +685,6 @@ Available restarts are:
   (restart-case (convert valued-option argument)
     (use-default-value ()
       :test (lambda (error)
-	      ;; #### NOTE: which design is better here? Accessing the option
-	      ;; through ERROR or directly via VALUED-OPTION (from
-	      ;; RESTARTABLE-CONVERT's lexical environment)? The later seems
-	      ;; more readable to me.
 	      (declare (ignore error))
 	      (slot-boundp valued-option 'default-value))
       :report (lambda (stream)
@@ -774,10 +768,6 @@ Available restarts are (depending on the context):
       (fallback-value valued-option))
     (use-default-value ()
       :test (lambda (error)
-	      ;; #### NOTE: which design is better here? Accessing the option
-	      ;; through ERROR or directly via VALUED-OPTION (from
-	      ;; RESTARTABLE-CONVERT's lexical environment)? The later seems
-	      ;; more readable to me.
 	      (declare (ignore error))
 	      (slot-boundp valued-option 'default-value))
       :report (lambda (stream)
@@ -868,10 +858,6 @@ Available restarts are:
   (restart-case (environment-convert valued-option env-val)
     (use-default-value ()
       :test (lambda (error)
-	      ;; #### NOTE: which design is better here? Accessing the option
-	      ;; through ERROR or directly via VALUED-OPTION (from
-	      ;; RESTARTABLE-CONVERT's lexical environment)? The later seems
-	      ;; more readable to me.
 	      (declare (ignore error))
 	      (slot-boundp valued-option 'default-value))
       :report (lambda (stream)
@@ -901,11 +887,6 @@ Available restarts are:
 ;; ============================================================================
 ;; The Switch Class
 ;; ============================================================================
-
-;; #### NOTE: people might want to subclass the switches in order to use other
-;; true/false values (I don't know, black/white or something) and have Clon
-;; still recognize them as a boolean option. But this won't work with the
-;; argument-style consistency check. Think again about this.
 
 ;; A switch can appear in the following forms:
 ;;
@@ -1173,6 +1154,5 @@ This class implements options the values of which are strings."))
 (defmethod convert ((stropt stropt) argument)
   "Return ARGUMENT."
   argument)
-
 
 ;;; option.lisp ends here

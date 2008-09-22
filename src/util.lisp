@@ -72,6 +72,32 @@
 ;; CLOS utility routines
 ;; ============================================================================
 
+(defclass abstract-class (standard-class)
+  ()
+  (:documentation "The ABSTRACT-CLASS class.
+This is the meta-class for abstract classes."))
+
+(defmacro defabstract (class super-classes slots &rest options)
+  "Like DEFCLASS, but define an abstract class."
+  (when (assoc :metaclass options)
+    (error "Defining abstract class ~S: explicit meta-class option." class))
+  `(defclass ,class ,super-classes ,slots ,@options
+    (:metaclass abstract-class)))
+
+(defmethod make-instance ((class abstract-class) &rest initargs)
+  (declare (ignore initargs))
+  (error "Instanciating class ~S: is abstract." (class-name class)))
+
+;; #### PORTME.
+(defmethod sb-mop:validate-superclass
+    ((class abstract-class) (superclass standard-class))
+  t)
+
+;; #### PORTME.
+(defmethod sb-mop:validate-superclass
+    ((class standard-class) (superclass abstract-class))
+  t)
+
 #|
 (defmacro with-method (method-declaration &body body)
   "Execute BODY with a temporary method defined by METHOD-DECLARATION."
