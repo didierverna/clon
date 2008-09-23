@@ -45,7 +45,7 @@
 
 (defsystem :clon
   :version #.+version+
-  ;; #### FIXME: SBCL-specific
+  ;; #### PORTME: SBCL-specific
   :depends-on (:sb-posix)
   :components ((:file "package")
 	       (:file "util")
