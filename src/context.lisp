@@ -127,10 +127,6 @@ options based on it."))
   (unless (sealedp synopsis)
     (error "Initializing context ~A: synopsis ~A not sealed." context synopsis)))
 
-;; #### TODO: we should offer more restarts, like modify the name of the
-;; option (handy in case of a typo for instance). But then, we will have to
-;; split the parsing process into several individual functions so that they
-;; can restart recursively (looking for the option etc).
 (defmacro restartable-unknown-cmdline-option-error
     (place name &optional argument)
   "Restartably throw an unknown-cmdline-option-error."
@@ -138,7 +134,14 @@ options based on it."))
 		  :name ,name :argument ,argument)
     (discard ()
      :report "Discard unknown option."
-     nil)))
+     nil)
+    ))
+
+(defun read-name (&optional short)
+  "Read an option's name from standard input.
+If SHORT, read an option's short name. Otherwise, read the long one."
+  (format t "Please type in the correct option's ~:[long~;short~] name:~%" short)
+  (list (read-line)))
 
 (defmethod initialize-instance :after ((context context) &key cmdline)
   "Parse CMDLINE."
@@ -219,66 +222,84 @@ CONTEXT is where to look for the options."
 			(cmdline-name (subseq arg 2 value-start))
 			(cmdline-value (when value-start
 					 (subseq arg (1+ value-start))))
-			(option (search-option context :long-name cmdline-name))
-			(name cmdline-name))
-		   (unless option
-		     (multiple-value-setq (option name)
-		       (search-option context :partial-name cmdline-name)))
-		   (if option
-		       (push-retrieved-option cmdline-options :long option
-					      cmdline-value cmdline name)
-		       (restartable-unknown-cmdline-option-error
-			cmdline-options cmdline-name cmdline-value))))
+			option-name option)
+		   (tagbody find-option
+		      (setq option-name cmdline-name)
+		      (setq option
+			    (search-option context :long-name cmdline-name))
+		      (unless option
+			(multiple-value-setq (option option-name)
+			  (search-option context :partial-name cmdline-name)))
+		      (if option
+			  (push-retrieved-option cmdline-options :long option
+						 cmdline-value cmdline
+						 option-name)
+			  (restart-case
+			      (restartable-unknown-cmdline-option-error
+			       cmdline-options cmdline-name cmdline-value)
+			    (fix-option-name (new-cmdline-name)
+			      :report "Fix the option name."
+			      :interactive read-name
+			      (setq cmdline-name new-cmdline-name)
+			      (go find-option)))))))
 		;; A short call, or a minus pack.
 		((beginning-of-string-p "-" arg)
-		 (block processing-short-call
-		   (let* ((value-start (position #\= arg :start 2))
-			  (cmdline-name (subseq arg 1 value-start))
-			  (cmdline-value (when value-start
-					   (subseq arg (1+ value-start))))
-			  option)
-		     (when cmdline-value
-		       (restart-case (error 'invalid--=-syntax :item arg)
-			 (discard-argument ()
-			   :report "Discard the argument."
-			   (setq cmdline-value nil))
-			 (stick-argument ()
-			   :report "Stick argument to option name."
-			   (setq cmdline-name (concatenate 'string
-						cmdline-name cmdline-value))
-			   (setq cmdline-value nil))
-			 (separate-argument ()
-			   :report "Separate option from its argument."
-			   (push cmdline-value cmdline)
-			   (setq cmdline-value nil))))
-		     (setq option
-			   (search-option context :short-name cmdline-name))
-		     (unless option
-		       (multiple-value-setq (option cmdline-value)
-			 (search-sticky-option context cmdline-name)))
-		     (cond (option
-			    (push-retrieved-option cmdline-options :short option
-						   cmdline-value cmdline))
-			   ((potential-pack-p cmdline-name context)
-			    ;; #### NOTE: When parsing a minus pack, only the
-			    ;; last option gets a cmdline argument because only
-			    ;; the last one is allowed to retrieve an argument
-			    ;; from there.
-			    (do-pack (option
-				      (subseq cmdline-name 0
-					      (1- (length cmdline-name)))
-				      context)
-			      (push-retrieved-option cmdline-options :short option))
-			    (let* ((name (subseq cmdline-name
-						 (1- (length cmdline-name))))
-				   (option (search-option context
-							  :short-name name)))
-			      (assert option)
-			      (push-retrieved-option
-			       cmdline-options :short option nil cmdline)))
-			   (t
-			    (restartable-unknown-cmdline-option-error
-			     cmdline-options cmdline-name))))))
+		 (let* ((value-start (position #\= arg :start 2))
+			(cmdline-name (subseq arg 1 value-start))
+			(cmdline-value (when value-start
+					 (subseq arg (1+ value-start))))
+			option)
+		   (when cmdline-value
+		     (restart-case (error 'invalid--=-syntax :item arg)
+		       (discard-argument ()
+			 :report "Discard the argument."
+			 (setq cmdline-value nil))
+		       (stick-argument ()
+			 :report "Stick argument to option name."
+			 (setq cmdline-name (concatenate 'string
+					      cmdline-name cmdline-value))
+			 (setq cmdline-value nil))
+		       (separate-argument ()
+			 :report "Separate option from its argument."
+			 (push cmdline-value cmdline)
+			 (setq cmdline-value nil))))
+		   (tagbody find-option
+		      (setq option
+			    (search-option context :short-name cmdline-name))
+		      (unless option
+			(multiple-value-setq (option cmdline-value)
+			  (search-sticky-option context cmdline-name)))
+		      (cond (option
+			     (push-retrieved-option cmdline-options :short
+						    option cmdline-value
+						    cmdline))
+			    ((potential-pack-p cmdline-name context)
+			     ;; #### NOTE: When parsing a minus pack, only the
+			     ;; last option gets a cmdline argument because
+			     ;; only the last one is allowed to retrieve an
+			     ;; argument from there.
+			     (do-pack (option
+				       (subseq cmdline-name 0
+					       (1- (length cmdline-name)))
+				       context)
+			       (push-retrieved-option cmdline-options :short
+						      option))
+			     (let* ((name (subseq cmdline-name
+						  (1- (length cmdline-name))))
+				    (option (search-option context
+							   :short-name name)))
+			       (assert option)
+			       (push-retrieved-option
+				cmdline-options :short option nil cmdline)))
+			    (t
+			     (restart-case
+				 (restartable-unknown-cmdline-option-error
+				  cmdline-options cmdline-name)
+			       (fix-option-name (new-cmdline-name)
+				 :report "Fix the option name."
+				 :interactive (lambda () (read-name :short))
+				 (setq cmdline-name new-cmdline-name)
+				 (go find-option))))))))
 		;; A plus call or a plus pack.
 		((beginning-of-string-p "+" arg)
 		 (block processing-+-option
@@ -311,16 +332,25 @@ CONTEXT is where to look for the options."
 		     ;; not meant to be long (otherwise, that would be long
 		     ;; names right?), so they're not meant to be
 		     ;; abbreviated.
-		     (setq option
-			   (search-option context :short-name cmdline-name))
-		     (cond (option
-			    (push-retrieved-option cmdline-options :plus option))
-			   ((potential-pack-p cmdline-name context)
-			    (do-pack (option cmdline-name context)
-			      (push-retrieved-option cmdline-options :plus option)))
-			   (t
-			    (restartable-unknown-cmdline-option-error
-			     cmdline-options cmdline-name))))))
+		     (tagbody find-option
+			(setq option
+			      (search-option context :short-name cmdline-name))
+			(cond (option
+			       (push-retrieved-option cmdline-options :plus
+						      option))
+			      ((potential-pack-p cmdline-name context)
+			       (do-pack (option cmdline-name context)
+				 (push-retrieved-option cmdline-options :plus
+							option)))
+			      (t
+			       (restart-case
+				   (restartable-unknown-cmdline-option-error
+				    cmdline-options cmdline-name)
+				 (fix-option-name (new-cmdline-name)
+				   :report "Fix the option name."
+				   :interactive (lambda () (read-name :short))
+				   (setq cmdline-name new-cmdline-name)
+				   (go find-option)))))))))
 		(t
 		 ;; Not an option call.
 		 ;; #### PORTME.
