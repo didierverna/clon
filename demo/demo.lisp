@@ -93,8 +93,8 @@
 	(clon:getopt context :short-name "F")
       (print (list value source)))
     (format t "~%~%Other options:")
-    (clon:do-cmdline-options (option name value) (context :error-handler :quit)
-			     (print (list option name value)))
+    (clon:do-cmdline-options (option name value) context
+      (print (list option name value)))
 ;    (format t "~%~%Unknown options:")
 ;    (clon:do-unknown-options (name value) context
 ;      (print (list name value)))

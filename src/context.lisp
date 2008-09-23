@@ -138,13 +138,7 @@ options based on it."))
 		  :name ,name :argument ,argument)
     (discard ()
      :report "Discard unknown option."
-     nil)
-    (register (error)
-     :report "Don't treat error right now, but remember it."
-     :interactive (lambda ()
-		    ;; #### PORTME.
-		    (list sb-debug:*debug-condition*))
-     (push error ,place))))
+     nil)))
 
 (defmethod initialize-instance :after ((context context) &key cmdline)
   "Parse CMDLINE."
@@ -187,19 +181,12 @@ options based on it."))
 		       (unless cmdline-value
 			 (push nil call))
 		       (push cmdline call))
-		     `(restart-case
-		       (multiple-value-bind ,(reverse vars) ,(reverse call)
-			 ,(when cmdline `(setq ,cmdline ,new-cmdline))
-			 (push-cmdline-option ,place
-			   :name ,name-form
-			   :option ,option
-			   :value ,value))
-		       (register (error)
-			:report "Don't treat error right now, but remember it."
-			:interactive (lambda ()
-				       ;; #### PORTME.
-				       (list sb-debug:*debug-condition*))
-			(push error ,place)))))
+		     `(multiple-value-bind ,(reverse vars) ,(reverse call)
+		       ,(when cmdline `(setq ,cmdline ,new-cmdline))
+		       (push-cmdline-option ,place
+			:name ,name-form
+			:option ,option
+			:value ,value))))
 	       (do-pack ((option pack context) &body body)
 		 "Evaluate BODY with OPTION bound to each option from PACK.
 CONTEXT is where to look for the options."
@@ -219,8 +206,6 @@ CONTEXT is where to look for the options."
 			   (terpri)
 			   ;; #### PORTME.
 			   (sb-ext:quit :unix-status 1))
-			  (:register
-			   (invoke-restart 'register error))
 			  (:none)))))
 	(do ((arg (pop cmdline) (pop cmdline)))
 	    ((null arg))
@@ -265,14 +250,7 @@ CONTEXT is where to look for the options."
 			 (separate-argument ()
 			   :report "Separate option from its argument."
 			   (push cmdline-value cmdline)
-			   (setq cmdline-value nil))
-			 (register (error)
-			   :report "Don't treat error right now, but remember it."
-			   :interactive (lambda ()
-					  ;; #### PORTME.
-					  (list sb-debug:*debug-condition*))
-			   (push error cmdline-items)
-			   (return-from processing-short-call))))
+			   (setq cmdline-value nil))))
 		     (setq option
 			   (search-option context :short-name cmdline-name))
 		     (unless option
@@ -325,13 +303,6 @@ CONTEXT is where to look for the options."
 			   (push cmdline-value cmdline)
 			   (push (concatenate 'string "-" cmdline-name)
 				 cmdline)
-			   (return-from processing-+-option))
-			 (register (error)
-			   :report "Don't treat error right now, but remember it."
-			   :interactive (lambda ()
-					  ;; #### PORTME.
-					  (list sb-debug:*debug-condition*))
-			   (push error cmdline-items)
 			   (return-from processing-+-option))))
 		     ;; #### NOTE: in theory, we could allow partial
 		     ;; matches on short names when they're used with the
@@ -373,15 +344,7 @@ CONTEXT is where to look for the options."
 				   (error 'cmdline-junk-error :junk arg)
 				 (discard ()
 				   :report "Discard junk."
-				   nil)
-				 (register (error)
-				   :report
-				   "Don't treat error right now, but remember it."
-				   :interactive
-				   (lambda ()
-				     ;; #### PORTME.
-				     (list sb-debug:*debug-condition*))
-				   (push error cmdline-items)))))))))))
+				   nil))))))))))
       (setf (cmdline-items context) (nreverse cmdline-items))
       (setf (slot-value context 'remainder) remainder))))
 
@@ -392,12 +355,10 @@ CONTEXT is where to look for the options."
 - ERROR-HANDLER is the behavior to adopt on errors at command-line parsing time.
   It can be one of:
   * :quit, meaning print the error and abort execution,
-  * :none, meaning let the debugger handle the situation,
-  * :register, meaning silently register the error.
+  * :none, meaning let the debugger handle the situation.
 - GETOPT-ERROR-HANDLER is the default behavior to adopt on command-line errors
   in the GETOPT family of functions (note that this behavior can be overridden
-in the functions themselves). It is meaningful only if errors have been
-previously registered. It can be one of:
+in the functions themselves). It can be one of:
   * :quit, meaning print the error and abort execution,
   * :none, meaning let the debugger handle the situation.
 - CMDLINE is the argument list (strings) to process.
@@ -442,9 +403,10 @@ The search is actually done in the CONTEXT'synopsis."
   "Get an option's value in CONTEXT.
 The option can be specified either by SHORT-NAME, LONG-NAME, or directly via
 an OPTION object.
-ERROR-HANDLER is the behavior to adopt when a command-line error has been
-registered for this option. Its default value depends on the CONTEXT. See
-`make-context' for a list of possible values.
+ERROR-HANDLER is the behavior to adopt on errors. Its default value depends on
+the CONTEXT. See `make-context' for a list of possible values. Note that
+command-line errors are treated at context-creation time, so the only errors
+that can occur here are coming from the environment.
 This function returns two values:
 - the retrieved value,
 - the value's source."
@@ -462,32 +424,16 @@ This function returns two values:
 	  (pop (cmdline-items context))
 	  (pop (cmdline-items context))))
 	((null cmdline-item))
-      (etypecase cmdline-item
-	(cmdline-option
-	 (cond ((eq (cmdline-option-option cmdline-item) option)
-		(setf (cmdline-items context)
-		      ;; #### NOTE: actually, I *do* have a use for nreconc,
-		      ;; he he ;-)
-		      (nreconc cmdline-items (cmdline-items context)))
-		(return-from getopt
-		  (values (cmdline-option-value cmdline-item)
-			  (list :cmdline (cmdline-option-name cmdline-item)))))
-	       (t
-		(push cmdline-item cmdline-items))))
-	(cmdline-option-error
-	 (if (not (eq option (option cmdline-item)))
-	     (push cmdline-item cmdline-items)
-	     (ecase error-handler
-	       (:quit
-		(let (*print-escape*) (print-object cmdline-item t)
-		     (terpri)
-		     ;; #### PORTME.
-		     (sb-ext:quit :unix-status 1)))
-	       (:none
-		;; #### FIXME: we have no restarts here!
-		(error cmdline-item)))))
-	(cmdline-error
-	 (push cmdline-item cmdline-items))))
+      (cond ((eq (cmdline-option-option cmdline-item) option)
+	     (setf (cmdline-items context)
+		   ;; #### NOTE: actually, I *do* have a use for nreconc,
+		   ;; he he ;-)
+		   (nreconc cmdline-items (cmdline-items context)))
+	     (return-from getopt
+	       (values (cmdline-option-value cmdline-item)
+		       (list :cmdline (cmdline-option-name cmdline-item)))))
+	    (t
+	     (push cmdline-item cmdline-items))))
     (setf (cmdline-items context) (nreverse cmdline-items)))
   ;; Try an environment variable:
   (handler-bind ((environment-error
@@ -510,65 +456,32 @@ This function returns two values:
 	     (slot-boundp option 'default-value))
     (values (default-value option) (list :default-value))))
 
-(defun getopt-cmdline
-    (context &key (error-handler (getopt-error-handler context)))
+(defun getopt-cmdline (context)
   "Get the next cmdline option in CONTEXT.
-ERROR-HANDLER is the behavior to adopt when a command-line error has been
-registered for this option. Its default value depends on the CONTEXT. See
-`make-context' for a list of possible values.
 This function returns three values:
 - the option object,
 - the option's name used on the command-line,
 - the retrieved value."
   (let ((cmdline-item (pop (cmdline-items context))))
     (when cmdline-item
-      (etypecase cmdline-item
-	(cmdline-option
-	 (values (cmdline-option-option cmdline-item)
-		 (cmdline-option-name cmdline-item)
-		 (cmdline-option-value cmdline-item)))
-	(cmdline-error
-	 (ecase error-handler
-	   (:quit
-	    (let (*print-escape*) (print-object cmdline-item t)
-		 (terpri)
-		 ;; #### PORTME.
-		 (sb-ext:quit :unix-status 1)))
-	   (:none
-	    ;; #### FIXME: we have no restart here!
-	    (error cmdline-item))))))))
+      (values (cmdline-option-option cmdline-item)
+	      (cmdline-option-name cmdline-item)
+	      (cmdline-option-value cmdline-item)))))
 
-(defmacro multiple-value-getopt-cmdline
-    ((option name value) (context &key error-handler) &body body)
+(defmacro multiple-value-getopt-cmdline ((option name value) context &body body)
   "Evaluate BODY on the next command-line option in CONTEXT.
 OPTION, NAME and VALUE are bound to the option's object, name used on the
-command-line) and retrieved value.
-ERROR-HANDLER is the behavior to adopt when a command-line error has been
-registered for this option. Its default value depends on the CONTEXT. See
-`make-context' for a list of possible values."
-  (let ((getopt-cmdline-args ()))
-    (when error-handler
-      (push error-handler getopt-cmdline-args)
-      (push :error-handler getopt-cmdline-args))
-    (push context getopt-cmdline-args)
-    `(multiple-value-bind (,option ,name ,value)
-      (getopt-cmdline ,@getopt-cmdline-args)
-      ,@body)))
+command-line) and retrieved value."
+  `(multiple-value-bind (,option ,name ,value) (getopt-cmdline ,context)
+    ,@body))
 
-(defmacro do-cmdline-options
-    ((option name value) (context &key error-handler) &body body)
+(defmacro do-cmdline-options ((option name value) context &body body)
   "Evaluate BODY over all command-line options in CONTEXT.
 OPTION, NAME and VALUE are bound to each option's object, name used on the
 command-line) and retrieved value."
-  (let ((multiple-value-getopt-cmdline-2nd-arg ()))
-    (when error-handler
-      (push error-handler multiple-value-getopt-cmdline-2nd-arg)
-      (push :error-handler multiple-value-getopt-cmdline-2nd-arg))
-    (push context multiple-value-getopt-cmdline-2nd-arg)
-    `(do () ((null (cmdline-items ,context)))
-      (multiple-value-getopt-cmdline (,option ,name ,value)
-	  ,multiple-value-getopt-cmdline-2nd-arg
-	,@body))))
+  `(do () ((null (cmdline-items ,context)))
+    (multiple-value-getopt-cmdline (,option ,name ,value) ,context
+      ,@body)))
 
 
 ;;; context.lisp ends here
