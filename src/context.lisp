@@ -67,6 +67,24 @@
 	     (format stream "Junk on the command-line: ~S." (junk error))))
   (:documentation "An error related to a command-line piece of junk."))
 
+(define-condition unrecognized-short-call-error (cmdline-error)
+  ((item ;; inherited from the CMDLINE-ERROR condition
+    :documentation "The unrecognized short call on the command-line."
+    :initarg :short-call
+    :reader short-call))
+  (:report (lambda (error stream)
+	     (format stream "Unrecognized short call: ~S." (short-call error))))
+  (:documentation "An error related to an unrecognized short call."))
+
+(define-condition unrecognized-plus-call-error (cmdline-error)
+  ((item ;; inherited from the CMDLINE-ERROR condition
+    :documentation "The unrecognized plus call on the command-line."
+    :initarg :plus-call
+    :reader plus-call))
+  (:report (lambda (error stream)
+	     (format stream "Unrecognized plus call: ~S." (plus-call error))))
+  (:documentation "An error related to an unrecognized plus call."))
+
 (define-condition unknown-cmdline-option-error (cmdline-error)
   ((item ;; inherited from the CMDLINE-ERROR condition
     :documentation "The option's name as it appears on the command-line."
@@ -127,15 +145,6 @@ options based on it."))
   (unless (sealedp synopsis)
     (error "Initializing context ~A: synopsis ~A not sealed." context synopsis)))
 
-(defmacro restartable-unknown-cmdline-option-error
-    (place name &optional argument)
-  "Restartably throw an unknown-cmdline-option-error."
-  `(restart-case (error 'unknown-cmdline-option-error
-		  :name ,name :argument ,argument)
-    (discard ()
-     :report "Discard unknown option."
-     nil)
-    ))
 (defun read-long-name ()
   "Read an option's long name from standard input."
   (format t "Please type in the correct option's long name:~%")
@@ -146,7 +155,7 @@ options based on it."))
 	    (return (list line))))))
 
 (defun read-call (&optional plus)
-  "Read an option's call  or pack from standard input.
+  "Read an option's call or pack from standard input.
 If PLUS, read a plus call or pack. Otherwise, read a short call or minus pack."
   (format
    t "Please type in the correct ~:[short call or minus~;plus call or~] pack:~%"
@@ -257,26 +266,26 @@ CONTEXT is where to look for the options."
 			      (go find-option)))))))
 		;; A short call, or a minus pack.
 		((beginning-of-string-p "-" arg)
-		 (let* ((value-start (position #\= arg :start 2))
-			(cmdline-name (subseq arg 1 value-start))
-			(cmdline-value (when value-start
-					 (subseq arg (1+ value-start))))
-			option)
-		   (when cmdline-value
-		     (restart-case (error 'invalid--=-syntax :item arg)
-		       (discard-argument ()
-			 :report "Discard the argument."
-			 (setq cmdline-value nil))
-		       (stick-argument ()
-			 :report "Stick argument to option name."
-			 (setq cmdline-name (concatenate 'string
-					      cmdline-name cmdline-value))
-			 (setq cmdline-value nil))
-		       (separate-argument ()
-			 :report "Separate option from its argument."
-			 (push cmdline-value cmdline)
-			 (setq cmdline-value nil))))
-		   (tagbody find-option
+		 (tagbody figure-this-short-call
+		    (let* ((value-start (position #\= arg :start 2))
+			   (cmdline-name (subseq arg 1 value-start))
+			   (cmdline-value (when value-start
+					    (subseq arg (1+ value-start))))
+			   option)
+		      (when cmdline-value
+			(restart-case (error 'invalid--=-syntax :item arg)
+			  (discard-argument ()
+			    :report "Discard the argument."
+			    (setq cmdline-value nil))
+			  (stick-argument ()
+			    :report "Stick argument to option name."
+			    (setq cmdline-name (concatenate 'string
+						 cmdline-name cmdline-value))
+			    (setq cmdline-value nil))
+			  (separate-argument ()
+			     :report "Separate option from its argument."
+			     (push cmdline-value cmdline)
+			     (setq cmdline-value nil))))
 		      (setq option
 			    (search-option context :short-name cmdline-name))
 		      (unless option
@@ -306,46 +315,50 @@ CONTEXT is where to look for the options."
 				cmdline-options :short option nil cmdline)))
 			    (t
 			     (restart-case
-				 (restartable-unknown-cmdline-option-error
-				  cmdline-options cmdline-name)
+				 (error 'unrecognized-short-call-error
+					:short-call cmdline-name)
+			       (discard ()
+				 :report "Discard this short call."
+				 nil)
 			       (fix-short-call (new-cmdline-name)
 				 :report "Fix this short call."
 				 :interactive (lambda () (read-call))
-				 (setq cmdline-name new-cmdline-name)
-				 (go find-option))))))))
+				 (setq arg (concatenate 'string
+					     "-" new-cmdline-name))
+				 (go figure-this-short-call))))))))
 		;; A plus call or a plus pack.
 		((beginning-of-string-p "+" arg)
-		 (block processing-+-option
-		   (let* ((value-start (position #\= arg :start 2))
-			  (cmdline-name (subseq arg 1 value-start))
-			  (cmdline-value (when value-start
-					   (subseq arg (1+ value-start))))
-			  option)
-		     (when cmdline-value
-		       (restart-case (error 'invalid-+=-syntax :item arg)
-			 (discard-argument ()
-			   :report "Discard the argument."
-			   (setq cmdline-value nil))
-			 (convert-to-short-and-stick ()
-			   :report "Convert to short call and stick argument."
-			   (push (concatenate 'string
-				   "-" cmdline-name cmdline-value)
-				 cmdline)
-			   (return-from processing-+-option))
-			 (convert-to-short-and-split ()
-			   :report "Convert to short call and split argument."
-			   (push cmdline-value cmdline)
-			   (push (concatenate 'string "-" cmdline-name)
-				 cmdline)
-			   (return-from processing-+-option))))
-		     ;; #### NOTE: in theory, we could allow partial
-		     ;; matches on short names when they're used with the
-		     ;; +-syntax, because there's no sticky argument or
-		     ;; whatever. But we don't. That's all. Short names are
-		     ;; not meant to be long (otherwise, that would be long
-		     ;; names right?), so they're not meant to be
-		     ;; abbreviated.
-		     (tagbody find-option
+		 (block processing-+-call
+		   (tagbody figure-this-+-call
+		      (let* ((value-start (position #\= arg :start 2))
+			     (cmdline-name (subseq arg 1 value-start))
+			     (cmdline-value (when value-start
+					      (subseq arg (1+ value-start))))
+			     option)
+			(when cmdline-value
+			  (restart-case (error 'invalid-+=-syntax :item arg)
+			    (discard-argument ()
+			      :report "Discard the argument."
+			      (setq cmdline-value nil))
+			    (convert-to-short-and-stick ()
+			      :report "Convert to short call and stick argument."
+			      (push (concatenate 'string
+				      "-" cmdline-name cmdline-value)
+				    cmdline)
+			      (return-from processing-+-call))
+			    (convert-to-short-and-split ()
+			      :report "Convert to short call and split argument."
+			      (push cmdline-value cmdline)
+			      (push (concatenate 'string "-" cmdline-name)
+				    cmdline)
+			      (return-from processing-+-call))))
+			;; #### NOTE: in theory, we could allow partial
+			;; matches on short names when they're used with the
+			;; +-syntax, because there's no sticky argument or
+			;; whatever. But we don't. That's all. Short names are
+			;; not meant to be long (otherwise, that would be long
+			;; names right?), so they're not meant to be
+			;; abbreviated.
 			(setq option
 			      (search-option context :short-name cmdline-name))
 			(cond (option
@@ -357,13 +370,17 @@ CONTEXT is where to look for the options."
 							option)))
 			      (t
 			       (restart-case
-				   (restartable-unknown-cmdline-option-error
-				    cmdline-options cmdline-name)
+				   (error 'unrecognized-plus-call-error
+					  :plus-call cmdline-name)
+				 (discard ()
+				   :report "Discard this plus call."
+				   nil)
 				 (fix-plus-call (new-cmdline-name)
 				   :report "Fix this plus call."
 				   :interactive (lambda () (read-call :plus))
-				   (setq cmdline-name new-cmdline-name)
-				   (go find-option)))))))))
+				   (setq arg (concatenate 'string
+					       "+" new-cmdline-name))
+				   (go figure-this-+-call)))))))))
 		(t
 		 ;; Not an option call.
 		 ;; #### PORTME.
