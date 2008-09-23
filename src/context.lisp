@@ -136,6 +136,14 @@ options based on it."))
      :report "Discard unknown option."
      nil)
     ))
+(defun read-long-name ()
+  "Read an option's long name from standard input."
+  (format t "Please type in the correct option's long name:~%")
+  (let (line)
+    (loop (setq line (read-line))
+	(if (position #\= line)
+	    (format t "Option names can't contain equal signs. Try again:~%")
+	    (return (list line))))))
 
 (defun read-name (&optional short)
   "Read an option's name from standard input.
@@ -234,12 +242,15 @@ CONTEXT is where to look for the options."
 			  (push-retrieved-option cmdline-options :long option
 						 cmdline-value cmdline
 						 option-name)
-			  (restart-case
-			      (restartable-unknown-cmdline-option-error
-			       cmdline-options cmdline-name cmdline-value)
+			  (restart-case (error 'unknown-cmdline-option-error
+					       :name cmdline-name
+					       :argument cmdline-value)
+			    (discard ()
+			      :report "Discard unknown option."
+			      nil)
 			    (fix-option-name (new-cmdline-name)
-			      :report "Fix the option name."
-			      :interactive read-name
+			      :report "Fix the option's long name."
+			      :interactive read-long-name
 			      (setq cmdline-name new-cmdline-name)
 			      (go find-option)))))))
 		;; A short call, or a minus pack.
