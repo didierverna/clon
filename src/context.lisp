@@ -44,6 +44,20 @@
   value ;; the converted option's cmdline value
   )
 
+(define-condition invalid--=-syntax (cmdline-error)
+  ()
+  (:report (lambda (error stream)
+	     (format stream "Invalid =-syntax in short call: ~S."
+		     (item error))))
+  (:documentation "An error related to a -= syntax."))
+
+(define-condition invalid-+=-syntax (cmdline-error)
+  ()
+  (:report (lambda (error stream)
+	     (format stream "Invalid =-syntax in plus call: ~S."
+		     (item error))))
+  (:documentation "An error related to a += syntax."))
+
 (define-condition cmdline-junk-error (cmdline-error)
   ((item ;; inherited from the CMDLINE-ERROR condition
     :documentation "The piece of junk appearing on the command-line."
@@ -232,56 +246,110 @@ CONTEXT is where to look for the options."
 			cmdline-items cmdline-name cmdline-value))))
 		;; A short call, or a minus pack.
 		((beginning-of-string-p "-" arg)
-		 ;; #### FIXME: check invalid syntax -foo=val
-		 (let* ((cmdline-name (subseq arg 1))
-			(option (search-option context :short-name cmdline-name))
-			cmdline-value)
-		   (unless option
-		     (multiple-value-setq (option cmdline-value)
-		       (search-sticky-option context cmdline-name)))
-		   (cond (option
-			  (push-retrieved-option cmdline-items :short option
-						 cmdline-value cmdline))
-			 ((potential-pack-p cmdline-name context)
-			  ;; #### NOTE: When parsing a minus pack, only the
-			  ;; last option gets a cmdline argument because only
-			  ;; the last one is allowed to retrieve an argument
-			  ;; from there.
-			  (do-pack (option
-				    (subseq cmdline-name 0
-					    (1- (length cmdline-name)))
-				    context)
-			    (push-retrieved-option cmdline-items :short option))
-			  (let* ((name (subseq cmdline-name
-					       (1- (length cmdline-name))))
-				 (option (search-option context
-							:short-name name)))
-			    (assert option)
-			    (push-retrieved-option
-			     cmdline-items :short option nil cmdline)))
-			 (t
-			  (restartable-unknown-cmdline-option-error
-			   cmdline-items cmdline-name)))))
+		 (block processing-short-call
+		   (let* ((value-start (position #\= arg :start 2))
+			  (cmdline-name (subseq arg 1 value-start))
+			  (cmdline-value (when value-start
+					   (subseq arg (1+ value-start))))
+			  option)
+		     (when cmdline-value
+		       (restart-case (error 'invalid--=-syntax :item arg)
+			 (discard-argument ()
+			   :report "Discard the argument."
+			   (setq cmdline-value nil))
+			 (stick-argument ()
+			   :report "Stick argument to option name."
+			   (setq cmdline-name (concatenate 'string
+						cmdline-name cmdline-value))
+			   (setq cmdline-value nil))
+			 (separate-argument ()
+			   :report "Separate option from its argument."
+			   (push cmdline-value cmdline)
+			   (setq cmdline-value nil))
+			 (register (error)
+			   :report "Don't treat error right now, but remember it."
+			   :interactive (lambda ()
+					  ;; #### PORTME.
+					  (list sb-debug:*debug-condition*))
+			   (push error cmdline-items)
+			   (return-from processing-short-call))))
+		     (setq option
+			   (search-option context :short-name cmdline-name))
+		     (unless option
+		       (multiple-value-setq (option cmdline-value)
+			 (search-sticky-option context cmdline-name)))
+		     (cond (option
+			    (push-retrieved-option cmdline-items :short option
+						   cmdline-value cmdline))
+			   ((potential-pack-p cmdline-name context)
+			    ;; #### NOTE: When parsing a minus pack, only the
+			    ;; last option gets a cmdline argument because only
+			    ;; the last one is allowed to retrieve an argument
+			    ;; from there.
+			    (do-pack (option
+				      (subseq cmdline-name 0
+					      (1- (length cmdline-name)))
+				      context)
+			      (push-retrieved-option cmdline-items :short option))
+			    (let* ((name (subseq cmdline-name
+						 (1- (length cmdline-name))))
+				   (option (search-option context
+							  :short-name name)))
+			      (assert option)
+			      (push-retrieved-option
+			       cmdline-items :short option nil cmdline)))
+			   (t
+			    (restartable-unknown-cmdline-option-error
+			     cmdline-items cmdline-name))))))
 		;; A plus call or a plus pack.
 		((beginning-of-string-p "+" arg)
-		 ;; #### FIXME: check invalid syntax +foo=val
-		 (let* ((cmdline-name (subseq arg 1))
-			;; #### NOTE: in theory, we could allow partial
-			;; matches on short names when they're used with the
-			;; +-syntax, because there's no sticky argument or
-			;; whatever. But we don't. That's all. Short names are
-			;; not meant to be long (otherwise, that would be long
-			;; names right?), so they're not meant to be
-			;; abbreviated.
-			(option (search-option context :short-name cmdline-name)))
-		   (cond (option
-			  (push-retrieved-option cmdline-items :plus option))
-			 ((potential-pack-p cmdline-name context)
-			  (do-pack (option cmdline-name context)
-			    (push-retrieved-option cmdline-items :plus option)))
-			 (t
-			  (restartable-unknown-cmdline-option-error
-			   cmdline-items cmdline-name)))))
+		 (block processing-+-option
+		   (let* ((value-start (position #\= arg :start 2))
+			  (cmdline-name (subseq arg 1 value-start))
+			  (cmdline-value (when value-start
+					   (subseq arg (1+ value-start))))
+			  option)
+		     (when cmdline-value
+		       (restart-case (error 'invalid-+=-syntax :item arg)
+			 (discard-argument ()
+			   :report "Discard the argument."
+			   (setq cmdline-value nil))
+			 (convert-to-short-and-stick ()
+			   :report "Convert to short call and stick argument."
+			   (push (concatenate 'string
+				   "-" cmdline-name cmdline-value)
+				 cmdline)
+			   (return-from processing-+-option))
+			 (convert-to-short-and-split ()
+			   :report "Convert to short call and split argument."
+			   (push cmdline-value cmdline)
+			   (push (concatenate 'string "-" cmdline-name)
+				 cmdline)
+			   (return-from processing-+-option))
+			 (register (error)
+			   :report "Don't treat error right now, but remember it."
+			   :interactive (lambda ()
+					  ;; #### PORTME.
+					  (list sb-debug:*debug-condition*))
+			   (push error cmdline-items)
+			   (return-from processing-+-option))))
+		     ;; #### NOTE: in theory, we could allow partial
+		     ;; matches on short names when they're used with the
+		     ;; +-syntax, because there's no sticky argument or
+		     ;; whatever. But we don't. That's all. Short names are
+		     ;; not meant to be long (otherwise, that would be long
+		     ;; names right?), so they're not meant to be
+		     ;; abbreviated.
+		     (setq option
+			   (search-option context :short-name cmdline-name))
+		     (cond (option
+			    (push-retrieved-option cmdline-items :plus option))
+			   ((potential-pack-p cmdline-name context)
+			    (do-pack (option cmdline-name context)
+			      (push-retrieved-option cmdline-items :plus option)))
+			   (t
+			    (restartable-unknown-cmdline-option-error
+			     cmdline-items cmdline-name))))))
 		(t
 		 ;; Not an option call.
 		 ;; #### PORTME.
@@ -290,6 +358,9 @@ CONTEXT is where to look for the options."
 			(setq remainder (cons arg cmdline))
 			(setq cmdline nil))
 		       (t
+			;; #### TODO: here, we should have an option to tell
+			;; CLon whether this particular synopsis accepts
+			;; remainders or not. See comment in synopsis.lisp.
 			;; If there's no more option on the cmdline, consider
 			;; this as the remainder (implicit since no "--" has
 			;; been used). If there's still another option
