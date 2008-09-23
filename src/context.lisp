@@ -96,7 +96,7 @@
 	     "The program name, as it appears on the command-line."
 	     :type string
 	     :reader progname)
-   (cmdline-options :documentation "The items on the command-line."
+   (cmdline-options :documentation "The options from the command-line."
 	  :type list
 	  :accessor cmdline-options)
    (remainder :documentation "The non-Clon part of the command-line."
