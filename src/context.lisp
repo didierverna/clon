@@ -145,10 +145,12 @@ options based on it."))
 	    (format t "Option names can't contain equal signs. Try again:~%")
 	    (return (list line))))))
 
-(defun read-name (&optional short)
-  "Read an option's name from standard input.
-If SHORT, read an option's short name. Otherwise, read the long one."
-  (format t "Please type in the correct option's ~:[long~;short~] name:~%" short)
+(defun read-call (&optional plus)
+  "Read an option's call  or pack from standard input.
+If PLUS, read a plus call or pack. Otherwise, read a short call or minus pack."
+  (format
+   t "Please type in the correct ~:[short call or minus~;plus call or~] pack:~%"
+   plus)
   (list (read-line)))
 
 (defmethod initialize-instance :after ((context context) &key cmdline)
@@ -306,9 +308,9 @@ CONTEXT is where to look for the options."
 			     (restart-case
 				 (restartable-unknown-cmdline-option-error
 				  cmdline-options cmdline-name)
-			       (fix-option-name (new-cmdline-name)
-				 :report "Fix the option name."
-				 :interactive (lambda () (read-name :short))
+			       (fix-short-call (new-cmdline-name)
+				 :report "Fix this short call."
+				 :interactive (lambda () (read-call))
 				 (setq cmdline-name new-cmdline-name)
 				 (go find-option))))))))
 		;; A plus call or a plus pack.
@@ -357,9 +359,9 @@ CONTEXT is where to look for the options."
 			       (restart-case
 				   (restartable-unknown-cmdline-option-error
 				    cmdline-options cmdline-name)
-				 (fix-option-name (new-cmdline-name)
-				   :report "Fix the option name."
-				   :interactive (lambda () (read-name :short))
+				 (fix-plus-call (new-cmdline-name)
+				   :report "Fix this plus call."
+				   :interactive (lambda () (read-call :plus))
 				   (setq cmdline-name new-cmdline-name)
 				   (go find-option)))))))))
 		(t
