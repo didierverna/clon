@@ -96,9 +96,9 @@
 	     "The program name, as it appears on the command-line."
 	     :type string
 	     :reader progname)
-   (cmdline-items :documentation "The items on the command-line."
+   (cmdline-options :documentation "The items on the command-line."
 	  :type list
-	  :accessor cmdline-items)
+	  :accessor cmdline-options)
    (remainder :documentation "The non-Clon part of the command-line."
 	      :type list
 	      :reader remainder)
@@ -143,7 +143,7 @@ options based on it."))
 (defmethod initialize-instance :after ((context context) &key cmdline)
   "Parse CMDLINE."
   (setf (slot-value context 'progname) (pop cmdline))
-  (let ((cmdline-items (list))
+  (let ((cmdline-options (list))
 	(remainder (list)))
     (macrolet ((push-cmdline-option (place &rest body)
 		 "Push a new CMDLINE-OPTION created with BODY onto PLACE."
@@ -225,10 +225,10 @@ CONTEXT is where to look for the options."
 		     (multiple-value-setq (option name)
 		       (search-option context :partial-name cmdline-name)))
 		   (if option
-		       (push-retrieved-option cmdline-items :long option
+		       (push-retrieved-option cmdline-options :long option
 					      cmdline-value cmdline name)
 		       (restartable-unknown-cmdline-option-error
-			cmdline-items cmdline-name cmdline-value))))
+			cmdline-options cmdline-name cmdline-value))))
 		;; A short call, or a minus pack.
 		((beginning-of-string-p "-" arg)
 		 (block processing-short-call
@@ -257,7 +257,7 @@ CONTEXT is where to look for the options."
 		       (multiple-value-setq (option cmdline-value)
 			 (search-sticky-option context cmdline-name)))
 		     (cond (option
-			    (push-retrieved-option cmdline-items :short option
+			    (push-retrieved-option cmdline-options :short option
 						   cmdline-value cmdline))
 			   ((potential-pack-p cmdline-name context)
 			    ;; #### NOTE: When parsing a minus pack, only the
@@ -268,17 +268,17 @@ CONTEXT is where to look for the options."
 				      (subseq cmdline-name 0
 					      (1- (length cmdline-name)))
 				      context)
-			      (push-retrieved-option cmdline-items :short option))
+			      (push-retrieved-option cmdline-options :short option))
 			    (let* ((name (subseq cmdline-name
 						 (1- (length cmdline-name))))
 				   (option (search-option context
 							  :short-name name)))
 			      (assert option)
 			      (push-retrieved-option
-			       cmdline-items :short option nil cmdline)))
+			       cmdline-options :short option nil cmdline)))
 			   (t
 			    (restartable-unknown-cmdline-option-error
-			     cmdline-items cmdline-name))))))
+			     cmdline-options cmdline-name))))))
 		;; A plus call or a plus pack.
 		((beginning-of-string-p "+" arg)
 		 (block processing-+-option
@@ -314,13 +314,13 @@ CONTEXT is where to look for the options."
 		     (setq option
 			   (search-option context :short-name cmdline-name))
 		     (cond (option
-			    (push-retrieved-option cmdline-items :plus option))
+			    (push-retrieved-option cmdline-options :plus option))
 			   ((potential-pack-p cmdline-name context)
 			    (do-pack (option cmdline-name context)
-			      (push-retrieved-option cmdline-items :plus option)))
+			      (push-retrieved-option cmdline-options :plus option)))
 			   (t
 			    (restartable-unknown-cmdline-option-error
-			     cmdline-items cmdline-name))))))
+			     cmdline-options cmdline-name))))))
 		(t
 		 ;; Not an option call.
 		 ;; #### PORTME.
@@ -345,7 +345,7 @@ CONTEXT is where to look for the options."
 				 (discard ()
 				   :report "Discard junk."
 				   nil))))))))))
-      (setf (cmdline-items context) (nreverse cmdline-items))
+      (setf (cmdline-options context) (nreverse cmdline-options))
       (setf (slot-value context 'remainder) remainder))))
 
 (defun make-context
@@ -419,22 +419,21 @@ This function returns two values:
 	   (synopsis context)
 	   context))
   ;; Try the command-line:
-  (let ((cmdline-items (list)))
-    (do ((cmdline-item
-	  (pop (cmdline-items context))
-	  (pop (cmdline-items context))))
-	((null cmdline-item))
-      (cond ((eq (cmdline-option-option cmdline-item) option)
-	     (setf (cmdline-items context)
-		   ;; #### NOTE: actually, I *do* have a use for nreconc,
-		   ;; he he ;-)
-		   (nreconc cmdline-items (cmdline-items context)))
+  (let ((cmdline-options (list)))
+    (do ((cmdline-option
+	  (pop (cmdline-options context))
+	  (pop (cmdline-options context))))
+	((null cmdline-option))
+      (cond ((eq (cmdline-option-option cmdline-option) option)
+	     (setf (cmdline-options context)
+		   ;; #### NOTE: actually, I *do* have a use for nreconc ;-)
+		   (nreconc cmdline-options (cmdline-options context)))
 	     (return-from getopt
-	       (values (cmdline-option-value cmdline-item)
-		       (list :cmdline (cmdline-option-name cmdline-item)))))
+	       (values (cmdline-option-value cmdline-option)
+		       (list :cmdline (cmdline-option-name cmdline-option)))))
 	    (t
-	     (push cmdline-item cmdline-items))))
-    (setf (cmdline-items context) (nreverse cmdline-items)))
+	     (push cmdline-option cmdline-options))))
+    (setf (cmdline-options context) (nreverse cmdline-options)))
   ;; Try an environment variable:
   (handler-bind ((environment-error
 		  (lambda (error)
@@ -462,11 +461,11 @@ This function returns three values:
 - the option object,
 - the option's name used on the command-line,
 - the retrieved value."
-  (let ((cmdline-item (pop (cmdline-items context))))
-    (when cmdline-item
-      (values (cmdline-option-option cmdline-item)
-	      (cmdline-option-name cmdline-item)
-	      (cmdline-option-value cmdline-item)))))
+  (let ((cmdline-option (pop (cmdline-options context))))
+    (when cmdline-option
+      (values (cmdline-option-option cmdline-option)
+	      (cmdline-option-name cmdline-option)
+	      (cmdline-option-value cmdline-option)))))
 
 (defmacro multiple-value-getopt-cmdline ((option name value) context &body body)
   "Evaluate BODY on the next command-line option in CONTEXT.
@@ -479,7 +478,7 @@ command-line) and retrieved value."
   "Evaluate BODY over all command-line options in CONTEXT.
 OPTION, NAME and VALUE are bound to each option's object, name used on the
 command-line) and retrieved value."
-  `(do () ((null (cmdline-items ,context)))
+  `(do () ((null (cmdline-options ,context)))
     (multiple-value-getopt-cmdline (,option ,name ,value) ,context
       ,@body)))
 
