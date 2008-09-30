@@ -383,28 +383,21 @@ CONTEXT is where to look for the options."
 				   (go figure-this-+-call)))))))))
 		(t
 		 ;; Not an option call.
-		 ;; #### PORTME.
-		 (cond ((sb-ext:posix-getenv "POSIXLY_CORRECT")
-			;; That's the end of the Clon-specific part:
+		 ;; #### TODO: here, we should have an option to tell CLon
+		 ;; whether this particular synopsis accepts remainders or
+		 ;; not. See comment in synopsis.lisp. If there's no more
+		 ;; option on the cmdline, consider this as the remainder
+		 ;; (implicit since no "--" has been used). If there's still
+		 ;; another option somewhere, then this is really junk.
+		 (cond ((notany #'option-call-p cmdline)
 			(setq remainder (cons arg cmdline))
 			(setq cmdline nil))
 		       (t
-			;; #### TODO: here, we should have an option to tell
-			;; CLon whether this particular synopsis accepts
-			;; remainders or not. See comment in synopsis.lisp.
-			;; If there's no more option on the cmdline, consider
-			;; this as the remainder (implicit since no "--" has
-			;; been used). If there's still another option
-			;; somewhere, then this is really junk.
-			(cond ((notany #'option-call-p cmdline)
-			       (setq remainder (cons arg cmdline))
-			       (setq cmdline nil))
-			      (t
-			       (restart-case
-				   (error 'cmdline-junk-error :junk arg)
-				 (discard ()
-				   :report "Discard junk."
-				   nil))))))))))
+			(restart-case
+			    (error 'cmdline-junk-error :junk arg)
+			  (discard ()
+			    :report "Discard junk."
+			    nil))))))))
       (setf (cmdline-options context) (nreverse cmdline-options))
       (setf (slot-value context 'remainder) remainder))))
 
