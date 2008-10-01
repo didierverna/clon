@@ -45,8 +45,7 @@
 	   :make-synopsis :define-synopsis :declare-synopsis
 	   :make-context
 	   :getopt
-	   :getopt-cmdline :multiple-value-getopt-cmdline :do-cmdline-options
-	   :getopt-unknown :multiple-value-getopt-unknown :do-unknown-options))
+	   :getopt-cmdline :multiple-value-getopt-cmdline :do-cmdline-options))
 
 
 (in-package :clon)
