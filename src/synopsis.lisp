@@ -32,6 +32,7 @@
 ;;; Code:
 
 (in-package :clon)
+(in-readtable :clon)
 
 
 ;; ============================================================================
@@ -80,7 +81,8 @@
   (let ((grp (make-group)))
     (add-to grp (make-text :contents "Clon specific options:"))
     (add-to grp (make-internal-flag "help" "Display Clon-specific help."))
-    (add-to grp (make-internal-stropt "version" "Display Clon's version number.
+    (add-to grp (make-internal-stropt "version"
+		    "Display Clon's version number.
 WHICH can be `number', `short' or `long'."
 		  :argument-name "WHICH"
 		  :argument-type :optional
@@ -90,16 +92,20 @@ WHICH can be `number', `short' or `long'."
       (add-to subgrp (make-text :contents "Clon output:"))
       ;; #### TODO: extend Clon with a search-path option type converting a
       ;; search path as below into a path list.
-      (add-to subgrp (make-internal-stropt "search-path" "Set Clon's search path.
+      (add-to subgrp (make-internal-stropt "search-path"
+			 "Set Clon's search path.
 If you don't want any search path at all, use this option with no argument."
 		       :argument-name "PATH"
 		       :argument-type :optional
 		       ;; #### TODO: maybe we could be more OS-friendly (read
 		       ;; OS-specific) in the default-value below.
-		       :default-value
-		      "~/.clon:~/share/clon:/usr/local/share/clon:/usr/share/clon"
+		       :default-value ~"~/.clon:"
+				     ~"~/share/clon:"
+				     ~"/usr/local/share/clon:"
+				     ~"/usr/share/clon"
 		       :env-var "SEARCH_PATH"))
-      (add-to subgrp (make-internal-stropt "theme" "Set Clon's output theme.
+      (add-to subgrp (make-internal-stropt "theme"
+			 "Set Clon's output theme.
 If you don't want any theme at all, use this option with no argument. Unless
 starting with /, ./ or ../, files are looked for in the Clon search path. The
 cth extension can be omitted."

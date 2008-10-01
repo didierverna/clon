@@ -32,6 +32,7 @@
 ;;; Code:
 
 (in-package :clon)
+(in-readtable :clon)
 
 
 ;; ============================================================================
@@ -209,8 +210,8 @@ a match by PARTIAL-NAME."
 	   (complete-string partial-name (long-name option))))))
 
 (defgeneric match-sticky-option (option namearg)
-  (:documentation
-   "Try to match OPTION's short name with a sticky argument against NAMEARG.
+  (:documentation ~"Try to match OPTION's short name with a sticky argument "
+		  ~"against NAMEARG.
 If option matches, return the argument part of NAMEARG."))
 
 

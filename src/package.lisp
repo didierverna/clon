@@ -34,7 +34,8 @@
 (in-package :cl-user)
 
 (defpackage :clon
-    (:use :cl)
+  (:use :cl)
+  (:shadow :*readtable*)
   (:import-from :clon-system :+version+)
   (:export :+version+
 	   :add-to :seal
@@ -46,5 +47,28 @@
 	   :getopt
 	   :getopt-cmdline :multiple-value-getopt-cmdline :do-cmdline-options
 	   :getopt-unknown :multiple-value-getopt-unknown :do-unknown-options))
+
+
+(in-package :clon)
+
+(defvar *readtable* (copy-readtable nil)
+  "The Clon readtable.")
+
+(defun tilde-reader (stream char)
+  "Read a series of ~\"strings\" to be concatenated together."
+  (declare (ignore char))
+  (apply #'concatenate 'string
+	 (loop :for str = (read stream t nil t)
+	       :then (progn (read-char stream t nil t)
+			    (read stream t nil t))
+	       :collect str
+	       :while (eql (peek-char t stream nil nil t) #\~))))
+
+(set-macro-character #\~ #'tilde-reader nil *readtable*)
+
+(defmacro in-readtable (name)
+  "Set the current readtable to the value of NAME::*READTABLE*."
+  `(eval-when (:compile-toplevel :load-toplevel :execute)
+    (setf cl:*readtable* (symbol-value (find-symbol "*READTABLE*" ,name)))))
 
 ;;; package.lisp ends here

@@ -32,7 +32,7 @@
 ;;; Code:
 
 (in-package :clon)
-
+(in-readtable :clon)
 
 ;; ============================================================================
 ;; Misc auxiliary routines

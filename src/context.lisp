@@ -32,6 +32,7 @@
 ;;; Code:
 
 (in-package :clon)
+(in-readtable :clon)
 
 
 ;; ============================================================================
@@ -110,8 +111,7 @@
 	     :type synopsis
 	     :initarg :synopsis
 	     :reader synopsis)
-   (progname :documentation
-	     "The program name, as it appears on the command-line."
+   (progname :documentation "The program name, as it appears on the command-line."
 	     :type string
 	     :reader progname)
    (cmdline-options :documentation "The options from the command-line."
@@ -120,19 +120,18 @@
    (remainder :documentation "The non-Clon part of the command-line."
 	      :type list
 	      :reader remainder)
-   (error-handler :documentation
-		  "The behavior to adopt on errors at command-line parsing time."
+   (error-handler :documentation ~"The behavior to adopt on errors "
+			       ~"at command-line parsing time."
 		  :type symbol
 		  :initarg :error-handler
 		  :initform :quit
 		  :reader error-handler)
-   (getopt-error-handler
-    :documentation
-    "The default behavior to adopt on errors in the getopt family of functions."
-    :type symbol
-    :initarg :getopt-error-handler
-    :initform :quit
-    :reader getopt-error-handler))
+   (getopt-error-handler :documentation ~"The default behavior to adopt on errors "
+				     ~"in the getopt family of functions."
+			:type symbol
+			:initarg :getopt-error-handler
+			:initform :quit
+			:reader getopt-error-handler))
   (:default-initargs
       ;; #### PORTME.
       :cmdline sb-ext:*posix-argv*)
@@ -157,8 +156,8 @@ options based on it."))
 (defun read-call (&optional plus)
   "Read an option's call or pack from standard input.
 If PLUS, read a plus call or pack. Otherwise, read a short call or minus pack."
-  (format
-   t "Please type in the correct ~:[short call or minus~;plus call or~] pack:~%"
+  (format t ~"Please type in the correct "
+	   ~"~:[short call or minus~;plus call or~] pack:~%"
    plus)
   (list (read-line)))
 

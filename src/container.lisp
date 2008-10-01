@@ -32,6 +32,7 @@
 ;;; Code:
 
 (in-package :clon)
+(in-readtable :clon)
 
 
 ;; #### NOTE: I don't like putting this function here (before the CONTAINER
@@ -120,8 +121,8 @@ command-line hierarchy."))
 ;; probably prohibit it altogether.
 
 (defgeneric check-name-clash (item1 item2)
-  (:documentation
-   "Check for name clash between ITEM1's options and ITEM2's options.")
+  (:documentation ~"Check for name clash between ITEM1's options "
+		  ~"and ITEM2's options.")
   (:method (item1 item2)
     "Do nothing (no name clash for a non-group or non-option ITEMs."
     (values))
