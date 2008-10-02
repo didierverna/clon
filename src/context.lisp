@@ -497,6 +497,8 @@ This function returns two values:
 		       (sb-ext:quit :unix-status 1))
 		      (:none)))))
     (let* ((env-var (env-var option))
+	   ;; #### PORTME.
+	   ;; #### Note: (sb-posix:getenv nil) -> nil, so using let* is ok.
 	   (env-val (sb-posix:getenv env-var)))
       (when env-val
 	(return-from getopt
