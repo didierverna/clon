@@ -36,8 +36,17 @@
 (defpackage :clon
   (:use :cl)
   (:shadow :*readtable*)
-  (:import-from :clon-system :+version+)
-  (:export :+version+
+  (:import-from :clon-system
+    :+release-major-level+
+    :+release-minor-level+
+    :+release-status+ :+release-status-level+
+    :+release-name+
+    :version)
+  (:export :+release-major-level+
+	   :+release-minor-level+
+	   :+release-status+ :+release-status-level+
+	   :+release-name+
+	   :version
 	   :add-to :seal
 	   :make-text
 	   :make-flag :make-switch :make-stropt

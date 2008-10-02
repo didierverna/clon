@@ -35,16 +35,98 @@
 
 (defpackage :clon-system
     (:use :cl :asdf)
-  (:export :+version+))
+  (:export :+release-major-level+
+	   :+release-minor-level+
+	   :+release-status+ :+release-status-level+
+	   :+release-name+
+	   :version))
 
 
 (in-package :clon-system)
 
-(defconstant +version+ "0.1"
-  "Current version of Clon")
+(defconstant +release-major-level+ 1
+  "The major level of this release.")
+
+(defconstant +release-minor-level+ 0
+  "The minor level of this release.")
+
+(defconstant +release-status+ :beta
+  "The status of this release.")
+
+(defconstant +release-status-level+ 1
+  "The status level of this release.")
+
+(defconstant +release-name+ "Michael Brecker"
+  "The name of this release.")
+
+;; #### TODO: I'm sure the format strings can be improved
+(defun %version (type major minor status level name)
+  (ecase type
+    (:number
+     (apply #'+
+       (* major 10000)
+       (* minor 100)
+       (when (eq status :patchlevel)
+	 (list level))))
+    (:short
+     (format nil "~S.~S~
+		 ~[~
+		   a~*~S~;~
+		   b~*~S~;~
+		   -pre~*~S~;~
+		   ~:[.~S~;~*~]~
+		 ~]"
+       major
+       minor
+       (ecase status
+	 (:alpha 0)
+	 (:beta 1)
+	 (:pre 2)
+	 (:patchlevel 3))
+       (zerop level)
+       level))
+    (:long
+     (format nil "~S.~S ~
+		 ~[~
+		   alpha ~*~S ~;~
+		   beta ~*~S ~;~
+		   pre ~*~S ~;~
+		   ~:[patchlevel ~S ~;~*~]~
+		 ~]~
+		 ~S"
+       major
+       minor
+       (ecase status
+	 (:alpha 0)
+	 (:beta 1)
+	 (:pre 2)
+	 (:patchlevel 3))
+       (zerop level)
+       level
+       name))))
+
+(defun version (&optional (type :number))
+  "Return the current version of Clon.
+TYPE can be one of :number, :short or :long.
+
+A version number is computed as major*10000 + minor*100 + patchlevel, leaving
+two digits for each level. Alpha, beta and pre status are ignored in version
+numbers.
+
+A short version is something like 1.3{a,b,-pre}4, or 1.3.4 for patchlevel.
+Alpha, beta or pre levels start at 1. Patchlevels start at 0 but are ignored
+in the output, so that 1.3.0 appears as just 1.3.
+
+A long version is something like
+1.3 {alpha,beta,pre, patchlevel} 4 \"Michael Brecker\". As for the short
+version, a patchlevel of 0 is ignored in the output."
+  (%version type +release-major-level+ +release-minor-level+
+	    +release-status+ +release-status-level+
+	    +release-name+))
 
 (defsystem :clon
-  :version #.+version+
+  ;; #### TODO: see about that
+  ;; :version #.+version+
   ;; #### PORTME: SBCL-specific
   :depends-on (:sb-posix)
   :components ((:file "package")
