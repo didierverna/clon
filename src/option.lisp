@@ -302,7 +302,7 @@ If AS-STRING, return a string of that character.")
 	     :reader argument))
   (:report (lambda (error stream)
 	     (format stream "Option '~A': spurious argument ~S."
-		     (name error) (argument error))))
+	       (name error) (argument error))))
   (:documentation "A spurious command-line argument error."))
 
 ;; #### NOTE: this macro is currently used only once.
@@ -623,7 +623,7 @@ ARGUMENT-REQUIRED-P slot."
 	    :reader comment))
   (:report (lambda (error stream)
 	     (format stream "Option ~A: invalid value ~S.~@[~%~A~]"
-		     (option error) (value error) (comment error))))
+	       (option error) (value error) (comment error))))
   (:documentation "An invalid value error."))
 
 (defun read-value ()
@@ -656,7 +656,7 @@ the one that was provided."
 	    :reader comment))
   (:report (lambda (error stream)
 	     (format stream "Option ~A: invalid argument ~S.~@[~%~A~]"
-		     (option error) (argument error) (comment error))))
+	       (option error) (argument error) (comment error))))
   (:documentation "An invalid argument error."))
 
 (defun read-argument ()
@@ -685,7 +685,7 @@ Available restarts are:
 	      (slot-boundp valued-option 'default-value))
       :report (lambda (stream)
 		(format stream "Use option's default value (~S) instead."
-			(default-value valued-option)))
+		  (default-value valued-option)))
       (default-value valued-option))
     (use-value (value)
       :report "Use another (already converted) value."
@@ -705,7 +705,7 @@ Available restarts are:
   ()
   (:report (lambda (error stream)
 	     (format stream "Option '~A': invalid argument ~S.~@[~%~A~]"
-		     (name error) (argument error) (comment error))))
+	       (name error) (argument error) (comment error))))
   (:documentation "An invalid command-line argument error."))
 
 (defun cmdline-convert (valued-option cmdline-name cmdline-argument)
@@ -760,7 +760,7 @@ Available restarts are (depending on the context):
 		   (slot-boundp valued-option 'fallback-value)))
       :report (lambda (stream)
 		(format stream "Use fallback value (~S)."
-			(fallback-value valued-option)))
+		  (fallback-value valued-option)))
       (fallback-value valued-option))
     (use-default-value ()
       :test (lambda (error)
@@ -768,7 +768,7 @@ Available restarts are (depending on the context):
 	      (slot-boundp valued-option 'default-value))
       :report (lambda (stream)
 		(format stream "Use option's default value (~S)."
-			(default-value valued-option)))
+		  (default-value valued-option)))
       (default-value valued-option))
     (use-value (value)
       :report "Use an already converted value."
@@ -808,12 +808,12 @@ Available restarts are (depending on the context):
     :reader env-val))
   (:report
    (lambda (error stream)
-     (format stream
-	     "Environment variable ~A (for option ~S): invalid value ~S.~@[~%~A~]"
-	     (env-var error)
-	     (or (long-name (option error)) (short-name (option error)))
-	     (env-val error)
-	     (comment error))))
+     (format stream "Environment variable ~A (for option ~S): ~
+		    invalid value ~S.~@[~%~A~]"
+       (env-var error)
+       (or (long-name (option error)) (short-name (option error)))
+       (env-val error)
+       (comment error))))
   (:documentation "An invalid environment variable's value error."))
 
 ;; #### WARNING: given the idea of supporting a list of env vars, I would need
@@ -835,7 +835,7 @@ to raise the higher level invalid-environment-value error instead."
 (defun read-env-val (env-var)
   "Read ENV-VAR's new value from standard input."
   (format t "Please type in a new value for the ~A environment variable:~%"
-	  env-var)
+    env-var)
   (list (read-line)))
 
 ;; #### WARNING: given the idea of supporting a list of env vars, I would need
@@ -858,7 +858,7 @@ Available restarts are:
 	      (slot-boundp valued-option 'default-value))
       :report (lambda (stream)
 		(format stream "Use option's default value (~S)."
-			(default-value valued-option)))
+		  (default-value valued-option)))
       (default-value valued-option))
     (use-value (value)
       :report "Use an already converted value."

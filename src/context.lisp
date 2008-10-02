@@ -49,14 +49,14 @@
   ()
   (:report (lambda (error stream)
 	     (format stream "Invalid =-syntax in short call: ~S."
-		     (item error))))
+	       (item error))))
   (:documentation "An error related to a -= syntax."))
 
 (define-condition invalid-+=-syntax (cmdline-error)
   ()
   (:report (lambda (error stream)
 	     (format stream "Invalid =-syntax in plus call: ~S."
-		     (item error))))
+	       (item error))))
   (:documentation "An error related to a += syntax."))
 
 (define-condition cmdline-junk-error (cmdline-error)
@@ -95,10 +95,10 @@
 	     :initarg :argument
 	     :reader argument))
   (:report (lambda (error stream)
-	     (format stream
-		     "Unknown command-line option ~S~@[ with argument ~S~]."
-		     (name error)
-		     (argument error))))
+	     (format stream "Unknown command-line option ~
+			    ~S~@[ with argument ~S~]."
+	       (name error)
+	       (argument error))))
   (:documentation "An error related to an unknown command-line option."))
 
 
@@ -156,9 +156,9 @@ options based on it."))
 (defun read-call (&optional plus)
   "Read an option's call or pack from standard input.
 If PLUS, read a plus call or pack. Otherwise, read a short call or minus pack."
-  (format t ~"Please type in the correct "
-	   ~"~:[short call or minus~;plus call or~] pack:~%"
-   plus)
+  (format t "Please type in the correct ~
+	    ~:[short call or minus~;plus call or~] pack:~%"
+    plus)
   (list (read-line)))
 
 (defmethod initialize-instance :after ((context context) &key cmdline)
