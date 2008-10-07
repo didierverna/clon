@@ -83,8 +83,8 @@
     (add-to grp (make-internal-flag "help" "Display Clon-specific help."))
     (add-to grp (make-internal-stropt "version"
 		    "Display Clon's version number.
-WHICH can be `number', `short' or `long'."
-		  :argument-name "WHICH"
+FMT can be `number', `short' or `long'."
+		  :argument-name "FMT"
 		  :argument-type :optional
 		  :default-value "long"
 		  :env-var "VERSION_FORMAT"))
