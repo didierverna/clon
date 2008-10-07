@@ -1,0 +1,23 @@
+* Support for a list of environment variables associated with an option
+  (not just one)
+* Support for value post-processing (I'm thinking env vars, but maybe
+  elsewhere). For instance, we could implement a --debug opton associated with
+  a DEBUG env var, and also/or with a NDEBUG env var for which we would
+  complement the conversion.
+* Maybe we could support the presence of an empty env-var as the equivalent of
+  a command-line option without an (optional) argument. But since we can't
+  distinguish a non-value from the empty string value, that would be
+  difficult. Not sure it's worth it.
+* Rethink the need for a default value in case of an optional argument.
+  Is that really required? Consider --phone=..., --fax=... or --fax (meaning
+  same as phone), which has no default value. Maybe the answer is a dynamic
+  default value (specified as a lambda expression).
+* Provide something more powerful than the remainder stuff for describing the
+  cmdline syntax. Some programs might want to alternate options and non-option
+  stuff.
+* Once the partial matching is fixed (meaning: the longest match is used, not
+  the first one), extend it to match name portions between -'s (e.g. --f-n ==
+  --family-name). 
+* Study POSIX behavior for cmdline options, and see if we can provide a
+  compliant mode, that would be triggered by POSIXLY_CORRECT, POSIX_ME_HARDER,
+  or other means (cmdline options?)
