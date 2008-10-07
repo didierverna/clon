@@ -147,19 +147,19 @@ The most important features of Clon are:
   ;; #### PORTME: SBCL-specific
   :depends-on (:sb-posix)
   :components ((:file "package")
-	       (:file "util")
-	       (:file "container")
-	       (:file "text")
+	       (:file "util" :depends-on ("package"))
+	       (:file "container" :depends-on ("util"))
+	       (:file "text" :depends-on ("util"))
 	       (:module "options"
-			:components ((:file "option")
-				     (:file "flag")
-				     (:file "valued")
-				     (:file "switch")
-				     (:file "stropt"))
-			:serial t)
-	       (:file "group")
-	       (:file "synopsis")
-	       (:file "context"))
-  :serial t)
+		 :depends-on ("util")
+		 :components ((:file "option")
+			      (:file "flag" :depends-on ("option"))
+			      (:file "valued" :depends-on ("option"))
+			      (:file "switch" :depends-on ("valued"))
+			      (:file "stropt" :depends-on ("valued"))))
+	       (:file "group" :depends-on ("container" "text" "options"))
+	       (:file "synopsis" :depends-on ("group"))
+	       (:file "context" :depends-on ("synopsis"))))
+
 
 ;;; clon.asd ends here
