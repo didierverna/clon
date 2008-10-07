@@ -44,66 +44,67 @@
 
 (in-package :clon-system)
 
-(defconstant +release-major-level+ 1
-  "The major level of this release.")
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defconstant +release-major-level+ 1
+    "The major level of this release.")
 
-(defconstant +release-minor-level+ 0
-  "The minor level of this release.")
+  (defconstant +release-minor-level+ 0
+    "The minor level of this release.")
 
-(defconstant +release-status+ :beta
-  "The status of this release.")
+  (defconstant +release-status+ :beta
+    "The status of this release.")
 
-(defconstant +release-status-level+ 1
-  "The status level of this release.")
+  (defconstant +release-status-level+ 1
+    "The status level of this release.")
 
-(defconstant +release-name+ "Michael Brecker"
-  "The name of this release.")
+  (defconstant +release-name+ "Michael Brecker"
+    "The name of this release.")
 
-;; #### TODO: I'm sure the format strings can be improved
-(defun %version (type major minor status level name)
-  (ecase type
-    (:number
-     (apply #'+
-       (* major 10000)
-       (* minor 100)
-       (when (eq status :patchlevel)
-	 (list level))))
-    (:short
-     (format nil "~S.~S~
-		 ~[~
-		   a~*~S~;~
-		   b~*~S~;~
-		   -pre~*~S~;~
-		   ~:[.~S~;~*~]~
-		 ~]"
-       major
-       minor
-       (ecase status
-	 (:alpha 0)
-	 (:beta 1)
-	 (:pre 2)
-	 (:patchlevel 3))
-       (zerop level)
-       level))
-    (:long
-     (format nil "~S.~S ~
-		 ~[~
-		   alpha ~*~S ~;~
-		   beta ~*~S ~;~
-		   pre ~*~S ~;~
-		   ~:[patchlevel ~S ~;~*~]~
-		 ~]~
-		 ~S"
-       major
-       minor
-       (ecase status
-	 (:alpha 0)
-	 (:beta 1)
-	 (:pre 2)
-	 (:patchlevel 3))
-       (zerop level)
-       level
-       name))))
+  ;; #### TODO: I'm sure the format strings can be improved
+  (defun %version (type major minor status level name)
+    (ecase type
+      (:number
+       (apply #'+
+	 (* major 10000)
+	 (* minor 100)
+	 (when (eq status :patchlevel)
+	   (list level))))
+      (:short
+       (format nil "~S.~S~
+		   ~[~
+		     a~*~S~;~
+		     b~*~S~;~
+		     -pre~*~S~;~
+		     ~:[.~S~;~*~]~
+		   ~]"
+	 major
+	 minor
+	 (ecase status
+	   (:alpha 0)
+	   (:beta 1)
+	   (:pre 2)
+	   (:patchlevel 3))
+	 (zerop level)
+	 level))
+      (:long
+       (format nil "~S.~S ~
+		   ~[~
+		     alpha ~*~S ~;~
+		     beta ~*~S ~;~
+		     pre ~*~S ~;~
+		     ~:[patchlevel ~S ~;~*~]~
+		   ~]~
+		   ~S"
+	 major
+	 minor
+	 (ecase status
+	   (:alpha 0)
+	   (:beta 1)
+	   (:pre 2)
+	   (:patchlevel 3))
+	 (zerop level)
+	 level
+	 name)))))
 
 (defun version (&optional (type :number))
   "Return the current version of Clon.
@@ -125,8 +126,24 @@ version, a patchlevel of 0 is ignored in the output."
 	    +release-name+))
 
 (defsystem :clon
-  ;; #### TODO: see about that
-  ;; :version #.+version+
+  :description "The Common Lisp / Command Line Option Nuker."
+  :long-description "Clon is a library for command-line option management.
+It is intended to ease the creation of standalone Common Lisp applications by
+providing a powerful and uniform command-line option interface.
+The most important features of Clon are:
+- [from the programmer's point of view] Centralized command-line options
+  specification and management, including automatic generation of help
+  strings, conversion from command-line / environment strings to
+  application-level option values, global or on-demand option retrieval, and
+  extensibility (the programmer can define his own option types).
+- [from the end-user's point of view] Uniform command-line option syntax
+  across Clonified applications, including customization of the help strings
+  layout (with optional ISO6429 coloring on terminals that support it),
+  possibly abbreviated option calls and short/long syntax."
+  :author "Didier Verna"
+  :maintainer "Didier Verna"
+  :license "GNU GPL"
+  :version #.(version :short)
   ;; #### PORTME: SBCL-specific
   :depends-on (:sb-posix)
   :components ((:file "package")
