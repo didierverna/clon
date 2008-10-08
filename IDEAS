@@ -21,3 +21,5 @@
 * Study POSIX behavior for cmdline options, and see if we can provide a
   compliant mode, that would be triggered by POSIXLY_CORRECT, POSIX_ME_HARDER,
   or other means (cmdline options?)
+* Implement automatic generation of whatever is needed for shell completion of
+  options (zsh in particular, zcomp I think it is).
