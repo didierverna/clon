@@ -44,6 +44,10 @@
 
 (in-package :clon-system)
 
+(defmacro define-constant (name value &optional doc)
+  `(defconstant ,name (if (boundp ',name) (symbol-value ',name) ,value)
+    ,@(when doc (list doc))))
+
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defconstant +release-major-level+ 1
     "The major level of this release.")
@@ -57,7 +61,7 @@
   (defconstant +release-status-level+ 1
     "The status level of this release.")
 
-  (defconstant +release-name+ "Michael Brecker"
+  (define-constant +release-name+ "Michael Brecker"
     "The name of this release.")
 
   ;; #### TODO: I'm sure the format strings can be improved
