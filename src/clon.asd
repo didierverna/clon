@@ -147,7 +147,7 @@ The most important features of Clon are:
   :author "Didier Verna"
   :maintainer "Didier Verna"
   :license "GNU GPL"
-  :version #.(version :short)
+  :version #.(version :long)
   ;; #### PORTME: SBCL-specific
   :depends-on (:sb-posix)
   :components ((:file "package")
