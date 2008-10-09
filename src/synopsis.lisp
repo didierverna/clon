@@ -41,8 +41,9 @@
 
 (defclass synopsis (container)
   ((postfix :documentation "A postfix to the program synopsis."
-	    :type string
+	    :type (or null string)
 	    :initarg :postfix
+	    :initform nil
 	    :reader postfix)
    (minus-pack :documentation "The minus pack string."
 	       :type (or null string)
@@ -52,14 +53,12 @@
 	      :reader plus-pack)
    (potential-pack :documentation "The potential pack string."
 		   :type (or null string)
-		   :reader potential-pack))
-  (:default-initargs
-      :postfix ""))
+		   :reader potential-pack)))
 
 (defun make-synopsis (&rest keys &key postfix)
   "Make a new SYNOPSIS.
-- POSTFIX is a string to append to the program synopsis.
-  It defaults to the empty string."
+- POSTFIX is a string to append to the program synopsis, in case it accepts a
+remainder."
   (declare (ignore postfix))
   (apply #'make-instance 'synopsis keys))
 
@@ -67,14 +66,6 @@
 ;; ----------------
 ;; Sealing protocol
 ;; ----------------
-
-;; #### TODO: we need a way to declare explicitely that a postfix exists for
-;; this synopsis. Currently, only -- or the POSIXLY_CORRECT env var can allow
-;; that. If we provide an option to force a POSIXLY_CORRECT behavior, for
-;; instance, we will have a problem in the cmdline parsing process, as it
-;; would take the first non-option argument as a potential argument to the
-;; previous option. This shows that we have to do more than just syntax
-;; parsing at context creation time.
 
 (defmethod seal :around ((synopsis synopsis))
   "Add Clon specific options to SYNOPSIS."

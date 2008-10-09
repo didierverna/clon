@@ -68,6 +68,12 @@
 	     (format stream "Junk on the command-line: ~S." (junk error))))
   (:documentation "An error related to a command-line piece of junk."))
 
+(defun restartable-cmdline-junk-error (junk)
+  (restart-case (error 'cmdline-junk-error :junk junk)
+    (discard ()
+      :report "Discard junk."
+      nil)))
+
 (define-condition unrecognized-short-call-error (cmdline-error)
   ((item ;; inherited from the CMDLINE-ERROR condition
     :documentation "The unrecognized short call on the command-line."
@@ -381,22 +387,24 @@ CONTEXT is where to look for the options."
 					       "+" new-cmdline-name))
 				   (go figure-this-+-call)))))))))
 		(t
-		 ;; Not an option call.
-		 ;; #### TODO: here, we should have an option to tell CLon
-		 ;; whether this particular synopsis accepts remainders or
-		 ;; not. See comment in synopsis.lisp. If there's no more
-		 ;; option on the cmdline, consider this as the remainder
-		 ;; (implicit since no "--" has been used). If there's still
-		 ;; another option somewhere, then this is really junk.
+		 ;; Not an option call. If there's no more option on the
+		 ;; cmdline, consider this as an implicit remainder. However,
+		 ;; contrary to the case of an explicit one (separated from
+		 ;; the rest of the cmdline by --), trigger an error if a
+		 ;; remainder is not expected. If there's still another option
+		 ;; somewhere, then this is real junk.
 		 (cond ((notany #'option-call-p cmdline)
-			(setq remainder (cons arg cmdline))
-			(setq cmdline nil))
+			(cond ((null (postfix context))
+			       (setq arg (cons arg cmdline))
+			       (setq cmdline nil)
+			       ;; Note that here, the whole remainder of the
+			       ;; cmdline might be discraded at once.
+			       (restartable-cmdline-junk-error arg))
+			      (t
+			       (setq remainder (cons arg cmdline))
+			       (setq cmdline nil))))
 		       (t
-			(restart-case
-			    (error 'cmdline-junk-error :junk arg)
-			  (discard ()
-			    :report "Discard junk."
-			    nil))))))))
+			(restartable-cmdline-junk-error arg)))))))
       (setf (cmdline-options context) (nreverse cmdline-options))
       (setf (slot-value context 'remainder) remainder))))
 
@@ -417,6 +425,11 @@ in the functions themselves). It can be one of:
   It defaults to a POSIX conformant argv."
   (declare (ignore synopsis error-handler getopt-error-handler cmdline))
   (apply #'make-instance 'context keys))
+
+
+(defmethod postfix ((context context))
+  "Return the postfix of CONTEXT's synopsis."
+  (postfix (synopsis context)))
 
 
 ;; -----------------------
