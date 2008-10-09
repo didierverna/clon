@@ -48,67 +48,66 @@
   `(defconstant ,name (if (boundp ',name) (symbol-value ',name) ,value)
     ,@(when doc (list doc))))
 
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (defconstant +release-major-level+ 1
-    "The major level of this release.")
+(defconstant +release-major-level+ 1
+  "The major level of this release.")
 
-  (defconstant +release-minor-level+ 0
-    "The minor level of this release.")
+(defconstant +release-minor-level+ 0
+  "The minor level of this release.")
 
-  (defconstant +release-status+ :beta
-    "The status of this release.")
+(defconstant +release-status+ :beta
+  "The status of this release.")
 
-  (defconstant +release-status-level+ 1
-    "The status level of this release.")
+(defconstant +release-status-level+ 1
+  "The status level of this release.")
 
-  (define-constant +release-name+ "Michael Brecker"
-    "The name of this release.")
+(define-constant +release-name+ "Michael Brecker"
+  "The name of this release.")
 
-  ;; #### TODO: I'm sure the format strings can be improved
-  (defun %version (type major minor status level name)
-    (ecase type
-      (:number
-       (apply #'+
-	 (* major 10000)
-	 (* minor 100)
-	 (when (eq status :patchlevel)
-	   (list level))))
-      (:short
-       (format nil "~S.~S~
-		   ~[~
-		     a~*~S~;~
-		     b~*~S~;~
-		     -pre~*~S~;~
-		     ~:[.~S~;~*~]~
-		   ~]"
-	 major
-	 minor
-	 (ecase status
-	   (:alpha 0)
-	   (:beta 1)
-	   (:pre 2)
-	   (:patchlevel 3))
-	 (zerop level)
-	 level))
-      (:long
-       (format nil "~S.~S ~
-		   ~[~
-		     alpha ~*~S ~;~
-		     beta ~*~S ~;~
-		     pre ~*~S ~;~
-		     ~:[patchlevel ~S ~;~*~]~
-		   ~]~
-		   ~S"
-	 major
-	 minor
-	 (ecase status
-	   (:alpha 0)
-	   (:beta 1)
-	   (:pre 2)
-	   (:patchlevel 3))
-	 (zerop level)
-	 level
-	 name)))))
+;; #### TODO: I'm sure the format strings can be improved
+(defun %version (type major minor status level name)
+  (ecase type
+    (:number
+     (apply #'+
+       (* major 10000)
+       (* minor 100)
+       (when (eq status :patchlevel)
+	 (list level))))
+    (:short
+     (format nil "~S.~S~
+		 ~[~
+		   a~*~S~;~
+		   b~*~S~;~
+		   -pre~*~S~;~
+		   ~:[.~S~;~*~]~
+		 ~]"
+       major
+       minor
+       (ecase status
+	 (:alpha 0)
+	 (:beta 1)
+	 (:pre 2)
+	 (:patchlevel 3))
+       (zerop level)
+       level))
+    (:long
+     (format nil "~S.~S ~
+		 ~[~
+		   alpha ~*~S ~;~
+		   beta ~*~S ~;~
+		   pre ~*~S ~;~
+		   ~:[patchlevel ~S ~;~*~]~
+		 ~]~
+		 ~S"
+       major
+       minor
+       (ecase status
+	 (:alpha 0)
+	 (:beta 1)
+	 (:pre 2)
+	 (:patchlevel 3))
+       (zerop level)
+       level
+       name))))
 
 (defun version (&optional (type :number))
   "Return the current version of Clon.
