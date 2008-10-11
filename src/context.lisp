@@ -491,7 +491,7 @@ This function returns two values:
 	((null cmdline-option))
       (cond ((eq (cmdline-option-option cmdline-option) option)
 	     (setf (cmdline-options context)
-		   ;; #### NOTE: actually, I *do* have a use for nreconc ;-)
+		   ;; Actually, I *do* have a use for nreconc ;-)
 		   (nreconc cmdline-options (cmdline-options context)))
 	     (return-from getopt
 	       (values (cmdline-option-value cmdline-option)

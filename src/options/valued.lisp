@@ -39,15 +39,6 @@
 ;; The Valued Option Class
 ;; ============================================================================
 
-;; #### NOTE: we should distinguish between the argument's display name, in
-;; itself, and the fact that we want to actually use it. For instance, we
-;; might want to display an option as just --color, but still declare that the
-;; argument name is CLR so that one day, it is possible to implement escape
-;; sequences like %n (for arg name) directly in the help strings. It's even
-;; more than that: while the argument display name belongs to the application,
-;; the fact that we want to see it probably rather belongs to the user
-;; preferences. Like, an option to display help in short form or something.
-
 (defabstract valued-option (option)
   ((argument-name :documentation "The option's argument display name."
 		  :initarg :argument-name
