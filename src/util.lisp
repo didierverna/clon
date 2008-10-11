@@ -49,6 +49,12 @@
 	 (string= beginning string :end2 length))))
 
 
+(defmacro econd (&body clauses)
+  "Like COND, but signal an error if no clause evaluates to t."
+  `(cond ,@(append clauses
+		   '((t (error "Fell out of ECOND clauses."))))))
+
+
 ;; ============================================================================
 ;; Key-Value pairs manipulation
 ;; ============================================================================
