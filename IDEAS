@@ -1,25 +1,46 @@
-* Support for a list of environment variables associated with an option
-  (not just one)
-* Support for value post-processing (I'm thinking env vars, but maybe
-  elsewhere). For instance, we could implement a --debug opton associated with
-  a DEBUG env var, and also/or with a NDEBUG env var for which we would
-  complement the conversion.
-* Maybe we could support the presence of an empty env-var as the equivalent of
-  a command-line option without an (optional) argument. But since we can't
-  distinguish a non-value from the empty string value, that would be
-  difficult. Not sure it's worth it.
-* Rethink the need for a default value in case of an optional argument.
-  Is that really required? Consider --phone=..., --fax=... or --fax (meaning
-  same as phone), which has no default value. Maybe the answer is a dynamic
-  default value (specified as a lambda expression).
-* Provide something more powerful than the remainder stuff for describing the
-  cmdline syntax. Some programs might want to alternate options and non-option
-  stuff.
-* Once the partial matching is fixed (meaning: the longest match is used, not
-  the first one), extend it to match name portions between -'s (e.g. --f-n ==
-  --family-name). 
-* Study POSIX behavior for cmdline options, and see if we can provide a
-  compliant mode, that would be triggered by POSIXLY_CORRECT, POSIX_ME_HARDER,
-  or other means (cmdline options?)
-* Implement automatic generation of whatever is needed for shell completion of
-  options (zsh in particular, zcomp I think it is).
+							-*- mode: outline -*-
+
+
+* Support for option aliases
+An option could have several names instead of just one.
+
+* Support for multiple environment variables
+An option could be associated with a list of environment variables instead of
+just one.
+
+* Support for value post-processing
+I'm especially thinking about multiple environment variable support, but maybe
+elsewhere. For instance, we could implement a --debug opton associated with
+a DEBUG env var, and also/or with a NDEBUG env var for which we should
+complement the conversion. Now the question is do we want to post-process the
+conversion value, the initial string value, or both ?
+
+* Treat empty en vars as options called without their (optional argument)
+With the restriction that there's no notion of an env var set without
+argument. There's only empty arguments. This will lead to problems if the
+option is supposed to accept empty strings.
+
+* Rethink the need for a default value in case of an optional argument
+Is that really required? Consider --phone=..., --fax=... or --fax (meaning
+same as phone), which has no default value. Maybe the answer is a dynamic
+default value (specified as a lambda expression)... hence the following idea:
+
+* Support for dynamic default value / fallback
+which could be computed from a lambda expression when needed.
+
+* Support for a complete cmdline syntax description
+Currently, there's just the notion of non-Clon remainder, but some programs
+might want to alternate options and non-option stuff, while still managing
+those parts with Clon.
+
+* Extend abbreviated option matching to dash-parts
+e.g. --f-n == --family-name. But we should fix the option matching algorithm
+first (currently, the first match is used, instead of looking for the longest).
+
+* Study POSIX behavior for cmdline options
+See if we can provide a POSIX compliant mode, that would be triggered by
+POSIXLY_CORRECT, POSIX_ME_HARDER, or other means (cmdline options?)
+
+* Support for shell completion
+Implement automatic generation of whatever is needed for shell completion of
+options (zsh in particular, zcomp I think it is).
