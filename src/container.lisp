@@ -198,6 +198,23 @@ command-line hierarchy."))
 ;; this through, but it would probably make things very difficult wrt sticky
 ;; options for instance. Think about it again at some point.
 
+(defun search-option-by-name (container &rest keys &key short-name long-name)
+  "Search for option with either SHORT-NAME or LONG-NAME in CONTAINER."
+  (declare (ignore short-name long-name))
+  (do-options (option container)
+    (let ((name
+	   (apply #'match-option option
+		  (select-keys keys :short-name :long-name))))
+      (when name
+	(return-from search-option-by-name (values option name))))))
+
+(defun search-option-by-abbreviation (container partial-name)
+  "Search for option abbreviated with PARTIAL-NAME in CONTAINER."
+  (do-options (option container)
+    (let ((name (match-option option :partial-name partial-name)))
+      (when name
+	(return-from search-option-by-abbreviation (values option name))))))
+
 (defgeneric search-option
     (there &rest keys &key short-name long-name partial-name)
   (:documentation "Search for option in THERE.
@@ -210,13 +227,10 @@ When such an option exists, return wo values:
   (:method
       ((container container) &rest keys &key short-name long-name partial-name)
     "Search for option in CONTAINER."
-    (declare (ignore short-name long-name partial-name))
-    (do-options (option container)
-      (let ((name
-	     (apply #'match-option option
-		    (select-keys keys :short-name :long-name :partial-name))))
-	(when name
-	  (return-from search-option (values option name)))))))
+    (econd ((or short-name long-name)
+	    (apply #'search-option-by-name container keys))
+	   (partial-name
+	    (search-option-by-abbreviation container partial-name)))))
 
 ;; #### NOTE: when looking for a sticky option, we stop at the first match,
 ;; even if, for instance, another option would match a longer part of the
