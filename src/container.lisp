@@ -189,31 +189,26 @@ command-line hierarchy."))
 ;; The Option Searching Protocol
 ;; ============================================================================
 
-;; #### NOTE: when partial matching is requested, the first matching option is
-;; returned. For instance, if you have --foobar and --foo options in that
-;; order, passing --foo will match the option --foo, but passing --fo will
-;; match --foobar. This is probably not the best behavior: it would be better
-;; to find the option "closest" to the partial match.
-;; #### NOTE: partial matches are not allowed on short options. I didn't think
-;; this through, but it would probably make things very difficult wrt sticky
-;; options for instance. Think about it again at some point.
-
 (defun search-option-by-name (container &rest keys &key short-name long-name)
   "Search for option with either SHORT-NAME or LONG-NAME in CONTAINER."
   (declare (ignore short-name long-name))
   (do-options (option container)
-    (let ((name
-	   (apply #'match-option option
-		  (select-keys keys :short-name :long-name))))
+    (let ((name (apply #'match-option option keys)))
       (when name
 	(return-from search-option-by-name (values option name))))))
 
 (defun search-option-by-abbreviation (container partial-name)
   "Search for option abbreviated with PARTIAL-NAME in CONTAINER."
-  (do-options (option container)
-    (let ((name (match-option option :partial-name partial-name)))
-      (when name
-	(return-from search-option-by-abbreviation (values option name))))))
+  (let ((shortest-distance most-positive-fixnum)
+	closest-option)
+    (do-options (option container)
+      (let ((distance (option-abbreviation-distance option partial-name)))
+	(when (< distance shortest-distance)
+	  (setq shortest-distance distance)
+	  (setq closest-option option))))
+    (when closest-option
+      (values closest-option
+	      (complete-string partial-name (long-name closest-option))))))
 
 (defgeneric search-option
     (there &rest keys &key short-name long-name partial-name)

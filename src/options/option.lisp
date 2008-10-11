@@ -194,20 +194,24 @@ For instance, completing 'he' with 'help' will produce 'he(lp)'."
   (assert (not (string= beginning complete)))
   (concatenate 'string beginning "(" (subseq complete (length beginning)) ")"))
 
-(defun match-option (option &key short-name long-name partial-name)
-  "Try to match OPTION against SHORT-NAME, LONG-NAME or PARTIAL-NAME.
-PARTIAL-NAME is a possible long name abbreviation.
-If OPTION matches, return the name that matched, possibly completed in case of
-a match by PARTIAL-NAME."
-  (cond (short-name
-	 (when (string= short-name (short-name option))
-	   short-name))
-	(long-name
-	 (when (string= long-name (long-name option))
-	   long-name))
-	(partial-name
-	 (when (beginning-of-string-p partial-name (long-name option))
-	   (complete-string partial-name (long-name option))))))
+(defun option-abbreviation-distance (option partial-name)
+  "Return the distance between OPTION's long name and PARTIAL-NAME.
+If PARTIAL-NAME does not abbreviate OPTION's long name, return
+MOST-POSITIVE-FIXNUM."
+  (with-slots (long-name) option
+    (if (beginning-of-string-p partial-name long-name)
+	(- (length long-name) (length partial-name))
+	most-positive-fixnum)))
+
+(defun match-option (option &key short-name long-name)
+  "Try to match OPTION against SHORT-NAME, LONG-NAME.
+If OPTION matches, return the name that matched."
+  (econd (short-name
+	  (when (string= short-name (short-name option))
+	    short-name))
+	 (long-name
+	  (when (string= long-name (long-name option))
+	    long-name))))
 
 (defgeneric match-sticky-option (option namearg)
   (:documentation ~"Try to match OPTION's short name with a sticky argument "

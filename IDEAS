@@ -34,8 +34,7 @@ might want to alternate options and non-option stuff, while still managing
 those parts with Clon.
 
 * Extend abbreviated option matching to dash-parts
-e.g. --f-n == --family-name. But we should fix the option matching algorithm
-first (currently, the first match is used, instead of looking for the longest).
+e.g. --f-n == --family-name.
 
 * Study POSIX behavior for cmdline options
 See if we can provide a POSIX compliant mode, that would be triggered by
