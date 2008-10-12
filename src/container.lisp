@@ -190,7 +190,10 @@ command-line hierarchy."))
 ;; ============================================================================
 
 (defun search-option-by-name (container &rest keys &key short-name long-name)
-  "Search for option with either SHORT-NAME or LONG-NAME in CONTAINER."
+  "Search for option with either SHORT-NAME or LONG-NAME in CONTAINER.
+When such an option exists, return two values:
+- the option itself,
+- the name that matched."
   (declare (ignore short-name long-name))
   (do-options (option container)
     (let ((name (apply #'match-option option keys)))
@@ -198,7 +201,10 @@ command-line hierarchy."))
 	(return-from search-option-by-name (values option name))))))
 
 (defun search-option-by-abbreviation (container partial-name)
-  "Search for option abbreviated with PARTIAL-NAME in CONTAINER."
+  "Search for option abbreviated with PARTIAL-NAME in CONTAINER.
+When such an option exists, return two values:
+- the option itself,
+- the completed name."
   (let ((shortest-distance most-positive-fixnum)
 	closest-option)
     (do-options (option container)
@@ -216,6 +222,7 @@ command-line hierarchy."))
 The search is done with SHORT-NAME, LONG-NAME, or PARTIAL-NAME.
 In case of a PARTIAL-NAME search, look for an option the long name of which
 begins with it.
+In case of multiple matches by PARTIAL-NAME, the longest match is selected.
 When such an option exists, return wo values:
 - the option itself,
 - the name used to find the option, possibly completed if partial.")
