@@ -234,22 +234,24 @@ When such an option exists, return wo values:
 	   (partial-name
 	    (search-option-by-abbreviation container partial-name)))))
 
-;; #### NOTE: when looking for a sticky option, we stop at the first match,
-;; even if, for instance, another option would match a longer part of the
-;; argument. This is probably not the best behavior: it would be better to
-;; find the option "closest" to the sticky match.
 (defgeneric search-sticky-option (there namearg)
   (:documentation "Search for a sticky option in THERE, matching NAMEARG.
 NAMEARG is the concatenation of the option's short name and its argument.
+In case of multiple matches, the option with the longest name is selected.
 When such an option exists, return two values:
 - the option itself,
 - the argument part of NAMEARG.")
   (:method ((container container) namearg)
     "Search for a sticky option in CONTAINER matching NAMEARG."
-    (do-options (option container)
-      (let ((argument (match-sticky-option option namearg)))
-	(when argument
-	  (return-from search-sticky-option (values option argument)))))))
+    (let ((longest-distance 0)
+	  closest-option)
+      (do-options (option container)
+	(let ((distance (option-sticky-distance option namearg)))
+	  (when (> distance longest-distance)
+	    (setq longest-distance distance)
+	    (setq closest-option option))))
+      (when closest-option
+	(values closest-option (subseq namearg longest-distance))))))
 
 
 ;;; container.lisp ends here

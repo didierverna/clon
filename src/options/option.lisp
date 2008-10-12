@@ -213,10 +213,10 @@ If OPTION matches, return the name that matched."
 	  (when (string= long-name (long-name option))
 	    long-name))))
 
-(defgeneric match-sticky-option (option namearg)
+(defgeneric option-sticky-distance (option namearg)
   (:documentation ~"Try to match OPTION's short name with a sticky argument "
 		  ~"against NAMEARG.
-If option matches, return the argument part of NAMEARG."))
+If OPTION matches, return the length of OPTION's short name; otherwise 0."))
 
 
 ;; ============================================================================

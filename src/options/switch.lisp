@@ -143,10 +143,10 @@ This class implements boolean options."))
 ;; Option searching protocol
 ;; -------------------------
 
-(defmethod match-sticky-option ((switch switch) namearg)
-  "Return nil (switches don't accept sticky arguments)."
+(defmethod option-sticky-distance ((switch switch) namearg)
+  "Return 0 (switches don't accept sticky arguments)."
   ;; #### NOTE: see related comment in the FLAG method.
-  nil)
+  0)
 
 
 ;; -------------------

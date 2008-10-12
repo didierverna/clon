@@ -126,14 +126,17 @@ ARGUMENT-REQUIRED-P slot."
 ;; Option searching protocol
 ;; -------------------------
 
-(defmethod match-sticky-option ((option valued-option) namearg)
-  "Try to match OPTION's short name with a sticky argument against NAMEARG."
+(defmethod option-sticky-distance ((option valued-option) namearg)
+  "Try to match OPTION's short name with a sticky argument against NAMEARG.
+If OPTION matches, return its short name's length; otherwise 0."
   (with-slots (short-name) option
-    (when (and short-name (beginning-of-string-p short-name namearg))
-      ;; This case should not happen because we always look for a complete
-      ;; match before looking for a sticky match.
-      (assert (not (string= namearg short-name)))
-      (subseq namearg (length short-name)))))
+    (cond ((and short-name (beginning-of-string-p short-name namearg))
+	   ;; This case should not happen because we always look for a
+	   ;; complete match before looking for a sticky match.
+	   (assert (not (string= namearg short-name)))
+	   (length short-name))
+	  (t
+	   0))))
 
 
 ;; -------------------

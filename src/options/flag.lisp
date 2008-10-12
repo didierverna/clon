@@ -81,19 +81,15 @@ This class implements options that don't take any argument."))
 ;; Option searching protocol
 ;; -------------------------
 
-(defmethod match-sticky-option ((flag flag) namearg)
-  "Return nil (flags don't take any argument, sticky or not)."
+(defmethod option-sticky-distance ((flag flag) namearg)
+  "Return 0 (flags don't take any argument, sticky or not)."
   ;; #### NOTE: there is something a bit shaky here: this function is called
   ;; during cmdline parsing (so this is really a lexico-syntactic analysis
-  ;; stage), but we return nil because of a semantic point concerning flags:
-  ;; they don't take arguments. In the current scheme where the *first* sticky
-  ;; option matching is returned (not the longest match), this is probably
-  ;; better (another question which remains unclear is what to do when a
-  ;; sticky argument leads to ambiguity). The consequence is that flags won't
-  ;; ever get a cmdline-argument in retrieve-from-short-call, hence the
-  ;; assertion there.
+  ;; stage), but we return 0 because of a semantic point concerning flags:
+  ;; they don't take arguments. The consequence is that flags won't ever get a
+  ;; cmdline-argument in retrieve-from-short-call, hence the assertion there.
   (declare (ignore namearg))
-  nil)
+  0)
 
 
 ;; -------------------
@@ -125,7 +121,7 @@ This class implements options that don't take any argument."))
 (defmethod retrieve-from-short-call
     ((flag flag) &optional cmdline-argument cmdline)
   "Retrieve FLAG's value from a short call."
-  ;; See comment about this assertion in match-sticky-option.
+  ;; See comment about this assertion in option-sticky-distance.
   (assert (null cmdline-argument))
   (values t cmdline))
 
