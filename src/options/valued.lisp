@@ -36,6 +36,47 @@
 
 
 ;; ============================================================================
+;; Utilities
+;; ============================================================================
+
+;; #### TODO: Yuck. There are places in this file, like right here, where some
+;; notion of the command-line syntax is needed. This is not very nice because
+;; the command-line syntax should ideally be known only to context.lisp.
+;; However, since the retrieval process changes according to the option
+;; classes, it is still reasonable to have it here.
+
+;; A better design would be a dialog between the context level and the option
+;; one. Like:
+;; - CONTEXT: retreive-from-long-call option arg-from-=-syntax [= nil],
+;; - OPTION: Hey, I need an argument, but you didn't give me one,
+;; - CONTEXT: Okay, lemme see what's next on the command-line...
+;;            ... Sorry, nothing for you. BARF.
+
+(defun option-call-p (str)
+  "Return true if STR looks like an option call."
+  (or (eq (elt str 0) #\-)
+      (eq (elt str 0) #\+)))
+
+(defun argument-popable-p (cmdline)
+  "Return true if the first CMDLINE item is an argument."
+  (and (car cmdline)
+       (not (option-call-p (car cmdline)))))
+
+(defmacro maybe-pop-argument (cmdline option cmdline-argument)
+  "Pop OPTION's argument from CMDLINE if needed.
+If so, store it into CMDLINE-ARGUMENT."
+  ;; At the time this macro is called, CMDLINE-ARGUMENT may already contain
+  ;; something, provided by either a sticky argument from a short call, or an
+  ;; =-syntax from a long call. Remember that these are the only 2 ways to
+  ;; provide optional arguments, so the need to pop something occurs only
+  ;; when an argument is mandatory, and it is still missing.
+  `(when (and (null ,cmdline-argument)
+	      (argument-required-p ,option)
+	      (argument-popable-p ,cmdline))
+     (setq ,cmdline-argument (pop ,cmdline))))
+
+
+;; ============================================================================
 ;; The Valued Option Class
 ;; ============================================================================
 
