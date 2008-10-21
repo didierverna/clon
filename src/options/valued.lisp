@@ -39,11 +39,11 @@
 ;; Utilities
 ;; ============================================================================
 
-;; #### TODO: Yuck. There are places in this file, like right here, where some
-;; notion of the command-line syntax is needed. This is not very nice because
-;; the command-line syntax should ideally be known only to context.lisp.
-;; However, since the retrieval process changes according to the option
-;; classes, it is still reasonable to have it here.
+;; #### TODO: Yucky yucky yuck. Design fuckage. There are places in
+;; option-related code where some notion of the command-line syntax is needed.
+;; This is not very nice because the command-line syntax should ideally be
+;; known only to context.lisp. However, since the retrieval process changes
+;; according to the option classes, it is still reasonable to have it here.
 
 ;; A better design would be a dialog between the context level and the option
 ;; one. Like:

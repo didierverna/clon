@@ -216,7 +216,7 @@ If AS-STRING, return a string of that character.")
 ;; ============================================================================
 
 ;; #### TODO: Yucky yucky yuck. Design fuckage. See comment in the Utilities
-;; section.
+;; section of valued.lisp.
 (define-condition cmdline-error (error)
   ((item :documentation "The concerned command-line item."
 	 :type string
