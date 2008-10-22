@@ -81,19 +81,20 @@ FMT can be `number', `short' or `long'."
 		  :env-var "VERSION_FORMAT"))
     (let ((subgrp (make-group)))
       (add-to subgrp (make-text :contents "Clon output:"))
-      ;; #### TODO: extend Clon with a search-path option type converting a
-      ;; search path as below into a path list.
-      (add-to subgrp (make-internal-stropt "search-path"
+      (add-to subgrp (make-internal-path "search-path"
 			 "Set Clon's search path.
 If you don't want any search path at all, use this option with no argument."
-		       :argument-name "PATH"
 		       :argument-type :optional
+		       :fallback-value nil
 		       ;; #### TODO: maybe we could be more OS-friendly (read
 		       ;; OS-specific) in the default-value below.
-		       :default-value ~"~/.clon:"
-				     ~"~/share/clon:"
-				     ~"/usr/local/share/clon:"
-				     ~"/usr/share/clon"
+		       :default-value
+		       `(,@(mapcar
+			    (lambda (subdir)
+			      (merge-pathnames subdir (user-homedir-pathname)))
+			    '(".clon/" "share/clon/"))
+			 #p"/usr/local/share/clon/"
+			 #p"/usr/share/clon/")
 		       :env-var "SEARCH_PATH"))
       (add-to subgrp (make-internal-stropt "theme"
 			 "Set Clon's output theme.

@@ -160,7 +160,8 @@ The most important features of Clon are:
 		  (:file "flag" :depends-on ("option"))
 		  (:file "valued" :depends-on ("option"))
 		  (:file "switch" :depends-on ("valued"))
-		  (:file "stropt" :depends-on ("valued"))))
+		  (:file "stropt" :depends-on ("valued"))
+		  (:file "path" :depends-on ("valued"))))
 	       (:file "group" :depends-on ("container" "text" "options"))
 	       (:module "retrieval"
 		 :depends-on ("options")
