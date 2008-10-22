@@ -15,6 +15,12 @@ a DEBUG env var, and also/or with a NDEBUG env var for which we should
 complement the conversion. Now the question is do we want to post-process the
 conversion value, the initial string value, or both ?
 
+Another related thought: value post-processing could mean value
+canonicalization (especially useful when in the debugger, you're invited to
+provide another value). For instance, in path options, the converter handles
+~/ abbreviations. However, this is not valid when typing a value directly,
+which is a shame.
+
 * Treat empty en vars as options called without their (optional argument)
 With the restriction that there's no notion of an env var set without
 argument. There's only empty arguments. This will lead to problems if the
@@ -36,6 +42,13 @@ those parts with Clon.
 * Extend abbreviated option matching to dash-parts
 e.g. --f-n == --family-name.
 
+* Extend the path option class to accept wildcards pathnames
+and expand them into actual directories.
+
+* Extend the path option class not to ignore a final colon
+Like TeX variables, this would mean to append the built-in path after the
+user-specified part.
+
 * Study POSIX behavior for cmdline options
 See if we can provide a POSIX compliant mode, that would be triggered by
 POSIXLY_CORRECT, POSIX_ME_HARDER, or other means (cmdline options?)
@@ -43,3 +56,12 @@ POSIXLY_CORRECT, POSIX_ME_HARDER, or other means (cmdline options?)
 * Support for shell completion
 Implement automatic generation of whatever is needed for shell completion of
 options (zsh in particular, zcomp I think it is).
+
+* Finer grain for conversion errors
+Currently, converters are supposed to raise an invalid-argument error, but we
+might want something more powerful (like handling a whole conversion-error
+hierarchy). For instance, when a path is wrong, we would like to provide a
+restart for modifying just the faulty path element. However, this is not
+currently possible because invalid-argument errors are trapped and converted
+to invalid-cmdline-argument or invalid-environment-value ones. So we can't
+benefit from all the restarts that we could define at the lower-level.
