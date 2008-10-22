@@ -162,7 +162,9 @@ The most important features of Clon are:
 			      (:file "stropt" :depends-on ("valued"))))
 	       (:file "group" :depends-on ("container" "text" "options"))
 	       (:file "synopsis" :depends-on ("group"))
-	       (:file "context" :depends-on ("synopsis"))))
+	       (:file "cmdline" :depends-on ("options"))
+	       (:file "environ" :depends-on ("options"))
+	       (:file "context" :depends-on ("synopsis" "cmdline" "environ"))))
 
 
 ;;; clon.asd ends here

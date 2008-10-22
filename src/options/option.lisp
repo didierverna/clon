@@ -36,6 +36,18 @@
 
 
 ;; ============================================================================
+;; Error Management
+;; ============================================================================
+
+(define-condition option-error (error)
+  ((option :documentation "The concerned option."
+	   :type option
+	   :initarg :option
+	   :reader option))
+  (:documentation "An error related to an option."))
+
+
+;; ============================================================================
 ;; The Option Class
 ;; ============================================================================
 
@@ -179,7 +191,7 @@ If OPTION matches, return the length of OPTION's short name; otherwise 0."))
 
 
 ;; ============================================================================
-;; The Char Packs  Protocol
+;; The Char Packs Protocol
 ;; ============================================================================
 
 ;; When examining the command-line, we first try to spot an option, then a
@@ -209,134 +221,6 @@ If AS-STRING, return a string of that character.")
     "Return nil (only switches are plus-packable)."
     (declare (ignore as-string))
     nil))
-
-
-;; ============================================================================
-;; The Retrieval Protocol
-;; ============================================================================
-
-;; #### TODO: Yucky yucky yuck. Design fuckage. See comment in the Utilities
-;; section of valued.lisp.
-(define-condition cmdline-error (error)
-  ((item :documentation "The concerned command-line item."
-	 :type string
-	 :initarg :item
-	 :reader item))
-  (:documentation "An error related to a command-line item."))
-
-;; #### NOTE: currently, there is only one environment error: an invalid value
-;; for an environment variable associated with an option. This means that the
-;; ENV-VAR slot below is redundant, because the environment variable can be
-;; accessed through the option object. However, the design is cleaner this way
-;; (it is coherent with the command-line one), and maybe if one day I have to
-;; extend it, I'll be happy I got it right in the first place.
-;; #### NOTE: as a matter of fact, I just thought of something: what about
-;; supporting a /list/ of associated environment variables? This would
-;; perfectly justify the comment above.
-(define-condition environment-error (error)
-  ((env-var :documentation "The concerned environment variable."
-	    :type string
-	    :initarg :env-var
-	    :reader env-var))
-  (:documentation "An error related to an environment variable."))
-
-(define-condition option-error (error)
-  ((option :documentation "The concerned option."
-	   :type option
-	   :initarg :option
-	   :reader option))
-  (:documentation "An error related to an option."))
-
-(define-condition cmdline-option-error (cmdline-error option-error)
-  ((item ;; inherited from the CMDLINE-ERROR condition
-    :documentation "The option's name as it appears on the command-line."
-    :initarg :name
-    :reader name))
-  (:documentation "An error related to a command-line (known) option."))
-
-(define-condition environmental-option-error (environment-error option-error)
-  ()
-  (:documentation "An error related to an option's environment variable."))
-
-(define-condition spurious-cmdline-argument (cmdline-option-error)
-  ((argument :documentation "The spurious argument."
-	     :type string
-	     :initarg :argument
-	     :reader argument))
-  (:report (lambda (error stream)
-	     (format stream "Option '~A': spurious argument ~S."
-	       (name error) (argument error))))
-  (:documentation "A spurious command-line argument error."))
-
-;; #### NOTE: this macro is currently used only once.
-(defmacro restartable-spurious-cmdline-argument-error
-    ((option name argument) &body body)
-  "Restartably throw a spurious-cmdline-argument error.
-The error relates to the command-line use of OPTION called by NAME with
-ARGUMENT.
-BODY constitutes the body of the only restart available, discard-argument, and
-should act as if ARGUMENT had not been provided."
-  `(restart-case (error 'spurious-cmdline-argument
-		  :option ,option
-		  :name ,name
-		  :argument ,argument)
-    (discard-argument ()
-     :report "Discard spurious argument."
-     ,@body)))
-
-(define-condition invalid-+-syntax (cmdline-option-error)
-  ()
-  (:report (lambda (error stream)
-	     (format stream "Option '~A': invalid +-syntax." (name error))))
-  (:documentation "An invalid +-syntax error."))
-
-(defmacro restartable-invalid-+-syntax-error ((option) &body body)
-  "Restartably throw an invalid-+-syntax error.
-The error relates to the command-line use of OPTION.
-BODY constitutes the body of the only restart available,
-use-short-call, and should act as if OPTION had been normally called by short
-name."
-  `(restart-case (error 'invalid-+-syntax
-		  :option ,option
-		  :name (short-name ,option))
-    (use-short-call ()
-     :report "Fake a normal call by short name."
-     ,@body)))
-
-(defgeneric retrieve-from-long-call
-    (option cmdline-name &optional cmdline-argument cmdline)
-  (:documentation "Retrieve OPTION's value from a long call.
-CMDLINE-NAME is the name used on the command-line.
-CMDLINE-ARGUMENT is a potentially already parsed cmdline argument.
-Otherwise, CMDLINE is where to find an argument.
-This function returns two values:
-- the retrieved value,
-- the new command-line (possibly with the first item popped if the option
-  requires an argument)."))
-
-(defgeneric retrieve-from-short-call (option &optional cmdline-argument cmdline)
-  (:documentation "Retrieve OPTION's value from a short call.
-CMDLINE-ARGUMENT is a potentially already parsed cmdline argument.
-Otherwise, CMDLINE is where to find an argument.
-This function returns two values:
-- the retrieved value,
-- the new command-line (possibly with the first item popped if the option
-  requires an argument)."))
-
-(defgeneric retrieve-from-plus-call (option)
-  (:documentation "Retrieve OPTION's value from a plus call."))
-
-;; #### WARNING: given the idea of supporting a list of env vars, I would need
-;; to modify this function in order to pass the env-var itself. This protocol
-;; would become even more similar to the command-line one. Yummy...
-(defgeneric retrieve-from-environment (option env-val)
-  (:documentation "Retrieve OPTION's value from the environment.
-ENV-VAL is the value stored in the associated environment variable.")
-  (:method :before (option env-val)
-     "Assert that ENV-VAL is not null."
-     ;; That's because getopt is not supposed to call this function unless
-     ;; there is actually somethign to retrieve.
-    (assert env-val)))
 
 
 ;;; option.lisp ends here

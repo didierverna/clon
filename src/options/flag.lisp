@@ -103,40 +103,4 @@ This class implements options that don't take any argument."))
   (potential-pack-char flag as-string))
 
 
-;; -------------------
-;; Retrieval protocol
-;; -------------------
-
-(defmethod retrieve-from-long-call
-    ((flag flag) cmdline-name  &optional cmdline-argument cmdline)
-  "Retrieve FLAG's value from a long call."
-  ;; CMDLINE-ARGUMENT might be non-nil when a flag was given a spurious
-  ;; argument through an =-syntax.
-  (if cmdline-argument
-      (restartable-spurious-cmdline-argument-error
-	  (flag cmdline-name cmdline-argument)
-	(values t cmdline))
-      (values t cmdline)))
-
-(defmethod retrieve-from-short-call
-    ((flag flag) &optional cmdline-argument cmdline)
-  "Retrieve FLAG's value from a short call."
-  ;; See comment about this assertion in option-sticky-distance.
-  (assert (null cmdline-argument))
-  (values t cmdline))
-
-(defmethod retrieve-from-plus-call ((flag flag))
-  "Throw an invalid-+-syntax error."
-  (restartable-invalid-+-syntax-error (flag) t))
-
-(defmethod retrieve-from-environment ((flag flag) env-val)
-  "Retrieve FLAG from the environment."
-  (declare (ignore env-val))
-  ;; #### NOTE: there's no way of providing an env var /without/ a value (the
-  ;; value is at least the empty string). Consequently, we decide that the
-  ;; presence of the env var, regardless of its value, stands for the presence
-  ;; of the flag.
-  t)
-
-
 ;;; flag.lisp ends here

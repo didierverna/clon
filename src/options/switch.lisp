@@ -165,24 +165,6 @@ This class implements boolean options."))
   (potential-pack-char switch as-string))
 
 
-;; ------------------
-;; Retrieval protocol
-;; ------------------
-
-(defmethod retrieve-from-short-call
-    ((switch switch) &optional cmdline-argument cmdline)
-  "Retrieve SWITCH's value from a short call."
-  ;; See comment about this assertion in search-sticky-option.
-  (assert (null cmdline-argument))
-  ;; Switches don't take arguments in short form, so leave the cmdline alone
-  ;; (don't mess with automatic remainder detection).
-  (values t cmdline))
-
-(defmethod retrieve-from-plus-call ((switch switch))
-  "Retrieve SWITCH's value from a plus call in CMDLINE."
-  nil)
-
-
 ;; -------------------
 ;; Conversion protocol
 ;; -------------------
