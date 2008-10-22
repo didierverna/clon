@@ -167,7 +167,7 @@ The most important features of Clon are:
 		 :components
 		 ((:file "cmdline")
 		  (:file "environ")))
-	       (:file "synopsis" :depends-on ("group" "options" "text"))
+	       (:file "synopsis" :depends-on ("group"))
 	       (:file "context" :depends-on ("synopsis" "retrieval"))))
 
 
