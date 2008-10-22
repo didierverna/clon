@@ -86,15 +86,24 @@ FMT can be `number', `short' or `long'."
 If you don't want any search path at all, use this option with no argument."
 		       :argument-type :optional
 		       :fallback-value nil
-		       ;; #### TODO: maybe we could be more OS-friendly (read
-		       ;; OS-specific) in the default-value below.
+		       ;; #### PORTME. I'm using Unix-like default for
+		       ;; everything here, plus OSX specific values that I
+		       ;; know of. Not sure about Windows or anything else.
 		       :default-value
-		       `(,@(mapcar
-			    (lambda (subdir)
-			      (merge-pathnames subdir (user-homedir-pathname)))
-			    '(".clon/" "share/clon/"))
-			 #p"/usr/local/share/clon/"
-			 #p"/usr/share/clon/")
+		       (let ((local-path '(".clon/" "share/clon/"))
+			     (global-path '(#p"/usr/local/share/clon/"
+					    #p"/usr/share/clon/")))
+			 (when (string= (software-type) "Darwin")
+			   (push "Library/Application Support/Clon/"
+				 local-path)
+			   (push #p"/Library/Application Support/Clon/"
+				 global-path))
+			 (append
+			  (mapcar
+			   (lambda (subdir)
+			     (merge-pathnames subdir (user-homedir-pathname)))
+			   local-path)
+			  global-path))
 		       :env-var "SEARCH_PATH"))
       (add-to subgrp (make-internal-stropt "theme"
 			 "Set Clon's output theme.
