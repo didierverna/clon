@@ -151,20 +151,24 @@ The most important features of Clon are:
   :depends-on (:sb-posix)
   :components ((:file "package")
 	       (:file "util" :depends-on ("package"))
-	       (:file "container" :depends-on ("util"))
 	       (:file "text" :depends-on ("util"))
+	       (:file "container" :depends-on ("util"))
 	       (:module "options"
 		 :depends-on ("util")
-		 :components ((:file "option")
-			      (:file "flag" :depends-on ("option"))
-			      (:file "valued" :depends-on ("option"))
-			      (:file "switch" :depends-on ("valued"))
-			      (:file "stropt" :depends-on ("valued"))))
+		 :components
+		 ((:file "option")
+		  (:file "flag" :depends-on ("option"))
+		  (:file "valued" :depends-on ("option"))
+		  (:file "switch" :depends-on ("valued"))
+		  (:file "stropt" :depends-on ("valued"))))
 	       (:file "group" :depends-on ("container" "text" "options"))
-	       (:file "synopsis" :depends-on ("group"))
-	       (:file "cmdline" :depends-on ("options"))
-	       (:file "environ" :depends-on ("options"))
-	       (:file "context" :depends-on ("synopsis" "cmdline" "environ"))))
+	       (:module "retrieval"
+		 :depends-on ("options")
+		 :components
+		 ((:file "cmdline")
+		  (:file "environ")))
+	       (:file "synopsis" :depends-on ("group" "options" "text"))
+	       (:file "context" :depends-on ("synopsis" "retrieval"))))
 
 
 ;;; clon.asd ends here
