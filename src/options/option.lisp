@@ -51,7 +51,7 @@
 ;; The Option Class
 ;; ============================================================================
 
-(defabstract option ()
+(defabstract option (traversable)
   ((short-name :documentation "The option's short name."
 	       :type (or null string)
 	       :initarg :short-name
@@ -71,10 +71,7 @@
 	    :type (or null string)
 	    :initarg :env-var
 	    :initform nil
-	    :reader env-var)
-   (traversedp :documentation "The option's traversal state."
-	       :initform nil
-	       :accessor traversedp))
+	    :reader env-var))
   (:default-initargs
     :internal nil)
   (:documentation "The OPTION class.
@@ -135,14 +132,9 @@ This is the base class for all options."))
 	     option1 option2 (long-name option1)))))
 
 
-;; ------------------
-;; Traversal protocol
-;; ------------------
-
-(defmethod untraverse ((option option))
-  "Mark OPTION as untraversed."
-  (setf (traversedp option) nil)
-  option)
+;; -----------------------
+;; Option mapping protocol
+;; -----------------------
 
 (defmethod mapoptions (func (option option))
   "Call FUNC on OPTION."

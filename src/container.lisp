@@ -47,24 +47,57 @@
     "Return t (consider non-container ITEMs as sealed)."
     t))
 
+
+
+;; ============================================================================
+;; The Traversable Class
+;; ============================================================================
+
+(defabstract traversable ()
+  ((traversedp :documentation "The object's traversal state."
+	       :initform nil
+	       :accessor traversedp))
+  (:documentation "The TRAVERSABLE class.
+This class is used for traversing graphs with loop avoidance."))
+
+(defgeneric untraverse (object)
+  (:documentation "Reset OBJECT's traversal state, and return OBJECT.")
+  (:method (object)
+    "Do nothing by default."
+    object)
+  (:method :after ((traversable traversable))
+    "Mark TRAVERSABLE as untraversed."
+    (setf (traversedp traversable) nil)))
+
+
+
 ;; ============================================================================
 ;; The Container Class
 ;; ============================================================================
 
-(defclass container ()
+(defclass container (traversable)
   ((items :documentation "The items in the container."
 	  :type list
 	  :initform nil
 	  :accessor container-items)
    (sealedp :documentation "Whether the container is sealed."
 	    :initform nil
-	    :accessor sealedp)
-   (traversedp :documentation "The container's traversal state."
-	       :initform nil
-	       :accessor traversedp))
+	    :accessor sealedp))
   (:documentation "The CONTAINER class.
 This class is a mixin used in synopsis and groups to represent the program's
 command-line hierarchy."))
+
+
+;; ------------------
+;; Traversal protocol
+;; ------------------
+
+(defmethod untraverse ((container container))
+  "Untraverse all CONTAINER items."
+  (dolist (item (container-items container))
+    (untraverse item))
+  container)
+
 
 
 ;; ============================================================================
@@ -89,6 +122,7 @@ command-line hierarchy."))
     (setf (sealedp container) t)))
 
 
+
 ;; ============================================================================
 ;; The Addition Protocol
 ;; ============================================================================
@@ -109,6 +143,7 @@ command-line hierarchy."))
   (:method ((container container) item)
     "Add ITEM to CONTAINER."
     (endpush item (container-items container))))
+
 
 
 ;; ============================================================================
@@ -141,23 +176,10 @@ command-line hierarchy."))
 	(check-name-clash item1 item2)))))
 
 
-;; ============================================================================
-;; The Traversal Protocol
-;; ============================================================================
 
-(defgeneric untraverse (item)
-  (:documentation "Reset ITEM's traversal state, and return ITEM.")
-  (:method (item)
-    "Do nothing by default."
-    item)
-  (:method ((container container))
-    "Untraverse all CONTAINER items."
-    (dolist (item (container-items container))
-      (untraverse item))
-    container)
-  (:method :after ((container container))
-    "Mark CONTAINER as untraversed."
-    (setf (traversedp container) nil)))
+;; ============================================================================
+;; The Option Mapping Protocol
+;; ============================================================================
 
 (defgeneric mapoptions (func there)
   (:documentation "Map FUNC over all options in THERE.")
@@ -174,8 +196,7 @@ command-line hierarchy."))
 
 (defmacro do-options ((opt container) &body body)
   "Execute BODY with OPT bound to every option in CONTAINER."
-  `(mapoptions
-    (lambda (,opt) ,@body)
+  `(mapoptions (lambda (,opt) ,@body)
     (untraverse ,container)))
 
 
