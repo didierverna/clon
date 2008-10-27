@@ -141,14 +141,18 @@ This is the base class for all options."))
 
 (defmethod untraverse ((option option))
   "Mark OPTION as untraversed."
-  (setf (traversedp option) nil))
+  (setf (traversedp option) nil)
+  option)
 
-(defmethod next-option ((option option))
-  "Return OPTION if it is the next one in a traversal process.
-If so, mark it as traversed."
+(defmethod mapoptions (func (option option))
+  "Call FUNC on OPTION."
   (unless (traversedp option)
-    (setf (traversedp option) t)
-    option))
+    (funcall func option)))
+
+(defmethod mapoptions :after (func (option option))
+  "Mark OPTION as traversed."
+  (setf (traversedp option) t))
+
 
 
 ;; ============================================================================

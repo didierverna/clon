@@ -146,42 +146,37 @@ command-line hierarchy."))
 ;; ============================================================================
 
 (defgeneric untraverse (item)
-  (:documentation "Reset ITEM's traversal state.")
+  (:documentation "Reset ITEM's traversal state, and return ITEM.")
   (:method (item)
     "Do nothing by default."
-    (values))
+    item)
   (:method ((container container))
-    "Reset the traversal state of all CONTAINER items."
+    "Untraverse all CONTAINER items."
     (dolist (item (container-items container))
-      (untraverse item)))
+      (untraverse item))
+    container)
   (:method :after ((container container))
     "Mark CONTAINER as untraversed."
     (setf (traversedp container) nil)))
 
-(defgeneric next-option (item)
-  (:documentation "Return the next option in a traversal process.")
-  (:method (item)
-    "Return nil by default (when ITEM doesn't contain or is not an option)."
-    nil)
-  (:method ((container container))
-    "Try to find the next option in a traversal process in CONTAINER."
+(defgeneric mapoptions (func there)
+  (:documentation "Map FUNC over all options in THERE.")
+  (:method (func elsewhere)
+    "Do nothing by default."
+    (values))
+  (:method (func (container container))
+    "Map FUNC over all options in CONTAINER."
     (unless (traversedp container)
       (dolist (item (container-items container))
-	(let ((opt (next-option item)))
-	  (when opt
-	    (return-from next-option opt))))
-      (setf (traversedp container) t)
-      nil)))
+	(mapoptions func item))))
+  (:method :after (func (container container))
+    (setf (traversedp container) t)))
 
-(defmacro do-options ((val container) &body body)
-  "Execute BODY with VAL bound to every option in CONTAINER."
-  (let ((the-container (gensym "container")))
-    `(let ((,the-container ,container))
-      (loop :initially (untraverse ,the-container)
-	:for ,val = (next-option ,the-container)
-	:then (next-option ,the-container)
-	:while ,val
-	:do ,@body))))
+(defmacro do-options ((opt container) &body body)
+  "Execute BODY with OPT bound to every option in CONTAINER."
+  `(mapoptions
+    (lambda (,opt) ,@body)
+    (untraverse ,container)))
 
 
 
