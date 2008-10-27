@@ -165,7 +165,7 @@ otherwise."
 
 
 ;; ============================================================================
-;; Convenience group definition
+;; Convenience Synopsis Definition
 ;; ============================================================================
 
 (defmacro define-synopsis (synopsis (&rest keys) &body body)

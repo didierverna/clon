@@ -51,7 +51,7 @@ implementing hierarchical program command-line."))
 
 
 ;; ============================================================================
-;; Convenience group definition
+;; Convenience Group definition
 ;; ============================================================================
 
 (defmacro define-group (group &body body)
