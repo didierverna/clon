@@ -72,12 +72,13 @@ remainder."
   (let ((grp (make-group)))
     (add-to grp (make-text :contents "Clon specific options:"))
     (add-to grp (make-internal-flag "help" "Display Clon-specific help."))
-    (add-to grp (make-internal-stropt "version"
+    (add-to grp (make-internal-enum "version"
 		    "Display Clon's version number.
 FMT can be `number', `short' or `long'."
 		  :argument-name "FMT"
 		  :argument-type :optional
-		  :default-value "long"
+		  :enum '(:number :short :long)
+		  :default-value :long
 		  :env-var "VERSION_FORMAT"))
     (let ((subgrp (make-group)))
       (add-to subgrp (make-text :contents "Clon output:"))
