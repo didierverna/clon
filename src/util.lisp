@@ -113,4 +113,15 @@ This is the meta-class for abstract classes."))
       (remove-method (function ,(car method-declaration)) ,method))))
 |#
 
+
+;; ===========================================================================
+;; Non ANSI stuff
+;; ===========================================================================
+
+(defun quit (status)
+  "Quit the Lisp environment"
+  ;; #### PORTME.
+  (sb-ext:quit :unix-status status))
+
+
 ;;; util.lisp ends here

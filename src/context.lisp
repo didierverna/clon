@@ -231,8 +231,7 @@ CONTEXT is where to look for the options."
 			  (:quit
 			   (let (*print-escape*) (print-object error t))
 			   (terpri)
-			   ;; #### PORTME.
-			   (sb-ext:quit :unix-status 1))
+			   (quit 1))
 			  (:none)))))
 	(do ((arg (pop cmdline) (pop cmdline)))
 	    ((null arg))
