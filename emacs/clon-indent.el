@@ -39,7 +39,12 @@
 		  push-cmdline-option push-unknown-option))
   (put symbol 'common-lisp-indent-function 1))
 
-(dolist (symbol '(make-internal-stropt make-internal-switch convert-value))
+(dolist (symbol '(make-internal-flag
+		  make-internal-switch
+		  make-internal-stropt
+		  make-internal-path
+		  make-internal-enum
+		  convert-value))
   (put symbol 'common-lisp-indent-function 2))
 
 (dolist (symbol '(push-retrieved-option))
