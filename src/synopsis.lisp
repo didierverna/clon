@@ -71,7 +71,7 @@ remainder."
   "Add Clon specific options to SYNOPSIS."
   (let ((grp (make-group)))
     (add-to grp (make-text :contents "Clon specific options:"))
-    (add-to grp (make-internal-flag "help" "Display Clon-specific help."))
+    (add-to grp (make-internal-flag "banner" "Display the full Clon banner."))
     (add-to grp (make-internal-enum "version"
 		    "Display Clon's version number.
 FMT can be `number', `short' or `long'."
@@ -80,6 +80,7 @@ FMT can be `number', `short' or `long'."
 		  :enum '(:number :short :long)
 		  :fallback-value :long
 		  #|:env-var "VERSION_FORMAT"|#))
+    (add-to grp (make-internal-flag "help" "Display Clon-specific help."))
     (let ((subgrp (make-group)))
       (add-to subgrp (make-text :contents "Clon output:"))
       (add-to subgrp (make-internal-path "search-path"
