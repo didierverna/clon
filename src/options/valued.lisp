@@ -86,6 +86,7 @@ subclasses of the VALUED-OPTION class."))
     ((option valued-option) &key argument-type
 			       (fallback-value nil fallback-value-supplied-p)
 			       (default-value nil default-value-supplied-p))
+  (declare (ignore fallback-value default-value))
   "Check validity of the value-related initargs."
   (unless (member argument-type '(:required :mandatory :optional))
     (error "Option ~A: invalid argument type ~S." option argument-type))
@@ -96,7 +97,25 @@ subclasses of the VALUED-OPTION class."))
 	     (not fallback-value-supplied-p)
 	     (not default-value-supplied-p))
     (error "Option ~A: fallback or default value required for optional argument."
-	   option))
+	   option)))
+
+(defmethod initialize-instance :after
+    ((option valued-option) &key argument-type
+			       (fallback-value nil fallback-value-supplied-p)
+			       (default-value nil default-value-supplied-p))
+  "Compute uninitialized OPTION slots with indirect initargs.
+This currently involves the conversion of the ARGUMENT-TYPE key to the
+ARGUMENT-REQUIRED-P slot."
+  (ecase argument-type
+    ((:required :mandatory)
+     (setf (slot-value option 'argument-required-p) t))
+    (:optional
+     (setf (slot-value option 'argument-required-p) nil)))
+  ;; #### NOTE: previously, I performed the validity checks on FALLBACK-VALUE
+  ;; and DEFAULT-VALUE in the :before method, which feels better. However,
+  ;; when the ENUM option class appeared, I realized that option values could
+  ;; depend on an option slot (the ENUM slot ikn that case), so we need to
+  ;; delay this check until right here.
   ;; Here, we catch and convert a potential invalid-value error into a simple
   ;; error because this check is intended for the Clon user, as opposed to the
   ;; Clon end-user. In other words, a potential error here is in the program
@@ -109,17 +128,6 @@ subclasses of the VALUED-OPTION class."))
     (handler-case (check-value option default-value)
       (invalid-value ()
 	(error "Option ~A: invalid default value ~S." option default-value)))))
-
-(defmethod initialize-instance :after
-    ((option valued-option) &key argument-type)
-  "Compute uninitialized OPTION slots with indirect initargs.
-This currently involves the conversion of the ARGUMENT-TYPE key to the
-ARGUMENT-REQUIRED-P slot."
-  (ecase argument-type
-    ((:required :mandatory)
-     (setf (slot-value option 'argument-required-p) t))
-    (:optional
-     (setf (slot-value option 'argument-required-p) nil))))
 
 
 ;; -------------------------
