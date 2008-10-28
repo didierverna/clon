@@ -78,8 +78,8 @@ FMT can be `number', `short' or `long'."
 		  :argument-name "FMT"
 		  :argument-type :optional
 		  :enum '(:number :short :long)
-		  :default-value :long
-		  :env-var "VERSION_FORMAT"))
+		  :fallback-value :long
+		  #|:env-var "VERSION_FORMAT"|#))
     (let ((subgrp (make-group)))
       (add-to subgrp (make-text :contents "Clon output:"))
       (add-to subgrp (make-internal-path "search-path"

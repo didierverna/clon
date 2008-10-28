@@ -170,6 +170,7 @@ If PLUS, read a plus call or pack. Otherwise, read a short call or minus pack."
 (defmethod initialize-instance :after ((context context) &key cmdline)
   "Parse CMDLINE."
   (setf (slot-value context 'progname) (pop cmdline))
+  ;; Step one: parse the command-line ========================================
   (let ((cmdline-options (list))
 	(remainder (list)))
     (macrolet ((push-cmdline-option (place &rest body)
@@ -406,7 +407,13 @@ CONTEXT is where to look for the options."
 		       (t
 			(restartable-cmdline-junk-error arg)))))))
       (setf (cmdline-options context) (nreverse cmdline-options))
-      (setf (slot-value context 'remainder) remainder))))
+      (setf (slot-value context 'remainder) remainder)))
+  ;; Step two: Treat internal options ========================================
+  (let ((version-format (getopt context :long-name "clon-version")))
+    (when version-format
+      (format t "~A~%" (version version-format))
+      (quit 0)))
+  )
 
 (defun make-context
     (&rest keys &key synopsis error-handler getopt-error-handler cmdline)
