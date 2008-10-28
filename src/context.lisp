@@ -126,6 +126,8 @@
    (remainder :documentation "The non-Clon part of the command-line."
 	      :type list
 	      :reader remainder)
+   (search-path :documentation "The search path for Clon files."
+		:reader search-path)
    (error-handler :documentation ~"The behavior to adopt on errors "
 			       ~"at command-line parsing time."
 		  :type symbol
@@ -421,7 +423,9 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.~%"
   (let ((version-format (getopt context :long-name "clon-version")))
     (when version-format
       (format t "~A~%" (version version-format))
-      (quit 0))))
+      (quit 0)))
+  (setf (slot-value context 'search-path)
+	(getopt context :long-name "clon-search-path")))
 
 (defun make-context
     (&rest keys &key synopsis error-handler getopt-error-handler cmdline)
