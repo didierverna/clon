@@ -229,7 +229,8 @@ CONTEXT is where to look for the options."
 		      (lambda (error)
 			(ecase (error-handler context)
 			  (:quit
-			   (let (*print-escape*) (print-object error t))
+			   (let (*print-escape*)
+			     (print-object error t))
 			   (terpri)
 			   (quit 1))
 			  (:none)))))
