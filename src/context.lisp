@@ -414,12 +414,13 @@ CONTEXT is where to look for the options."
       (setf (slot-value context 'remainder) remainder)))
   ;; Step two: Treat internal options ========================================
   (when (getopt context :long-name "clon-banner")
-    (format t "The Clon library, version ~A
-Written by Didier Verna <didier@lrde.epita.fr>
+    (format t "~A is powered by the Clon library, version ~A,
+written by Didier Verna <didier@lrde.epita.fr>.
 
-Copyright (C) 2008 Didier Verna
+Copyright (C) 2008 Didier Verna.
 Clon is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.~%"
+      (pathname-name (progname context))
       (version :long))
     (quit 0))
   (let ((version-format (getopt context :long-name "clon-version")))
