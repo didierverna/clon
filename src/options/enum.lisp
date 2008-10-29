@@ -51,8 +51,8 @@ This class implements options whose values belong to a set of keywords."))
 (defun make-enum (&rest keys
 		  &key short-name long-name description
 		       argument-name argument-type
-		       enum fallback-value default-value
-		       env-var)
+		       enum env-var fallback-value default-value
+		       nullablep)
   "Make a new enum option.
 - SHORT-NAME is the option's short name (without the dash).
   It defaults to nil.
@@ -65,21 +65,23 @@ This class implements options whose values belong to a set of keywords."))
   :mandatory are synonyms).
   It defaults to :optional.
 - ENUM is the set of possible values.
+- ENV-VAR is the option's associated environment variable.
+  It defaults to nil.
 - FALLBACK-VALUE is the option's fallback value (for missing optional
   arguments), if any.
 - DEFAULT-VALUE is the option's default value, if any.
-- ENV-VAR is the option's associated environment variable.
-  It defaults to nil."
+- NULLABLEP indicates whether this option accepts nil as a value."
   (declare (ignore short-name long-name description
 		  argument-name argument-type
-		  enum fallback-value default-value
-		  env-var))
+		  enum env-var fallback-value default-value
+		  nullablep))
   (apply #'make-instance 'enum keys))
 
 (defun make-internal-enum (long-name description
 			    &rest keys
-			    &key env-var argument-name argument-type
-				 enum fallback-value default-value)
+			    &key argument-name argument-type
+				 enum env-var fallback-value default-value
+				 nullablep)
   "Make a new internal (Clon-specific) enum option.
 - LONG-NAME is the option's long-name, minus the 'clon-' prefix.
   (Internal options don't have short names.)
@@ -89,14 +91,15 @@ This class implements options whose values belong to a set of keywords."))
   :mandatory are synonyms).
   It defaults to :optional.
 - ENUM is the set of possible values.
+- ENV-VAR is the option's associated environment variable, minus the 'CLON_'
+  prefix. It defaults to nil.
 - FALLBACK-VALUE is the option's fallback value (for missing optional
   arguments), if any.
 - DEFAULT-VALUE is the option's default value, if any.
-- ENV-VAR is the option's associated environment variable, minus the 'CLON_'
-  prefix. It defaults to nil."
+- NULLABLEP indicates whether this option accepts nil as a value."
   (declare (ignore argument-name argument-type
-		   enum fallback-value default-value
-		   env-var))
+		   enum env-var fallback-value default-value
+		   nullablep))
   (apply #'make-instance 'enum
 	 :long-name long-name
 	 :description description

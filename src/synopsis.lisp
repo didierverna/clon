@@ -87,7 +87,7 @@ FMT can be `number', `short' or `long'."
 			 "Set Clon's search path.
 If you don't want any search path at all, use this option with no argument."
 		       :argument-type :optional
-		       :fallback-value nil
+		       :fallback-value nil ;; paths are nullable by default
 		       ;; #### PORTME. I'm using Unix-like default for
 		       ;; everything here, plus OSX specific values that I
 		       ;; know of. Not sure about Windows or anything else.
@@ -112,8 +112,10 @@ If you don't want any search path at all, use this option with no argument."
 If you don't want any theme at all, use this option with no argument. Unless
 starting with /, ./ or ../, files are looked for in the Clon search path. The
 cth extension can be omitted."
-		       :argument-name "PATH"
+		       :argument-name "FILE"
 		       :argument-type :optional
+		       :nullablep t
+		       :fallback-value nil
 		       :default-value "default"
 		       :env-var "THEME"))
       (add-to subgrp (make-internal-stropt "line-width"

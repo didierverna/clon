@@ -52,7 +52,11 @@
 		   :reader fallback-value)
    (default-value :documentation "The option's default value."
 		 :initarg :default-value
-		 :reader default-value))
+		 :reader default-value)
+   (nullablep :documentation "Whether this option's value can be nil."
+	      :initarg :nullablep
+	      :initform nil
+	      :reader nullablep))
   (:default-initargs
     :argument-type :required)
   (:documentation "The VALUED-OPTION class.
@@ -185,7 +189,11 @@ If OPTION matches, return its short name's length; otherwise 0."
 
 (defgeneric check-value (valued-option value)
   (:documentation "Check that VALUE is valid for VALUED-OPTION.
-If VALUE is valid, return it. Otherwise, raise an invalid-value error."))
+If VALUE is valid, return it. Otherwise, raise an invalid-value error.")
+  (:method :around ((option valued-option) value)
+    "Bypass the provided user method if VALUE is nil and OPTION is nullable."
+    (unless (and (nullablep option) (null value))
+      (call-next-method))))
 
 (defun restartable-check-value (valued-option value)
   "Restartably check that VALUE is valid for VALUED-OPTION.

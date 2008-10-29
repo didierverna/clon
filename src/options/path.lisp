@@ -41,13 +41,19 @@
 
 (defoption path ()
   ((argument-name ;; inherited from the VALUED-OPTION class
-    :initform "PATH"))
+    :initform "PATH")
+   (nullablep ;; inherited from the VALUED-OPTION class
+    ;; Note that this doesn't really matter, as empty paths are already
+    ;; handled below.
+    :initform t))
   (:documentation "The PATH class.
 This class implements options whose values are colon-separated directory names."))
 
 (defun make-path (&rest keys
-		  &key short-name long-name description env-var
-		       argument-name argument-type fallback-value default-value)
+		  &key short-name long-name description
+		       argument-name argument-type
+		       env-var fallback-value default-value
+		       nullablep)
   "Make a new path option.
 - SHORT-NAME is the option's short name (without the dash).
   It defaults to nil.
@@ -55,38 +61,43 @@ This class implements options whose values are colon-separated directory names."
   It defaults to nil.
 - DESCRIPTION is the option's description appearing in help strings.
   It defaults to nil.
-- ENV-VAR is the option's associated environment variable.
-  It defaults to nil.
 - ARGUMENT-NAME is the option's argument name appearing in help strings.
 - ARGUMENT-TYPE is one of :required, :mandatory or :optional (:required and
   :mandatory are synonyms).
   It defaults to :optional.
+- ENV-VAR is the option's associated environment variable.
+  It defaults to nil.
 - FALLBACK-VALUE is the option's fallback value (for missing optional
   arguments), if any.
-- DEFAULT-VALUE is the option's default value, if any."
+- DEFAULT-VALUE is the option's default value, if any.
+- NULLABLEP indicates whether this option accepts nil as a value."
   (declare (ignore short-name long-name description env-var
-		  argument-name argument-type fallback-value default-value))
+		  argument-name argument-type fallback-value default-value
+		  nullablep))
   (apply #'make-instance 'path keys))
 
 (defun make-internal-path (long-name description
 			    &rest keys
-			    &key env-var argument-name
-				 argument-type fallback-value default-value)
+			    &key argument-name argument-type
+				 env-var fallback-value default-value
+				 nullablep)
   "Make a new internal (Clon-specific) path option.
 - LONG-NAME is the option's long-name, minus the 'clon-' prefix.
   (Internal options don't have short names.)
 - DESCRIPTION is the options's description.
-- ENV-VAR is the option's associated environment variable, minus the 'CLON_'
-  prefix. It defaults to nil.
 - ARGUMENT-NAME is the option's argument name appearing in help strings.
 - ARGUMENT-TYPE is one of :required, :mandatory or :optional (:required and
   :mandatory are synonyms).
   It defaults to :optional.
+- ENV-VAR is the option's associated environment variable, minus the 'CLON_'
+  prefix. It defaults to nil.
 - FALLBACK-VALUE is the option's fallback value (for missing optional
   arguments), if any.
-- DEFAULT-VALUE is the option's default value, if any."
-  (declare (ignore env-var
-		  argument-name argument-type fallback-value default-value))
+- DEFAULT-VALUE is the option's default value, if any.
+- NULLABLEP indicates whether this option accepts nil as a value."
+  (declare (ignore argument-name argument-type
+		   env-var fallback-value default-value
+		   nullablep))
   (apply #'make-instance 'path
 	 :long-name long-name
 	 :description description
@@ -113,35 +124,42 @@ This class implements options whose values are colon-separated directory names."
 
 (defmethod check-value ((path path) value)
   "Check that VALUE is a valid PATH."
-  (when value
-    (unless (listp value)
-      (error 'invalid-value
-	     :option path
-	     :value value
-	     :comment "Value must be a list of directory pathnames."))
-    (mapc (lambda (elt)
-	    (unless (pathnamep elt)
-	      (error 'invalid-value
-		     :option path
-		     :value value
-		     :comment (format nil "~S is not a pathname." elt)))
-	    (unless (directory-pathname-p elt)
-	      (error 'invalid-value
-		     :option path
-		     :value value
-		     :comment (format nil "~S is not a directory pathname." elt)))
-	    (when (wild-pathname-p elt)
-	      (error 'invalid-value
-		     :option path
-		     :value value
-		     :comment (format nil "~S contains wildcards." elt)))
-	    (when (string= (cadr (pathname-directory elt)) "~")
-	      (error 'invalid-value
-		     :option path
-		     :value value
-		     :comment
-		     (format nil "~S contains a ~~/ abbreviation." elt))))
-	  value)))
+  (cond (value
+	 (unless (listp value)
+	   (error 'invalid-value
+		  :option path
+		  :value value
+		  :comment "Value must be a list of directory pathnames."))
+	 (mapc (lambda (elt)
+		 (unless (pathnamep elt)
+		   (error 'invalid-value
+			  :option path
+			  :value value
+			  :comment (format nil "~S is not a pathname." elt)))
+		 (unless (directory-pathname-p elt)
+		   (error 'invalid-value
+			  :option path
+			  :value value
+			  :comment (format nil "~S is not a directory pathname."
+				     elt)))
+		 (when (wild-pathname-p elt)
+		   (error 'invalid-value
+			  :option path
+			  :value value
+			  :comment (format nil "~S contains wildcards." elt)))
+		 (when (string= (cadr (pathname-directory elt)) "~")
+		   (error 'invalid-value
+			  :option path
+			  :value value
+			  :comment
+			  (format nil "~S contains a ~~/ abbreviation." elt))))
+	       value))
+	(t
+	 (assert (not (nullablep path)))
+	 (error 'invalid-value
+		:option path
+		:value value
+		:comment "Null path forbidden."))))
 
 (defun split-path (path)
   "Split PATH into a list of directories."
@@ -154,33 +172,41 @@ This class implements options whose values are colon-separated directory names."
 (defmethod convert ((path path) argument)
   "Convert ARGUMENT to PATH's value.
 ARGUMENT must be a colon-separated list of directory names."
-  (mapcar (lambda (dirname)
-	    (let ((pathname (pathname dirname)))
-	      (when (wild-pathname-p pathname)
-		(error 'invalid-argument
-		       :option path
-		       :argument argument
-		       :comment "Path contains wildcards."))
-	      (unless (directory-pathname-p pathname)
-		(setq pathname
-		      (make-pathname
-		       :directory (append (or (pathname-directory pathname)
-					      (list :relative))
-					  (list (file-namestring pathname)))
-		       :name nil
-		       :type nil
-		       :defaults pathname)))
-	      (when (string= (cadr (pathname-directory pathname)) "~")
-		(setq pathname
-		      (merge-pathnames
-		       (make-pathname
-			:directory
-			(list* :relative
-			       (cddr (pathname-directory pathname)))
-			:defaults pathname)
-		       (user-homedir-pathname))))
-	      pathname))
-	  (split-path argument)))
+  (let ((value
+	 (mapcar (lambda (dirname)
+		   (let ((pathname (pathname dirname)))
+		     (when (wild-pathname-p pathname)
+		       (error 'invalid-argument
+			      :option path
+			      :argument argument
+			      :comment "Path contains wildcards."))
+		     (unless (directory-pathname-p pathname)
+		       (setq pathname
+			     (make-pathname
+			      :directory
+			      (append (or (pathname-directory pathname)
+					  (list :relative))
+				      (list (file-namestring pathname)))
+			      :name nil
+			      :type nil
+			      :defaults pathname)))
+		     (when (string= (cadr (pathname-directory pathname)) "~")
+		       (setq pathname
+			     (merge-pathnames
+			      (make-pathname
+			       :directory
+			       (list* :relative
+				      (cddr (pathname-directory pathname)))
+			       :defaults pathname)
+			      (user-homedir-pathname))))
+		     pathname))
+		 (split-path argument))))
+    (if value
+	value
+	(error 'invalid-argument
+	       :option path
+	       :argument argument
+	       :comment "Null path forbidden."))))
 
 
 ;;; path.lisp ends here

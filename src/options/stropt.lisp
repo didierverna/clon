@@ -63,8 +63,10 @@
 This class implements options the values of which are strings."))
 
 (defun make-stropt (&rest keys
-		    &key short-name long-name description env-var
-			 argument-name argument-type fallback-value default-value)
+		    &key short-name long-name description
+			 argument-name argument-type
+			 env-var fallback-value default-value
+			 nullablep)
   "Make a new string option.
 - SHORT-NAME is the option's short name (without the dash).
   It defaults to nil.
@@ -72,39 +74,44 @@ This class implements options the values of which are strings."))
   It defaults to nil.
 - DESCRIPTION is the option's description appearing in help strings.
   It defaults to nil.
-- ENV-VAR is the option's associated environment variable.
-  It defaults to nil.
 - ARGUMENT-NAME is the option's argument name appearing in help strings.
 - ARGUMENT-TYPE is one of :required, :mandatory or :optional (:required and
   :mandatory are synonyms).
   It defaults to :optional.
+- ENV-VAR is the option's associated environment variable.
+  It defaults to nil.
 - FALLBACK-VALUE is the option's fallback value (for missing optional
   arguments), if any.
-- DEFAULT-VALUE is the option's default value, if any."
-  (declare (ignore short-name long-name description env-var
-		   argument-name argument-type fallback-value default-value))
+- DEFAULT-VALUE is the option's default value, if any.
+- NULLABLEP indicates whether this option accepts nil as a value."
+  (declare (ignore short-name long-name description
+		   argument-name argument-type
+		   env-var fallback-value default-value
+		   nullablep))
   (apply #'make-instance 'stropt keys))
 
 (defun make-internal-stropt (long-name description
 			      &rest keys
-			      &key env-var argument-name
-				   argument-type fallback-value default-value)
+			      &key argument-name argument-type
+				   env-var fallback-value default-value
+				   nullablep)
   "Make a new internal (Clon-specific) string option.
 - LONG-NAME is the option's long-name, minus the 'clon-' prefix.
   (Internal options don't have short names.)
 - DESCRIPTION is the options's description.
-- ENV-VAR is the option's associated environment variable, minus the 'CLON_'
-  prefix. It defaults to nil.
 - ARGUMENT-NAME is the option's argument name appearing in help strings.
 - ARGUMENT-TYPE is one of :required, :mandatory or :optional (:required and
   :mandatory are synonyms).
   It defaults to :optional.
+- ENV-VAR is the option's associated environment variable, minus the 'CLON_'
+  prefix. It defaults to nil.
 - FALLBACK-VALUE is the option's fallback value (for missing optional
   arguments), if any.
-- DEFAULT-VALUE is the option's default value, if any."
-  (declare (ignore env-var
-		   argument-name argument-type fallback-value default-value
-		   ))
+- DEFAULT-VALUE is the option's default value, if any.
+- NULLABLEP indicates whether this option accepts nil as a value."
+  (declare (ignore argument-name argument-type
+		   env-var fallback-value default-value
+		   nullablep))
   (apply #'make-instance 'stropt
 	 :long-name long-name
 	 :description description

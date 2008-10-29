@@ -57,6 +57,10 @@
     :documentation "The option's argument style."
     :initarg :argument-style
     :reader argument-style)
+   (nullablep ;; inherited from the VALUED-OPTION class
+    ;; Note that this doesn't really matter, as the CONVERT method for
+    ;; switches just returns its argument.
+    :initform t)
    (argument-styles :documentation "The possible argument styles."
 		    :allocation :class
 		    :type list
@@ -90,9 +94,9 @@ This class implements boolean options."))
     (setq keys (list* :fallback-value t keys)))
   (apply #'call-next-method switch keys))
 
-(defun make-switch (&rest keys &key short-name long-name description env-var
-				   argument-type default-value
-				   argument-style)
+(defun make-switch (&rest keys &key short-name long-name description
+				   argument-style argument-type
+				   env-var default-value)
   "Make a new switch.
 - SHORT-NAME is the switch's short name (without the dash).
   It defaults to nil.
@@ -100,37 +104,36 @@ This class implements boolean options."))
   It defaults to nil.
 - DESCRIPTION is the switch's description appearing in help strings.
   It defaults to nil.
-- ENV-VAR is the switch's associated environment variable.
-  It defaults to nil.
+- ARGUMENT-STYLE is the switch's argument display style. It can be one of
+  :yes/no, :on/off, :true/false, :yup/nope.
+  It defaults to :yes/no.
 - ARGUMENT-TYPE is one of :required, :mandatory or :optional (:required and
   :mandatory are synonyms).
   It defaults to :optional.
-- DEFAULT-VALUE is the switch's default value, if any.
-- ARGUMENT-STYLE is the switch's argument display style. It can be one of
-  :yes/no, :on/off, :true/false, :yup/nope.
-  It defaults to :yes/no."
+- ENV-VAR is the switch's associated environment variable.
+  It defaults to nil.
+- DEFAULT-VALUE is the switch's default value, if any."
   (declare (ignore short-name long-name description env-var
 		   argument-type default-value
 		   argument-style))
   (apply #'make-instance 'switch keys))
 
 (defun make-internal-switch (long-name description
-			     &rest keys &key env-var
-					    argument-type default-value
-					    argument-style)
+			     &rest keys &key argument-style argument-type
+					    env-var default-value)
   "Make a new internal (Clon-specific) switch.
 - LONG-NAME is the switch's long-name, minus the 'clon-' prefix.
   (Internal options don't have short names.)
 - DESCRIPTION is the switch's description.
-- ENV-VAR is the switch's associated environment variable, minus the 'CLON_'
-  prefix. It defaults to nil.
+- ARGUMENT-STYLE is the switch's argument display style. It can be one of
+  :yes/no, :on/off, :true/false, :yup/nope.
+  It defaults to :yes/no.
 - ARGUMENT-TYPE is one of :required, :mandatory or :optional (:required and
   :mandatory are synonyms).
   It defaults to :optional.
-- DEFAULT-VALUE is the switch's default value, if any.
-- ARGUMENT-STYLE is the switch's argument display style. It can be one of
-  :yes/no, :on/off, :true/false, :yup/nope.
-  It defaults to :yes/no."
+- ENV-VAR is the switch's associated environment variable, minus the 'CLON_'
+  prefix. It defaults to nil.
+- DEFAULT-VALUE is the switch's default value, if any."
   (declare (ignore env-var argument-type default-value argument-style))
   (apply #'make-instance 'switch
 	 :long-name long-name
