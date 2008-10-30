@@ -81,7 +81,7 @@ subclasses of the VALUED-OPTION class."))
   "Wrapper around defclass for defining a new Clon valued option class."
   (when (assoc :metaclass options)
     (error "Defining valued option class ~S: explicit meta-class option." class))
-  `(defclass ,class ,(cons 'valued-option superclasses)
+  `(defclass ,class (,@superclasses valued-option)
     ,slots
     ,@options
     (:metaclass valued-option-class)))
