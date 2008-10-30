@@ -130,6 +130,8 @@
 		:reader search-path)
    (theme :documentation "The theme filename."
 	  :reader theme)
+   (highlight :documentation "Whether to highlight Clon's output."
+	      :reader highlight)
    (error-handler :documentation ~"The behavior to adopt on errors "
 			       ~"at command-line parsing time."
 		  :type symbol
@@ -430,7 +432,9 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.~%"
   (setf (slot-value context 'search-path)
 	(getopt context :long-name "clon-search-path"))
   (setf (slot-value context 'theme)
-	(getopt context :long-name "clon-theme")))
+	(getopt context :long-name "clon-theme"))
+  (setf (slot-value context 'highlight)
+	(getopt context :long-name "clon-highlight")))
 
 (defun make-context
     (&rest keys &key synopsis error-handler getopt-error-handler cmdline)

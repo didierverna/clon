@@ -124,11 +124,12 @@ If not given, the terminal size will be used when possible. Otherwise, 80
 columns will be assumed."
 		       :argument-name "WIDTH"
 		       :env-var "WIDTH"))
-      (add-to subgrp (make-internal-switch "highlight"
-			 "Force or inhibit Clon's output highlighting.
-If not given, highlighting will be turned on for tty output, and off
-otherwise."
-		       :env-var "HIGHLIGHT"))
+      (add-to subgrp (make-internal-xswitch "highlight"
+			 "Set Clon's output highlighting to on/off/auto.
+Auto (the default) means on for tty output and off otherwise."
+		       :enum '(:auto)
+		       :env-var "HIGHLIGHT"
+		       :default-value :auto))
       (seal subgrp)
       (add-to grp subgrp))
     (seal grp)
