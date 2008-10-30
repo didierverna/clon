@@ -44,6 +44,7 @@
 		  make-internal-stropt
 		  make-internal-path
 		  make-internal-enum
+		  make-internal-xswitch
 		  convert-value))
   (put symbol 'common-lisp-indent-function 2))
 
