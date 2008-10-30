@@ -48,6 +48,11 @@
   (:documentation "The ENUM class.
 This class implements options whose values belong to a set of keywords."))
 
+(defmethod initialize-instance :before ((e enum) &rest keys &key enum)
+  (declare (ignore keys))
+  (unless enum
+    (error "Enum ~S: empty enum." e)))
+
 (defun make-enum (&rest keys
 		  &key short-name long-name description
 		       argument-name argument-type
