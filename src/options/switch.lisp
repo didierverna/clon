@@ -172,7 +172,11 @@ This class implements boolean options."))
 
 (defmethod check-value ((switch switch) value)
   "Check that VALUE is valid for SWITCH."
-  ;; All values are valid for switches: everything but nil means 'yes'."
+  (unless (member value '(t nil))
+    (error 'invalid-value
+	   :option switch
+	   :value value
+	   :comment "Valid values are t or nil."))
   value)
 
 ;; #### TODO: allow abbreviations of values
