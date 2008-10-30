@@ -275,6 +275,9 @@ This function returns two values:
       (retrieve-from-short-call option)))
   ;; Special case for switches:
   (:method ((switch switch))
+    nil)
+  ;; Special case for xswitches:
+  (:method ((xswitch xswitch))
     nil))
 
 
