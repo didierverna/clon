@@ -58,8 +58,6 @@
     :initarg :argument-style
     :reader argument-style)
    (nullablep ;; inherited from the VALUED-OPTION class
-    ;; Note that this doesn't really matter, as the CONVERT method for
-    ;; switches just returns its argument.
     :initform t)
    (argument-styles :documentation "The possible argument styles."
 		    :allocation :class
@@ -113,9 +111,9 @@ This class implements boolean options."))
 - ENV-VAR is the switch's associated environment variable.
   It defaults to nil.
 - DEFAULT-VALUE is the switch's default value, if any."
-  (declare (ignore short-name long-name description env-var
-		   argument-type default-value
-		   argument-style))
+  (declare (ignore short-name long-name description
+		   argument-style argument-type
+		   env-var default-value))
   (apply #'make-instance 'switch keys))
 
 (defun make-internal-switch (long-name description
@@ -134,7 +132,7 @@ This class implements boolean options."))
 - ENV-VAR is the switch's associated environment variable, minus the 'CLON_'
   prefix. It defaults to nil.
 - DEFAULT-VALUE is the switch's default value, if any."
-  (declare (ignore env-var argument-type default-value argument-style))
+  (declare (ignore  argument-style argument-type env-var default-value))
   (apply #'make-instance 'switch
 	 :long-name long-name
 	 :description description
@@ -160,7 +158,7 @@ This class implements boolean options."))
   "Return SWITCH's minus pack character, if any."
   ;; Here, we don't need to look into the argument type (required or optional)
   ;; as for other options, because for switches, the argument type only has an
-  ;;impact on long calls.
+  ;; impact on long calls.
   (potential-pack-char switch as-string))
 
 (defmethod plus-pack-char ((switch switch) &optional as-string)
@@ -177,6 +175,7 @@ This class implements boolean options."))
   ;; All values are valid for switches: everything but nil means 'yes'."
   value)
 
+;; #### TODO: allow abbreviations of values
 (defmethod convert ((switch switch) argument)
   "Convert ARGUMENT to SWITCH's value.
 If ARGUMENT is not valid for a switch, raise a conversion error."
