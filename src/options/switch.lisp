@@ -191,13 +191,10 @@ If ARGUMENT is not valid for a switch, raise a conversion error."
 	 (error 'invalid-argument
 		:option switch
 		:argument argument
-		:comment
-		(concatenate 'string
-		  "Valid arguments are: "
-		  (reduce (lambda (str1 str2)
-			    (concatenate 'string str1 ", " str2))
-			  (append (yes-values switch) (no-values switch)))
-		  ".")))))
+		:comment (format nil "Valid arguments are: ~A."
+			   (list-to-string
+			    (append (yes-values switch)
+				    (no-values switch))))))))
 
 
 ;;; switch.lisp ends here

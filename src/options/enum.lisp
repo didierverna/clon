@@ -116,14 +116,6 @@ This class implements options whose values belong to a set of keywords."))
 ;; Conversion protocol
 ;; -------------------
 
-(defun enum-to-string (enum)
-  "Return a coma-separated list of ENUM values."
-  (reduce (lambda (name1 name2)
-	    (concatenate 'string name1 ", " name2))
-	  enum
-	  :key (lambda (keyword)
-		 (string-downcase (symbol-name keyword)))))
-
 (defmethod check-value ((enum enum) value)
   "Check that VALUE is a valid ENUM."
   (unless (keywordp value)
@@ -137,7 +129,7 @@ This class implements options whose values belong to a set of keywords."))
 	   :value value
 	   :comment (concatenate 'string
 		      "Valid values are: "
-		      (enum-to-string (enum enum))
+		      (symbols-to-string (enum enum))
 		      ".")))
   value)
 
@@ -162,7 +154,7 @@ abbreviation, the closest matching symbol is used."
 			    :argument argument
 			    :comment (concatenate 'string
 				       "Valid arguments are: "
-				       (enum-to-string (enum enum))
+				       (symbols-to-string (enum enum))
 				       ".")))))
 
 

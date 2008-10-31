@@ -34,9 +34,15 @@
 (in-package :clon)
 (in-readtable :clon)
 
+
 ;; ============================================================================
 ;; Misc auxiliary routines
 ;; ============================================================================
+
+(defmacro econd (&body clauses)
+  "Like COND, but signal an error if no clause evaluates to t."
+  `(cond ,@(append clauses
+		   '((t (error "Fell out of ECOND clauses."))))))
 
 (defmacro endpush (object place)
   "Like push, but at the end."
@@ -48,11 +54,19 @@
     (and (>= (length string) length)
 	 (string= beginning string :end2 length))))
 
+(defun list-to-string (list &key (key #'identity))
+  "Return a coma-separated string of all LIST elements.
+KEY should provide a way to get a string from each LIST element."
+  (reduce (lambda (str1 str2) (concatenate 'string str1 ", " str2))
+	  list
+	  :key key))
 
-(defmacro econd (&body clauses)
-  "Like COND, but signal an error if no clause evaluates to t."
-  `(cond ,@(append clauses
-		   '((t (error "Fell out of ECOND clauses."))))))
+(defun symbols-to-string (symbols)
+  "Return a coma-separated list of downcased SYMBOLS names."
+  (list-to-string symbols
+		  :key (lambda (symbol)
+			 (string-downcase (symbol-name symbol)))))
+
 
 
 ;; ============================================================================
@@ -72,6 +86,7 @@
 	:for val :in (cdr keys) :by #'cddr
 	:unless (member key removed)
 	:nconc (list key val)))
+
 
 
 ;; ============================================================================
@@ -104,14 +119,6 @@ This is the meta-class for abstract classes."))
     ((class standard-class) (superclass abstract-class))
   t)
 
-#|
-(defmacro with-method (method-declaration &body body)
-  "Execute BODY with a temporary method defined by METHOD-DECLARATION."
-  (let ((method (gensym "method")))
-    `(let ((,method (defmethod ,@method-declaration)))
-      ,@body
-      (remove-method (function ,(car method-declaration)) ,method))))
-|#
 
 
 ;; ===========================================================================

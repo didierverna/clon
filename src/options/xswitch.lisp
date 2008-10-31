@@ -146,10 +146,8 @@ The plus-syntax is available for extended xswitches."))
       (error 'invalid-value
 	     :option xswitch
 	     :value value
-	     :comment (concatenate 'string
-			"Valid values are: t, nil, "
-			(enum-to-string (enum xswitch))
-			"."))))
+	     :comment (format nil "Valid values are: t, nil, ~A."
+			(symbols-to-string (enum xswitch))))))
   value)
 
 ;; #### TODO: allow abbreviations of values
@@ -177,16 +175,11 @@ If ARGUMENT is not valid for an xswitch, raise a conversion error."
 				   :option xswitch
 				   :argument argument
 				   :comment
-				   (concatenate 'string
-				     "Valid arguments are: "
-				     (reduce (lambda (str1 str2)
-					       (concatenate 'string
-						 str1 ", " str2))
-					     (append (yes-values xswitch)
-						     (no-values xswitch)))
-				     ", "
-				     (enum-to-string (enum xswitch))
-				     ".")))))))
+				   (format nil "Valid arguments are: ~A, ~A."
+				     (list-to-string
+				      (append (yes-values xswitch)
+					      (no-values xswitch)))
+				     (symbols-to-string (enum xswitch)))))))))
 
 
 ;;; xswitch.lisp ends here
