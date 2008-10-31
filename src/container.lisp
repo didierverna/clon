@@ -146,6 +146,9 @@ command-line hierarchy."))
 
 
 
+;; #### TODO: all the stuff below should be put somewhere else (after options
+;; are defined).
+
 ;; ============================================================================
 ;; The Name Clash Check Protocol
 ;; ============================================================================
