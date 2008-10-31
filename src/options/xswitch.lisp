@@ -159,27 +159,16 @@ If ARGUMENT is not valid for an xswitch, raise a conversion error."
 	((member argument (no-values xswitch) :test #'string=)
 	 nil)
 	(t
-	 (setq argument (string-upcase argument))
-	 (loop :with len = (length argument)
-	       :with distance = most-positive-fixnum
-	       :with closest
-	       :for value in (enum xswitch)
-	       :for value-name = (symbol-name value)
-	       :when (and (beginning-of-string-p argument value-name)
-			  (< (- (length value-name) len) distance))
-	       :do (setq distance (- (length value-name) len)
-			 closest value)
-	       :finally (if closest
-			    (return closest)
-			    (error 'invalid-argument
-				   :option xswitch
-				   :argument argument
-				   :comment
-				   (format nil "Valid arguments are: ~A, ~A."
-				     (list-to-string
-				      (append (yes-values xswitch)
-					      (no-values xswitch)))
-				     (symbols-to-string (enum xswitch)))))))))
+	 (or (closest-match (string-upcase argument) (enum xswitch)
+			    :key #'symbol-name)
+	     (error 'invalid-argument
+		    :option xswitch
+		    :argument argument
+		    :comment (format nil "Valid arguments are: ~A, ~A."
+			       (list-to-string
+				(append (yes-values xswitch)
+					(no-values xswitch)))
+			       (symbols-to-string (enum xswitch))))))))
 
 
 ;;; xswitch.lisp ends here

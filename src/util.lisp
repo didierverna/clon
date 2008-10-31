@@ -54,6 +54,22 @@
     (and (>= (length string) length)
 	 (string= beginning string :end2 length))))
 
+(defun closest-match (match list &key (key #'identity))
+  "Return the LIST element closest to MATCH, or nil.
+KEY should provide a way to get a string from each LIST element."
+  (let ((match-length (length match))
+	(shortest-distance most-positive-fixnum)
+	closest-match)
+    (dolist (elt list)
+      (let ((elt-string (funcall key elt))
+	    distance)
+	(when (and (beginning-of-string-p match elt-string)
+		   (< (setq distance (- (length elt-string) match-length))
+		      shortest-distance))
+	  (setq shortest-distance distance)
+	  (setq closest-match elt))))
+    closest-match))
+
 (defun list-to-string (list &key (key #'identity))
   "Return a coma-separated string of all LIST elements.
 KEY should provide a way to get a string from each LIST element."

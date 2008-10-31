@@ -135,23 +135,12 @@ This class implements options whose values belong to a set of keywords."))
   "Convert ARGUMENT to ENUM's value.
 ARGUMENT must be a possibly abbreviated symbol name. In case of an
 abbreviation, the closest matching symbol is used."
-  (setq argument (string-upcase argument))
-  (loop :with len = (length argument)
-	:with distance = most-positive-fixnum
-	:with closest
-	:for value in (enum enum)
-	:for value-name = (symbol-name value)
-	:when (and (beginning-of-string-p argument value-name)
-		   (< (- (length value-name) len) distance))
-	:do (setq distance (- (length value-name) len)
-		  closest value)
-	:finally (if closest
-		     (return closest)
-		     (error 'invalid-argument
-			    :option enum
-			    :argument argument
-			    :comment (format nil "Valid arguments are: ~A."
-				       (symbols-to-string (enum enum)))))))
+  (or (closest-match (string-upcase argument) (enum enum) :key #'symbol-name)
+      (error 'invalid-argument
+	     :option enum
+	     :argument argument
+	     :comment (format nil "Valid arguments are: ~A."
+			(symbols-to-string (enum enum))))))
 
 
 ;;; enum.lisp ends here
