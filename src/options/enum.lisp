@@ -121,7 +121,8 @@ This class implements options whose values belong to a set of keywords."))
   (reduce (lambda (name1 name2)
 	    (concatenate 'string name1 ", " name2))
 	  enum
-	  :key #'symbol-name))
+	  :key (lambda (keyword)
+		 (string-downcase (symbol-name keyword)))))
 
 (defmethod check-value ((enum enum) value)
   "Check that VALUE is a valid ENUM."
