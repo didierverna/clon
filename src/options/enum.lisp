@@ -127,10 +127,8 @@ This class implements options whose values belong to a set of keywords."))
     (error 'invalid-value
 	   :option enum
 	   :value value
-	   :comment (concatenate 'string
-		      "Valid values are: "
-		      (symbols-to-string (enum enum))
-		      ".")))
+	   :comment (format nil "Valid values are: ~A."
+		      (symbols-to-string (enum enum)))))
   value)
 
 (defmethod convert ((enum enum) argument)
@@ -152,10 +150,8 @@ abbreviation, the closest matching symbol is used."
 		     (error 'invalid-argument
 			    :option enum
 			    :argument argument
-			    :comment (concatenate 'string
-				       "Valid arguments are: "
-				       (symbols-to-string (enum enum))
-				       ".")))))
+			    :comment (format nil "Valid arguments are: ~A."
+				       (symbols-to-string (enum enum)))))))
 
 
 ;;; enum.lisp ends here
