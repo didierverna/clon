@@ -48,14 +48,17 @@
   "Like push, but at the end."
   `(setf ,place (nconc ,place (list ,object))))
 
-(defun beginning-of-string-p (beginning string)
-  "Check that STRING starts with BEGINNING."
+(defun beginning-of-string-p (beginning string &optional ignore-case)
+  "Check that STRING starts with BEGINNING.
+If IGNORE-CASE, well, ignore case."
   (let ((length (length beginning)))
     (and (>= (length string) length)
-	 (string= beginning string :end2 length))))
+	 (funcall (if ignore-case #'string-equal #'string=)
+		  beginning string :end2 length))))
 
-(defun closest-match (match list &key (key #'identity))
+(defun closest-match (match list &key ignore-case (key #'identity))
   "Return the LIST element closest to MATCH, or nil.
+If IGNORE-CASE, well, ignore case.
 KEY should provide a way to get a string from each LIST element."
   (let ((match-length (length match))
 	(shortest-distance most-positive-fixnum)
@@ -63,7 +66,7 @@ KEY should provide a way to get a string from each LIST element."
     (dolist (elt list)
       (let ((elt-string (funcall key elt))
 	    distance)
-	(when (and (beginning-of-string-p match elt-string)
+	(when (and (beginning-of-string-p match elt-string ignore-case)
 		   (< (setq distance (- (length elt-string) match-length))
 		      shortest-distance))
 	  (setq shortest-distance distance)

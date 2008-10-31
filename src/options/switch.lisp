@@ -179,22 +179,24 @@ This class implements boolean options."))
 	   :comment "Valid values are t or nil."))
   value)
 
-;; #### TODO: allow abbreviations of values
 (defmethod convert ((switch switch) argument)
-  "Convert ARGUMENT to SWITCH's value.
+  "Convert (possibly abbreviated) ARGUMENT to SWITCH's value.
 If ARGUMENT is not valid for a switch, raise a conversion error."
-  (cond ((member argument (yes-values switch) :test #'string=)
-	 t)
-	((member argument (no-values switch) :test #'string=)
-	 nil)
-	(t
-	 (error 'invalid-argument
-		:option switch
-		:argument argument
-		:comment (format nil "Valid arguments are: ~A."
-			   (list-to-string
-			    (append (yes-values switch)
-				    (no-values switch))))))))
+  (let ((match (closest-match argument
+			      (append (yes-values switch) (no-values switch))
+			      :ignore-case t)))
+    (cond ((member match (yes-values switch) :test #'string-equal)
+	   t)
+	  ((member match (no-values switch) :test #'string-equal)
+	   nil)
+	  (t
+	   (error 'invalid-argument
+		  :option switch
+		  :argument argument
+		  :comment (format nil "Valid arguments are: ~A."
+			     (list-to-string
+			      (append (yes-values switch)
+				      (no-values switch)))))))))
 
 
 ;;; switch.lisp ends here

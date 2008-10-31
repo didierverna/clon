@@ -150,25 +150,27 @@ The plus-syntax is available for extended xswitches."))
 			(symbols-to-string (enum xswitch))))))
   value)
 
-;; #### TODO: allow abbreviations of values
 (defmethod convert ((xswitch xswitch) argument)
-  "Convert ARGUMENT to XSWITCH's value.
+  "Convert (possibly abbreviated) ARGUMENT to XSWITCH's value.
 If ARGUMENT is not valid for an xswitch, raise a conversion error."
-  (cond ((member argument (yes-values xswitch) :test #'string=)
-	 t)
-	((member argument (no-values xswitch) :test #'string=)
-	 nil)
-	(t
-	 (or (closest-match (string-upcase argument) (enum xswitch)
-			    :key #'symbol-name)
-	     (error 'invalid-argument
-		    :option xswitch
-		    :argument argument
-		    :comment (format nil "Valid arguments are: ~A, ~A."
-			       (list-to-string
-				(append (yes-values xswitch)
-					(no-values xswitch)))
-			       (symbols-to-string (enum xswitch))))))))
+  (let ((match (closest-match argument
+			      (append (yes-values xswitch) (no-values xswitch))
+			      :ignore-case t)))
+    (cond ((member match (yes-values xswitch) :test #'string-equal)
+	   t)
+	  ((member match (no-values xswitch) :test #'string-equal)
+	   nil)
+	  (t
+	   (or (closest-match argument (enum xswitch)
+			      :ignore-case t :key #'symbol-name)
+	       (error 'invalid-argument
+		      :option xswitch
+		      :argument argument
+		      :comment (format nil "Valid arguments are: ~A, ~A."
+				 (list-to-string
+				  (append (yes-values xswitch)
+					  (no-values xswitch)))
+				 (symbols-to-string (enum xswitch)))))))))
 
 
 ;;; xswitch.lisp ends here

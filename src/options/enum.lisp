@@ -132,10 +132,9 @@ This class implements options whose values belong to a set of keywords."))
   value)
 
 (defmethod convert ((enum enum) argument)
-  "Convert ARGUMENT to ENUM's value.
-ARGUMENT must be a possibly abbreviated symbol name. In case of an
-abbreviation, the closest matching symbol is used."
-  (or (closest-match (string-upcase argument) (enum enum) :key #'symbol-name)
+  "Convert (possibly abbreviated) ARGUMENT to ENUM's value.
+If ARGUMENT doesn't name one of ENUM's symbols, raise a conversion error."
+  (or (closest-match argument (enum enum) :ignore-case t :key #'symbol-name)
       (error 'invalid-argument
 	     :option enum
 	     :argument argument
