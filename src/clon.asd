@@ -151,10 +151,11 @@ The most important features of Clon are:
   :depends-on (:sb-posix)
   :components ((:file "package")
 	       (:file "util" :depends-on ("package"))
-	       (:file "text" :depends-on ("util"))
-	       (:file "container" :depends-on ("util"))
+	       (:file "traversable" :depends-on ("util"))
+	       (:file "text" :depends-on ("traversable"))
+	       (:file "container" :depends-on ("traversable"))
 	       (:module "options"
-		 :depends-on ("util" "container")
+		 :depends-on ("traversable" "container")
 		 :components
 		 ((:file "option")
 		  (:file "flag" :depends-on ("option"))

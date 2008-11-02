@@ -116,6 +116,15 @@ This is the base class for all options."))
   (apply #'call-next-method option keys))
 
 
+;; ------------------
+;; Traversal protocol
+;; ------------------
+
+(defmethod untraverse ((option option))
+  "OPTION is a terminal object: do nothing."
+  (values))
+
+
 ;; -------------------------
 ;; Name clash check protocol
 ;; -------------------------

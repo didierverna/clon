@@ -1,11 +1,11 @@
-;;; text.lisp --- Text management for Clon
+;;; traversable.lisp --- Traversable objects for Clon
 
 ;; Copyright (C) 2008 Didier Verna
 
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
-;; Created:       Wed Jul  2 13:49:48 2008
-;; Last Revision: Wed Jul  2 13:49:48 2008
+;; Created:       Sun Nov  2 22:10:17 2008
+;; Last Revision: Sun Nov  2 22:10:17 2008
 
 ;; This file is part of Clon.
 
@@ -36,31 +36,28 @@
 
 
 ;; ==========================================================================
-;; The Text Class
+;; The Traversable Class
 ;; ==========================================================================
 
-(defclass text (traversable)
-  ((contents :documentation "The actual text string."
-	     :type string
-	     :initarg :contents
-	     :reader contents))
-  (:documentation "The TEXT class.
-This class implements plain text objects appearing in a synopsis."))
-
-(defun make-text (&rest keys &key contents)
-  "Make a new text.
-- CONTENTS is the actual text to display."
-  (declare (ignore contents))
-  (apply #'make-instance 'text keys))
+(defabstract traversable ()
+  ((traversedp :documentation "The object's traversal state."
+	       :initform nil
+	       :accessor traversedp))
+  (:documentation "The TRAVERSABLE class.
+This class is used for traversing graphs with loop avoidance."))
 
 
-;; ------------------
-;; Traversal protocol
-;; ------------------
 
-(defmethod untraverse ((text text))
-  "TEXT is a terminal object: do nothing."
-  (values))
+;; ==========================================================================
+;; The Traversal Protocol
+;; ==========================================================================
+
+(defgeneric untraverse (object)
+  (:documentation "Reset OBJECT's traversal state, and return OBJECT.")
+  (:method :after((traversable traversable))
+    "Mark TRAVERSABLE as untraversed."
+    (setf (traversedp traversable) nil)))
 
 
-;;; text.lisp ends here
+
+;;; traversable.lisp ends here

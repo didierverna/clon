@@ -50,28 +50,6 @@
 
 
 ;; ============================================================================
-;; The Traversable Class
-;; ============================================================================
-
-(defabstract traversable ()
-  ((traversedp :documentation "The object's traversal state."
-	       :initform nil
-	       :accessor traversedp))
-  (:documentation "The TRAVERSABLE class.
-This class is used for traversing graphs with loop avoidance."))
-
-(defgeneric untraverse (object)
-  (:documentation "Reset OBJECT's traversal state, and return OBJECT.")
-  (:method (object)
-    "Do nothing by default."
-    object)
-  (:method :after ((traversable traversable))
-    "Mark TRAVERSABLE as untraversed."
-    (setf (traversedp traversable) nil)))
-
-
-
-;; ============================================================================
 ;; The Container Class
 ;; ============================================================================
 
