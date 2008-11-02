@@ -45,17 +45,25 @@
     "Do nothing by default."
     (values))
   (:method (func (container container))
-    "Map FUNC over all options in CONTAINER."
+    "Map FUNC over all containers or options in CONTAINER."
     (unless (traversedp container)
       (dolist (item (container-items container))
 	(mapoptions func item))))
   (:method :after (func (container container))
-    (setf (traversedp container) t)))
+    "Mark CONTAINER as traversed."
+    (setf (traversedp container) t))
+  (:method (func (option option))
+    "Call FUNC on OPTION."
+    (unless (traversedp option)
+      (funcall func option)))
+  (:method :after (func (option option))
+    "Mark OPTION as traversed."
+    (setf (traversedp option) t)))
 
-(defmacro do-options ((opt container) &body body)
-  "Execute BODY with OPT bound to every option in CONTAINER."
+(defmacro do-options ((opt there) &body body)
+  "Execute BODY with OPT bound to every option in THERE."
   `(mapoptions (lambda (,opt) ,@body)
-    (untraverse ,container)))
+    (untraverse ,there)))
 
 
 
@@ -184,6 +192,8 @@ Auto (the default) means on for tty output and off otherwise."
 ;; The Potential Pack Protocol
 ;; ============================================================================
 
+;; #### NOTE: a generic function is a bit overkill here, because its use is
+;; only to provide a convenience wrapper for contexts.
 (defgeneric potential-pack-p (pack there)
   (:documentation "Return t if PACK is a potential pack in THERE.")
   (:method (pack (synopsis synopsis))

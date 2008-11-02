@@ -151,6 +151,198 @@
 This class represents the associatiion of a synopsis and a set of command-line
 options based on it."))
 
+
+;; --------------------------------------------
+;; Convenience wrappers around context synopsis
+;; --------------------------------------------
+
+(defmethod postfix ((context context))
+  "Return the postfix of CONTEXT's synopsis."
+  (postfix (synopsis context)))
+
+(defmethod potential-pack-p (pack (context context))
+  "Return t if PACK (a string) is a potential pack in CONTEXT."
+  (potential-pack-p pack (synopsis context)))
+
+
+;; #### WARNING: the two wrappers below are here to make the DO-OPTIONS macro
+;; work directly on contexts. Beware that both of them are needed.
+
+(defmethod mapoptions (func (context context))
+  "Map FUNC over all options in CONTEXT synopsis."
+  (mapoptions func (synopsis context)))
+
+(defmethod untraverse ((context context))
+  "Untraverse CONTEXT synopsis."
+  (untraverse (synopsis context)))
+
+
+
+;; ===========================================================================
+;; The Option Search Protocol
+;; ===========================================================================
+
+(defun search-option-by-name (context &rest keys &key short-name long-name)
+  "Search for option with either SHORT-NAME or LONG-NAME in SYNOPSIS.
+When such an option exists, return two values:
+- the option itself,
+- the name that matched."
+  (declare (ignore short-name long-name))
+  (do-options (option context)
+    (let ((name (apply #'match-option option keys)))
+      (when name
+	(return-from search-option-by-name (values option name))))))
+
+(defun search-option-by-abbreviation (context partial-name)
+  "Search for option abbreviated with PARTIAL-NAME in SYNOPSIS.
+When such an option exists, return two values:
+- the option itself,
+- the completed name."
+  (let ((shortest-distance most-positive-fixnum)
+	closest-option)
+    (do-options (option context)
+      (let ((distance (option-abbreviation-distance option partial-name)))
+	(when (< distance shortest-distance)
+	  (setq shortest-distance distance)
+	  (setq closest-option option))))
+    (when closest-option
+      (values closest-option
+	      ;; When long names are abbreviated (for instance --he instead of
+	      ;; --help), we register the command-line name like this: he(lp).
+	      ;; In case of error report, this will help the user spot where
+	      ;; he did something wrong.
+	      (complete-string partial-name (long-name closest-option))))))
+
+(defun search-option (context &rest keys &key short-name long-name partial-name)
+  "Search for an option in CONTEXT.
+The search is done with SHORT-NAME, LONG-NAME, or PARTIAL-NAME.
+In case of a PARTIAL-NAME search, look for an option the long name of which
+begins with it.
+In case of multiple matches by PARTIAL-NAME, the longest match is selected.
+When such an option exists, return wo values:
+- the option itself,
+- the name used to find the option, possibly completed if partial."
+  (econd ((or short-name long-name)
+	  (apply #'search-option-by-name context keys))
+	 (partial-name
+	  (search-option-by-abbreviation context partial-name))))
+
+(defun search-sticky-option (context namearg)
+  "Search for a sticky option in CONTEXT, matching NAMEARG.
+NAMEARG is the concatenation of the option's short name and its argument.
+In case of multiple matches, the option with the longest name is selected.
+When such an option exists, return two values:
+- the option itself,
+- the argument part of NAMEARG."
+  (let ((longest-distance 0)
+	closest-option)
+    (do-options (option context)
+      (let ((distance (option-sticky-distance option namearg)))
+	(when (> distance longest-distance)
+	  (setq longest-distance distance)
+	  (setq closest-option option))))
+    (when closest-option
+      (values closest-option (subseq namearg longest-distance)))))
+
+
+
+;; ============================================================================
+;; The Option Retrieval Protocol
+;; ============================================================================
+
+(defun getopt (context &rest keys
+		       &key short-name long-name option
+			    (error-handler (getopt-error-handler context)))
+  "Get an option's value in CONTEXT.
+The option can be specified either by SHORT-NAME, LONG-NAME, or directly via
+an OPTION object.
+ERROR-HANDLER is the behavior to adopt on errors. Its default value depends on
+the CONTEXT. See `make-context' for a list of possible values. Note that
+command-line errors are treated at context-creation time, so the only errors
+that can occur here are coming from the environment.
+This function returns two values:
+- the retrieved value,
+- the value's source."
+  (unless option
+    (setq option
+	  (apply #'search-option context (remove-keys keys :error-handler))))
+  (unless option
+    (error "Getting option ~S from synopsis ~A in context ~A: unknown option."
+	   (or short-name long-name)
+	   (synopsis context)
+	   context))
+  ;; Try the command-line:
+  (let ((cmdline-options (list)))
+    (do ((cmdline-option
+	  (pop (cmdline-options context))
+	  (pop (cmdline-options context))))
+	((null cmdline-option))
+      (cond ((eq (cmdline-option-option cmdline-option) option)
+	     (setf (cmdline-options context)
+		   ;; Actually, I *do* have a use for nreconc ;-)
+		   (nreconc cmdline-options (cmdline-options context)))
+	     (return-from getopt
+	       (values (cmdline-option-value cmdline-option)
+		       (list :cmdline (cmdline-option-name cmdline-option)))))
+	    (t
+	     (push cmdline-option cmdline-options))))
+    (setf (cmdline-options context) (nreverse cmdline-options)))
+  ;; Try an environment variable:
+  (handler-bind ((environment-error
+		  (lambda (error)
+		    (ecase error-handler
+		      (:quit
+		       (let (*print-escape*) (print-object error t))
+		       (terpri)
+		       ;; #### PORTME.
+		       (sb-ext:quit :unix-status 1))
+		      (:none)))))
+    (let* ((env-var (env-var option))
+	   ;; #### PORTME.
+	   ;; #### Note: (sb-posix:getenv nil) -> nil, so using let* is ok.
+	   (env-val (sb-posix:getenv env-var)))
+      (when env-val
+	(return-from getopt
+	  (values (retrieve-from-environment option env-val)
+		  (list :environement env-var))))))
+  ;; Try a default value:
+  (when (and (typep option 'valued-option)
+	     (slot-boundp option 'default-value))
+    (values (default-value option) (list :default-value))))
+
+(defun getopt-cmdline (context)
+  "Get the next cmdline option in CONTEXT.
+This function returns three values:
+- the option object,
+- the option's name used on the command-line,
+- the retrieved value."
+  (let ((cmdline-option (pop (cmdline-options context))))
+    (when cmdline-option
+      (values (cmdline-option-option cmdline-option)
+	      (cmdline-option-name cmdline-option)
+	      (cmdline-option-value cmdline-option)))))
+
+(defmacro multiple-value-getopt-cmdline ((option name value) context &body body)
+  "Evaluate BODY on the next command-line option in CONTEXT.
+OPTION, NAME and VALUE are bound to the option's object, name used on the
+command-line) and retrieved value."
+  `(multiple-value-bind (,option ,name ,value) (getopt-cmdline ,context)
+    ,@body))
+
+(defmacro do-cmdline-options ((option name value) context &body body)
+  "Evaluate BODY over all command-line options in CONTEXT.
+OPTION, NAME and VALUE are bound to each option's object, name used on the
+command-line) and retrieved value."
+  `(do () ((null (cmdline-options ,context)))
+    (multiple-value-getopt-cmdline (,option ,name ,value) ,context
+      ,@body)))
+
+
+
+;; ==========================================================================
+;; Context Creation
+;; ==========================================================================
+
 (defmethod initialize-instance :before ((context context) &key synopsis)
   "Ensure that SYNOPSIS is sealed."
   (unless (sealedp synopsis)
@@ -453,177 +645,6 @@ in the functions themselves). It can be one of:
   It defaults to a POSIX conformant argv."
   (declare (ignore synopsis error-handler getopt-error-handler cmdline))
   (apply #'make-instance 'context keys))
-
-
-(defmethod postfix ((context context))
-  "Return the postfix of CONTEXT's synopsis."
-  (postfix (synopsis context)))
-
-
-;; -----------------------
-;; Potential pack protocol
-;; -----------------------
-
-(defmethod potential-pack-p (pack (context context))
-  "Return t if PACK (a string) is a potential pack in CONTEXT."
-  (potential-pack-p pack (synopsis context)))
-
-
-
-;; ===========================================================================
-;; The Option Search Protocol
-;; ===========================================================================
-
-(defun search-option-by-name (context &rest keys &key short-name long-name)
-  "Search for option with either SHORT-NAME or LONG-NAME in SYNOPSIS.
-When such an option exists, return two values:
-- the option itself,
-- the name that matched."
-  (declare (ignore short-name long-name))
-  (do-options (option (synopsis context))
-    (let ((name (apply #'match-option option keys)))
-      (when name
-	(return-from search-option-by-name (values option name))))))
-
-(defun search-option-by-abbreviation (context partial-name)
-  "Search for option abbreviated with PARTIAL-NAME in SYNOPSIS.
-When such an option exists, return two values:
-- the option itself,
-- the completed name."
-  (let ((shortest-distance most-positive-fixnum)
-	closest-option)
-    (do-options (option (synopsis context))
-      (let ((distance (option-abbreviation-distance option partial-name)))
-	(when (< distance shortest-distance)
-	  (setq shortest-distance distance)
-	  (setq closest-option option))))
-    (when closest-option
-      (values closest-option
-	      (complete-string partial-name (long-name closest-option))))))
-
-(defun search-option (context &rest keys &key short-name long-name partial-name)
-  "Search for an option in CONTEXT.
-The search is done with SHORT-NAME, LONG-NAME, or PARTIAL-NAME.
-In case of a PARTIAL-NAME search, look for an option the long name of which
-begins with it.
-In case of multiple matches by PARTIAL-NAME, the longest match is selected.
-When such an option exists, return wo values:
-- the option itself,
-- the name used to find the option, possibly completed if partial."
-  (econd ((or short-name long-name)
-	  (apply #'search-option-by-name context keys))
-	 (partial-name
-	  (search-option-by-abbreviation context partial-name))))
-
-(defun search-sticky-option (context namearg)
-  "Search for a sticky option in CONTEXT, matching NAMEARG.
-NAMEARG is the concatenation of the option's short name and its argument.
-In case of multiple matches, the option with the longest name is selected.
-When such an option exists, return two values:
-- the option itself,
-- the argument part of NAMEARG."
-  (let ((longest-distance 0)
-	closest-option)
-    (do-options (option (synopsis context))
-      (let ((distance (option-sticky-distance option namearg)))
-	(when (> distance longest-distance)
-	  (setq longest-distance distance)
-	  (setq closest-option option))))
-    (when closest-option
-      (values closest-option (subseq namearg longest-distance)))))
-
-
-
-;; ============================================================================
-;; The Option Retrieval Protocol
-;; ============================================================================
-
-(defun getopt (context &rest keys
-		       &key short-name long-name option
-			    (error-handler (getopt-error-handler context)))
-  "Get an option's value in CONTEXT.
-The option can be specified either by SHORT-NAME, LONG-NAME, or directly via
-an OPTION object.
-ERROR-HANDLER is the behavior to adopt on errors. Its default value depends on
-the CONTEXT. See `make-context' for a list of possible values. Note that
-command-line errors are treated at context-creation time, so the only errors
-that can occur here are coming from the environment.
-This function returns two values:
-- the retrieved value,
-- the value's source."
-  (unless option
-    (setq option
-	  (apply #'search-option context (remove-keys keys :error-handler))))
-  (unless option
-    (error "Getting option ~S from synopsis ~A in context ~A: unknown option."
-	   (or short-name long-name)
-	   (synopsis context)
-	   context))
-  ;; Try the command-line:
-  (let ((cmdline-options (list)))
-    (do ((cmdline-option
-	  (pop (cmdline-options context))
-	  (pop (cmdline-options context))))
-	((null cmdline-option))
-      (cond ((eq (cmdline-option-option cmdline-option) option)
-	     (setf (cmdline-options context)
-		   ;; Actually, I *do* have a use for nreconc ;-)
-		   (nreconc cmdline-options (cmdline-options context)))
-	     (return-from getopt
-	       (values (cmdline-option-value cmdline-option)
-		       (list :cmdline (cmdline-option-name cmdline-option)))))
-	    (t
-	     (push cmdline-option cmdline-options))))
-    (setf (cmdline-options context) (nreverse cmdline-options)))
-  ;; Try an environment variable:
-  (handler-bind ((environment-error
-		  (lambda (error)
-		    (ecase error-handler
-		      (:quit
-		       (let (*print-escape*) (print-object error t))
-		       (terpri)
-		       ;; #### PORTME.
-		       (sb-ext:quit :unix-status 1))
-		      (:none)))))
-    (let* ((env-var (env-var option))
-	   ;; #### PORTME.
-	   ;; #### Note: (sb-posix:getenv nil) -> nil, so using let* is ok.
-	   (env-val (sb-posix:getenv env-var)))
-      (when env-val
-	(return-from getopt
-	  (values (retrieve-from-environment option env-val)
-		  (list :environement env-var))))))
-  ;; Try a default value:
-  (when (and (typep option 'valued-option)
-	     (slot-boundp option 'default-value))
-    (values (default-value option) (list :default-value))))
-
-(defun getopt-cmdline (context)
-  "Get the next cmdline option in CONTEXT.
-This function returns three values:
-- the option object,
-- the option's name used on the command-line,
-- the retrieved value."
-  (let ((cmdline-option (pop (cmdline-options context))))
-    (when cmdline-option
-      (values (cmdline-option-option cmdline-option)
-	      (cmdline-option-name cmdline-option)
-	      (cmdline-option-value cmdline-option)))))
-
-(defmacro multiple-value-getopt-cmdline ((option name value) context &body body)
-  "Evaluate BODY on the next command-line option in CONTEXT.
-OPTION, NAME and VALUE are bound to the option's object, name used on the
-command-line) and retrieved value."
-  `(multiple-value-bind (,option ,name ,value) (getopt-cmdline ,context)
-    ,@body))
-
-(defmacro do-cmdline-options ((option name value) context &body body)
-  "Evaluate BODY over all command-line options in CONTEXT.
-OPTION, NAME and VALUE are bound to each option's object, name used on the
-command-line) and retrieved value."
-  `(do () ((null (cmdline-options ,context)))
-    (multiple-value-getopt-cmdline (,option ,name ,value) ,context
-      ,@body)))
 
 
 ;;; context.lisp ends here

@@ -47,6 +47,7 @@
   (:documentation "An error related to an option."))
 
 
+
 ;; ============================================================================
 ;; The Option Class
 ;; ============================================================================
@@ -132,34 +133,10 @@ This is the base class for all options."))
 	     option1 option2 (long-name option1)))))
 
 
-;; -----------------------
-;; Option mapping protocol
-;; -----------------------
-
-(defmethod mapoptions (func (option option))
-  "Call FUNC on OPTION."
-  (unless (traversedp option)
-    (funcall func option)))
-
-(defmethod mapoptions :after (func (option option))
-  "Mark OPTION as traversed."
-  (setf (traversedp option) t))
-
-
 
 ;; ============================================================================
 ;; The Option Search protocol
 ;; ============================================================================
-
-;; When long names are abbreviated (for instance --he instead of --help), we
-;; register the command-line name like this: he(lp). In case of error report,
-;; this will help the user spot where he did something wrong.
-(defun complete-string (beginning complete)
-  "Complete BEGINNING with the rest of COMPLETE in parentheses.
-For instance, completing 'he' with 'help' will produce 'he(lp)'."
-  (assert (beginning-of-string-p beginning complete))
-  (assert (not (string= beginning complete)))
-  (concatenate 'string beginning "(" (subseq complete (length beginning)) ")"))
 
 (defun option-abbreviation-distance (option partial-name)
   "Return the distance between OPTION's long name and PARTIAL-NAME.
@@ -184,6 +161,7 @@ If OPTION matches, return the name that matched."
   (:documentation ~"Try to match OPTION's short name with a sticky argument "
 		  ~"against NAMEARG.
 If OPTION matches, return the length of OPTION's short name; otherwise 0."))
+
 
 
 ;; ============================================================================

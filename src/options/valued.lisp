@@ -86,53 +86,6 @@ subclasses of the VALUED-OPTION class."))
     ,@options
     (:metaclass valued-option-class)))
 
-(defmethod initialize-instance :before
-    ((option valued-option) &key argument-type
-			       (fallback-value nil fallback-value-supplied-p)
-			       (default-value nil default-value-supplied-p))
-  (declare (ignore fallback-value default-value))
-  "Check validity of the value-related initargs."
-  (unless (member argument-type '(:required :mandatory :optional))
-    (error "Option ~A: invalid argument type ~S." option argument-type))
-  (when (and (not (eq argument-type :optional))
-	     fallback-value-supplied-p)
-    (warn "Option ~A: fallback value supplied for required argument." option))
-  (when (and (eq argument-type :optional)
-	     (not fallback-value-supplied-p)
-	     (not default-value-supplied-p))
-    (error "Option ~A: fallback or default value required for optional argument."
-	   option)))
-
-(defmethod initialize-instance :after
-    ((option valued-option) &key argument-type
-			       (fallback-value nil fallback-value-supplied-p)
-			       (default-value nil default-value-supplied-p))
-  "Compute uninitialized OPTION slots with indirect initargs.
-This currently involves the conversion of the ARGUMENT-TYPE key to the
-ARGUMENT-REQUIRED-P slot."
-  (ecase argument-type
-    ((:required :mandatory)
-     (setf (slot-value option 'argument-required-p) t))
-    (:optional
-     (setf (slot-value option 'argument-required-p) nil)))
-  ;; #### NOTE: previously, I performed the validity checks on FALLBACK-VALUE
-  ;; and DEFAULT-VALUE in the :before method, which feels better. However,
-  ;; when the ENUM option class appeared, I realized that option values could
-  ;; depend on an option slot (the ENUM slot ikn that case), so we need to
-  ;; delay this check until right here.
-  ;; Here, we catch and convert a potential invalid-value error into a simple
-  ;; error because this check is intended for the Clon user, as opposed to the
-  ;; Clon end-user. In other words, a potential error here is in the program
-  ;; itself; not in the usage of the program.
-  (when fallback-value-supplied-p
-    (handler-case (check-value option fallback-value)
-      (invalid-value ()
-	(error "Option ~A: invalid fallback value ~S." option fallback-value))))
-  (when default-value-supplied-p
-    (handler-case (check-value option default-value)
-      (invalid-value ()
-	(error "Option ~A: invalid default value ~S." option default-value)))))
-
 
 ;; -------------------------
 ;; Option searching protocol
@@ -163,6 +116,7 @@ If OPTION matches, return its short name's length; otherwise 0."
   "Return OPTION's minus pack character if OPTION's argument is optional."
   (unless (argument-required-p option)
     (potential-pack-char option as-string)))
+
 
 
 ;; ===========================================================================
@@ -255,6 +209,59 @@ Available restarts are:
       :report "Use another (to be converted) argument."
       :interactive read-argument
       (restartable-convert valued-option argument))))
+
+
+
+;; ==========================================================================
+;; Value Option Creation
+;; ==========================================================================
+
+(defmethod initialize-instance :before
+    ((option valued-option) &key argument-type
+			       (fallback-value nil fallback-value-supplied-p)
+			       (default-value nil default-value-supplied-p))
+  (declare (ignore fallback-value default-value))
+  "Check validity of the value-related initargs."
+  (unless (member argument-type '(:required :mandatory :optional))
+    (error "Option ~A: invalid argument type ~S." option argument-type))
+  (when (and (not (eq argument-type :optional))
+	     fallback-value-supplied-p)
+    (warn "Option ~A: fallback value supplied for required argument." option))
+  (when (and (eq argument-type :optional)
+	     (not fallback-value-supplied-p)
+	     (not default-value-supplied-p))
+    (error "Option ~A: fallback or default value required for optional argument."
+	   option)))
+
+(defmethod initialize-instance :after
+    ((option valued-option) &key argument-type
+			       (fallback-value nil fallback-value-supplied-p)
+			       (default-value nil default-value-supplied-p))
+  "Compute uninitialized OPTION slots with indirect initargs.
+This currently involves the conversion of the ARGUMENT-TYPE key to the
+ARGUMENT-REQUIRED-P slot."
+  (ecase argument-type
+    ((:required :mandatory)
+     (setf (slot-value option 'argument-required-p) t))
+    (:optional
+     (setf (slot-value option 'argument-required-p) nil)))
+  ;; #### NOTE: previously, I performed the validity checks on FALLBACK-VALUE
+  ;; and DEFAULT-VALUE in the :before method, which feels better. However,
+  ;; when the ENUM option class appeared, I realized that option values could
+  ;; depend on an option slot (the ENUM slot ikn that case), so we need to
+  ;; delay this check until right here.
+  ;; Here, we catch and convert a potential invalid-value error into a simple
+  ;; error because this check is intended for the Clon user, as opposed to the
+  ;; Clon end-user. In other words, a potential error here is in the program
+  ;; itself; not in the usage of the program.
+  (when fallback-value-supplied-p
+    (handler-case (check-value option fallback-value)
+      (invalid-value ()
+	(error "Option ~A: invalid fallback value ~S." option fallback-value))))
+  (when default-value-supplied-p
+    (handler-case (check-value option default-value)
+      (invalid-value ()
+	(error "Option ~A: invalid default value ~S." option default-value)))))
 
 
 ;;; valued.lisp ends here

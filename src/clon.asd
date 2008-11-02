@@ -154,8 +154,6 @@ The most important features of Clon are:
 	       (:file "text" :depends-on ("util"))
 	       (:file "container" :depends-on ("util"))
 	       (:module "options"
-		 ;; #### FIXME: CONTAINER dependency because of
-		 ;; CHECK-NAME-CLASH and MAPOPTIONS.
 		 :depends-on ("util" "container")
 		 :components
 		 ((:file "option")

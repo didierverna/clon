@@ -35,9 +35,9 @@
 (in-readtable :clon)
 
 
-;; ============================================================================
-;; Misc auxiliary routines
-;; ============================================================================
+;; ==========================================================================
+;; Miscellaneous Auxiliary Routines
+;; ==========================================================================
 
 (defmacro econd (&body clauses)
   "Like COND, but signal an error if no clause evaluates to t."
@@ -73,6 +73,13 @@ KEY should provide a way to get a string from each LIST element."
 	  (setq closest-match elt))))
     closest-match))
 
+(defun complete-string (beginning complete)
+  "Complete BEGINNING with the rest of COMPLETE in parentheses.
+For instance, completing 'he' with 'help' will produce 'he(lp)'."
+  (assert (beginning-of-string-p beginning complete))
+  (assert (not (string= beginning complete)))
+  (concatenate 'string beginning "(" (subseq complete (length beginning)) ")"))
+
 (defun list-to-string (list &key (key #'identity))
   "Return a coma-separated string of all LIST elements.
 KEY should provide a way to get a string from each LIST element."
@@ -88,9 +95,9 @@ KEY should provide a way to get a string from each LIST element."
 
 
 
-;; ============================================================================
-;; Key-Value pairs manipulation
-;; ============================================================================
+;; ==========================================================================
+;; Key-Value Pairs Manipulation
+;; ==========================================================================
 
 (defun select-keys (keys &rest selected)
   "Return a new property list from KEYS with only SELECTED ones."
@@ -108,9 +115,9 @@ KEY should provide a way to get a string from each LIST element."
 
 
 
-;; ============================================================================
-;; CLOS utility routines
-;; ============================================================================
+;; ==========================================================================
+;; CLOS Utility Routines
+;; ==========================================================================
 
 (defclass abstract-class (standard-class)
   ()
@@ -140,9 +147,9 @@ This is the meta-class for abstract classes."))
 
 
 
-;; ===========================================================================
-;; Non ANSI stuff
-;; ===========================================================================
+;; ==========================================================================
+;; Non Standard Stuff
+;; ==========================================================================
 
 (defun quit (status)
   "Quit the Lisp environment"
