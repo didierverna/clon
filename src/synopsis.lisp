@@ -36,6 +36,30 @@
 
 
 ;; ============================================================================
+;; The Option Mapping Protocol
+;; ============================================================================
+
+(defgeneric mapoptions (func there)
+  (:documentation "Map FUNC over all options in THERE.")
+  (:method (func elsewhere)
+    "Do nothing by default."
+    (values))
+  (:method (func (container container))
+    "Map FUNC over all options in CONTAINER."
+    (unless (traversedp container)
+      (dolist (item (container-items container))
+	(mapoptions func item))))
+  (:method :after (func (container container))
+    (setf (traversedp container) t)))
+
+(defmacro do-options ((opt container) &body body)
+  "Execute BODY with OPT bound to every option in CONTAINER."
+  `(mapoptions (lambda (,opt) ,@body)
+    (untraverse ,container)))
+
+
+
+;; ============================================================================
 ;; The Synopsis Class
 ;; ============================================================================
 
@@ -155,6 +179,7 @@ Auto (the default) means on for tty output and off otherwise."
     (setf (slot-value synopsis 'plus-pack) plus-pack)))
 
 
+
 ;; ============================================================================
 ;; The Potential Pack Protocol
 ;; ============================================================================
@@ -167,6 +192,7 @@ Auto (the default) means on for tty output and off otherwise."
     ;; STRING-LEFT-TRIM gets a nil CHAR-BAG which is ok and gives the expected
     ;; result.
     (zerop (length (string-left-trim (potential-pack synopsis) pack)))))
+
 
 
 ;; ============================================================================

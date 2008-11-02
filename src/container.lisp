@@ -117,7 +117,7 @@ command-line hierarchy."))
 	  :while (cdr items)
 	  :do (loop :for item2 in (cdr items)
 		    :do (check-name-clash (car items) item2))))
-  (:method((container container))
+  (:method ((container container))
     "Mark CONTAINER as sealed."
     (setf (sealedp container) t)))
 
@@ -145,9 +145,6 @@ command-line hierarchy."))
     (endpush item (container-items container))))
 
 
-
-;; #### TODO: all the stuff below should be put somewhere else (after options
-;; are defined).
 
 ;; ============================================================================
 ;; The Name Clash Check Protocol
@@ -177,100 +174,6 @@ command-line hierarchy."))
     (dolist (item1 (container-items container1))
       (dolist (item2 (container-items container2))
 	(check-name-clash item1 item2)))))
-
-
-
-;; ============================================================================
-;; The Option Mapping Protocol
-;; ============================================================================
-
-(defgeneric mapoptions (func there)
-  (:documentation "Map FUNC over all options in THERE.")
-  (:method (func elsewhere)
-    "Do nothing by default."
-    (values))
-  (:method (func (container container))
-    "Map FUNC over all options in CONTAINER."
-    (unless (traversedp container)
-      (dolist (item (container-items container))
-	(mapoptions func item))))
-  (:method :after (func (container container))
-    (setf (traversedp container) t)))
-
-(defmacro do-options ((opt container) &body body)
-  "Execute BODY with OPT bound to every option in CONTAINER."
-  `(mapoptions (lambda (,opt) ,@body)
-    (untraverse ,container)))
-
-
-
-;; ============================================================================
-;; The Option Searching Protocol
-;; ============================================================================
-
-(defun search-option-by-name (container &rest keys &key short-name long-name)
-  "Search for option with either SHORT-NAME or LONG-NAME in CONTAINER.
-When such an option exists, return two values:
-- the option itself,
-- the name that matched."
-  (declare (ignore short-name long-name))
-  (do-options (option container)
-    (let ((name (apply #'match-option option keys)))
-      (when name
-	(return-from search-option-by-name (values option name))))))
-
-(defun search-option-by-abbreviation (container partial-name)
-  "Search for option abbreviated with PARTIAL-NAME in CONTAINER.
-When such an option exists, return two values:
-- the option itself,
-- the completed name."
-  (let ((shortest-distance most-positive-fixnum)
-	closest-option)
-    (do-options (option container)
-      (let ((distance (option-abbreviation-distance option partial-name)))
-	(when (< distance shortest-distance)
-	  (setq shortest-distance distance)
-	  (setq closest-option option))))
-    (when closest-option
-      (values closest-option
-	      (complete-string partial-name (long-name closest-option))))))
-
-(defgeneric search-option
-    (there &rest keys &key short-name long-name partial-name)
-  (:documentation "Search for option in THERE.
-The search is done with SHORT-NAME, LONG-NAME, or PARTIAL-NAME.
-In case of a PARTIAL-NAME search, look for an option the long name of which
-begins with it.
-In case of multiple matches by PARTIAL-NAME, the longest match is selected.
-When such an option exists, return wo values:
-- the option itself,
-- the name used to find the option, possibly completed if partial.")
-  (:method
-      ((container container) &rest keys &key short-name long-name partial-name)
-    "Search for option in CONTAINER."
-    (econd ((or short-name long-name)
-	    (apply #'search-option-by-name container keys))
-	   (partial-name
-	    (search-option-by-abbreviation container partial-name)))))
-
-(defgeneric search-sticky-option (there namearg)
-  (:documentation "Search for a sticky option in THERE, matching NAMEARG.
-NAMEARG is the concatenation of the option's short name and its argument.
-In case of multiple matches, the option with the longest name is selected.
-When such an option exists, return two values:
-- the option itself,
-- the argument part of NAMEARG.")
-  (:method ((container container) namearg)
-    "Search for a sticky option in CONTAINER matching NAMEARG."
-    (let ((longest-distance 0)
-	  closest-option)
-      (do-options (option container)
-	(let ((distance (option-sticky-distance option namearg)))
-	  (when (> distance longest-distance)
-	    (setq longest-distance distance)
-	    (setq closest-option option))))
-      (when closest-option
-	(values closest-option (subseq namearg longest-distance))))))
 
 
 ;;; container.lisp ends here

@@ -469,21 +469,69 @@ in the functions themselves). It can be one of:
   (potential-pack-p pack (synopsis context)))
 
 
-;; -------------------------
-;; Option searching protocol
-;; -------------------------
 
-(defmethod search-option
-    ((context context) &rest keys &key short-name long-name partial-name)
+;; ===========================================================================
+;; The Option Search Protocol
+;; ===========================================================================
+
+(defun search-option-by-name (context &rest keys &key short-name long-name)
+  "Search for option with either SHORT-NAME or LONG-NAME in SYNOPSIS.
+When such an option exists, return two values:
+- the option itself,
+- the name that matched."
+  (declare (ignore short-name long-name))
+  (do-options (option (synopsis context))
+    (let ((name (apply #'match-option option keys)))
+      (when name
+	(return-from search-option-by-name (values option name))))))
+
+(defun search-option-by-abbreviation (context partial-name)
+  "Search for option abbreviated with PARTIAL-NAME in SYNOPSIS.
+When such an option exists, return two values:
+- the option itself,
+- the completed name."
+  (let ((shortest-distance most-positive-fixnum)
+	closest-option)
+    (do-options (option (synopsis context))
+      (let ((distance (option-abbreviation-distance option partial-name)))
+	(when (< distance shortest-distance)
+	  (setq shortest-distance distance)
+	  (setq closest-option option))))
+    (when closest-option
+      (values closest-option
+	      (complete-string partial-name (long-name closest-option))))))
+
+(defun search-option (context &rest keys &key short-name long-name partial-name)
   "Search for an option in CONTEXT.
-The search is actually done in the CONTEXT'synopsis."
-  (declare (ignore short-name long-name partial-name))
-  (apply #'search-option (synopsis context) keys))
+The search is done with SHORT-NAME, LONG-NAME, or PARTIAL-NAME.
+In case of a PARTIAL-NAME search, look for an option the long name of which
+begins with it.
+In case of multiple matches by PARTIAL-NAME, the longest match is selected.
+When such an option exists, return wo values:
+- the option itself,
+- the name used to find the option, possibly completed if partial."
+  (econd ((or short-name long-name)
+	  (apply #'search-option-by-name context keys))
+	 (partial-name
+	  (search-option-by-abbreviation context partial-name))))
 
-(defmethod search-sticky-option ((context context) namearg)
-  "Search for a sticky option in CONTEXT.
-The search is actually done in the CONTEXT'synopsis."
-  (search-sticky-option (synopsis context) namearg))
+(defun search-sticky-option (context namearg)
+  "Search for a sticky option in CONTEXT, matching NAMEARG.
+NAMEARG is the concatenation of the option's short name and its argument.
+In case of multiple matches, the option with the longest name is selected.
+When such an option exists, return two values:
+- the option itself,
+- the argument part of NAMEARG."
+  (let ((longest-distance 0)
+	closest-option)
+    (do-options (option (synopsis context))
+      (let ((distance (option-sticky-distance option namearg)))
+	(when (> distance longest-distance)
+	  (setq longest-distance distance)
+	  (setq closest-option option))))
+    (when closest-option
+      (values closest-option (subseq namearg longest-distance)))))
+
 
 
 ;; ============================================================================
