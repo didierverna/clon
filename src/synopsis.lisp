@@ -48,17 +48,13 @@
     "Map FUNC over all containers or options in CONTAINER."
     (unless (traversedp container)
       (dolist (item (container-items container))
-	(mapoptions func item))))
-  (:method :after (func (container container))
-    "Mark CONTAINER as traversed."
-    (setf (traversedp container) t))
+	(mapoptions func item))
+      (setf (traversedp container) t)))
   (:method (func (option option))
     "Call FUNC on OPTION."
     (unless (traversedp option)
-      (funcall func option)))
-  (:method :after (func (option option))
-    "Mark OPTION as traversed."
-    (setf (traversedp option) t)))
+      (funcall func option)
+      (setf (traversedp option) t))))
 
 (defmacro do-options ((opt there) &body body)
   "Execute BODY with OPT bound to every option in THERE."
