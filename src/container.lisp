@@ -35,20 +35,6 @@
 (in-readtable :clon)
 
 
-;; #### NOTE: I don't like putting this function here (before the CONTAINER
-;; class, outside the sealing protocol section), but this lets me specify
-;; directly the :accessor in the class below.
-(defgeneric sealedp (item)
-  (:documentation "Returns t if ITEM is sealed.")
-  ;; This function is supposed to work even on non-container items (options
-  ;; and strings) because of the add-to function below, hence the following
-  ;; non-specialized default method:
-  (:method (item)
-    "Return t (consider non-container ITEMs as sealed)."
-    t))
-
-
-
 ;; ============================================================================
 ;; The Container Class
 ;; ============================================================================
@@ -103,9 +89,6 @@ command-line hierarchy."))
 ;; The Sealing Protocol
 ;; ============================================================================
 
-;; Contrary to SEALEDP, this function is not supposed to work on non-container
-;; items, because sealing is manual (so you're supposed to know what you're
-;; doing).
 (defgeneric seal (container)
   (:documentation "Seal CONTAINER.")
   (:method :before ((container container))
@@ -126,19 +109,19 @@ command-line hierarchy."))
 ;; The Addition Protocol
 ;; ============================================================================
 
-;; #### NOTE: using a generic function here is overkill because no other
-;; method is implemented anywhere else.
+;; #### NOTE: there's actually only one primary method for this function, as
+;; defined below. The use of a generic function is a bit overkill, but it
+;; allows to specialize the before-method below to perform some sanity checks.
 (defgeneric add-to (container item)
   (:documentation "Add ITEM to CONTAINER.")
-  ;; There is currently no need to further specialize this function, as
-  ;; everything is done below.
-  (:method :before ((container container) item)
-    "Ensure that ITEM is sealed and CONTAINER is not."
+  (:method :before ((container container) (item container))
+    "Ensure that container ITEM is sealed and that CONTAINER is not."
     (when (sealedp container)
-      (error "Adding item ~A to container ~A: container sealed." item container))
+      (error "Adding item ~A to container ~A: container sealed."
+	     item container))
     (unless (sealedp item)
-      (error "Adding item ~A to container ~A: item not sealed." item
-	     container)))
+      (error "Adding item ~A to container ~A: item not sealed."
+	     item container)))
   (:method ((container container) item)
     "Add ITEM to CONTAINER."
     (endpush item (container-items container))))
