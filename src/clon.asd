@@ -153,9 +153,8 @@ The most important features of Clon are:
 	       (:file "util" :depends-on ("package"))
 	       (:file "traversable" :depends-on ("util"))
 	       (:file "text" :depends-on ("traversable"))
-	       (:file "container" :depends-on ("traversable"))
 	       (:module "options"
-		 :depends-on ("traversable" "container")
+		 :depends-on ("text")
 		 :components
 		 ((:file "option")
 		  (:file "flag" :depends-on ("option"))
@@ -165,7 +164,8 @@ The most important features of Clon are:
 		  (:file "path" :depends-on ("valued"))
 		  (:file "enum" :depends-on ("valued"))
 		  (:file "xswitch" :depends-on ("valued"))))
-	       (:file "group" :depends-on ("container" "text" "options"))
+	       (:file "container" :depends-on ("options"))
+	       (:file "group" :depends-on ("container"))
 	       (:module "retrieval"
 		 :depends-on ("options")
 		 :components

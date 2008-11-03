@@ -125,21 +125,35 @@ This is the base class for all options."))
   (values))
 
 
-;; -------------------------
-;; Name clash check protocol
-;; -------------------------
 
-(defmethod check-name-clash ((option1 option) (option2 option))
-  "Ensure that there is no name clash between OPTION1 and OPTION2."
-  (unless (eq option1 option2)
-    (when (and (short-name option1) (short-name option2)
-	       (string= (short-name option1) (short-name option2)))
-      (error "Options ~A and ~A: indentical short name ~S."
-	     option1 option2 (short-name option1)))
-    (when (and (long-name option1) (long-name option2)
-	       (string= (long-name option1) (long-name option2)))
-      (error "Options ~A and ~A: identical Long name ~S."
-	     option1 option2 (long-name option1)))))
+;; ==========================================================================
+;; The Name Clash Check Protocol
+;; ==========================================================================
+
+(defgeneric check-name-clash (item1 item2)
+  (:documentation ~"Check for name clash between ITEM1's options "
+		  ~"and ITEM2's options.")
+  (:method (item1 (text text))
+    "Do nothing (no name clash with a text object."
+    (values))
+  (:method ((text text) item2)
+    "Do nothing (no name clash with a text object."
+    (values))
+  ;; #### NOTE: currently, name clashes are considered on short and long names
+  ;; independently. That is, it is possible to have a short name identical to
+  ;; a long one, although I don't see why you would want to do that, and I
+  ;; should probably prohibit it altogether.
+  (:method ((option1 option) (option2 option))
+    "Ensure that there is no name clash between OPTION1 and OPTION2."
+    (unless (eq option1 option2)
+      (when (and (short-name option1) (short-name option2)
+		 (string= (short-name option1) (short-name option2)))
+	(error "Options ~A and ~A: indentical short name ~S."
+	       option1 option2 (short-name option1)))
+      (when (and (long-name option1) (long-name option2)
+		 (string= (long-name option1) (long-name option2)))
+	(error "Options ~A and ~A: identical Long name ~S."
+	       option1 option2 (long-name option1))))))
 
 
 

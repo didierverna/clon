@@ -77,38 +77,26 @@ command-line hierarchy."))
   container)
 
 
+;; -------------------------
+;; Name clash check protocol
+;; -------------------------
 
-;; #### TODO: the name clash check and sealing protocol are not well placed
-;; here. There's something to do to improve the dependencies.
+(defmethod check-name-clash ((container container) item2)
+  "Check for name clash between CONTAINER's options and ITEM2's ones."
+  (dolist (item1 (container-items container))
+    (check-name-clash item1 item2)))
 
-;; ============================================================================
-;; The Name Clash Check Protocol
-;; ============================================================================
+(defmethod check-name-clash (item1 (container container))
+  "Check for name clash between ITEM1's options and CONTAINER's ones."
+  (dolist (item2 (container-items container))
+    (check-name-clash item1 item2)))
 
-;; #### NOTE: currently, name clashes are considered on short and long names
-;; independently. That is, it is possible to have a short name identical to a
-;; long one, although I don't see why you would want to do that, and I should
-;; probably prohibit it altogether.
+(defmethod check-name-clash ((container1 container) (container2 container))
+  "Check for name clash between CONTAINER1's options and CONTAINER2's ones."
+  (dolist (item1 (container-items container1))
+    (dolist (item2 (container-items container2))
+      (check-name-clash item1 item2))))
 
-(defgeneric check-name-clash (item1 item2)
-  (:documentation ~"Check for name clash between ITEM1's options "
-		  ~"and ITEM2's options.")
-  (:method (item1 item2)
-    "Do nothing (no name clash for a non-group or non-option ITEMs."
-    (values))
-  (:method ((container container) item2)
-    "Check for name clash between CONTAINER's options and ITEM2's ones."
-    (dolist (item1 (container-items container))
-      (check-name-clash item1 item2)))
-  (:method (item1 (container container))
-    "Check for name clash between ITEM1's options and CONTAINER's ones."
-    (dolist (item2 (container-items container))
-      (check-name-clash item1 item2)))
-  (:method ((container1 container) (container2 container))
-    "Check for name clash between CONTAINER1's options and CONTAINER2's ones."
-    (dolist (item1 (container-items container1))
-      (dolist (item2 (container-items container2))
-	(check-name-clash item1 item2)))))
 
 
 ;; ============================================================================
