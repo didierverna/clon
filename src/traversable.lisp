@@ -5,7 +5,7 @@
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Sun Nov  2 22:10:17 2008
-;; Last Revision: Sun Nov  2 22:10:17 2008
+;; Last Revision: Wed Nov  5 09:26:18 2008
 
 ;; This file is part of Clon.
 
@@ -57,7 +57,6 @@ This class is used for traversing graphs with loop avoidance."))
   (:method :after((traversable traversable))
     "Mark TRAVERSABLE as untraversed."
     (setf (traversedp traversable) nil)))
-
 
 
 ;;; traversable.lisp ends here

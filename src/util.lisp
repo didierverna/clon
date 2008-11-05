@@ -5,7 +5,7 @@
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Mon Jun 30 17:23:36 2008
-;; Last Revision: Mon Jun 30 17:23:36 2008
+;; Last Revision: Wed Nov  5 09:23:14 2008
 
 ;; This file is part of Clon.
 
@@ -148,7 +148,7 @@ This is the meta-class for abstract classes."))
 
 
 ;; ==========================================================================
-;; Non Standard Stuff
+;; Wrappers around non ANSI features
 ;; ==========================================================================
 
 (defun quit (status)
