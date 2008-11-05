@@ -5,7 +5,7 @@
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Tue Oct  7 21:22:05 2008
-;; Last Revision: Wed Nov  5 10:01:23 2008
+;; Last Revision: Wed Nov  5 17:20:09 2008
 
 ;; This file is part of Clon.
 
@@ -49,32 +49,6 @@
   ()
   (:documentation "The FLAG class.
 This class implements options that don't take any argument."))
-
-
-;; ----------------------
-;; Option search protocol
-;; ----------------------
-
-(defmethod option-sticky-distance ((flag flag) namearg)
-  "Return 0 (flags don't take any argument, sticky or not)."
-  ;; #### NOTE: there is something a bit shaky here: this function is called
-  ;; during cmdline parsing (so this is really a lexico-syntactic analysis
-  ;; stage), but we return 0 because of a semantic point concerning flags:
-  ;; they don't take arguments. The consequence is that flags won't ever get a
-  ;; cmdline-argument in retrieve-from-short-call, hence the assertion there.
-  (declare (ignore namearg))
-  0)
-
-
-;; -------------------
-;; Char packs protocol
-;; -------------------
-
-(defmethod minus-pack-char ((flag flag) &optional as-string)
-  "Return FLAG's minus pack character, if any."
-  ;; Since flags don't take any argument, being minus-packable is the same as
-  ;; being potentially packable.
-  (potential-pack-char flag as-string))
 
 
 

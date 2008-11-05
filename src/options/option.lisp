@@ -146,7 +146,15 @@ If OPTION matches, return the name that matched."
 (defgeneric option-sticky-distance (option namearg)
   (:documentation ~"Try to match OPTION's short name with a sticky argument "
 		  ~"against NAMEARG.
-If OPTION matches, return the length of OPTION's short name; otherwise 0."))
+If OPTION matches, return the length of OPTION's short name; otherwise 0.")
+  ;; #### NOTE: this method currently only applies to flags.
+  (:method ((option option) namearg)
+    "Return 0 (non-valued options don't take any argument, sticky or not)."
+    ;; #### NOTE: the consequence of this method returning 0 is that
+    ;; non-valued options (i.e. flags) won't ever get a cmdline-argument in
+    ;; retrieve-from-short-call, hence the assertion there.
+    (declare (ignore namearg))
+    0))
 
 
 
@@ -172,7 +180,13 @@ If AS-STRING, return a string of that character."
 
 (defgeneric minus-pack-char (option &optional as-string)
   (:documentation "Return OPTION's minus pack character, if any.
-If AS-STRING, return a string of that character."))
+If AS-STRING, return a string of that character.")
+  ;; #### NOTE: this method currently only applies to flags.
+  (:method ((option option) &optional as-string)
+    "Return OPTION's potential pack character."
+    ;; Since non-valued options don't take any argument, being minus-packable
+    ;; is the same as being potentially packable.
+    (potential-pack-char option as-string)))
 
 (defgeneric plus-pack-char (option &optional as-string)
   (:documentation "Return OPTION's plus pack character, if any.
