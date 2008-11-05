@@ -5,7 +5,7 @@
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Wed Oct 22 13:41:39 2008
-;; Last Revision: Wed Oct 22 13:41:39 2008
+;; Last Revision: Wed Nov  5 10:23:25 2008
 
 ;; This file is part of Clon.
 
@@ -35,9 +35,9 @@
 (in-readtable :clon)
 
 
-;; ============================================================================
+;; ==========================================================================
 ;; The Path Option Class
-;; ============================================================================
+;; ==========================================================================
 
 (defoption path ()
   ((argument-name ;; inherited from the VALUED-OPTION class
@@ -48,61 +48,6 @@
     :initform t))
   (:documentation "The PATH class.
 This class implements options whose values are colon-separated directory names."))
-
-(defun make-path (&rest keys
-		  &key short-name long-name description
-		       argument-name argument-type
-		       env-var fallback-value default-value
-		       nullablep)
-  "Make a new path option.
-- SHORT-NAME is the option's short name (without the dash).
-  It defaults to nil.
-- LONG-NAME is the option's long name (without the double-dash).
-  It defaults to nil.
-- DESCRIPTION is the option's description appearing in help strings.
-  It defaults to nil.
-- ARGUMENT-NAME is the option's argument name appearing in help strings.
-- ARGUMENT-TYPE is one of :required, :mandatory or :optional (:required and
-  :mandatory are synonyms).
-  It defaults to :optional.
-- ENV-VAR is the option's associated environment variable.
-  It defaults to nil.
-- FALLBACK-VALUE is the option's fallback value (for missing optional
-  arguments), if any.
-- DEFAULT-VALUE is the option's default value, if any.
-- NULLABLEP indicates whether this option accepts nil as a value."
-  (declare (ignore short-name long-name description env-var
-		  argument-name argument-type fallback-value default-value
-		  nullablep))
-  (apply #'make-instance 'path keys))
-
-(defun make-internal-path (long-name description
-			    &rest keys
-			    &key argument-name argument-type
-				 env-var fallback-value default-value
-				 nullablep)
-  "Make a new internal (Clon-specific) path option.
-- LONG-NAME is the option's long-name, minus the 'clon-' prefix.
-  (Internal options don't have short names.)
-- DESCRIPTION is the options's description.
-- ARGUMENT-NAME is the option's argument name appearing in help strings.
-- ARGUMENT-TYPE is one of :required, :mandatory or :optional (:required and
-  :mandatory are synonyms).
-  It defaults to :optional.
-- ENV-VAR is the option's associated environment variable, minus the 'CLON_'
-  prefix. It defaults to nil.
-- FALLBACK-VALUE is the option's fallback value (for missing optional
-  arguments), if any.
-- DEFAULT-VALUE is the option's default value, if any.
-- NULLABLEP indicates whether this option accepts nil as a value."
-  (declare (ignore argument-name argument-type
-		   env-var fallback-value default-value
-		   nullablep))
-  (apply #'make-instance 'path
-	 :long-name long-name
-	 :description description
-	 :internal t
-	 keys))
 
 
 ;; -------------------
@@ -122,6 +67,7 @@ This class implements options whose values are colon-separated directory names."
        (pathname-component-null-p (pathname-type pathname))
        pathname))
 
+;; Value check subprotocol
 (defmethod check-value ((path path) value)
   "Check that VALUE is a valid PATH."
   (cond (value
@@ -207,6 +153,67 @@ ARGUMENT must be a colon-separated list of directory names."
 	       :option path
 	       :argument argument
 	       :comment "Null path forbidden."))))
+
+
+
+;; ==========================================================================
+;; Path Instance Creation
+;; ==========================================================================
+
+(defun make-path (&rest keys
+		  &key short-name long-name description
+		       argument-name argument-type
+		       env-var fallback-value default-value
+		       nullablep)
+  "Make a new path option.
+- SHORT-NAME is the option's short name (without the dash).
+  It defaults to nil.
+- LONG-NAME is the option's long name (without the double-dash).
+  It defaults to nil.
+- DESCRIPTION is the option's description appearing in help strings.
+  It defaults to nil.
+- ARGUMENT-NAME is the option's argument name appearing in help strings.
+- ARGUMENT-TYPE is one of :required, :mandatory or :optional (:required and
+  :mandatory are synonyms).
+  It defaults to :optional.
+- ENV-VAR is the option's associated environment variable.
+  It defaults to nil.
+- FALLBACK-VALUE is the option's fallback value (for missing optional
+  arguments), if any.
+- DEFAULT-VALUE is the option's default value, if any.
+- NULLABLEP indicates whether this option accepts nil as a value."
+  (declare (ignore short-name long-name description env-var
+		  argument-name argument-type fallback-value default-value
+		  nullablep))
+  (apply #'make-instance 'path keys))
+
+(defun make-internal-path (long-name description
+			    &rest keys
+			    &key argument-name argument-type
+				 env-var fallback-value default-value
+				 nullablep)
+  "Make a new internal (Clon-specific) path option.
+- LONG-NAME is the option's long-name, minus the 'clon-' prefix.
+  (Internal options don't have short names.)
+- DESCRIPTION is the options's description.
+- ARGUMENT-NAME is the option's argument name appearing in help strings.
+- ARGUMENT-TYPE is one of :required, :mandatory or :optional (:required and
+  :mandatory are synonyms).
+  It defaults to :optional.
+- ENV-VAR is the option's associated environment variable, minus the 'CLON_'
+  prefix. It defaults to nil.
+- FALLBACK-VALUE is the option's fallback value (for missing optional
+  arguments), if any.
+- DEFAULT-VALUE is the option's default value, if any.
+- NULLABLEP indicates whether this option accepts nil as a value."
+  (declare (ignore argument-name argument-type
+		   env-var fallback-value default-value
+		   nullablep))
+  (apply #'make-instance 'path
+	 :long-name long-name
+	 :description description
+	 :internal t
+	 keys))
 
 
 ;;; path.lisp ends here

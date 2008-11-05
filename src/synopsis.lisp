@@ -5,7 +5,7 @@
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Sun Jul 13 11:14:19 2008
-;; Last Revision: Sun Jul 13 11:14:19 2008
+;; Last Revision: Wed Nov  5 10:41:26 2008
 
 ;; This file is part of Clon.
 
@@ -35,9 +35,9 @@
 (in-readtable :clon)
 
 
-;; ============================================================================
+;; ==========================================================================
 ;; The Option Mapping Protocol
-;; ============================================================================
+;; ==========================================================================
 
 (defgeneric mapoptions (func there)
   (:documentation "Map FUNC over all options in THERE.")
@@ -63,9 +63,9 @@
 
 
 
-;; ============================================================================
+;; ==========================================================================
 ;; The Synopsis Class
-;; ============================================================================
+;; ==========================================================================
 
 (defclass synopsis (container)
   ((postfix :documentation "A postfix to the program synopsis."
@@ -82,13 +82,6 @@
    (potential-pack :documentation "The potential pack string."
 		   :type (or null string)
 		   :reader potential-pack)))
-
-(defun make-synopsis (&rest keys &key postfix)
-  "Make a new SYNOPSIS.
-- POSTFIX is a string to append to the program synopsis, in case it accepts a
-remainder."
-  (declare (ignore postfix))
-  (apply #'make-instance 'synopsis keys))
 
 
 ;; ----------------
@@ -184,9 +177,9 @@ Auto (the default) means on for tty output and off otherwise."
 
 
 
-;; ============================================================================
+;; ==========================================================================
 ;; The Potential Pack Protocol
-;; ============================================================================
+;; ==========================================================================
 
 ;; #### NOTE: a generic function is a bit overkill here, because its use is
 ;; only to provide a convenience wrapper for contexts.
@@ -201,9 +194,16 @@ Auto (the default) means on for tty output and off otherwise."
 
 
 
-;; ============================================================================
-;; Convenience Synopsis Definition
-;; ============================================================================
+;; ==========================================================================
+;; Synopsis Instance Creation
+;; ==========================================================================
+
+(defun make-synopsis (&rest keys &key postfix)
+  "Make a new SYNOPSIS.
+- POSTFIX is a string to append to the program synopsis, in case it accepts a
+remainder."
+  (declare (ignore postfix))
+  (apply #'make-instance 'synopsis keys))
 
 (defmacro define-synopsis (synopsis (&rest keys) &body body)
   "Evaluate BODY with SYNOPSIS bound to a new synopsis, seal it and return it.

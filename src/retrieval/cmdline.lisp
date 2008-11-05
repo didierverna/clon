@@ -5,7 +5,7 @@
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Wed Oct 22 09:20:48 2008
-;; Last Revision: Wed Oct 22 10:03:37 2008
+;; Last Revision: Wed Nov  5 10:52:17 2008
 
 ;; This file is part of Clon.
 
@@ -35,9 +35,9 @@
 (in-readtable :clon)
 
 
-;; ============================================================================
+;; ==========================================================================
 ;; Utilities
-;; ============================================================================
+;; ==========================================================================
 
 (defun option-call-p (str)
   "Return true if STR looks like an option call."
@@ -64,9 +64,9 @@ If so, store it in CMDLINE-ARGUMENT."
 
 
 
-;; ===========================================================================
-;; Command-line error management
-;; ===========================================================================
+;; ==========================================================================
+;; Command-line error management (regarding known options)
+;; ==========================================================================
 
 (define-condition cmdline-error (error)
   ((item :documentation "The concerned command-line item."
@@ -142,9 +142,10 @@ name."
   (:documentation "A missing command-line argument error."))
 
 
-;; ============================================================================
+
+;; ==========================================================================
 ;; The Command-Line Retrieval Protocol
-;; ============================================================================
+;; ==========================================================================
 
 (defun cmdline-convert (valued-option cmdline-name cmdline-argument)
   "Convert CMDLINE-ARGUMENT to VALUED-OPTION's value.

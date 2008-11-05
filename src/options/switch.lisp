@@ -5,7 +5,7 @@
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Tue Oct  7 21:28:03 2008
-;; Last Revision: Tue Oct  7 21:29:07 2008
+;; Last Revision: Wed Nov  5 10:20:49 2008
 
 ;; This file is part of Clon.
 
@@ -35,9 +35,9 @@
 (in-readtable :clon)
 
 
-;; ============================================================================
+;; ==========================================================================
 ;; The Switch Class
-;; ============================================================================
+;; ==========================================================================
 
 ;; A switch can appear in the following forms:
 ;;
@@ -79,6 +79,72 @@
     :argument-style :yes/no)
   (:documentation "The SWITCH class.
 This class implements boolean options."))
+
+
+;; ----------------------
+;; Option search protocol
+;; ----------------------
+
+(defmethod option-sticky-distance ((switch switch) namearg)
+  "Return 0 (switches don't accept sticky arguments)."
+  ;; #### NOTE: see related comment in the FLAG method.
+  0)
+
+
+;; -------------------
+;; Char packs protocol
+;; -------------------
+
+(defmethod minus-pack-char ((switch switch) &optional as-string)
+  "Return SWITCH's minus pack character, if any."
+  ;; Here, we don't need to look into the argument type (required or optional)
+  ;; as for other options, because for switches, the argument type only has an
+  ;; impact on long calls.
+  (potential-pack-char switch as-string))
+
+(defmethod plus-pack-char ((switch switch) &optional as-string)
+  "Return SWITCH's plus pack character, if any."
+  (potential-pack-char switch as-string))
+
+
+;; -------------------
+;; Conversion protocol
+;; -------------------
+
+;; Value check subprotocol
+(defmethod check-value ((switch switch) value)
+  "Check that VALUE is valid for SWITCH."
+  (unless (member value '(t nil))
+    (error 'invalid-value
+	   :option switch
+	   :value value
+	   :comment "Valid values are t or nil."))
+  value)
+
+(defmethod convert ((switch switch) argument)
+  "Convert (possibly abbreviated) ARGUMENT to SWITCH's value.
+If ARGUMENT is not valid for a switch, raise a conversion error."
+  (let ((match (closest-match argument
+			      (append (yes-values switch) (no-values switch))
+			      :ignore-case t)))
+    (cond ((member match (yes-values switch) :test #'string-equal)
+	   t)
+	  ((member match (no-values switch) :test #'string-equal)
+	   nil)
+	  (t
+	   (error 'invalid-argument
+		  :option switch
+		  :argument argument
+		  :comment (format nil "Valid arguments are: ~A."
+			     (list-to-string
+			      (append (yes-values switch)
+				      (no-values switch)))))))))
+
+
+
+;; ==========================================================================
+;; Switch Instance Creation
+;; ==========================================================================
 
 (defmethod initialize-instance :before ((switch switch) &key argument-style)
   "Check validity of switch-specific initargs."
@@ -138,65 +204,6 @@ This class implements boolean options."))
 	 :description description
 	 :internal t
 	 keys))
-
-
-;; -------------------------
-;; Option searching protocol
-;; -------------------------
-
-(defmethod option-sticky-distance ((switch switch) namearg)
-  "Return 0 (switches don't accept sticky arguments)."
-  ;; #### NOTE: see related comment in the FLAG method.
-  0)
-
-
-;; -------------------
-;; Char packs protocol
-;; -------------------
-
-(defmethod minus-pack-char ((switch switch) &optional as-string)
-  "Return SWITCH's minus pack character, if any."
-  ;; Here, we don't need to look into the argument type (required or optional)
-  ;; as for other options, because for switches, the argument type only has an
-  ;; impact on long calls.
-  (potential-pack-char switch as-string))
-
-(defmethod plus-pack-char ((switch switch) &optional as-string)
-  "Return SWITCH's plus pack character, if any."
-  (potential-pack-char switch as-string))
-
-
-;; -------------------
-;; Conversion protocol
-;; -------------------
-
-(defmethod check-value ((switch switch) value)
-  "Check that VALUE is valid for SWITCH."
-  (unless (member value '(t nil))
-    (error 'invalid-value
-	   :option switch
-	   :value value
-	   :comment "Valid values are t or nil."))
-  value)
-
-(defmethod convert ((switch switch) argument)
-  "Convert (possibly abbreviated) ARGUMENT to SWITCH's value.
-If ARGUMENT is not valid for a switch, raise a conversion error."
-  (let ((match (closest-match argument
-			      (append (yes-values switch) (no-values switch))
-			      :ignore-case t)))
-    (cond ((member match (yes-values switch) :test #'string-equal)
-	   t)
-	  ((member match (no-values switch) :test #'string-equal)
-	   nil)
-	  (t
-	   (error 'invalid-argument
-		  :option switch
-		  :argument argument
-		  :comment (format nil "Valid arguments are: ~A."
-			     (list-to-string
-			      (append (yes-values switch)
-				      (no-values switch)))))))))
 
 
 ;;; switch.lisp ends here

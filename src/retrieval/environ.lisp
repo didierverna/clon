@@ -5,7 +5,7 @@
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Wed Oct 22 10:12:37 2008
-;; Last Revision: Wed Oct 22 10:12:37 2008
+;; Last Revision: Wed Nov  5 10:37:15 2008
 
 ;; This file is part of Clon.
 
@@ -35,9 +35,9 @@
 (in-readtable :clon)
 
 
-;; ============================================================================
-;; Error Management
-;; ============================================================================
+;; ==========================================================================
+;; Environmental Error Management
+;; ==========================================================================
 
 ;; #### NOTE: currently, there is only one environment error: an invalid value
 ;; for an environment variable associated with an option. This means that the
@@ -76,9 +76,10 @@
   (:documentation "An invalid environment variable's value error."))
 
 
-;; ============================================================================
-;; The Retrieval Protocol
-;; ============================================================================
+
+;; ==========================================================================
+;; The Environement Retrieval Protocol
+;; ==========================================================================
 
 ;; #### WARNING: given the idea of supporting a list of env vars, I would need
 ;; to modify this function in order to pass the env-var itself. This protocol

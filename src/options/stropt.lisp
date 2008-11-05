@@ -5,7 +5,7 @@
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Tue Oct  7 21:29:39 2008
-;; Last Revision: Tue Oct  7 21:30:49 2008
+;; Last Revision: Wed Nov  5 10:19:21 2008
 
 ;; This file is part of Clon.
 
@@ -35,9 +35,9 @@
 (in-readtable :clon)
 
 
-;; ============================================================================
+;; ==========================================================================
 ;; The String Option Class
-;; ============================================================================
+;; ==========================================================================
 
 ;; #### NOTE: all of this applies to user-defined options as well.
 
@@ -61,6 +61,31 @@
     :initform "STR"))
   (:documentation "The STROPT class.
 This class implements options the values of which are strings."))
+
+
+;; -------------------
+;; Conversion protocol
+;; -------------------
+
+;; Value check subprotocol
+(defmethod check-value ((stropt stropt) value)
+  "Check that VALUE is valid for STROPT."
+  (if (stringp value)
+      value
+      (error 'invalid-value
+	     :option stropt
+	     :value value
+	     :comment "Value must be a string.")))
+
+(defmethod convert ((stropt stropt) argument)
+  "Return ARGUMENT."
+  argument)
+
+
+
+;; ==========================================================================
+;; Stropt Instance Creation
+;; ==========================================================================
 
 (defun make-stropt (&rest keys
 		    &key short-name long-name description
@@ -117,24 +142,6 @@ This class implements options the values of which are strings."))
 	 :description description
 	 :internal t
 	 keys))
-
-
-;; -------------------
-;; Conversion protocol
-;; -------------------
-
-(defmethod check-value ((stropt stropt) value)
-  "Check that VALUE is valid for STROPT."
-  (if (stringp value)
-      value
-      (error 'invalid-value
-	     :option stropt
-	     :value value
-	     :comment "Value must be a string.")))
-
-(defmethod convert ((stropt stropt) argument)
-  "Return ARGUMENT."
-  argument)
 
 
 ;;; stropt.lisp ends here

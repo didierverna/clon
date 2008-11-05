@@ -5,7 +5,7 @@
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Thu Oct 30 18:36:30 2008
-;; Last Revision: Thu Oct 30 18:36:30 2008
+;; Last Revision: Wed Nov  5 10:26:49 2008
 
 ;; This file is part of Clon.
 
@@ -35,9 +35,9 @@
 (in-readtable :clon)
 
 
-;; ============================================================================
+;; ==========================================================================
 ;; The Extended Switch Class
-;; ============================================================================
+;; ==========================================================================
 
 (defoption xswitch ()
   ((nullablep ;; inherited from the VALUED-OPTION class
@@ -60,6 +60,66 @@
   (:documentation "The XSWITCH class.
 This class implements switches extended with enumeration values.
 The plus-syntax is available for extended xswitches."))
+
+
+;; -------------------
+;; Char packs protocol
+;; -------------------
+
+(defmethod plus-pack-char ((xswitch xswitch) &optional as-string)
+  "Return XSWITCH's plus pack character, if any."
+  (potential-pack-char xswitch as-string))
+
+
+;; -------------------
+;; Conversion protocol
+;; -------------------
+
+;; Value check subprotocol
+(defmethod check-value ((xswitch xswitch) value)
+  "Check that VALUE is valid for XSWITCH."
+  ;; All values are valid for xswitches: everything but nil means 'yes'."
+  (unless (member value '(t nil))
+    (unless (keywordp value)
+      (error 'invalid-value
+	     :option xswitch
+	     :value value
+	     :comment "Value must be t, nil or a keyword."))
+    (unless (member value (enum xswitch))
+      (error 'invalid-value
+	     :option xswitch
+	     :value value
+	     :comment (format nil "Valid values are: t, nil, ~A."
+			(symbols-to-string (enum xswitch))))))
+  value)
+
+(defmethod convert ((xswitch xswitch) argument)
+  "Convert (possibly abbreviated) ARGUMENT to XSWITCH's value.
+If ARGUMENT is not valid for an xswitch, raise a conversion error."
+  (let ((match (closest-match argument
+			      (append (yes-values xswitch) (no-values xswitch))
+			      :ignore-case t)))
+    (cond ((member match (yes-values xswitch) :test #'string-equal)
+	   t)
+	  ((member match (no-values xswitch) :test #'string-equal)
+	   nil)
+	  (t
+	   (or (closest-match argument (enum xswitch)
+			      :ignore-case t :key #'symbol-name)
+	       (error 'invalid-argument
+		      :option xswitch
+		      :argument argument
+		      :comment (format nil "Valid arguments are: ~A, ~A."
+				 (list-to-string
+				  (append (yes-values xswitch)
+					  (no-values xswitch)))
+				 (symbols-to-string (enum xswitch)))))))))
+
+
+
+;; ==========================================================================
+;; Extended Switch Instance Creation
+;; ==========================================================================
 
 (defmethod initialize-instance :before
     ((xswitch xswitch) &rest keys &key enum)
@@ -118,59 +178,6 @@ The plus-syntax is available for extended xswitches."))
 	 :description description
 	 :internal t
 	 keys))
-
-
-;; -------------------
-;; Char packs protocol
-;; -------------------
-
-(defmethod plus-pack-char ((xswitch xswitch) &optional as-string)
-  "Return XSWITCH's plus pack character, if any."
-  (potential-pack-char xswitch as-string))
-
-
-;; -------------------
-;; Conversion protocol
-;; -------------------
-
-(defmethod check-value ((xswitch xswitch) value)
-  "Check that VALUE is valid for XSWITCH."
-  ;; All values are valid for xswitches: everything but nil means 'yes'."
-  (unless (member value '(t nil))
-    (unless (keywordp value)
-      (error 'invalid-value
-	     :option xswitch
-	     :value value
-	     :comment "Value must be t, nil or a keyword."))
-    (unless (member value (enum xswitch))
-      (error 'invalid-value
-	     :option xswitch
-	     :value value
-	     :comment (format nil "Valid values are: t, nil, ~A."
-			(symbols-to-string (enum xswitch))))))
-  value)
-
-(defmethod convert ((xswitch xswitch) argument)
-  "Convert (possibly abbreviated) ARGUMENT to XSWITCH's value.
-If ARGUMENT is not valid for an xswitch, raise a conversion error."
-  (let ((match (closest-match argument
-			      (append (yes-values xswitch) (no-values xswitch))
-			      :ignore-case t)))
-    (cond ((member match (yes-values xswitch) :test #'string-equal)
-	   t)
-	  ((member match (no-values xswitch) :test #'string-equal)
-	   nil)
-	  (t
-	   (or (closest-match argument (enum xswitch)
-			      :ignore-case t :key #'symbol-name)
-	       (error 'invalid-argument
-		      :option xswitch
-		      :argument argument
-		      :comment (format nil "Valid arguments are: ~A, ~A."
-				 (list-to-string
-				  (append (yes-values xswitch)
-					  (no-values xswitch)))
-				 (symbols-to-string (enum xswitch)))))))))
 
 
 ;;; xswitch.lisp ends here

@@ -5,7 +5,7 @@
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Wed Jul  2 13:49:48 2008
-;; Last Revision: Wed Jul  2 13:49:48 2008
+;; Last Revision: Wed Nov  5 14:30:37 2008
 
 ;; This file is part of Clon.
 
@@ -47,20 +47,26 @@
   (:documentation "The TEXT class.
 This class implements plain text objects appearing in a synopsis."))
 
-(defun make-text (&rest keys &key contents)
-  "Make a new text.
-- CONTENTS is the actual text to display."
-  (declare (ignore contents))
-  (apply #'make-instance 'text keys))
-
 
 ;; ------------------
 ;; Traversal protocol
 ;; ------------------
 
 (defmethod untraverse ((text text))
-  "TEXT is a terminal object: do nothing."
-  (values))
+  "TEXT is a terminal object: just return it."
+  text)
+
+
+
+;; ==========================================================================
+;; Text Instance Creation
+;; ==========================================================================
+
+(defun make-text (&rest keys &key contents)
+  "Make a new text.
+- CONTENTS is the actual text to display."
+  (declare (ignore contents))
+  (apply #'make-instance 'text keys))
 
 
 ;;; text.lisp ends here

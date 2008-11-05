@@ -5,7 +5,7 @@
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Tue Oct  7 21:25:03 2008
-;; Last Revision: Tue Oct  7 21:27:19 2008
+;; Last Revision: Wed Nov  5 10:13:56 2008
 
 ;; This file is part of Clon.
 
@@ -35,9 +35,9 @@
 (in-readtable :clon)
 
 
-;; ============================================================================
+;; ==========================================================================
 ;; The Valued Option Class
-;; ============================================================================
+;; ==========================================================================
 
 (defabstract valued-option (option)
   ((argument-name :documentation "The option's argument display name."
@@ -62,34 +62,10 @@
   (:documentation "The VALUED-OPTION class.
 This is the base class for options accepting arguments."))
 
-(defclass valued-option-class (standard-class)
-  ()
-  (:documentation "The VALUED-OPTION-CLASS class.
-This is the meta-class for all valued options, that is, for all
-subclasses of the VALUED-OPTION class."))
 
-(defvar *valued-option-names* nil
-  "The list of known valued option names.")
-
-(defmethod initialize-instance :after
-    ((class valued-option-class) &key direct-superclasses direct-slots)
-  "Register CLASS as a new valued option class."
-  (declare (ignore direct-superclasses direct-slots))
-  (pushnew (symbol-name (class-name class)) *valued-option-names*))
-
-(defmacro defoption (class superclasses slots &rest options)
-  "Wrapper around defclass for defining a new Clon valued option class."
-  (when (assoc :metaclass options)
-    (error "Defining valued option class ~S: explicit meta-class option." class))
-  `(defclass ,class (,@superclasses valued-option)
-    ,slots
-    ,@options
-    (:metaclass valued-option-class)))
-
-
-;; -------------------------
-;; Option searching protocol
-;; -------------------------
+;; ----------------------
+;; Option search protocol
+;; ----------------------
 
 (defmethod option-sticky-distance ((option valued-option) namearg)
   "Try to match OPTION's short name with a sticky argument against NAMEARG.
@@ -119,9 +95,13 @@ If OPTION matches, return its short name's length; otherwise 0."
 
 
 
-;; ===========================================================================
+;; ==========================================================================
 ;; The Conversion Protocol
-;; ===========================================================================
+;; ==========================================================================
+
+;; ---------------------------
+;; The value check subprotocol
+;; ---------------------------
 
 (define-condition invalid-value (option-error)
   ((value :documentation "The invalid value."
@@ -136,11 +116,6 @@ If OPTION matches, return its short name's length; otherwise 0."
 	       (option error) (value error) (comment error))))
   (:documentation "An invalid value error."))
 
-(defun read-value ()
-  "Read an option value from standard input."
-  (format t "Please type in the new value:~%")
-  (list (read)))
-
 (defgeneric check-value (valued-option value)
   (:documentation "Check that VALUE is valid for VALUED-OPTION.
 If VALUE is valid, return it. Otherwise, raise an invalid-value error.")
@@ -148,6 +123,11 @@ If VALUE is valid, return it. Otherwise, raise an invalid-value error.")
     "Bypass the provided user method if VALUE is nil and OPTION is nullable."
     (unless (and (nullablep option) (null value))
       (call-next-method))))
+
+(defun read-value ()
+  "Read an option value from standard input."
+  (format t "Please type in the new value:~%")
+  (list (read)))
 
 (defun restartable-check-value (valued-option value)
   "Restartably check that VALUE is valid for VALUED-OPTION.
@@ -158,6 +138,11 @@ the one that was provided."
       :report "Use another value instead."
       :interactive read-value
       (restartable-check-value valued-option value))))
+
+
+;; ------------------------------
+;; The argument check subprotocol
+;; ------------------------------
 
 (define-condition invalid-argument (option-error)
   ((argument :documentation "The invalid argument."
@@ -173,14 +158,14 @@ the one that was provided."
 	       (option error) (argument error) (comment error))))
   (:documentation "An invalid argument error."))
 
+(defgeneric convert (valued-option argument)
+  (:documentation "Convert ARGUMENT to VALUED-OPTION's value.
+If ARGUMENT is invalid, raise an invalid-argument error."))
+
 (defun read-argument ()
   "Read an option argument from standard input."
   (format t "Please type in the new argument:~%")
   (list (read-line)))
-
-(defgeneric convert (valued-option argument)
-  (:documentation "Convert ARGUMENT to VALUED-OPTION's value.
-If ARGUMENT is invalid, raise an invalid-argument error."))
 
 ;; #### NOTE: the restarts provided here are actually not used because
 ;; conversion errors are caught by a handler-case in the retrieval routines,
@@ -213,7 +198,37 @@ Available restarts are:
 
 
 ;; ==========================================================================
-;; Value Option Creation
+;; Valued Option Subclass Creation
+;; ==========================================================================
+
+(defclass valued-option-class (standard-class)
+  ()
+  (:documentation "The VALUED-OPTION-CLASS class.
+This is the meta-class for all valued options, that is, for all
+subclasses of the VALUED-OPTION class."))
+
+(defvar *valued-option-names* nil
+  "The list of known valued option names.")
+
+(defmethod initialize-instance :after
+    ((class valued-option-class) &key direct-superclasses direct-slots)
+  "Register CLASS as a new valued option class."
+  (declare (ignore direct-superclasses direct-slots))
+  (pushnew (symbol-name (class-name class)) *valued-option-names*))
+
+(defmacro defoption (class superclasses slots &rest options)
+  "Wrapper around defclass for defining a new Clon valued option class."
+  (when (assoc :metaclass options)
+    (error "Defining valued option class ~S: explicit meta-class option." class))
+  `(defclass ,class (,@superclasses valued-option)
+    ,slots
+    ,@options
+    (:metaclass valued-option-class)))
+
+
+
+;; ==========================================================================
+;; Valued Option Instance Creation
 ;; ==========================================================================
 
 (defmethod initialize-instance :before
