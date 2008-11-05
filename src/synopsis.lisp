@@ -39,22 +39,32 @@
 ;; The Option Mapping Protocol
 ;; ==========================================================================
 
+;; #### NOTE: there are two very good reasons for updating the traversal state
+;; of traversable objects in an after method, as done below:
+;; 1/ this is obviously the right thing to do,
+;; 2/ moving it away from the primary method makes this primary method return
+;;    the value of FUNC itself when FUNC is actually called. This is an
+;;    important idiom because callers might want to rely on the return value
+;;    of (the last computation of) mapoptions, especially when used through
+;;    the DO-OPTIONS below. See for example the function SEARCH-OPTION-BY-NAME
+;;    in context.lisp.
 (defgeneric mapoptions (func there)
   (:documentation "Map FUNC over all options in THERE.")
   (:method (func elsewhere)
     "Do nothing by default."
     (values))
+  (:method :after (func (traversable traversable))
+    "Mark TRAVERSABLE as traversed."
+    (setf (traversedp traversable) t))
   (:method (func (container container))
     "Map FUNC over all containers or options in CONTAINER."
     (unless (traversedp container)
       (dolist (item (container-items container))
-	(mapoptions func item))
-      (setf (traversedp container) t)))
+	(mapoptions func item))))
   (:method (func (option option))
     "Call FUNC on OPTION."
     (unless (traversedp option)
-      (funcall func option)
-      (setf (traversedp option) t))))
+      (funcall func option))))
 
 (defmacro do-options ((opt there) &body body)
   "Execute BODY with OPT bound to every option in THERE."
