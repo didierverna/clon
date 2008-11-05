@@ -5,7 +5,7 @@
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Tue Oct  7 21:25:03 2008
-;; Last Revision: Wed Nov  5 18:26:06 2008
+;; Last Revision: Wed Nov  5 18:33:04 2008
 
 ;; This file is part of Clon.
 
@@ -121,6 +121,9 @@ If OPTION matches, return its short name's length; otherwise 0."
 If VALUE is valid, return it. Otherwise, raise an invalid-value error.")
   (:method :around ((option valued-option) value)
     "Bypass the provided user method if VALUE is nil and OPTION is nullable."
+    ;; #### NOTE: check-value must return the value if it is valid. This is
+    ;; exactly what happens below when the unless clause fails (it returns
+    ;; nil).
     (unless (and (nullablep option) (null value))
       (call-next-method))))
 
