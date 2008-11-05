@@ -223,14 +223,14 @@ This function returns two values:
 - the retrieved value,
 - the new command-line (possibly with the first item popped if the option
   requires an argument).")
-  ;; Method for flags:
-  (:method ((flag flag) cmdline-name  &optional cmdline-argument cmdline)
-    ;; CMDLINE-ARGUMENT might be non-nil when a flag was given a spurious
-    ;; argument through an =-syntax.
+  ;; Method for non-valued options (currently, only falgs):
+  (:method ((option option) cmdline-name  &optional cmdline-argument cmdline)
+    ;; CMDLINE-ARGUMENT might be non-nil when a non-valued option was given a
+    ;; spurious argument through an =-syntax.
     (if cmdline-argument
 	(restartable-spurious-cmdline-argument-error
-	 (flag cmdline-name cmdline-argument)
-	 (values t cmdline))
+	    (option cmdline-name cmdline-argument)
+	  (values t cmdline))
 	(values t cmdline)))
   ;; Method for all valued options:
   (:method ((option valued-option) cmdline-name &optional cmdline-argument cmdline)
