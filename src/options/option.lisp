@@ -71,8 +71,8 @@ This is the base class for all options."))
 ;; ------------------
 
 (defmethod untraverse ((option option))
-  "OPTION is a terminal object: do nothing."
-  (values))
+  "OPTION is a terminal object: just return it."
+  option)
 
 
 
