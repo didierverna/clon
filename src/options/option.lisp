@@ -5,7 +5,7 @@
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Wed Jul  2 14:26:44 2008
-;; Last Revision: Wed Jul  2 14:26:44 2008
+;; Last Revision: Wed Nov  5 14:30:09 2008
 
 ;; This file is part of Clon.
 
@@ -35,22 +35,9 @@
 (in-readtable :clon)
 
 
-;; ============================================================================
-;; Error Management
-;; ============================================================================
-
-(define-condition option-error (error)
-  ((option :documentation "The concerned option."
-	   :type option
-	   :initarg :option
-	   :reader option))
-  (:documentation "An error related to an option."))
-
-
-
-;; ============================================================================
+;; ==========================================================================
 ;; The Option Class
-;; ============================================================================
+;; ==========================================================================
 
 (defabstract option (traversable)
   ((short-name :documentation "The option's short name."
@@ -77,43 +64,6 @@
     :internal nil)
   (:documentation "The OPTION class.
 This is the base class for all options."))
-
-(defmethod initialize-instance :before
-    ((option option) &key short-name long-name description internal)
-  "Check validity of the name-related initargs."
-  (when internal
-    (assert (not (or (zerop (length long-name))
-		     (zerop (length description))))))
-  (unless (or short-name long-name)
-    (error "Option ~A: no name given." option))
-  (when (and long-name (zerop (length long-name)))
-    (error "Option ~A: empty long name." option))
-  (when (and short-name (zerop (length short-name)))
-    (error "Option ~A: empty short name." option))
-  (when (and short-name long-name (string= short-name long-name))
-    (error "Option ~A: short and long names identical." option))
-  ;; Short names can't begin with a dash because that would conflict with
-  ;; the long name syntax.
-  (when (and short-name (beginning-of-string-p "-" short-name))
-    (error "Option ~A: short name begins with a dash." option))
-  ;; Clon uses only long names, not short ones. But it's preferable to
-  ;; reserve the prefix in both cases.
-  (unless internal
-    (dolist (name (list short-name long-name))
-      (when (and name (or (string= name "clon")
-			  (beginning-of-string-p "clon-" name)))
-	(error "Option ~A: name ~S reserved by Clon." option name)))))
-
-(defmethod initialize-instance :around
-    ((option option) &rest keys &key long-name env-var internal)
-  "If INTERNAL, prefix LONG-NAME with \"clon-\" and ENV-VAR with \"CLON_\"."
-  (when internal
-    (setq long-name (concatenate 'string "clon-" long-name))
-    (setq keys (list* :long-name long-name (remove-keys keys :long-name)))
-    (when env-var
-      (setq env-var (concatenate 'string "CLON_" env-var))
-      (setq keys (list* :env-var env-var (remove-keys keys :env-var)))))
-  (apply #'call-next-method option keys))
 
 
 ;; ------------------
