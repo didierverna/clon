@@ -39,7 +39,7 @@
 ;; The Container Class
 ;; ============================================================================
 
-(defclass container (traversable)
+(defabstract container (traversable)
   ((items :documentation "The items in the container."
 	  :type list
 	  :initform nil
