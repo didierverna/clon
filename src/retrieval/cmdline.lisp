@@ -274,10 +274,8 @@ This function returns two values:
   (:method ((option valued-option))
     (restartable-invalid-+-syntax-error (option)
       (retrieve-from-short-call option)))
-  ;; Plus calls for switches and xswitches means nil:
-  (:method ((switch switch))
-    nil)
-  (:method ((xswitch xswitch))
+  ;; Method for plus-callable options (currently, only [x]switches):
+  (:method ((plus-callable plus-callable))
     nil))
 
 

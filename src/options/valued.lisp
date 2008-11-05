@@ -5,7 +5,7 @@
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Tue Oct  7 21:25:03 2008
-;; Last Revision: Wed Nov  5 10:13:56 2008
+;; Last Revision: Wed Nov  5 18:26:06 2008
 
 ;; This file is part of Clon.
 
@@ -277,6 +277,32 @@ ARGUMENT-REQUIRED-P slot."
     (handler-case (check-value option default-value)
       (invalid-value ()
 	(error "Option ~A: invalid default value ~S." option default-value)))))
+
+
+
+;; ==========================================================================
+;; The Plus Callable Class
+;; ==========================================================================
+
+;; #### NOTE: this class is currently only used for [x]switches.
+(defclass plus-callable ()
+  ()
+  (:documentation "The PLUS-CALLABLE Class.
+This class is a mixin used to authorize the +-syntax for some options."))
+
+;; #### PORTME.
+(defmethod sb-mop:validate-superclass
+    ((class valued-option-class) (superclass standard-class))
+  t)
+
+
+;; -------------------
+;; Char packs protocol
+;; -------------------
+
+(defmethod plus-pack-char ((plus-callable plus-callable) &optional as-string)
+  "Return PLUS-CALLABLE plus pack character, if any."
+  (potential-pack-char plus-callable as-string))
 
 
 ;;; valued.lisp ends here

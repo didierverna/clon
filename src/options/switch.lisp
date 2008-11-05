@@ -52,7 +52,7 @@
 ;; value is given by the -/+ call. When the argument is optional, omitting it
 ;; is equivalent to saying yes.
 
-(defoption switch ()
+(defoption switch (plus-callable)
   ((argument-name ;; inherited from the VALUED-OPTION class
     :documentation "The option's argument style."
     :initarg :argument-style
@@ -87,7 +87,7 @@ This class implements boolean options."))
 
 (defmethod option-sticky-distance ((switch switch) namearg)
   "Return 0 (switches don't accept sticky arguments)."
-  ;; #### NOTE: see related comment in the FLAG method.
+  ;; #### NOTE: see related comment in the OPTION method.
   0)
 
 
@@ -102,9 +102,6 @@ This class implements boolean options."))
   ;; impact on long calls.
   (potential-pack-char switch as-string))
 
-(defmethod plus-pack-char ((switch switch) &optional as-string)
-  "Return SWITCH's plus pack character, if any."
-  (potential-pack-char switch as-string))
 
 
 ;; -------------------

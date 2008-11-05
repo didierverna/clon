@@ -39,7 +39,7 @@
 ;; The Extended Switch Class
 ;; ==========================================================================
 
-(defoption xswitch ()
+(defoption xswitch (plus-callable)
   ((nullablep ;; inherited from the VALUED-OPTION class
     :initform t)
    (yes-values :documentation "The possible 'yes' values."
@@ -60,15 +60,6 @@
   (:documentation "The XSWITCH class.
 This class implements switches extended with enumeration values.
 The plus-syntax is available for extended xswitches."))
-
-
-;; -------------------
-;; Char packs protocol
-;; -------------------
-
-(defmethod plus-pack-char ((xswitch xswitch) &optional as-string)
-  "Return XSWITCH's plus pack character, if any."
-  (potential-pack-char xswitch as-string))
 
 
 ;; -------------------
