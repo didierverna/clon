@@ -5,7 +5,7 @@
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Tue Jul  1 16:08:02 2008
-;; Last Revision: Tue Jul  1 16:08:02 2008
+;; Last Revision: Wed Nov  5 10:54:32 2008
 
 ;; This file is part of Clon.
 
@@ -35,15 +35,9 @@
 (in-readtable :clon)
 
 
-;; ============================================================================
-;; The Command-Line Items
-;; ============================================================================
-
-(defstruct cmdline-option
-  name ;; the option's name as used on the cmdline
-  option ;; the corresponding option object
-  value ;; the converted option's cmdline value
-  )
+;; ==========================================================================
+;; Command-line error management (not regarding known options)
+;; ==========================================================================
 
 (define-condition invalid--=-syntax (cmdline-error)
   ()
@@ -108,9 +102,16 @@
   (:documentation "An error related to an unknown command-line option."))
 
 
-;; ============================================================================
+
+;; ==========================================================================
 ;; The Context Class
-;; ============================================================================
+;; ==========================================================================
+
+(defstruct cmdline-option
+  name ;; the option's name as used on the cmdline
+  option ;; the corresponding option object
+  value ;; the converted option's cmdline value
+  )
 
 (defclass context ()
   ((synopsis :documentation "The program synopsis."
@@ -121,7 +122,7 @@
 	     :type string
 	     :reader progname)
    (cmdline-options :documentation "The options from the command-line."
-	  :type list
+	  :type list ;; of cmdline-option objects
 	  :accessor cmdline-options)
    (remainder :documentation "The non-Clon part of the command-line."
 	      :type list
@@ -178,9 +179,9 @@ options based on it."))
 
 
 
-;; ===========================================================================
+;; =========================================================================
 ;; The Option Search Protocol
-;; ===========================================================================
+;; =========================================================================
 
 (defun search-option-by-name (context &rest keys &key short-name long-name)
   "Search for option with either SHORT-NAME or LONG-NAME in SYNOPSIS.
@@ -246,9 +247,9 @@ When such an option exists, return two values:
 
 
 
-;; ============================================================================
+;; ==========================================================================
 ;; The Option Retrieval Protocol
-;; ============================================================================
+;; ==========================================================================
 
 (defun getopt (context &rest keys
 		       &key short-name long-name option
@@ -340,7 +341,7 @@ command-line) and retrieved value."
 
 
 ;; ==========================================================================
-;; Context Creation
+;; Context Instance Creation
 ;; ==========================================================================
 
 (defmethod initialize-instance :before ((context context) &key synopsis)
@@ -368,7 +369,7 @@ If PLUS, read a plus call or pack. Otherwise, read a short call or minus pack."
 (defmethod initialize-instance :after ((context context) &key cmdline)
   "Parse CMDLINE."
   (setf (slot-value context 'progname) (pop cmdline))
-  ;; Step one: parse the command-line ========================================
+  ;; Step one: parse the command-line =======================================
   (let ((cmdline-options (list))
 	(remainder (list)))
     (macrolet ((push-cmdline-option (place &rest body)
@@ -606,7 +607,7 @@ CONTEXT is where to look for the options."
 			(restartable-cmdline-junk-error arg)))))))
       (setf (cmdline-options context) (nreverse cmdline-options))
       (setf (slot-value context 'remainder) remainder)))
-  ;; Step two: Treat internal options ========================================
+  ;; Step two: handle internal options ======================================
   (when (getopt context :long-name "clon-banner")
     (format t "~A is powered by the Clon library, version ~A,
 written by Didier Verna <didier@lrde.epita.fr>.

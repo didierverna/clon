@@ -5,7 +5,7 @@
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Tue Oct 28 13:50:08 2008
-;; Last Revision: Tue Oct 28 13:50:08 2008
+;; Last Revision: Wed Nov  5 10:27:47 2008
 
 ;; This file is part of Clon.
 
@@ -35,9 +35,9 @@
 (in-readtable :clon)
 
 
-;; ============================================================================
+;; ==========================================================================
 ;; The Enum Option Class
-;; ============================================================================
+;; ==========================================================================
 
 (defoption enum ()
   ((argument-name ;; inherited from the VALUED-OPTION class

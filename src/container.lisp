@@ -5,7 +5,7 @@
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Wed Jul  2 10:02:47 2008
-;; Last Revision: Wed Jul  2 10:02:47 2008
+;; Last Revision: Wed Nov  5 10:31:43 2008
 
 ;; This file is part of Clon.
 
@@ -35,9 +35,9 @@
 (in-readtable :clon)
 
 
-;; ============================================================================
+;; ==========================================================================
 ;; The Container Class
-;; ============================================================================
+;; ==========================================================================
 
 (defabstract container (traversable)
   ((items :documentation "The items in the container."
@@ -85,9 +85,9 @@ command-line hierarchy."))
 
 
 
-;; ============================================================================
+;; ==========================================================================
 ;; The Sealing Protocol
-;; ============================================================================
+;; ==========================================================================
 
 (defgeneric seal (container)
   (:documentation "Seal CONTAINER.")
@@ -105,9 +105,9 @@ command-line hierarchy."))
 
 
 
-;; ============================================================================
+;; ==========================================================================
 ;; The Addition Protocol
-;; ============================================================================
+;; ==========================================================================
 
 ;; #### NOTE: there's actually only one primary method for this function, as
 ;; defined below. The use of a generic function is a bit overkill, but it

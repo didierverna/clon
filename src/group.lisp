@@ -5,7 +5,7 @@
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Tue Jul  1 15:52:44 2008
-;; Last Revision: Tue Jul  1 15:52:44 2008
+;; Last Revision: Wed Nov  5 10:31:20 2008
 
 ;; This file is part of Clon.
 
@@ -35,9 +35,9 @@
 (in-readtable :clon)
 
 
-;; ============================================================================
+;; ==========================================================================
 ;; The Group class
-;; ============================================================================
+;; ==========================================================================
 
 (defclass group (container)
   ()
@@ -45,15 +45,15 @@
 This class groups other groups, options or strings together, effectively
 implementing hierarchical program command-line."))
 
+
+
+;; ==========================================================================
+;; Group Instance Creation
+;; ==========================================================================
+
 (defun make-group ()
   "Make a new group."
   (make-instance 'group))
-
-
-
-;; ============================================================================
-;; Convenience Group definition
-;; ============================================================================
 
 (defmacro define-group (group &body body)
   "Evaluate BODY with GROUP bound to a new group, seal it and return it."
