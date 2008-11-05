@@ -247,19 +247,18 @@ This function returns two values:
 - the retrieved value,
 - the new command-line (possibly with the first item popped if the option
   requires an argument).")
-  ;; Method for flags:
-  (:method ((flag flag) &optional cmdline-argument cmdline)
+  ;; Method for non-valued options (currently, only flags):
+  (:method ((option option) &optional cmdline-argument cmdline)
     ;; See comment about this assertion in OPTION-STICKY-DISTANCE.
     (assert (null cmdline-argument))
     (values t cmdline))
-  ;; Method for all valued options (but switches):
+  ;; Method for valued options:
   (:method ((option valued-option) &optional cmdline-argument cmdline)
     (maybe-pop-argument cmdline option cmdline-argument)
     (values
      (restartable-cmdline-convert option (short-name option) cmdline-argument)
      cmdline))
-  ;; Special case for switches because they don't take arguments in short
-  ;; form:
+  ;; Switches don't take arguments in short form:
   (:method ((switch switch) &optional cmdline-argument cmdline)
     ;; See comment about this assertion in SEARCH-STICKY-OPTION.
     (assert (null cmdline-argument))
@@ -267,18 +266,17 @@ This function returns two values:
 
 (defgeneric retrieve-from-plus-call (option)
   (:documentation "Retrieve OPTION's value from a plus call.")
-  ;; Method for flags:
-  (:method ((flag flag))
-    (restartable-invalid-+-syntax-error (flag)
+  ;; Method for non-valued options (currently, only flags):
+  (:method ((option option))
+    (restartable-invalid-+-syntax-error (option)
       t))
-  ;; Method for all valued options (but switches):
+  ;; Method for valued options:
   (:method ((option valued-option))
     (restartable-invalid-+-syntax-error (option)
       (retrieve-from-short-call option)))
-  ;; Special case for switches:
+  ;; Plus calls for switches and xswitches means nil:
   (:method ((switch switch))
     nil)
-  ;; Special case for xswitches:
   (:method ((xswitch xswitch))
     nil))
 
