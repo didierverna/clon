@@ -72,3 +72,12 @@ which case we might use nil as a fallback or a default value. However, only
 the PATH option class can lead to a null value from user input (stropts and
 enums can't). Should we change this, or just let the user provide new option
 classes to do so ?
+
+* Better detection of minus-packs
+When parsing a short call, we try a known option, a known option with a sticky
+argument, a pack, and then barf. Sometimes, a pack can be mistaken for a known
+option with a sticky (however invalid) argument. For instance, suppose we have
+a -d switch and a -v flag. Using -dv will lead to an invalid argument to -d,
+whereas the user probably meant -v -d (or -vd which works). We could improve
+the detection of this situation by catching the invalid argument error, and
+then trying a pack instead of immediately reporting the error.
