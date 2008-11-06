@@ -192,7 +192,7 @@ If AS-STRING, return a string of that character.")
   (:documentation "Return OPTION's plus pack character, if any.
 If AS-STRING, return a string of that character.")
   (:method ((option option) &optional as-string)
-    "Return nil (only switches are plus-packable)."
+    "Return nil (only the switch hierarchy is plus-packable)."
     (declare (ignore as-string))
     nil))
 

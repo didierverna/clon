@@ -47,10 +47,8 @@
 ;;  --boolean[=yes(no)]                 long name,  optional argument
 ;;  --boolean=yes(no)                   long name,  required argument
 
-;; Switches arguments are optional by default. This is only meaningful for
-;; long-name syntax, though, because short names never take an argument (the
-;; value is given by the -/+ call. When the argument is optional, omitting it
-;; is equivalent to saying yes.
+;; Switches arguments are optional by default. When the argument is optional,
+;; omitting it is equivalent to saying yes.
 
 (defoption switch (plus-callable)
   ((argument-name ;; inherited from the VALUED-OPTION class
@@ -79,29 +77,6 @@
     :argument-style :yes/no)
   (:documentation "The SWITCH class.
 This class implements boolean options."))
-
-
-;; ----------------------
-;; Option search protocol
-;; ----------------------
-
-(defmethod option-sticky-distance ((switch switch) namearg)
-  "Return 0 (switches don't accept sticky arguments)."
-  ;; #### NOTE: see related comment in the OPTION method.
-  0)
-
-
-;; -------------------
-;; Char packs protocol
-;; -------------------
-
-(defmethod minus-pack-char ((switch switch) &optional as-string)
-  "Return SWITCH's minus pack character, if any."
-  ;; Here, we don't need to look into the argument type (required or optional)
-  ;; as for other options, because for switches, the argument type only has an
-  ;; impact on long calls.
-  (potential-pack-char switch as-string))
-
 
 
 ;; -------------------

@@ -257,12 +257,7 @@ This function returns two values:
     (maybe-pop-argument cmdline option cmdline-argument)
     (values
      (restartable-cmdline-convert option (short-name option) cmdline-argument)
-     cmdline))
-  ;; Switches don't take arguments in short form:
-  (:method ((switch switch) &optional cmdline-argument cmdline)
-    ;; See comment about this assertion in SEARCH-STICKY-OPTION.
-    (assert (null cmdline-argument))
-    (values t cmdline)))
+     cmdline)))
 
 (defgeneric retrieve-from-plus-call (option)
   (:documentation "Retrieve OPTION's value from a plus call.")
@@ -274,7 +269,7 @@ This function returns two values:
   (:method ((option valued-option))
     (restartable-invalid-+-syntax-error (option)
       (retrieve-from-short-call option)))
-  ;; Method for plus-callable options (currently, only [x]switches):
+  ;; Method for plus-callable options (currently, the switch hierarchy):
   (:method ((plus-callable plus-callable))
     nil))
 

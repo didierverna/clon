@@ -287,11 +287,10 @@ ARGUMENT-REQUIRED-P slot."
 ;; The Plus Callable Class
 ;; ==========================================================================
 
-;; #### NOTE: this class is currently only used for [x]switches.
 (defclass plus-callable ()
   ()
   (:documentation "The PLUS-CALLABLE Class.
-This class is a mixin used to authorize the +-syntax for some options."))
+This class is a mixin used to authorize the +-syntax for the switch hierarchy."))
 
 ;; #### PORTME.
 (defmethod sb-mop:validate-superclass
