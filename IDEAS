@@ -21,18 +21,13 @@ provide another value). For instance, in path options, the converter handles
 ~/ abbreviations. However, this is not valid when typing a value directly,
 which is a shame.
 
-* Treat empty en vars as options called without their (optional argument)
+* Treat empty env vars as options called without their (optional argument)
 With the restriction that there's no notion of an env var set without
 argument. There's only empty arguments. This will lead to problems if the
 option is supposed to accept empty strings.
 
-* Rethink the need for a default value in case of an optional argument
-Is that really required? Consider --phone=..., --fax=... or --fax (meaning
-same as phone), which has no default value. Maybe the answer is a dynamic
-default value (specified as a lambda expression)... hence the following idea:
-
 * Support for dynamic default value / fallback
-which could be computed from a lambda expression when needed.
+computed at run-time from a lambda expression for instance.
 
 * Support for a complete cmdline syntax description
 Currently, there's just the notion of non-Clon remainder, but some programs
@@ -42,10 +37,10 @@ those parts with Clon.
 * Extend abbreviated option matching to dash-parts
 e.g. --f-n == --family-name.
 
-* Extend the path option class to accept wildcards pathnames
+* Extend the path option class to accept wildcards in pathnames
 and expand them into actual directories.
 
-* Extend the path option class not to ignore a final colon
+* Extend the path option class to not ignore a final colon
 Like TeX variables, this would mean to append the built-in path after the
 user-specified part.
 
