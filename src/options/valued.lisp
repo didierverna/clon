@@ -287,6 +287,11 @@ ARGUMENT-REQUIRED-P slot."
 ;; The Plus Callable Class
 ;; ==========================================================================
 
+;; #### NOTE: currently, only the yes/no hierarchy is plus-callable (the +
+;; syntax meaning to return nil). The need for other kinds of plus-callable
+;; options might pop up someday. Then, it would be advisable to design a
+;; mechanism by which a + call would return something else than nil, actually
+;; defined by the option class. A slot in the class below would do I think.
 (defclass plus-callable ()
   ()
   (:documentation "The PLUS-CALLABLE Class.

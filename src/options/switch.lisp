@@ -50,7 +50,7 @@
 ;; Switches arguments are optional by default. When the argument is optional,
 ;; omitting it is equivalent to saying yes.
 
-(defoption switch (plus-callable)
+(defoption switch (yes/no)
   ((argument-name ;; inherited from the VALUED-OPTION class
     :documentation "The option's argument style."
     :initarg :argument-style
@@ -61,17 +61,7 @@
 		    :allocation :class
 		    :type list
 		    :initform '(:yes/no :on/off :true/false :yup/nope)
-		    :accessor argument-styles)
-   (yes-values :documentation "The possible 'yes' values."
-	       :allocation :class
-	       :type list
-	       :initform '("yes" "on" "true" "yup")
-	       :accessor yes-values)
-   (no-values :documentation "The possible 'no' values."
-	      :allocation :class
-	      :type list
-	      :initform '("no" "off" "false" "nope")
-	      :accessor no-values))
+		    :accessor argument-styles))
   (:default-initargs
     :argument-type :optional
     :argument-style :yes/no)
@@ -96,21 +86,16 @@ This class implements boolean options."))
 (defmethod convert ((switch switch) argument)
   "Convert (possibly abbreviated) ARGUMENT to SWITCH's value.
 If ARGUMENT is not valid for a switch, raise a conversion error."
-  (let ((match (closest-match argument
-			      (append (yes-values switch) (no-values switch))
-			      :ignore-case t)))
-    (cond ((member match (yes-values switch) :test #'string-equal)
-	   t)
-	  ((member match (no-values switch) :test #'string-equal)
-	   nil)
-	  (t
-	   (error 'invalid-argument
-		  :option switch
-		  :argument argument
-		  :comment (format nil "Valid arguments are: ~A."
-			     (list-to-string
-			      (append (yes-values switch)
-				      (no-values switch)))))))))
+  (handler-case (call-next-method) ;; the yes/no method
+    ;; #### See the FIXME in yesno.
+    (t ()
+       (error 'invalid-argument
+	      :option switch
+	      :argument argument
+	      :comment (format nil "Valid arguments are: ~A."
+			 (list-to-string
+			  (append (yes-values switch)
+				  (no-values switch))))))))
 
 
 
