@@ -39,17 +39,16 @@
 ;; The Extended Switch Class
 ;; ==========================================================================
 
-(defoption xswitch (yes/no)
+(defoption xswitch (switch-base enum-base)
   ((nullablep ;; inherited from the VALUED-OPTION class
     :initform t)
-   (enum :documentation "The set of possible non-boolean values."
-	 :initarg :enum
-	 :reader enum))
+   (enum ;; inherited from the ENUM-BASE class
+    :documentation "The set of possible non-boolean values."))
   (:default-initargs
       :argument-type :optional)
   (:documentation "The XSWITCH class.
 This class merges the functionalities of switches and enumerations.
-The plus-syntax is available for extended xswitches."))
+As such, the plus-syntax is available for extended xswitches."))
 
 
 ;; -------------------
@@ -77,19 +76,23 @@ The plus-syntax is available for extended xswitches."))
 (defmethod convert ((xswitch xswitch) argument)
   "Convert (possibly abbreviated) ARGUMENT to XSWITCH's value.
 If ARGUMENT is not valid for an xswitch, raise a conversion error."
-  (handler-case (call-next-method) ;; the yes/no method
-    ;; #### See the FIXME in yesno.
-    (t ()
-       (or (closest-match argument (enum xswitch)
-			  :ignore-case t :key #'symbol-name)
+  (let* ((other-values (mapcar #'symbol-to-string (enum xswitch)))
+	 (all-values (append (yes-values xswitch)
+			     (no-values xswitch)
+			     other-values))
+	 (match (closest-match argument all-values :ignore-case t)))
+    (cond ((member match (yes-values xswitch) :test #'string-equal)
+	   t)
+	  ((member match (no-values xswitch) :test #'string-equal)
+	   nil)
+	  ((member match other-values :test #'string-equal)
+	   (intern (string-upcase match) "KEYWORD"))
+	  (t
 	   (error 'invalid-argument
 		  :option xswitch
 		  :argument argument
-		  :comment (format nil "Valid arguments are: ~A, ~A."
-			     (list-to-string
-			      (append (yes-values xswitch)
-				      (no-values xswitch)))
-			     (symbols-to-string (enum xswitch))))))))
+		  :comment (format nil "Valid arguments are: ~A."
+			     (list-to-string all-values)))))))
 
 
 

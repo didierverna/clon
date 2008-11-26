@@ -87,11 +87,13 @@ KEY should provide a way to get a string from each LIST element."
 	  list
 	  :key key))
 
+(defun symbol-to-string (symbol)
+  "Return SYMBOL name downcased."
+  (string-downcase (symbol-name symbol)))
+
 (defun symbols-to-string (symbols)
   "Return a coma-separated list of downcased SYMBOLS names."
-  (list-to-string symbols
-		  :key (lambda (symbol)
-			 (string-downcase (symbol-name symbol)))))
+  (list-to-string symbols :key #'symbol-to-string))
 
 
 

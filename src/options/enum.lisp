@@ -39,12 +39,9 @@
 ;; The Enum Option Class
 ;; ==========================================================================
 
-(defoption enum ()
+(defoption enum (enum-base)
   ((argument-name ;; inherited from the VALUED-OPTION class
-    :initform "TYPE")
-   (enum :documentation "The set of possible values."
-	 :initarg :enum
-	 :reader enum))
+    :initform "TYPE"))
   (:documentation "The ENUM class.
 This class implements options whose values belong to a set of keywords."))
 

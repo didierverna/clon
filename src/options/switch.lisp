@@ -50,7 +50,7 @@
 ;; Switches arguments are optional by default. When the argument is optional,
 ;; omitting it is equivalent to saying yes.
 
-(defoption switch (yes/no)
+(defoption switch (switch-base)
   ((argument-name ;; inherited from the VALUED-OPTION class
     :documentation "The option's argument style."
     :initarg :argument-style
@@ -86,16 +86,20 @@ This class implements boolean options."))
 (defmethod convert ((switch switch) argument)
   "Convert (possibly abbreviated) ARGUMENT to SWITCH's value.
 If ARGUMENT is not valid for a switch, raise a conversion error."
-  (handler-case (call-next-method) ;; the yes/no method
-    ;; #### See the FIXME in yesno.
-    (t ()
-       (error 'invalid-argument
-	      :option switch
-	      :argument argument
-	      :comment (format nil "Valid arguments are: ~A."
-			 (list-to-string
-			  (append (yes-values switch)
-				  (no-values switch))))))))
+  (let ((match (closest-match argument
+			      (append (yes-values switch) (no-values switch))
+			      :ignore-case t)))
+    (cond ((member match (yes-values switch) :test #'string-equal)
+	   t)
+	  ((member match (no-values switch) :test #'string-equal)
+	   nil)
+	  (t
+	   (error 'invalid-argument
+		  :option switch
+		  :argument argument
+		  :comment (format nil "Valid arguments are: ~A."
+			     (list-to-string (append (yes-values switch)
+						     (no-values switch)))))))))
 
 
 

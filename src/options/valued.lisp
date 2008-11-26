@@ -312,4 +312,37 @@ This class is a mixin used to authorize the +-syntax for the switch hierarchy.")
   (potential-pack-char plus-callable as-string))
 
 
+
+;; ==========================================================================
+;; The SWITCH-BASE Class
+;; ==========================================================================
+
+(defabstract switch-base (plus-callable)
+  ((yes-values :documentation "The possible 'yes' values."
+	       :allocation :class
+	       :type list
+	       :initform '("yes" "on" "true" "yup")
+	       :accessor yes-values)
+   (no-values :documentation "The possible 'no' values."
+	      :allocation :class
+	      :type list
+	      :initform '("no" "off" "false" "nope")
+	      :accessor no-values))
+  (:documentation "The SWITCH-BASE abstract class.
+This class provides support for options including boolean values."))
+
+
+
+;; ==========================================================================
+;; The ENUM-BASE Class
+;; ==========================================================================
+
+(defabstract enum-base ()
+  ((enum :documentation "The set of possible values."
+	 :initarg :enum
+	 :reader enum))
+  (:documentation "The ENUM-BASE abstract class.
+This class provides support for options including enumerated values."))
+
+
 ;;; valued.lisp ends here
