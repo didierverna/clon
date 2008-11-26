@@ -39,26 +39,16 @@
 ;; The Extended Switch Class
 ;; ==========================================================================
 
-(defoption xswitch (plus-callable)
+(defoption xswitch (yes/no)
   ((nullablep ;; inherited from the VALUED-OPTION class
     :initform t)
-   (yes-values :documentation "The possible 'yes' values."
-	       :allocation :class
-	       :type list
-	       :initform '("yes" "on" "true" "yup")
-	       :accessor yes-values)
-   (no-values :documentation "The possible 'no' values."
-	      :allocation :class
-	      :type list
-	      :initform '("no" "off" "false" "nope")
-	      :accessor no-values)
    (enum :documentation "The set of possible non-boolean values."
 	 :initarg :enum
 	 :reader enum))
   (:default-initargs
       :argument-type :optional)
   (:documentation "The XSWITCH class.
-This class implements switches extended with enumeration values.
+This class merges the functionalities of switches and enumerations.
 The plus-syntax is available for extended xswitches."))
 
 
@@ -87,24 +77,19 @@ The plus-syntax is available for extended xswitches."))
 (defmethod convert ((xswitch xswitch) argument)
   "Convert (possibly abbreviated) ARGUMENT to XSWITCH's value.
 If ARGUMENT is not valid for an xswitch, raise a conversion error."
-  (let ((match (closest-match argument
-			      (append (yes-values xswitch) (no-values xswitch))
-			      :ignore-case t)))
-    (cond ((member match (yes-values xswitch) :test #'string-equal)
-	   t)
-	  ((member match (no-values xswitch) :test #'string-equal)
-	   nil)
-	  (t
-	   (or (closest-match argument (enum xswitch)
-			      :ignore-case t :key #'symbol-name)
-	       (error 'invalid-argument
-		      :option xswitch
-		      :argument argument
-		      :comment (format nil "Valid arguments are: ~A, ~A."
-				 (list-to-string
-				  (append (yes-values xswitch)
-					  (no-values xswitch)))
-				 (symbols-to-string (enum xswitch)))))))))
+  (handler-case (call-next-method) ;; the yes/no method
+    ;; #### See the FIXME in yesno.
+    (t ()
+       (or (closest-match argument (enum xswitch)
+			  :ignore-case t :key #'symbol-name)
+	   (error 'invalid-argument
+		  :option xswitch
+		  :argument argument
+		  :comment (format nil "Valid arguments are: ~A, ~A."
+			     (list-to-string
+			      (append (yes-values xswitch)
+				      (no-values xswitch)))
+			     (symbols-to-string (enum xswitch))))))))
 
 
 
