@@ -331,6 +331,13 @@ This class is a mixin used to authorize the +-syntax for the switch hierarchy.")
   (:documentation "The SWITCH-BASE abstract class.
 This class provides support for options including boolean values."))
 
+(defmethod initialize-instance :around
+    ((switch-base switch-base) &rest keys &key argument-type)
+  "Provide a fallback value of t when argument is optional."
+  (when (eq argument-type :optional)
+    (setq keys (list* :fallback-value t keys)))
+  (apply #'call-next-method switch-base keys))
+
 
 
 ;; ==========================================================================

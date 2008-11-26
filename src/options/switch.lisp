@@ -112,13 +112,6 @@ If ARGUMENT is not valid for a switch, raise a conversion error."
   (unless (member argument-style (argument-styles switch))
     (error "Invalid switch argument style ~S." argument-style)))
 
-(defmethod initialize-instance :around
-    ((switch switch) &rest keys &key argument-type)
-  "Provide a fallback value of t when SWITCH's argument is optional."
-  (when (eq argument-type :optional)
-    (setq keys (list* :fallback-value t keys)))
-  (apply #'call-next-method switch keys))
-
 (defun make-switch (&rest keys &key short-name long-name description
 				   argument-style argument-type
 				   env-var default-value)

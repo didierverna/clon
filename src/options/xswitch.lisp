@@ -106,13 +106,6 @@ If ARGUMENT is not valid for an xswitch, raise a conversion error."
   (unless enum
     (error "XSwitch ~S: empty enum." xswitch)))
 
-(defmethod initialize-instance :around
-    ((xswitch xswitch) &rest keys &key argument-type)
-  "Provide a fallback value of t when XSWITCH's argument is optional."
-  (when (eq argument-type :optional)
-    (setq keys (list* :fallback-value t keys)))
-  (apply #'call-next-method xswitch keys))
-
 (defun make-xswitch (&rest keys &key short-name long-name description
 				    argument-name argument-type
 				    enum env-var default-value)
