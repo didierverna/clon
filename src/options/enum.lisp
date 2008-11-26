@@ -82,11 +82,6 @@ If ARGUMENT doesn't name one of ENUM's symbols, raise a conversion error."
 ;; Enum Instance Creation
 ;; ==========================================================================
 
-(defmethod initialize-instance :before ((e enum) &rest keys &key enum)
-  (declare (ignore keys))
-  (unless enum
-    (error "Enum ~S: empty enum." e)))
-
 (defun make-enum (&rest keys
 		  &key short-name long-name description
 		       argument-name argument-type

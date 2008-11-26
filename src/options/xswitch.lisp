@@ -100,12 +100,6 @@ If ARGUMENT is not valid for an xswitch, raise a conversion error."
 ;; Extended Switch Instance Creation
 ;; ==========================================================================
 
-(defmethod initialize-instance :before
-    ((xswitch xswitch) &rest keys &key enum)
-  (declare (ignore keys))
-  (unless enum
-    (error "XSwitch ~S: empty enum." xswitch)))
-
 (defun make-xswitch (&rest keys &key short-name long-name description
 				    argument-name argument-type
 				    enum env-var default-value)

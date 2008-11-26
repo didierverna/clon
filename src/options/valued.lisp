@@ -351,5 +351,11 @@ This class provides support for options including boolean values."))
   (:documentation "The ENUM-BASE abstract class.
 This class provides support for options including enumerated values."))
 
+(defmethod initialize-instance :before
+    ((enum-base enum-base) &rest keys &key enum)
+  (declare (ignore keys))
+  (unless enum
+    (error "Enum based option ~S: empty enum." enum-base)))
+
 
 ;;; valued.lisp ends here
