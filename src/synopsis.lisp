@@ -149,12 +149,13 @@ cth extension can be omitted."
 		       :fallback-value nil
 		       :default-value "default"
 		       :env-var "THEME"))
-      (add-to subgrp (make-internal-stropt "line-width"
+      (add-to subgrp (make-internal-lispobj "line-width"
 			 "Set Clon's output line width.
 If not given, the terminal size will be used when possible. Otherwise, 80
 columns will be assumed."
 		       :argument-name "WIDTH"
-		       :env-var "WIDTH"))
+		       :env-var "LINE_WIDTH"
+		       :typespec `(integer 1 ,most-positive-fixnum)))
       (add-to subgrp (make-internal-xswitch "highlight"
 			 "Set Clon's output highlighting to on/off/auto.
 Auto (the default) means on for tty output and off otherwise."
