@@ -133,6 +133,8 @@
 	  :reader theme)
    (highlight :documentation "Whether to highlight Clon's output."
 	      :reader highlight)
+   (line-width :documentation "The line width for help display."
+	       :accessor line-width)
    (error-handler :documentation ~"The behavior to adopt on errors "
 			       ~"at command-line parsing time."
 		  :type symbol
@@ -627,7 +629,9 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.~%"
   (setf (slot-value context 'theme)
 	(getopt context :long-name "clon-theme"))
   (setf (slot-value context 'highlight)
-	(getopt context :long-name "clon-highlight")))
+	(getopt context :long-name "clon-highlight"))
+  (setf (slot-value context 'line-width)
+	(getopt context :long-name "clon-line-width")))
 
 (defun make-context
     (&rest keys &key synopsis error-handler getopt-error-handler cmdline)
