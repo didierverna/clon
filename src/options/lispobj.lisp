@@ -64,7 +64,13 @@ This class implements read-from-string options."))
 
 (defmethod convert ((lispobj lispobj) argument)
   "Return the evaluation of ARGUMENT string."
-  (multiple-value-bind (value position) (read-from-string argument)
+  (multiple-value-bind (value position)
+      (handler-case (read-from-string argument)
+	(end-of-file ()
+	  (error 'invalid-argument
+		 :option lispobj
+		 :argument argument
+		 :comment (format nil "Cannot parse argument ~S." argument))))
     (cond ((< position (length argument))
 	   (error 'invalid-argument
 		  :option lispobj
