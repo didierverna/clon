@@ -134,7 +134,8 @@
    (highlight :documentation "Whether to highlight Clon's output."
 	      :reader highlight)
    (line-width :documentation "The line width for help display."
-	       :accessor line-width)
+	       :reader line-width
+	       :initform nil)
    (error-handler :documentation ~"The behavior to adopt on errors "
 			       ~"at command-line parsing time."
 		  :type symbol
