@@ -91,7 +91,12 @@
 	      :reader plus-pack)
    (potential-pack :documentation "The potential pack string."
 		   :type (or null string)
-		   :reader potential-pack)))
+		   :reader potential-pack)
+   (clon-options-group :documentation "The Clon options group."
+		       :type group
+		       :reader clon-options-group))
+  (:documentation "The SYNOPSIS class.
+This class handles the description of the program's command-line options."))
 
 
 ;; ----------------
@@ -165,7 +170,8 @@ Auto (the default) means on for tty output and off otherwise."
       (seal subgrp)
       (add-to grp subgrp))
     (seal grp)
-    (add-to synopsis grp))
+    (add-to synopsis grp)
+    (setf (slot-value synopsis 'clon-options-group) grp))
   (call-next-method))
 
 (defmethod seal :after ((synopsis synopsis))

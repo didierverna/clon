@@ -164,6 +164,10 @@ options based on it."))
   "Return the postfix of CONTEXT's synopsis."
   (postfix (synopsis context)))
 
+(defmethod clon-options-group ((context context))
+  "Return the Clon options group of CONTEXT's synopsis."
+  (clon-options-group (synopsis context)))
+
 (defmethod potential-pack-p (pack (context context))
   "Return t if PACK (a string) is a potential pack in CONTEXT."
   (potential-pack-p pack (synopsis context)))
@@ -179,6 +183,25 @@ options based on it."))
 (defmethod untraverse ((context context))
   "Untraverse CONTEXT synopsis."
   (untraverse (synopsis context)))
+
+
+
+;; =========================================================================
+;; The Usage Protocol
+;; =========================================================================
+
+(defun make-context-sheet (context stream)
+  "Create a STREAM sheet from CONTEXT."
+  ;; #### FIXME: what about the highlight flag ??
+  (make-sheet :stream stream
+	      :line-width (line-width context)
+	      :search-path (search-path context)
+	      :theme (theme context)))
+
+(defun usage (context stream)
+  "Print CONTEXT's synopsis usage on STREAM."
+  '(print-usage (synopsis context) (make-sheet-from-context context stream)
+    #|:show-hidden nil|#))
 
 
 
@@ -632,7 +655,12 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.~%"
   (setf (slot-value context 'highlight)
 	(getopt context :long-name "clon-highlight"))
   (setf (slot-value context 'line-width)
-	(getopt context :long-name "clon-line-width")))
+	(getopt context :long-name "clon-line-width"))
+  (when (getopt context :long-name "clon-help")
+    '(print-usage (clon-options-group context)
+      (make-context-sheet context *standard-output*)
+      #|:show-hidden t|#)
+    (quit 0)))
 
 (defun make-context
     (&rest keys &key synopsis error-handler getopt-error-handler cmdline)

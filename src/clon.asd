@@ -155,23 +155,24 @@ The most important features of Clon are:
 	       (:file "text" :depends-on ("traversable"))
 	       (:module "options"
 		 :depends-on ("text")
-		 :components
-		 ((:file "option")
-		  (:file "flag" :depends-on ("option"))
-		  (:file "valued" :depends-on ("option"))
-		  (:file "switch" :depends-on ("valued"))
-		  (:file "stropt" :depends-on ("valued"))
-		  (:file "lispobj" :depends-on ("valued"))
-		  (:file "path" :depends-on ("valued"))
-		  (:file "enum" :depends-on ("valued"))
-		  (:file "xswitch" :depends-on ("valued"))))
+		 :components ((:file "option")
+			      (:file "flag" :depends-on ("option"))
+			      (:file "valued" :depends-on ("option"))
+			      (:file "switch" :depends-on ("valued"))
+			      (:file "stropt" :depends-on ("valued"))
+			      (:file "lispobj" :depends-on ("valued"))
+			      (:file "path" :depends-on ("valued"))
+			      (:file "enum" :depends-on ("valued"))
+			      (:file "xswitch" :depends-on ("valued"))))
 	       (:file "container" :depends-on ("options"))
 	       (:file "group" :depends-on ("container"))
 	       (:module "retrieval"
 		 :depends-on ("options")
-		 :components
-		 ((:file "cmdline")
-		  (:file "environ")))
+		 :components ((:file "cmdline")
+			      (:file "environ")))
+	       (:module "output"
+		 :depends-on ("util")
+		 :components ((:file "sheet")))
 	       (:file "synopsis" :depends-on ("group"))
 	       (:file "context" :depends-on ("synopsis" "retrieval"))))
 
