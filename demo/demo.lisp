@@ -89,6 +89,9 @@
   ;; This context will use the POSIX command line:
   (let ((context (clon:make-context :synopsis *synopsis* :error-handler :none
 				    :getopt-error-handler :none)))
+    (when (clon:getopt context :short-name "h")
+      (clon:usage context)
+      (quit))
     (multiple-value-bind (value source)
 	(clon:getopt context :short-name "F")
       (print (list value source)))

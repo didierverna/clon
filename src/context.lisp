@@ -198,10 +198,22 @@ options based on it."))
 	      :search-path (search-path context)
 	      :theme (theme context)))
 
-(defun usage (context stream)
-  "Print CONTEXT's synopsis usage on STREAM."
-  '(print-usage (synopsis context) (make-sheet-from-context context stream)
-    #|:show-hidden nil|#))
+(defun usage (context &key (item (synopsis context)) (stream *standard-output*))
+  "Print CONTEXT's ITEM usage on STREAM.
+ITEM defaults to the whole program's synopsis.
+STREAM defaults to the standard output."
+  #|
+  ;; Do it here:
+  ;; :progname (pathname-name (progname context))
+  clon__sheet_put_synopsis (sheet,
+  basename (the_ctx->argv[0]),
+  ARRAY_EMPTY (the_ctx->minus_pack_chars) ? NULL
+  : ARRAY (the_ctx->minus_pack_chars),
+  ARRAY_EMPTY (the_ctx->plus_pack_chars) ? NULL
+  : ARRAY (the_ctx->plus_pack_chars),
+  the_ctx->postfix);
+  |#
+  (%usage (make-context-sheet context stream) item #|:show-hidden nil|#))
 
 
 
@@ -657,9 +669,9 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.~%"
   (setf (slot-value context 'line-width)
 	(getopt context :long-name "clon-line-width"))
   (when (getopt context :long-name "clon-help")
-    '(print-usage (clon-options-group context)
-      (make-context-sheet context *standard-output*)
-      #|:show-hidden t|#)
+    (%usage (make-context-sheet context *standard-output*)
+	    (clon-options-group context)
+	    #|:show-hidden t|#)
     (quit 0)))
 
 (defun make-context
