@@ -49,7 +49,9 @@
 	   :version
 	   :add-to :seal
 	   :make-text
-	   :make-flag :make-switch :make-stropt
+	   :make-flag
+	   :make-switch
+	   :make-stropt :make-enum :make-xswitch :make-lispobj :make-path
 	   :make-group :define-group :declare-group
 	   :make-synopsis :define-synopsis :declare-synopsis
 	   :make-context
