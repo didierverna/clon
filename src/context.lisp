@@ -164,6 +164,14 @@ options based on it."))
   "Return the postfix of CONTEXT's synopsis."
   (postfix (synopsis context)))
 
+(defmethod minus-pack ((context context))
+  "Return the minus-pack of CONTEXT's synopsis."
+  (minus-pack (synopsis context)))
+
+(defmethod plus-pack ((context context))
+  "Return the plus-pack of CONTEXT's synopsis."
+  (plus-pack (synopsis context)))
+
 (defmethod clon-options-group ((context context))
   "Return the Clon options group of CONTEXT's synopsis."
   (clon-options-group (synopsis context)))
@@ -190,30 +198,30 @@ options based on it."))
 ;; The Usage Protocol
 ;; =========================================================================
 
-(defun make-context-sheet (context stream)
+(defun %usage-header (sheet context)
+  (format (output-stream sheet)
+      "Usage: ~A~@[ [-~A]~]~@[ [+~A]~] [OPTIONS...]~@[ ~A~]~%"
+    (pathname-name (progname context))
+    (minus-pack context)
+    (plus-pack context)
+    (postfix context)))
+
+(defun make-context-sheet (context output-stream)
   "Create a STREAM sheet from CONTEXT."
   ;; #### FIXME: what about the highlight flag ??
-  (make-sheet :stream stream
+  (make-sheet :output-stream output-stream
 	      :line-width (line-width context)
 	      :search-path (search-path context)
 	      :theme (theme context)))
 
-(defun usage (context &key (item (synopsis context)) (stream *standard-output*))
+(defun usage
+    (context &key (item (synopsis context)) (output-stream *standard-output*))
   "Print CONTEXT's ITEM usage on STREAM.
 ITEM defaults to the whole program's synopsis.
 STREAM defaults to the standard output."
-  #|
-  ;; Do it here:
-  ;; :progname (pathname-name (progname context))
-  clon__sheet_put_synopsis (sheet,
-  basename (the_ctx->argv[0]),
-  ARRAY_EMPTY (the_ctx->minus_pack_chars) ? NULL
-  : ARRAY (the_ctx->minus_pack_chars),
-  ARRAY_EMPTY (the_ctx->plus_pack_chars) ? NULL
-  : ARRAY (the_ctx->plus_pack_chars),
-  the_ctx->postfix);
-  |#
-  (%usage (make-context-sheet context stream) item #|:show-hidden nil|#))
+  (let ((sheet (make-context-sheet context output-stream)))
+    (%usage-header sheet context)
+    (%usage sheet item #|:show-hidden nil|#)))
 
 
 

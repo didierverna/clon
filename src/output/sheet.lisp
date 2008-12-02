@@ -40,7 +40,14 @@
 ;; ==========================================================================
 
 (defclass sheet ()
-  ()
+  ((output-stream :documentation "The sheet's output stream."
+		  :type stream
+		  :reader output-stream
+		  :initarg :output-stream)
+   (line-width :documentation "The sheet's line width."
+	       :type (integer 1)
+	       :reader line-width
+	       :initarg :line-width))
   (:documentation "The SHEET class.
 This class implements the notion of sheet for printing Clon help."))
 
@@ -50,7 +57,15 @@ This class implements the notion of sheet for printing Clon help."))
 ;; Sheet Instance Creation
 ;; ==========================================================================
 
-(defun make-sheet (&key stream line-width search-path theme)
-  )
+(defun make-sheet (&key output-stream line-width search-path theme)
+  "Make a new SHEET."
+  (declare (ignore search-path theme))
+  (unless line-width
+    (setq line-width 80))
+  ;; See the --clon-line-width option specification
+  (assert (typep line-width '(integer 1)))
+  (funcall #'make-instance 'sheet
+	   :output-stream output-stream :line-width line-width))
+
 
 ;;; sheet.lisp ends here
