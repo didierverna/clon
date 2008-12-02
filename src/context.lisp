@@ -214,13 +214,15 @@ options based on it."))
 	      :search-path (search-path context)
 	      :theme (theme context)))
 
-(defun usage
-    (context &key (item (synopsis context)) (output-stream *standard-output*))
+(defun usage (context
+	      &key (item (synopsis context) item-supplied-p)
+		   (output-stream *standard-output*))
   "Print CONTEXT's ITEM usage on STREAM.
 ITEM defaults to the whole program's synopsis.
 STREAM defaults to the standard output."
   (let ((sheet (make-context-sheet context output-stream)))
-    (%usage-header sheet context)
+    (unless item-supplied-p
+      (%usage-header sheet context))
     (%usage sheet item #|:show-hidden nil|#)))
 
 
