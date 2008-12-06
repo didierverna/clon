@@ -223,7 +223,7 @@ STREAM defaults to the standard output."
   (let ((sheet (make-context-sheet context output-stream)))
     (unless item-supplied-p
       (%usage-header sheet context))
-    (%usage sheet item #|:show-hidden nil|#)))
+    (%usage sheet item)))
 
 
 
@@ -680,8 +680,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.~%"
 	(getopt context :long-name "clon-line-width"))
   (when (getopt context :long-name "clon-help")
     (%usage (make-context-sheet context *standard-output*)
-	    (clon-options-group context)
-	    #|:show-hidden t|#)
+	    (clon-options-group context))
     (quit 0)))
 
 (defun make-context
