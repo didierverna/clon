@@ -170,11 +170,11 @@ The most important features of Clon are:
 		 :depends-on ("options")
 		 :components ((:file "cmdline")
 			      (:file "environ")))
+	       (:file "synopsis" :depends-on ("group"))
 	       (:module "output"
-		 :depends-on ("util")
+		 :depends-on ("synopsis" "retrieval")
 		 :components ((:file "sheet")
 			      (:file "usage" :depends-on ("sheet"))))
-	       (:file "synopsis" :depends-on ("group"))
 	       (:file "context" :depends-on ("synopsis" "retrieval"))))
 
 

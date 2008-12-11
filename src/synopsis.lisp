@@ -193,14 +193,6 @@ Auto (the default) means on for tty output and off otherwise."
     (setf (slot-value synopsis 'plus-pack) plus-pack)))
 
 
-;; --------------
-;; Usage protocol
-;; --------------
-
-(defmethod %usage (sheet (synopsis synopsis))
-  (print synopsis))
-
-
 
 ;; ==========================================================================
 ;; The Potential Pack Protocol
