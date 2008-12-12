@@ -31,11 +31,11 @@
 
 ;;; Code:
 
-;; TIOCGWINSZ on Darwin:
-("sys/ttycom.h")
+;; TIOCGWINSZ is in sys/ttycom.h on Darwin
+("sys/ttycom.h" "sys/errno.h")
 
-((:integer +tiocgwinsz+ "TIOCGWINSZ"
-    "The ioctl command for getting the terminal's window information.")
+((:integer +tiocgwinsz+ "TIOCGWINSZ")
+ (:integer +enotty+ "ENOTTY")
  (:structure winsize ("struct winsize"
 		      ((unsigned 2) ws-row "unsigned short" "ws_row")
 		      ((unsigned 2) ws-col "unsigned short" "ws_col")

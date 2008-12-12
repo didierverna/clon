@@ -62,12 +62,15 @@ This class implements the notion of sheet for printing Clon help."))
   (declare (ignore search-path theme))
   (unless line-width
     ;; #### PORTME.
-    (with-winsize winsize ()
-      ;; #### FIXME: handle errors (25 = ENOTTY)
-      (sb-posix:ioctl (stream-file-stream output-stream) +tiocgwinsz+ winsize)
-      (setq line-width (winsize-ws-col winsize)))
-    (prin1 line-width)
-    (setq line-width 80))
+    (handler-case
+	(with-winsize winsize ()
+	  (sb-posix:ioctl (stream-file-stream output-stream) +tiocgwinsz+ winsize)
+	  (setq line-width (winsize-ws-col winsize)))
+      (sb-posix:syscall-error (error)
+	;; ENOTTY error should remain silent, but no the others.
+	(unless (= (sb-posix:syscall-errno error) +enotty+)
+	  (let (*print-escape*) (print-object error *error-output*)))
+	(setq line-width 80))))
   ;; See the --clon-line-width option specification
   (assert (typep line-width '(integer 1)))
   (funcall #'make-instance 'sheet
