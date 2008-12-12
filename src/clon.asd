@@ -34,7 +34,8 @@
 (in-package :cl-user)
 
 (defpackage :clon-system
-    (:use :cl :asdf)
+    ;; #### PORTME.
+   (:use :cl :asdf :sb-grovel :sb-alien)
   (:export :+release-major-level+
 	   :+release-minor-level+
 	   :+release-status+ :+release-status-level+
@@ -147,10 +148,14 @@ The most important features of Clon are:
   :maintainer "Didier Verna"
   :license "GNU GPL"
   :version #.(version :long)
-  ;; #### PORTME: SBCL-specific
-  :depends-on (:sb-posix)
+  ;; #### PORTME.
+  :depends-on (:sb-posix :sb-grovel)
   :components ((:file "package")
-	       (:file "util" :depends-on ("package"))
+	       ;; #### PORTME.
+	       (grovel-constants-file "opsys"
+		:depends-on ("package")
+		:package :clon)
+	       (:file "util" :depends-on ("opsys"))
 	       (:file "traversable" :depends-on ("util"))
 	       (:file "text" :depends-on ("traversable"))
 	       (:module "options"

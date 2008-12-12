@@ -61,6 +61,12 @@ This class implements the notion of sheet for printing Clon help."))
   "Make a new SHEET."
   (declare (ignore search-path theme))
   (unless line-width
+    ;; #### PORTME.
+    (with-winsize winsize ()
+      ;; #### FIXME: handle errors (25 = ENOTTY)
+      (sb-posix:ioctl (stream-file-stream output-stream) +tiocgwinsz+ winsize)
+      (setq line-width (winsize-ws-col winsize)))
+    (prin1 line-width)
     (setq line-width 80))
   ;; See the --clon-line-width option specification
   (assert (typep line-width '(integer 1)))

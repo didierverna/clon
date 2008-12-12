@@ -150,6 +150,30 @@ This is the meta-class for abstract classes."))
 
 
 ;; ==========================================================================
+;; Stream to file-stream conversion (thanks Nikodemus !)
+;; ==========================================================================
+
+(defgeneric stream-file-stream (stream &optional direction)
+  (:documentation "Convert STREAM to a file-stream.")
+  (:method ((stream file-stream) &optional direction)
+    (declare (ignore direction))
+    stream)
+  (:method ((stream synonym-stream) &optional direction)
+    (declare (ignore direction))
+    (stream-file-stream (symbol-value (synonym-stream-symbol stream))))
+  (:method ((stream two-way-stream) &optional direction)
+    (stream-file-stream
+     (case direction
+       (:input (two-way-stream-input-stream stream))
+       (:output (two-way-stream-output-stream stream))
+       (otherwise
+	(error "Cannot extract file-stream from TWO-WAY-STREAM ~A:
+invalid direction: ~S"
+	       stream direction))))))
+
+
+
+;; ==========================================================================
 ;; Wrappers around non ANSI features
 ;; ==========================================================================
 
