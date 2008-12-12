@@ -39,7 +39,8 @@
 		  push-cmdline-option push-unknown-option))
   (put symbol 'common-lisp-indent-function 1))
 
-(dolist (symbol '(make-internal-flag
+(dolist (symbol '(with-winsize
+		  make-internal-flag
 		  make-internal-switch
 		  make-internal-stropt
 		  make-internal-path
