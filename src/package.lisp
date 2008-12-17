@@ -5,7 +5,7 @@
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Wed Jun 18 08:49:39 2008
-;; Last Revision: Wed Jun 18 08:49:39 2008
+;; Last Revision: Wed Dec 17 16:45:07 2008
 
 ;; This file is part of Clon.
 
@@ -36,7 +36,7 @@
 (defpackage :clon
   (:use :cl)
   (:shadow :*readtable*)
-  (:import-from :clon-system
+  (:import-from :clon-asdf
     :+release-major-level+
     :+release-minor-level+
     :+release-status+ :+release-status-level+

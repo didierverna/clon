@@ -33,7 +33,7 @@
 
 (in-package :cl-user)
 
-(defpackage :clon-system
+(defpackage :clon-asdf
     ;; #### PORTME.
    (:use :cl :asdf :sb-grovel :sb-alien)
   (:export :+release-major-level+
@@ -43,7 +43,7 @@
 	   :version))
 
 
-(in-package :clon-system)
+(in-package :clon-asdf)
 
 (defmacro define-constant (name value &optional doc)
   `(defconstant ,name (if (boundp ',name) (symbol-value ',name) ,value)
