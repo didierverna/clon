@@ -40,6 +40,7 @@
   (put symbol 'common-lisp-indent-function 1))
 
 (dolist (symbol '(with-winsize
+		  stream-file-stream
 		  make-internal-flag
 		  make-internal-switch
 		  make-internal-stropt
