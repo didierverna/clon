@@ -31,8 +31,8 @@
 
 ;;; Code:
 
-;; TIOCGWINSZ is in sys/ttycom.h on Darwin
-("sys/ttycom.h" "sys/errno.h")
+
+("sys/ioctl.h")
 
 ((:integer +tiocgwinsz+ "TIOCGWINSZ")
  (:structure winsize ("struct winsize"
