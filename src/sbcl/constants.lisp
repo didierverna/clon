@@ -35,7 +35,6 @@
 ("sys/ttycom.h" "sys/errno.h")
 
 ((:integer +tiocgwinsz+ "TIOCGWINSZ")
- (:integer +enotty+ "ENOTTY")
  (:structure winsize ("struct winsize"
 		      ((unsigned 2) ws-row "unsigned short" "ws_row")
 		      ((unsigned 2) ws-col "unsigned short" "ws_col")

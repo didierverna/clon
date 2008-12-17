@@ -68,7 +68,7 @@ This class implements the notion of sheet for printing Clon help."))
 	  (setq line-width (winsize-ws-col winsize)))
       (sb-posix:syscall-error (error)
 	;; ENOTTY error should remain silent, but no the others.
-	(unless (= (sb-posix:syscall-errno error) +enotty+)
+	(unless (= (sb-posix:syscall-errno error) sb-posix:enotty)
 	  (let (*print-escape*) (print-object error *error-output*)))
 	(setq line-width 80))))
   ;; See the --clon-line-width option specification
