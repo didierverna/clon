@@ -151,11 +151,12 @@ The most important features of Clon are:
   ;; #### PORTME.
   :depends-on (:sb-posix :sb-grovel)
   :components ((:file "package")
-	       ;; #### PORTME.
-	       (grovel-constants-file "opsys"
-		:depends-on ("package")
-		:package :clon)
-	       (:file "util" :depends-on ("opsys"))
+	       #+sbcl
+	       (:module "sbcl"
+		 :depends-on ("package")
+		 :components ((grovel-constants-file "constants"
+				:package :clon)))
+	       (:file "util" :depends-on (#+sbcl "sbcl" "package"))
 	       (:file "traversable" :depends-on ("util"))
 	       (:file "text" :depends-on ("traversable"))
 	       (:module "options"

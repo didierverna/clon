@@ -1,11 +1,11 @@
-;;; opsys.lisp --- Operating system interface for Clon
+;;; constants.lisp --- SBCL Operating system interface for Clon
 
 ;; Copyright (C) 2008 Didier Verna
 
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Sat Dec  6 20:36:38 2008
-;; Last Revision: Sat Dec  6 20:36:38 2008
+;; Last Revision: Wed Dec 17 16:53:12 2008
 
 ;; This file is part of Clon.
 
@@ -43,4 +43,4 @@
 		      ((unsigned 2) ws-ypixel "unsigned short" "ws_ypixel"))))
 
 
-;;; opsys.lisp ends here
+;;; constants.lisp ends here
