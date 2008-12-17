@@ -64,7 +64,9 @@ This class implements the notion of sheet for printing Clon help."))
     ;; #### PORTME.
     (handler-case
 	(with-winsize winsize ()
-	  (sb-posix:ioctl (stream-file-stream output-stream) +tiocgwinsz+ winsize)
+	  (sb-posix:ioctl (stream-file-stream output-stream :output)
+			  +tiocgwinsz+
+			  winsize)
 	  (setq line-width (winsize-ws-col winsize)))
       (sb-posix:syscall-error (error)
 	;; ENOTTY error should remain silent, but no the others.
