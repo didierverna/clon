@@ -106,6 +106,7 @@ This class implements the notion of sheet for printing Clon help."))
 
 (defun output-newline (sheet)
   "Output a newline to SHEET's stream."
+  ;; #### FIXME: don't I need to honor changes of faces ??
   (mapc (lambda (frame)
 	  (princ-spaces sheet (- (frame-right-margin frame) (column sheet))))
 	(butlast (frames sheet)))
@@ -121,9 +122,87 @@ This class implements the notion of sheet for printing Clon help."))
     ((:put-header :put-text #+():put-option #+():close-group)
      (output-newline sheet))))
 
+(defun next-line (sheet)
+  "Go to the next line and reach the proper left position."
+  ;; First, close the current line
+  ;; #### NOTE: Actually, output-newline would better be named close-line.
+  (output-newline sheet)
+  (let ((frames (cdr (nreverse (copy-list (frames sheet))))))
+    ;; Next, skip frames starting at position 0.
+    (loop :while (zerop (frame-left-margin (car frames)))
+      :do (pop frames))
+    ;; Finally, reach the proper column, opening the needed faces.
+    (mapc (lambda (frame)
+	    (princ-spaces sheet (- (frame-left-margin frame) (column sheet))))
+	  frames)))
+
+(defun maybe-next-line (sheet)
+  "Go to the next line if we're already past SHEET's right margin."
+  (if (>= (column sheet) (right-margin sheet))
+      (next-line sheet)))
+
+;; #### FIXME: This routine does not handle special characters (the ones that
+;; don't actually display anything. Since this is for short description
+;; strings, this would not be normally a problem, but the current situation is
+;; not totally clean.
 (defun output-string (sheet string)
-  "Output STRING to SHEET."
-  )
+  "Output STRING to SHEET.
+STRING is output within the current frame's bounds.
+Spacing characters are honored but newlines might replace spaces when the
+output reaches the rightmost bound."
+  (assert (<= 0 (left-margin sheet)))
+  (assert (< (left-margin sheet) (right-margin sheet)))
+  (assert (and string (not (zerop (length string)))))
+  ;; #### FIXME: I don't remember, but this might not work: don't I need to
+  ;; honor the frames'faces here instead of blindly spacing ?? Or am I sure
+  ;; I'm in the proper frame/face ?
+  ;; First, adjust the tabbing.
+  (if (< (column sheet) (left-margin sheet))
+      (princ-spaces sheet (- (left-margin sheet) (column sheet))))
+  (loop :with len = (length string)
+	:with i = 0
+	:while (< i len)
+	:do (maybe-next-line sheet)
+	(case (aref string i)
+	  (#\space
+	   (princ-char sheet #\space)
+	   (incf i))
+	  (#\tab
+	   ;; #### FIXME: get a real tabsize
+	   (let ((spaces (+ (- (* (+ (floor (/ (- (column sheet)
+						  (left-margin sheet))
+					       8))
+				     1)
+				  8)
+			       (column sheet))
+			    (left-margin sheet))))
+	     (cond ((< (+ (column sheet) spaces) (right-margin sheet))
+		    (princ-spaces sheet spaces))
+		   (t
+		    (next-line sheet)
+		    (princ-spaces sheet (- (+ (column sheet) spaces)
+					   (right-margin sheet))))))
+	   (incf i))
+	  (#\newline
+	   (next-line sheet)
+	   (incf i))
+	  (otherwise
+	   (let ((end (or (position-if
+			   (lambda (char)
+			     (member char '(#\space #\tab #\newline)))
+			   string
+			   :start i)
+			  len)))
+	     (cond ((or (= (column sheet) (left-margin sheet))
+			(< (+ (column sheet) (- end i)) (right-margin sheet)))
+		    ;; If we're at the tabbing pos, we output the word right
+		    ;; here, since it couldn't fit anywhere else. Otherwise,
+		    ;; we can add it here if it ends before ARRAY_LAST
+		    ;; (sheet->frame_stack).right_margin
+		    (princ-string sheet (subseq string i end))
+		    (setq i end))
+		   (t
+		    (next-line sheet))))))))
 
 (defun output-text (sheet text)
   "Output a TEXT component to SHEET."
