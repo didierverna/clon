@@ -47,13 +47,62 @@
    (line-width :documentation "The sheet's line width."
 	       :type (integer 1)
 	       :reader line-width
-	       :initarg :line-width))
+	       :initarg :line-width)
+   (last-action :documentation "The last action performed on the sheet."
+		:type symbol
+		:accessor last-action
+		:initform :none))
   (:documentation "The SHEET class.
 This class implements the notion of sheet for printing Clon help."))
 
 
+
+;; ==========================================================================
+;; Sheet Processing
+;; ==========================================================================
+
 (defmacro within-group (sheet &body body)
   `(progn ,@body))
+
+(defun newline (sheet)
+  (terpri (output-stream sheet)))
+
+(defun maybe-newline (sheet)
+  "Output a newline to SHEET if needed."
+  (ecase (last-action sheet)
+    ((:none #+():open-group)
+     (values))
+    ((:put-header #+():put-string #+():put-option #+():close-group)
+     (newline sheet))))
+
+(defun output-char (sheet char)
+  (assert (and (char/= char #\newline) (char/= char #\tab)))
+  (princ char (output-stream sheet)))
+
+(defun output-string (sheet string)
+  (princ string (output-stream sheet)))
+
+(defun output-header (sheet pathname minus-pack plus-pack postfix)
+  (output-string sheet "Usage: ")
+  (output-string sheet pathname)
+  (when minus-pack
+    (output-string sheet " [")
+    (output-char sheet #\-)
+    (output-string sheet minus-pack)
+    (output-char sheet #\]))
+  (when plus-pack
+    (output-string sheet " [")
+    (output-char sheet #\+)
+    (output-string sheet plus-pack)
+    (output-char sheet #\]))
+  (output-string sheet " [")
+  (output-string sheet "OPTIONS")
+  (output-char sheet #\])
+  (when postfix
+    (output-char sheet #\space)
+    (output-string sheet postfix))
+  (newline sheet)
+  (setf (last-action sheet) :put-header))
 
 
 

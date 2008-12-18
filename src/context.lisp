@@ -198,14 +198,6 @@ options based on it."))
 ;; The Usage Protocol
 ;; =========================================================================
 
-(defun %usage-header (sheet context)
-  (format (output-stream sheet)
-      "Usage: ~A~@[ [-~A]~]~@[ [+~A]~] [OPTIONS...]~@[ ~A~]~%"
-    (pathname-name (progname context))
-    (minus-pack context)
-    (plus-pack context)
-    (postfix context)))
-
 (defun make-context-sheet (context output-stream)
   "Create a STREAM sheet from CONTEXT."
   ;; #### FIXME: what about the highlight flag ??
@@ -213,6 +205,13 @@ options based on it."))
 	      :line-width (line-width context)
 	      :search-path (search-path context)
 	      :theme (theme context)))
+
+(defun %usage-header (context sheet)
+  (output-header sheet
+		 (pathname-name (progname context))
+		 (minus-pack context)
+		 (plus-pack context)
+		 (postfix context)))
 
 (defun usage (context
 	      &key (item (synopsis context) item-supplied-p)
@@ -222,7 +221,7 @@ ITEM defaults to the whole program's synopsis.
 STREAM defaults to the standard output."
   (let ((sheet (make-context-sheet context output-stream)))
     (unless item-supplied-p
-      (%usage-header sheet context))
+      (%usage-header context sheet))
     (%usage sheet item)))
 
 
