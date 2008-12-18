@@ -48,6 +48,10 @@
 	       :type (integer 1)
 	       :reader line-width
 	       :initarg :line-width)
+   (column :documentation "The sheet's current column."
+	   :type (integer 0)
+	   :accessor column
+	   :initform 0)
    (last-action :documentation "The last action performed on the sheet."
 		:type symbol
 		:accessor last-action
@@ -65,42 +69,60 @@ This class implements the notion of sheet for printing Clon help."))
   `(progn ,@body))
 
 (defun newline (sheet)
-  (terpri (output-stream sheet)))
+  "Output a newline to SHEET's stream."
+  (terpri (output-stream sheet))
+  (setf (column sheet) 0))
 
 (defun maybe-newline (sheet)
   "Output a newline to SHEET if needed."
   (ecase (last-action sheet)
     ((:none #+():open-group)
      (values))
-    ((:put-header #+():put-string #+():put-option #+():close-group)
+    ((:put-header :put-text #+():put-option #+():close-group)
      (newline sheet))))
 
-(defun output-char (sheet char)
+(defun princ-char (sheet char)
+  "Princ CHAR on SHEET's stream."
   (assert (and (char/= char #\newline) (char/= char #\tab)))
-  (princ char (output-stream sheet)))
+  (princ char (output-stream sheet))
+  (incf (column sheet)))
+
+(defun princ-string (sheet string)
+  "Princ STRING on SHEET's stream."
+  (princ string (output-stream sheet))
+  (setf (column sheet) (+ (length string) (column sheet))))
 
 (defun output-string (sheet string)
-  (princ string (output-stream sheet)))
+  "Output STRING to SHEET."
+  )
+
+(defun output-text (sheet text)
+  "Output a TEXT component to SHEET."
+  (maybe-newline sheet)
+  (when (and text (not (zerop (length text))))
+    (output-string sheet text))
+  (setf (last-action sheet) :put-text))
 
 (defun output-header (sheet pathname minus-pack plus-pack postfix)
-  (output-string sheet "Usage: ")
-  (output-string sheet pathname)
+  "Output a usage header to SHEET."
+  (princ-string sheet "Usage: ")
+  (princ-string sheet pathname)
   (when minus-pack
-    (output-string sheet " [")
-    (output-char sheet #\-)
-    (output-string sheet minus-pack)
-    (output-char sheet #\]))
+    (princ-string sheet " [")
+    (princ-char sheet #\-)
+    (princ-string sheet minus-pack)
+    (princ-char sheet #\]))
   (when plus-pack
-    (output-string sheet " [")
-    (output-char sheet #\+)
-    (output-string sheet plus-pack)
-    (output-char sheet #\]))
-  (output-string sheet " [")
-  (output-string sheet "OPTIONS")
-  (output-char sheet #\])
+    (princ-string sheet " [")
+    (princ-char sheet #\+)
+    (princ-string sheet plus-pack)
+    (princ-char sheet #\]))
+  (princ-string sheet " [")
+  (princ-string sheet "OPTIONS")
+  (princ-char sheet #\])
   (when postfix
-    (output-char sheet #\space)
-    (output-string sheet postfix))
+    (princ-char sheet #\space)
+    (princ-string sheet postfix))
   (newline sheet)
   (setf (last-action sheet) :put-header))
 

@@ -37,6 +37,8 @@
 
 (defgeneric %usage (sheet item)
   (:documentation "Describe usage of ITEM on SHEET.")
+  (:method (sheet (text text))
+    (output-text sheet (contents text)))
   (:method (sheet (container container))
     (assert (sealedp container))
     (within-group sheet
