@@ -66,6 +66,16 @@ This class implements the notion of sheet for printing Clon help."))
 (defmacro within-group (sheet &body body)
   `(progn ,@body))
 
+(defmacro map-frames (frame (sheet &key reverse) &body body)
+  "Map BODY over SHEET's frames.
+If REVERSE, map in reverse order.
+Bind FRAME to each frame when evaluating BODY."
+  `(mapc (lambda (,frame)
+	   ,@body)
+    ,(if reverse
+	 `(cdr (nreverse (copy-list (frames ,sheet))))
+	 `(butlast (frames ,sheet)))))
+
 
 
 ;; ==========================================================================
@@ -107,9 +117,8 @@ This class implements the notion of sheet for printing Clon help."))
 (defun output-newline (sheet)
   "Output a newline to SHEET's stream."
   ;; #### FIXME: don't I need to honor changes of faces ??
-  (mapc (lambda (frame)
-	  (princ-spaces sheet (- (frame-right-margin frame) (column sheet))))
-	(butlast (frames sheet)))
+  (map-frames frame (sheet)
+    (princ-spaces sheet (- (frame-right-margin frame) (column sheet))))
   (princ-spaces sheet (- (line-width sheet) (column sheet)))
   (terpri (output-stream sheet))
   (setf (column sheet) 0))
@@ -127,14 +136,11 @@ This class implements the notion of sheet for printing Clon help."))
   ;; First, close the current line
   ;; #### NOTE: Actually, output-newline would better be named close-line.
   (output-newline sheet)
-  (let ((frames (cdr (nreverse (copy-list (frames sheet))))))
-    ;; Next, skip frames starting at position 0.
-    (loop :while (zerop (frame-left-margin (car frames)))
-      :do (pop frames))
-    ;; Finally, reach the proper column, opening the needed faces.
-    (mapc (lambda (frame)
-	    (princ-spaces sheet (- (frame-left-margin frame) (column sheet))))
-	  frames)))
+  (map-frames frame (sheet :reverse t)
+    ;; Next, skip frames starting at position 0 and reach the proper column,
+    ;; opening the needed faces.
+    (unless (zerop (frame-left-margin frame))
+      (princ-spaces sheet (- (frame-left-margin frame) (column sheet))))))
 
 (defun maybe-next-line (sheet)
   "Go to the next line if we're already past SHEET's right margin."
