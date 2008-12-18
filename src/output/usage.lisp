@@ -37,10 +37,14 @@
 
 (defgeneric %usage (sheet item)
   (:documentation "Describe usage of ITEM on SHEET.")
-  (:method (sheet item)
-    (values))
-  (:method (sheet (synopsis synopsis))
-    (print synopsis)))
+  (:method (sheet (container container))
+    (assert (sealedp container))
+    (within-group sheet
+	;; Currently, the only item vertical separation available isfor
+	;; toplevel groups. We could think of implementing subgroups vspace,
+	;; options vspace etc.
+	(dolist (item (container-items container))
+	  (%usage sheet item)))))
 
 
 ;;; usage.lisp ends here

@@ -52,6 +52,10 @@
 This class implements the notion of sheet for printing Clon help."))
 
 
+(defmacro within-group (sheet &body body)
+  `(progn ,@body))
+
+
 
 ;; ==========================================================================
 ;; Sheet Instance Creation
