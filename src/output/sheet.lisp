@@ -52,6 +52,10 @@
 	   :type (integer 0)
 	   :accessor column
 	   :initform 0)
+   (frames :documentation "The stack of currently open frames."
+	   :type list
+	   :accessor frames
+	   :initform nil)
    (last-action :documentation "The last action performed on the sheet."
 		:type symbol
 		:accessor last-action
@@ -59,27 +63,31 @@
   (:documentation "The SHEET class.
 This class implements the notion of sheet for printing Clon help."))
 
+(defmacro within-group (sheet &body body)
+  `(progn ,@body))
+
 
 
 ;; ==========================================================================
 ;; Sheet Processing
 ;; ==========================================================================
 
-(defmacro within-group (sheet &body body)
-  `(progn ,@body))
+(defstruct frame
+  left-margin right-margin)
 
-(defun newline (sheet)
-  "Output a newline to SHEET's stream."
-  (terpri (output-stream sheet))
-  (setf (column sheet) 0))
+(defun left-margin (sheet)
+  (frame-left-margin (car (frames sheet))))
 
-(defun maybe-newline (sheet)
-  "Output a newline to SHEET if needed."
-  (ecase (last-action sheet)
-    ((:none #+():open-group)
-     (values))
-    ((:put-header :put-text #+():put-option #+():close-group)
-     (newline sheet))))
+(defun right-margin (sheet)
+  (frame-right-margin (car (frames sheet))))
+
+(defun open-frame-1 (sheet left-margin right-margin)
+  "Open a new frame on SHEET between LEFT-MARGIN and RIGHT-MARGIN."
+  (push (make-frame :left-margin left-margin :right-margin right-margin)
+	(frames sheet)))
+
+(defun close-frame-1 (sheet)
+  (pop (frames sheet)))
 
 (defun princ-char (sheet char)
   "Princ CHAR on SHEET's stream."
@@ -92,13 +100,34 @@ This class implements the notion of sheet for printing Clon help."))
   (princ string (output-stream sheet))
   (setf (column sheet) (+ (length string) (column sheet))))
 
+(defun princ-spaces (sheet number)
+  "Princ NUMBER spaces to SHEET."
+  (princ-string sheet (make-string number :initial-element #\space)))
+
+(defun output-newline (sheet)
+  "Output a newline to SHEET's stream."
+  (mapc (lambda (frame)
+	  (princ-spaces sheet (- (frame-right-margin frame) (column sheet))))
+	(butlast (frames sheet)))
+  (princ-spaces sheet (- (line-width sheet) (column sheet)))
+  (terpri (output-stream sheet))
+  (setf (column sheet) 0))
+
+(defun maybe-output-newline (sheet)
+  "Output a newline to SHEET if needed."
+  (ecase (last-action sheet)
+    ((:none #+():open-group)
+     (values))
+    ((:put-header :put-text #+():put-option #+():close-group)
+     (output-newline sheet))))
+
 (defun output-string (sheet string)
   "Output STRING to SHEET."
   )
 
 (defun output-text (sheet text)
   "Output a TEXT component to SHEET."
-  (maybe-newline sheet)
+  (maybe-output-newline sheet)
   (when (and text (not (zerop (length text))))
     (output-string sheet text))
   (setf (last-action sheet) :put-text))
@@ -123,7 +152,7 @@ This class implements the notion of sheet for printing Clon help."))
   (when postfix
     (princ-char sheet #\space)
     (princ-string sheet postfix))
-  (newline sheet)
+  (output-newline sheet)
   (setf (last-action sheet) :put-header))
 
 
@@ -131,6 +160,11 @@ This class implements the notion of sheet for printing Clon help."))
 ;; ==========================================================================
 ;; Sheet Instance Creation
 ;; ==========================================================================
+
+(defmethod initialize-instance :after
+    ((sheet sheet) &key output-stream line-width search-path theme)
+  (declare (ignore output-stream line-width search-path theme))
+  (open-frame-1 sheet 0 (line-width sheet)))
 
 (defun make-sheet (&key output-stream line-width search-path theme)
   "Make a new SHEET."
@@ -152,6 +186,21 @@ This class implements the notion of sheet for printing Clon help."))
   (assert (typep line-width '(integer 1)))
   (funcall #'make-instance 'sheet
 	   :output-stream output-stream :line-width line-width))
+
+(defun unmake-sheet (sheet)
+  "Unmake SHEET."
+  (assert (= (length (frames sheet)) 1))
+  (close-frame-1 sheet)
+  (princ-char sheet #\newline))
+
+(defmacro with-sheet ((sheet &rest keys
+			     &key output-stream line-width search-path theme)
+		      &body body)
+  "Execute BODY with SHEET bound to a new sheet."
+  (declare (ignore output-stream line-width search-path theme))
+  `(let ((,sheet (apply #'make-sheet ,keys)))
+    ,@body
+    (unmake-sheet ,sheet)))
 
 
 ;;; sheet.lisp ends here
