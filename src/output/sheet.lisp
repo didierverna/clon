@@ -187,20 +187,11 @@ This class implements the notion of sheet for printing Clon help."))
   (funcall #'make-instance 'sheet
 	   :output-stream output-stream :line-width line-width))
 
-(defun unmake-sheet (sheet)
-  "Unmake SHEET."
+(defun flush-sheet (sheet)
+  "Flush SHEET."
   (assert (= (length (frames sheet)) 1))
   (close-frame-1 sheet)
   (princ-char sheet #\newline))
-
-(defmacro with-sheet ((sheet &rest keys
-			     &key output-stream line-width search-path theme)
-		      &body body)
-  "Execute BODY with SHEET bound to a new sheet."
-  (declare (ignore output-stream line-width search-path theme))
-  `(let ((,sheet (apply #'make-sheet ,keys)))
-    ,@body
-    (unmake-sheet ,sheet)))
 
 
 ;;; sheet.lisp ends here

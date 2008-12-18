@@ -206,6 +206,13 @@ options based on it."))
 	      :search-path (search-path context)
 	      :theme (theme context)))
 
+;; #### FIXME: inconsistency. Why do I have a line-width slot in CONTEXT but
+;; not an output-stream one ?
+(defmacro with-context-sheet ((sheet context output-stream) &body body)
+  `(let ((,sheet (make-context-sheet ,context ,output-stream)))
+    ,@body
+    (flush-sheet ,sheet)))
+
 (defun %usage-header (context sheet)
   (output-header sheet
 		 (pathname-name (progname context))
@@ -219,7 +226,7 @@ options based on it."))
   "Print CONTEXT's ITEM usage on STREAM.
 ITEM defaults to the whole program's synopsis.
 STREAM defaults to the standard output."
-  (let ((sheet (make-context-sheet context output-stream)))
+  (with-context-sheet (sheet context output-stream)
     (unless item-supplied-p
       (%usage-header context sheet))
     (%usage sheet item)))
@@ -678,8 +685,8 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.~%"
   (setf (slot-value context 'line-width)
 	(getopt context :long-name "clon-line-width"))
   (when (getopt context :long-name "clon-help")
-    (%usage (make-context-sheet context *standard-output*)
-	    (clon-options-group context))
+    (with-context-sheet (sheet context *standard-output*)
+      (%usage sheet (clon-options-group context)))
     (quit 0)))
 
 (defun make-context

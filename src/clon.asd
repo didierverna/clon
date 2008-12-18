@@ -181,7 +181,7 @@ The most important features of Clon are:
 		 :depends-on ("synopsis" "retrieval")
 		 :components ((:file "sheet")
 			      (:file "usage" :depends-on ("sheet"))))
-	       (:file "context" :depends-on ("synopsis" "retrieval"))))
+	       (:file "context" :depends-on ("output"))))
 
 
 ;;; clon.asd ends here
