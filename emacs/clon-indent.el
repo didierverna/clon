@@ -47,7 +47,7 @@
 		  make-internal-path
 		  make-internal-enum
 		  make-internal-xswitch
-		  convert-value))
+		  within-group))
   (put symbol 'common-lisp-indent-function 2))
 
 (dolist (symbol '(push-retrieved-option))
