@@ -56,15 +56,16 @@
 	   :type list
 	   :accessor frames
 	   :initform nil)
+   (in-group :documentation "The current group imbrication."
+	     :type (integer 0)
+	     :accessor in-group
+	     :initform 0)
    (last-action :documentation "The last action performed on the sheet."
 		:type symbol
 		:accessor last-action
 		:initform :none))
   (:documentation "The SHEET class.
 This class implements the notion of sheet for printing Clon help."))
-
-(defmacro within-group (sheet &body body)
-  `(progn ,@body))
 
 (defmacro map-frames (frame (sheet &key reverse) &body body)
   "Map BODY over SHEET's frames.
@@ -114,6 +115,29 @@ Bind FRAME to each frame when evaluating BODY."
   "Princ NUMBER spaces to SHEET."
   (princ-string sheet (make-string number :initial-element #\space)))
 
+(defun reach-column (sheet column)
+  "Reach COLUMN on SHEET."
+  (assert (<= (column sheet) column))
+  (assert (<= column (right-margin sheet)))
+  (map-frames frame (sheet :reverse t)
+    (unless (<= (frame-left-margin frame) (column sheet))
+      (princ-spaces sheet (- (frame-left-margin frame) (column sheet)))))
+  (princ-spaces sheet (- column (column sheet))))
+
+(defun open-frame (sheet left-margin right-margin)
+  (assert (frames sheet))
+  (assert (>= left-margin (left-margin sheet)))
+  (assert (<= (column sheet) left-margin))
+  (when (<= right-margin 0)
+    (setq right-margin (+ (right-margin sheet) right-margin)))
+  (reach-column sheet left-margin)
+  (open-frame-1 sheet left-margin right-margin))
+
+(defun close-frame (sheet)
+  (assert (frames sheet))
+  (princ-spaces sheet (- (right-margin sheet) (column sheet)))
+  (close-frame-1 sheet))
+
 (defun output-newline (sheet)
   "Output a newline to SHEET's stream."
   ;; #### FIXME: don't I need to honor changes of faces ??
@@ -126,7 +150,7 @@ Bind FRAME to each frame when evaluating BODY."
 (defun maybe-output-newline (sheet)
   "Output a newline to SHEET if needed."
   (ecase (last-action sheet)
-    ((:none #+():open-group)
+    ((:none :open-group)
      (values))
     ((:put-header :put-text #+():put-option #+():close-group)
      (output-newline sheet))))
@@ -209,6 +233,29 @@ output reaches the rightmost bound."
 		    (setq i end))
 		   (t
 		    (next-line sheet))))))))
+
+(defun nesting-level (level)
+  (if (or (= level 0) (= level 1)) 0 (1- level)))
+
+(defun open-group (sheet)
+  "Open a new group on SHEET."
+  (let ((indent 2))
+    (incf (in-group sheet))
+    (maybe-output-newline sheet)
+    (open-frame sheet (* (nesting-level (in-group sheet)) indent) 0)
+    (setf (last-action sheet) :open-group)))
+
+(defun close-group (sheet)
+  "Close the current group on SHEET."
+  (close-frame sheet)
+  (decf (in-group sheet))
+  (setf (last-action sheet) :close-group))
+
+(defmacro within-group (sheet &body body)
+  `(progn
+    (open-group ,sheet)
+    ,@body
+    (close-group ,sheet)))
 
 (defun output-text (sheet text)
   "Output a TEXT component to SHEET."
