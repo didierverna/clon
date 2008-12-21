@@ -39,6 +39,10 @@
   (:documentation "Describe usage of ITEM on SHEET.")
   (:method (sheet (text text))
     (output-text sheet (contents text)))
+  (:method (sheet (option option))
+    (output-option sheet
+		   (short-name option) (long-name option)
+		   (description option) (env-var option)))
   (:method (sheet (container container))
     (assert (sealedp container))
     (within-group sheet

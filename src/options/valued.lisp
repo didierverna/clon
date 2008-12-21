@@ -94,6 +94,37 @@ If OPTION matches, return its short name's length; otherwise 0."
     (potential-pack-char option as-string)))
 
 
+;; ----------------
+;; Display protocol
+;; ----------------
+
+(defgeneric short-syntax-display-prefix (option)
+  (:documentation "Return the display prefix for OPTION's short call.")
+  (:method ((option valued-option))
+    "-"))
+
+(defmethod display ((option valued-option))
+  "Return OPTION's display specification."
+  (read-from-string
+   (format nil "(option
+		 (syntax (short-name ~@[\"~A\"~])
+			 ~:[~:;\", \"~](long-name ~@[\"--~A\"~]))
+		 (description ~@[~S~]
+		   (fallback ~@[\"Fallback: ~A\"~])
+		   (default ~@[\"Default: ~A\"~])
+		   (environ ~@[\"Environment: ~A\"~])))"
+     (and (short-name option)
+	  (concatenate 'string
+	    (short-syntax-display-prefix option)
+	    (short-name option)))
+     (and (short-name option) (long-name option))
+     (long-name option)
+     (description option)
+     (and (slot-boundp option 'fallback-value) (fallback-value option))
+     (and (slot-boundp option 'default-value) (default-value option))
+     (env-var option))))
+
+
 
 ;; ==========================================================================
 ;; The Conversion Protocol
@@ -301,6 +332,10 @@ This class is a mixin used to authorize the +-syntax for the switch hierarchy.")
 (defmethod sb-mop:validate-superclass
     ((class valued-option-class) (superclass standard-class))
   t)
+
+
+(defmethod short-syntax-display-prefix ((option plus-callable))
+  "-(+)")
 
 
 ;; -------------------

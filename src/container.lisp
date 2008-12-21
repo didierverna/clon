@@ -84,6 +84,15 @@ command-line hierarchy."))
       (check-name-clash item1 item2))))
 
 
+;; ----------------
+;; Display protocol
+;; ----------------
+
+(defmethod display ((container container))
+  "Return CONTAINER'display specification."
+  `(,@(mapcar #'display (container-items container))))
+
+
 
 ;; ==========================================================================
 ;; The Sealing Protocol

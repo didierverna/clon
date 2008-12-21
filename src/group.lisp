@@ -46,6 +46,16 @@ This class groups other groups, options or strings together, effectively
 implementing hierarchical program command-line."))
 
 
+;; ----------------
+;; Display protocol
+;; ----------------
+
+(defmethod display ((group group))
+  "Return GROUP's display specification."
+  (let ((dpy (call-next-method)))
+    (push 'group dpy)))
+
+
 
 ;; ==========================================================================
 ;; Group Instance Creation

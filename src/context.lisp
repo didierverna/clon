@@ -198,6 +198,27 @@ options based on it."))
 ;; The Usage Protocol
 ;; =========================================================================
 
+(defun synopsis-display (context)
+  "Return CONTEXT's synopsis display."
+  (let ((dpy `(" "
+	       (program ,(pathname-name (progname context)))
+	       "Usage: "
+	       synopsis)))
+    (when (minus-pack context)
+      (push `(options (minus-pack ,(format nil "[-~A]" (minus-pack context))))
+	    dpy)
+      (push " " dpy))
+    (when (plus-pack context)
+      (push `(options (plus-pack ,(format nil "[+~A]" (plus-pack context))))
+	    dpy)
+      (push " " dpy))
+    (push '(options "[OPTIONS]") dpy)
+    (when (postfix context)
+      (push " " dpy)
+      (push `(postfix ,(postfix context)) dpy))
+    (nreverse dpy)))
+
+
 (defun make-context-sheet (context output-stream)
   "Create a STREAM sheet from CONTEXT."
   ;; #### FIXME: what about the highlight flag ??
@@ -209,16 +230,12 @@ options based on it."))
 ;; #### FIXME: inconsistency. Why do I have a line-width slot in CONTEXT but
 ;; not an output-stream one ?
 (defmacro with-context-sheet ((sheet context output-stream) &body body)
-  `(let ((,sheet (make-context-sheet ,context ,output-stream)))
+  `(let ((,sheet #+()(make-context-sheet ,context ,output-stream)))
     ,@body
-    (flush-sheet ,sheet)))
+    #+()(flush-sheet ,sheet)))
 
-(defun %usage-header (context sheet)
-  (output-header sheet
-		 (pathname-name (progname context))
-		 (minus-pack context)
-		 (plus-pack context)
-		 (postfix context)))
+(defun %usage (sheet something)
+  (print something))
 
 (defun usage (context
 	      &key (item (synopsis context) item-supplied-p)
@@ -227,9 +244,11 @@ options based on it."))
 ITEM defaults to the whole program's synopsis.
 STREAM defaults to the standard output."
   (with-context-sheet (sheet context output-stream)
-    (unless item-supplied-p
-      (%usage-header context sheet))
-    (%usage sheet item)))
+    (%usage sheet
+	    (if item-supplied-p
+		(display item)
+		(list (synopsis-display context)
+		      (display item))))))
 
 
 
@@ -686,7 +705,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.~%"
 	(getopt context :long-name "clon-line-width"))
   (when (getopt context :long-name "clon-help")
     (with-context-sheet (sheet context *standard-output*)
-      (%usage sheet (clon-options-group context)))
+      (%usage sheet (display (clon-options-group context))))
     (quit 0)))
 
 (defun make-context

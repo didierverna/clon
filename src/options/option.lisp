@@ -75,6 +75,25 @@ This is the base class for all options."))
   option)
 
 
+;; ----------------
+;; Display protocol
+;; ----------------
+
+(defmethod display ((option option))
+  "Return OPTION's display specification."
+  (read-from-string
+   (format nil "(option
+		 (syntax (short-name ~@[\"-~A\"~])
+			 ~:[~:;\", \"~](long-name ~@[\"--~A\"~]))
+		 (description ~@[~S~]
+		   (environ ~@[\"Environment: ~A\"~])))"
+     (short-name option)
+     (and (short-name option) (long-name option))
+     (long-name option)
+     (description option)
+     (env-var option))))
+
+
 
 ;; ==========================================================================
 ;; Error Management
