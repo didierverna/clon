@@ -107,16 +107,15 @@ If OPTION matches, return its short name's length; otherwise 0."
   "Return OPTION's display specification."
   (read-from-string
    (format nil "(option
-		 (syntax (short-name ~@[\"~A\"~])
+		 (syntax (short-name ~?)
 			 ~:[~:;\", \"~](long-name ~@[\"--~A\"~]))
 		 (description ~@[~S~]
 		   (fallback ~@[\"Fallback: ~A\"~])
 		   (default ~@[\"Default: ~A\"~])
 		   (environ ~@[\"Environment: ~A\"~])))"
-     (and (short-name option)
-	  (concatenate 'string
-	    (short-syntax-display-prefix option)
-	    (short-name option)))
+     "~:[~:;\"~A~A\"~]" (list (short-name option)
+			      (short-syntax-display-prefix option)
+			      (short-name option))
      (and (short-name option) (long-name option))
      (long-name option)
      (description option)
