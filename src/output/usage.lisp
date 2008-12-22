@@ -43,6 +43,10 @@
     (output-option sheet
 		   (short-name option) (long-name option)
 		   (description option) (env-var option)))
+  (:method (sheet (option valued-option))
+    (output-option sheet
+		   (short-name option) (long-name option)
+		   (description option) (env-var option)))
   (:method (sheet (container container))
     (assert (sealedp container))
     (within-group sheet

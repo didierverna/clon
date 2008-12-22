@@ -82,13 +82,13 @@ This is the base class for all options."))
 (defmethod display ((option option))
   "Return OPTION's display specification."
   (read-from-string
+   ;; #### FIXME: syntax face elements separator: ", "
    (format nil "(option
 		 (syntax (short-name ~@[\"-~A\"~])
-			 ~:[~:;\", \"~](long-name ~@[\"--~A\"~]))
+			 (long-name ~@[\"--~A\"~]))
 		 (description ~@[~S~]
-		   (environ ~@[\"Environment: ~A\"~])))"
+		   (environment ~@[\"Environment: ~A\"~])))"
      (short-name option)
-     (and (short-name option) (long-name option))
      (long-name option)
      (description option)
      (env-var option))))

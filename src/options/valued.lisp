@@ -106,18 +106,28 @@ If OPTION matches, return its short name's length; otherwise 0."
 (defmethod display ((option valued-option))
   "Return OPTION's display specification."
   (read-from-string
+   ;; #### FIXME: syntax face elements separator: ", "
    (format nil "(option
 		 (syntax (short-name ~?)
-			 ~:[~:;\", \"~](long-name ~@[\"--~A\"~]))
+			 (long-name ~?))
 		 (description ~@[~S~]
 		   (fallback ~@[\"Fallback: ~A\"~])
 		   (default ~@[\"Default: ~A\"~])
 		   (environ ~@[\"Environment: ~A\"~])))"
-     "~:[~:;\"~A~A\"~]" (list (short-name option)
-			      (short-syntax-display-prefix option)
-			      (short-name option))
-     (and (short-name option) (long-name option))
-     (long-name option)
+     ;; short-name processing
+     "~:[~:;\"~A~A\" (argument ~:[~:;~:[\"[~A]\"~:;~S~]~])~]"
+     (list (short-name option)
+	   (short-syntax-display-prefix option)
+	   (short-name option)
+	   (not (long-name option))
+	   (argument-required-p option)
+	   (argument-name option))
+     ;; long-name processing
+     "~@[\"--~A\"~] (argument ~:[~:;~:[\"[=~A]\"~:;\"=~A\"~]~])"
+     (list (long-name option)
+	   (long-name option)
+	   (argument-required-p option)
+	   (argument-name option))
      (description option)
      (and (slot-boundp option 'fallback-value) (fallback-value option))
      (and (slot-boundp option 'default-value) (default-value option))

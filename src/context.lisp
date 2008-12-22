@@ -200,24 +200,18 @@ options based on it."))
 
 (defun synopsis-display (context)
   "Return CONTEXT's synopsis display."
-  (let ((dpy `(" "
-	       (program ,(pathname-name (progname context)))
-	       "Usage: "
-	       synopsis)))
-    (when (minus-pack context)
-      (push `(options (minus-pack ,(format nil "[-~A]" (minus-pack context))))
-	    dpy)
-      (push " " dpy))
-    (when (plus-pack context)
-      (push `(options (plus-pack ,(format nil "[+~A]" (plus-pack context))))
-	    dpy)
-      (push " " dpy))
-    (push '(options "[OPTIONS]") dpy)
-    (when (postfix context)
-      (push " " dpy)
-      (push `(postfix ,(postfix context)) dpy))
-    (nreverse dpy)))
-
+  (read-from-string
+   ;; #### FIXME: face elements separator: #\space
+   (format nil "(synopsis \"Usage:\"
+		 (program ~S)
+		 (options (minus-pack ~@[\"[-~A]\"~]))
+		 (options (plus-pack ~@[\"[+~A]~]\"))
+		 (options \"[OPTIONS]\")
+		 (postfix ~@[~S~]))"
+     (pathname-name (progname context))
+     (minus-pack context)
+     (plus-pack context)
+     (postfix context))))
 
 (defun make-context-sheet (context output-stream)
   "Create a STREAM sheet from CONTEXT."
