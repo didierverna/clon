@@ -343,6 +343,10 @@ This class is a mixin used to authorize the +-syntax for the switch hierarchy.")
   t)
 
 
+;; ----------------
+;; Display protocol
+;; ----------------
+
 (defmethod short-syntax-display-prefix ((option plus-callable))
   "-(+)")
 

@@ -195,7 +195,7 @@ options based on it."))
 
 
 ;; =========================================================================
-;; The Usage Protocol
+;; The Help Protocol
 ;; =========================================================================
 
 (defun synopsis-display (context)
@@ -228,17 +228,17 @@ options based on it."))
     ,@body
     #+()(flush-sheet ,sheet)))
 
-(defun %usage (sheet something)
+(defun %help (sheet something)
   (print something))
 
-(defun usage (context
+(defun help (context
 	      &key (item (synopsis context) item-supplied-p)
 		   (output-stream *standard-output*))
-  "Print CONTEXT's ITEM usage on STREAM.
-ITEM defaults to the whole program's synopsis.
-STREAM defaults to the standard output."
+  "Print CONTEXT's ITEM help on OUTPUT-STREAM.
+ITEM defaults to the whole program'synopsis.
+OUTPUT-STREAM defaults to standard output."
   (with-context-sheet (sheet context output-stream)
-    (%usage sheet
+    (%help sheet
 	    (if item-supplied-p
 		(display item)
 		(list (synopsis-display context)
@@ -699,7 +699,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.~%"
 	(getopt context :long-name "clon-line-width"))
   (when (getopt context :long-name "clon-help")
     (with-context-sheet (sheet context *standard-output*)
-      (%usage sheet (display (clon-options-group context))))
+      (%help sheet (display (clon-options-group context))))
     (quit 0)))
 
 (defun make-context

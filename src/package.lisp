@@ -57,7 +57,7 @@
 	   :make-context
 	   :getopt
 	   :getopt-cmdline :multiple-value-getopt-cmdline :do-cmdline-options
-	   :usage))
+	   :help))
 
 
 (in-package :clon)

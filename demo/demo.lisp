@@ -90,7 +90,7 @@
   (let ((context (clon:make-context :synopsis *synopsis* :error-handler :none
 				    :getopt-error-handler :none)))
     (when (clon:getopt context :short-name "h")
-      (clon:usage context)
+      (clon:help context)
       (quit))
     (multiple-value-bind (value source)
 	(clon:getopt context :short-name "F")
