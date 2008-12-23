@@ -193,12 +193,12 @@ Auto (the default) means on for tty output and off otherwise."
     (setf (slot-value synopsis 'plus-pack) plus-pack)))
 
 
-;; ----------------
-;; Display protocol
-;; ----------------
+;; ---------------------------
+;; Help specification protocol
+;; ---------------------------
 
-(defmethod display ((synopsis synopsis) &key program)
-  "Return SYNOPSIS's display specification."
+(defmethod help-spec ((synopsis synopsis) &key program)
+  "Return SYNOPSIS's help specification."
   (list* (accumulate (synopsis)
 	   "Usage:"
 	   `(program ,program)

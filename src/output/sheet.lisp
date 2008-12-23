@@ -287,6 +287,10 @@ output reaches the rightmost bound."
   (output-newline sheet)
   (setf (last-action sheet) :put-header))
 
+(defun print-help (sheet help-spec)
+  "Print HELP-SPEC on SHEET."
+  (print help-spec (output-stream sheet)))
+
 
 
 ;; ==========================================================================
@@ -298,9 +302,9 @@ output reaches the rightmost bound."
   (declare (ignore output-stream line-width search-path theme))
   (open-frame-1 sheet 0 (line-width sheet)))
 
-(defun make-sheet (&key output-stream line-width search-path theme)
+(defun make-sheet (&key output-stream search-path theme line-width highlight)
   "Make a new SHEET."
-  (declare (ignore search-path theme))
+  (declare (ignore search-path theme highlight))
   (unless line-width
     ;; #### PORTME.
     (handler-case

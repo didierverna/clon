@@ -46,12 +46,12 @@ This class groups other groups, options or strings together, effectively
 implementing hierarchical program command-line."))
 
 
-;; ----------------
-;; Display protocol
-;; ----------------
+;; ---------------------------
+;; Help specification protocol
+;; ---------------------------
 
-(defmethod display ((group group) &key)
-  "Return GROUP's display specification."
+(defmethod help-spec ((group group) &key)
+  "Return GROUP's help specification."
   (let ((dpy (call-next-method)))
     (when dpy
       (push 'group dpy))))

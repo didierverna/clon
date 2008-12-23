@@ -84,13 +84,13 @@ command-line hierarchy."))
       (check-name-clash item1 item2))))
 
 
-;; ----------------
-;; Display protocol
-;; ----------------
+;; -------------------------
+;; Help specifation protocol
+;; -------------------------
 
-(defmethod display ((container container) &key)
-  "Return CONTAINER'display specification."
-  `(,@(mapcar #'display (container-items container))))
+(defmethod help-spec ((container container) &key)
+  "Return CONTAINER's help specification."
+  `(,@(mapcar #'help-spec (container-items container))))
 
 
 

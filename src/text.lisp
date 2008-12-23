@@ -59,11 +59,11 @@ This class implements plain text objects appearing in a synopsis."))
 
 
 ;; ==========================================================================
-;; The Display Protocol
+;; The Help Specification Protocol
 ;; ==========================================================================
 
-(defgeneric display (item &key &allow-other-keys)
-  (:documentation "Return a display specification for ITEM.")
+(defgeneric help-spec (item &key &allow-other-keys)
+  (:documentation "Return a help specification for ITEM.")
   (:method ((text text) &key)
     `(text ,(contents text))))
 

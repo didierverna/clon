@@ -199,22 +199,19 @@ options based on it."))
 ;; =========================================================================
 
 (defun make-context-sheet (context output-stream)
-  "Create a STREAM sheet from CONTEXT."
-  ;; #### FIXME: what about the highlight flag ??
+  "Create a CONTEXT based sheet for printing on OUTPUT-STRREAM."
   (make-sheet :output-stream output-stream
-	      :line-width (line-width context)
 	      :search-path (search-path context)
-	      :theme (theme context)))
+	      :theme (theme context)
+	      :line-width (line-width context)
+	      :highlight (highlight context)))
 
 ;; #### FIXME: inconsistency. Why do I have a line-width slot in CONTEXT but
 ;; not an output-stream one ?
 (defmacro with-context-sheet ((sheet context output-stream) &body body)
-  `(let ((,sheet #+()(make-context-sheet ,context ,output-stream)))
+  `(let ((,sheet (make-context-sheet ,context ,output-stream)))
     ,@body
-    #+()(flush-sheet ,sheet)))
-
-(defun %help (sheet something)
-  (print something))
+    (flush-sheet ,sheet)))
 
 (defun help (context &key (item (synopsis context))
 		     (    output-stream *standard-output*))
@@ -222,7 +219,8 @@ options based on it."))
 ITEM defaults to the whole program'synopsis.
 OUTPUT-STREAM defaults to standard output."
   (with-context-sheet (sheet context output-stream)
-    (%help sheet (display item :program (pathname-name (progname context))))))
+    (print-help sheet
+		(help-spec item :program (pathname-name (progname context))))))
 
 
 
@@ -673,13 +671,13 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.~%"
 	(getopt context :long-name "clon-search-path"))
   (setf (slot-value context 'theme)
 	(getopt context :long-name "clon-theme"))
-  (setf (slot-value context 'highlight)
-	(getopt context :long-name "clon-highlight"))
   (setf (slot-value context 'line-width)
 	(getopt context :long-name "clon-line-width"))
+  (setf (slot-value context 'highlight)
+	(getopt context :long-name "clon-highlight"))
   (when (getopt context :long-name "clon-help")
     (with-context-sheet (sheet context *standard-output*)
-      (%help sheet (display (clon-options-group context))))
+      (print-help sheet (help-spec (clon-options-group context))))
     (quit 0)))
 
 (defun make-context

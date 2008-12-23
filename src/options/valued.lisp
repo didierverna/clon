@@ -94,23 +94,23 @@ If OPTION matches, return its short name's length; otherwise 0."
     (potential-pack-char option as-string)))
 
 
-;; ----------------
-;; Display protocol
-;; ----------------
+;; ---------------------------
+;; Help specification protocol
+;; ---------------------------
 
-(defgeneric short-syntax-display-prefix (option)
-  (:documentation "Return the display prefix for OPTION's short call.")
+(defgeneric short-syntax-help-spec-prefix (option)
+  (:documentation "Return the help specification prefix for OPTION's short call.")
   (:method ((option valued-option))
     "-"))
 
-(defmethod display ((option valued-option) &key)
-  "Return OPTION's display specification."
+(defmethod help-spec ((option valued-option) &key)
+  "Return OPTION's help specification."
   (accumulate (option)
     (accumulate (syntax)
       (accumulate (short-name)
 	(when (short-name option)
 	  (format nil "~A~A"
-	    (short-syntax-display-prefix option)
+	    (short-syntax-help-spec-prefix option)
 	    (short-name option)))
 	(accumulate (argument)
 	  (when (and (short-name option) (not (long-name option)))
@@ -347,11 +347,11 @@ This class is a mixin used to authorize the +-syntax for the switch hierarchy.")
   t)
 
 
-;; ----------------
-;; Display protocol
-;; ----------------
+;; ---------------------------
+;; Help specification protocol
+;; ---------------------------
 
-(defmethod short-syntax-display-prefix ((option plus-callable))
+(defmethod short-syntax-help-spec-prefix ((option plus-callable))
   "-(+)")
 
 

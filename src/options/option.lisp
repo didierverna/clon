@@ -75,12 +75,12 @@ This is the base class for all options."))
   option)
 
 
-;; ----------------
-;; Display protocol
-;; ----------------
+;; ---------------------------
+;; Help specification protocol
+;; ---------------------------
 
-(defmethod display ((option option) &key)
-  "Return OPTION's display specification."
+(defmethod help-spec ((option option) &key)
+  "Return OPTION's help specification."
   (accumulate (option)
     (accumulate (syntax)
       (when (short-name option)
