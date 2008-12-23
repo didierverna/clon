@@ -105,34 +105,37 @@ If OPTION matches, return its short name's length; otherwise 0."
 
 (defmethod display ((option valued-option))
   "Return OPTION's display specification."
-  (read-from-string
-   ;; #### FIXME: syntax face elements separator: ", "
-   (format nil "(option
-		 (syntax (short-name ~?)
-			 (long-name ~?))
-		 (description ~@[~S~]
-		   (fallback ~@[\"Fallback: ~A\"~])
-		   (default ~@[\"Default: ~A\"~])
-		   (environ ~@[\"Environment: ~A\"~])))"
-     ;; short-name processing
-     "~? (argument ~:[~:;~:[\"[~A]\"~:;~S~]~])"
-     (list "~:[~:;\"~A~A\"~]"
-	   (list (short-name option)
-		 (short-syntax-display-prefix option)
-		 (short-name option))
-	   (and (short-name option) (not (long-name option)))
-	   (argument-required-p option)
-	   (argument-name option))
-     ;; long-name processing
-     "~@[\"--~A\"~] (argument ~:[~:;~:[\"[=~A]\"~:;\"=~A\"~]~])"
-     (list (long-name option)
-	   (long-name option)
-	   (argument-required-p option)
-	   (argument-name option))
-     (description option)
-     (and (slot-boundp option 'fallback-value) (fallback-value option))
-     (and (slot-boundp option 'default-value) (default-value option))
-     (env-var option))))
+  (accumulate (option)
+    (accumulate (syntax)
+      (accumulate (short-name)
+	(when (short-name option)
+	  (format nil "~A~A"
+	    (short-syntax-display-prefix option)
+	    (short-name option)))
+	(accumulate (argument)
+	  (when (and (short-name option) (not (long-name option)))
+	    (format nil "~:[[~A]~:;~A~]"
+	      (argument-required-p option)
+	      (argument-name option)))))
+      (accumulate (long-name)
+	(when (long-name option)
+	  (format nil "--~A" (long-name option)))
+	(accumulate (argument)
+	  (when (long-name option)
+	    (format nil "~:[[=~A]~:;=~A~]"
+	      (argument-required-p option)
+	      (argument-name option))))))
+    (accumulate (description)
+      (description option)
+      (accumulate (fallback)
+	(when (slot-boundp option 'fallback-value)
+	  (format nil "Fallback: ~A" (fallback-value option))))
+      (accumulate (default)
+	(when (slot-boundp option 'default-value)
+	  (format nil "Default: ~A" (default-value option))))
+      (accumulate (environment)
+	(when (env-var option)
+	  (format nil "Environment: ~A" (env-var option)))))))
 
 
 
