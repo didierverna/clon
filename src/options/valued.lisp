@@ -115,11 +115,12 @@ If OPTION matches, return its short name's length; otherwise 0."
 		   (default ~@[\"Default: ~A\"~])
 		   (environ ~@[\"Environment: ~A\"~])))"
      ;; short-name processing
-     "~:[~:;\"~A~A\" (argument ~:[~:;~:[\"[~A]\"~:;~S~]~])~]"
-     (list (short-name option)
-	   (short-syntax-display-prefix option)
-	   (short-name option)
-	   (not (long-name option))
+     "~? (argument ~:[~:;~:[\"[~A]\"~:;~S~]~])"
+     (list "~:[~:;\"~A~A\"~]"
+	   (list (short-name option)
+		 (short-syntax-display-prefix option)
+		 (short-name option))
+	   (and (short-name option) (not (long-name option)))
 	   (argument-required-p option)
 	   (argument-name option))
      ;; long-name processing
