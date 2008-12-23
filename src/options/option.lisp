@@ -103,8 +103,9 @@ This is the base class for all options."))
 	 (option-help
 	  (let ((opt (list 'option)))
 	    (maybe-push syntax-help opt)
-	    (maybe-push description-help opt))))
-    (nreverse option-help)))
+	    (maybe-push description-help opt)
+	    (nreverse opt))))
+    option-help))
 
 
 
