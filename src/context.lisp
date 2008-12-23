@@ -200,18 +200,20 @@ options based on it."))
 
 (defun synopsis-display (context)
   "Return CONTEXT's synopsis display."
-  (read-from-string
-   ;; #### FIXME: face elements separator: #\space
-   (format nil "(synopsis \"Usage:\"
-		 (program ~S)
-		 (options (minus-pack ~@[\"[-~A]\"~]))
-		 (options (plus-pack ~@[\"[+~A]~]\"))
-		 (options \"[OPTIONS]\")
-		 (postfix ~@[~S~]))"
-     (pathname-name (progname context))
-     (minus-pack context)
-     (plus-pack context)
-     (postfix context))))
+  (accumulate (synopsis)
+    "Usage:"
+    (accumulate (program)
+      (pathname-name (progname context)))
+    (accumulate (options)
+      (accumulate (minus-pack)
+	(and (minus-pack context) (format nil "[-~A]" (minus-pack context)))))
+    (accumulate (options)
+      (accumulate (plus-pack)
+	(and (plus-pack context) (format nil "[+~A]" (plus-pack context)))))
+    (accumulate (options)
+      "[OPTIONS]")
+    (accumulate (postfix)
+      (postfix context))))
 
 (defun make-context-sheet (context output-stream)
   "Create a STREAM sheet from CONTEXT."
