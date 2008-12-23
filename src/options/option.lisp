@@ -81,25 +81,16 @@ This is the base class for all options."))
 
 (defmethod display ((option option))
   "Return OPTION's display specification."
-  (let* ((short-name-help
-	  (when (short-name option)
-	    `(short-name ,(format nil "-~A" (short-name option)))))
-	 (long-name-help
-	  (when (long-name option)
-	    `(long-name ,(format nil "--~A" (long-name option)))))
-	 (syntax-help (accumulate (syntax)
-			short-name-help
-			long-name-help))
-	 (environment-help
-	  (when (env-var option)
-	    `(environment ,(format nil "Environment: ~A" (env-var option)))))
-	 (description-help (accumulate (description)
-			     (description option)
-			     environment-help))
-	 (option-help (accumulate (option)
-			syntax-help
-			description-help)))
-    option-help))
+  (accumulate (option)
+    (accumulate (syntax)
+      (when (short-name option)
+	`(short-name ,(format nil "-~A" (short-name option))))
+      (when (long-name option)
+	`(long-name ,(format nil "--~A" (long-name option)))))
+    (accumulate (description)
+      (description option)
+      (when (env-var option)
+	`(environment ,(format nil "Environment: ~A" (env-var option)))))))
 
 
 
