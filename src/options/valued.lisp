@@ -103,7 +103,7 @@ If OPTION matches, return its short name's length; otherwise 0."
   (:method ((option valued-option))
     "-"))
 
-(defmethod display ((option valued-option))
+(defmethod display ((option valued-option) &key)
   "Return OPTION's display specification."
   (accumulate (option)
     (accumulate (syntax)

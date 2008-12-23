@@ -79,7 +79,7 @@ This is the base class for all options."))
 ;; Display protocol
 ;; ----------------
 
-(defmethod display ((option option))
+(defmethod display ((option option) &key)
   "Return OPTION's display specification."
   (accumulate (option)
     (accumulate (syntax)

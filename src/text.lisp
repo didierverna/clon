@@ -62,9 +62,9 @@ This class implements plain text objects appearing in a synopsis."))
 ;; The Display Protocol
 ;; ==========================================================================
 
-(defgeneric display (item)
+(defgeneric display (item &key &allow-other-keys)
   (:documentation "Return a display specification for ITEM.")
-  (:method ((text text))
+  (:method ((text text) &key)
     `(text ,(contents text))))
 
 

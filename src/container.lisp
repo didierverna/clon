@@ -88,7 +88,7 @@ command-line hierarchy."))
 ;; Display protocol
 ;; ----------------
 
-(defmethod display ((container container))
+(defmethod display ((container container) &key)
   "Return CONTAINER'display specification."
   `(,@(mapcar #'display (container-items container))))
 

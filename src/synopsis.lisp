@@ -193,6 +193,28 @@ Auto (the default) means on for tty output and off otherwise."
     (setf (slot-value synopsis 'plus-pack) plus-pack)))
 
 
+;; ----------------
+;; Display protocol
+;; ----------------
+
+(defmethod display ((synopsis synopsis) &key program)
+  "Return SYNOPSIS's display specification."
+  (list* (accumulate (synopsis)
+	   "Usage:"
+	   `(program ,program)
+	   (accumulate (minus-pack)
+	     (and (minus-pack synopsis)
+		  (format nil "[-~A]" (minus-pack synopsis))))
+	   (accumulate (plus-pack)
+	     (and (plus-pack synopsis)
+		  (format nil "[+~A]" (plus-pack synopsis))))
+	   '(options "[OPTIONS]")
+	   (accumulate (postfix)
+	     (postfix synopsis)))
+	 ;; This calls the CONTAINER method.
+	 (call-next-method)))
+
+
 
 ;; ==========================================================================
 ;; The Potential Pack Protocol

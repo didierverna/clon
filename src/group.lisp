@@ -50,10 +50,11 @@ implementing hierarchical program command-line."))
 ;; Display protocol
 ;; ----------------
 
-(defmethod display ((group group))
+(defmethod display ((group group) &key)
   "Return GROUP's display specification."
   (let ((dpy (call-next-method)))
-    (push 'group dpy)))
+    (when dpy
+      (push 'group dpy))))
 
 
 

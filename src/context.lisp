@@ -198,23 +198,6 @@ options based on it."))
 ;; The Help Protocol
 ;; =========================================================================
 
-(defun synopsis-display (context)
-  "Return CONTEXT's synopsis display."
-  (accumulate (synopsis)
-    "Usage:"
-    (accumulate (program)
-      (pathname-name (progname context)))
-    (accumulate (options)
-      (accumulate (minus-pack)
-	(and (minus-pack context) (format nil "[-~A]" (minus-pack context)))))
-    (accumulate (options)
-      (accumulate (plus-pack)
-	(and (plus-pack context) (format nil "[+~A]" (plus-pack context)))))
-    (accumulate (options)
-      "[OPTIONS]")
-    (accumulate (postfix)
-      (postfix context))))
-
 (defun make-context-sheet (context output-stream)
   "Create a STREAM sheet from CONTEXT."
   ;; #### FIXME: what about the highlight flag ??
@@ -233,18 +216,13 @@ options based on it."))
 (defun %help (sheet something)
   (print something))
 
-(defun help (context
-	      &key (item (synopsis context) item-supplied-p)
-		   (output-stream *standard-output*))
+(defun help (context &key (item (synopsis context))
+		     (    output-stream *standard-output*))
   "Print CONTEXT's ITEM help on OUTPUT-STREAM.
 ITEM defaults to the whole program'synopsis.
 OUTPUT-STREAM defaults to standard output."
   (with-context-sheet (sheet context output-stream)
-    (%help sheet
-	    (if item-supplied-p
-		(display item)
-		(list (synopsis-display context)
-		      (display item))))))
+    (%help sheet (display item :program (pathname-name (progname context))))))
 
 
 
