@@ -81,17 +81,36 @@ This is the base class for all options."))
 
 (defmethod display ((option option))
   "Return OPTION's display specification."
-  (read-from-string
-   ;; #### FIXME: syntax face elements separator: ", "
-   (format nil "(option
-		 (syntax (short-name ~@[\"-~A\"~])
-			 (long-name ~@[\"--~A\"~]))
-		 (description ~@[~S~]
-		   (environment ~@[\"Environment: ~A\"~])))"
-     (short-name option)
-     (long-name option)
-     (description option)
-     (env-var option))))
+  (let* ((short-name-help
+	  (when (short-name option)
+	    `(short-name ,(format nil "-~A" (short-name option)))))
+	 (long-name-help
+	  (when (long-name option)
+	    `(long-name ,(format nil "--~A" (long-name option)))))
+	 (syntax-help
+	  (let ((syn (list 'syntax)))
+	    (when short-name-help
+	      (push short-name-help syn))
+	    (when long-name-help
+	      (push long-name-help syn))
+	    (nreverse syn)))
+	 (environment-help
+	  (when (env-var option)
+	    `(environment ,(format nil "Environment: ~A" (env-var option)))))
+	 (description-help
+	  (let ((desc (list 'description)))
+	    (when (description option)
+	      (push (description option) desc))
+	    (when environment-help
+	      (push environment-help desc))
+	    (nreverse desc)))
+	 (option-help
+	  (let ((opt (list 'option)))
+	    (when syntax-help
+	      (push syntax-help opt))
+	    (when description-help
+	      (push description-help opt)))))
+    (nreverse option-help)))
 
 
 
