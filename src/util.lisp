@@ -50,7 +50,9 @@
 
 (defmacro maybe-push (object place)
   "Like push, but only if OBJECT is non-nil."
-  `(when ,object (push ,object ,place)))
+  (let ((the-object (gensym "object")))
+    `(let ((,the-object ,object))
+      (when ,the-object (push ,the-object ,place)))))
 
 (defmacro accumulate ((initial-value) &body body)
   "Accumulate BODY forms in a list beginning with INITIAL-VALUE.
