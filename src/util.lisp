@@ -48,6 +48,10 @@
   "Like push, but at the end."
   `(setf ,place (nconc ,place (list ,object))))
 
+(defmacro maybe-push (object place)
+  "Like push, but only if OBJECT is non-nil."
+  `(when ,object (push ,object ,place)))
+
 (defun beginning-of-string-p (beginning string &optional ignore-case)
   "Check that STRING starts with BEGINNING.
 If IGNORE-CASE, well, ignore case."

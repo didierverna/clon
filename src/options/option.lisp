@@ -89,27 +89,21 @@ This is the base class for all options."))
 	    `(long-name ,(format nil "--~A" (long-name option)))))
 	 (syntax-help
 	  (let ((syn (list 'syntax)))
-	    (when short-name-help
-	      (push short-name-help syn))
-	    (when long-name-help
-	      (push long-name-help syn))
+	    (maybe-push short-name-help syn)
+	    (maybe-push long-name-help syn)
 	    (nreverse syn)))
 	 (environment-help
 	  (when (env-var option)
 	    `(environment ,(format nil "Environment: ~A" (env-var option)))))
 	 (description-help
 	  (let ((desc (list 'description)))
-	    (when (description option)
-	      (push (description option) desc))
-	    (when environment-help
-	      (push environment-help desc))
+	    (maybe-push (description option) desc)
+	    (maybe-push environment-help desc)
 	    (nreverse desc)))
 	 (option-help
 	  (let ((opt (list 'option)))
-	    (when syntax-help
-	      (push syntax-help opt))
-	    (when description-help
-	      (push description-help opt)))))
+	    (maybe-push syntax-help opt)
+	    (maybe-push description-help opt))))
     (nreverse option-help)))
 
 
