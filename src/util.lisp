@@ -52,6 +52,22 @@
   "Like push, but only if OBJECT is non-nil."
   `(when ,object (push ,object ,place)))
 
+(defmacro accumulate ((initial-value) &body body)
+  "Accumulate BODY forms in a list beginning with INITIAL-VALUE.
+INITIAL-VALUE is not evaluated. BODY forms are accumulated only when their
+value is non-nil.
+If nothing to accumulate, then return nil instead of the list of
+INITIAL-VALUE."
+  (let ((place (gensym "place"))
+	(initial-place (gensym "initial-place")))
+    `(let* ((,place (list ',initial-value))
+	    (,initial-place ,place))
+      ,@(mapcar (lambda (body-form)
+		  `(maybe-push ,body-form ,place))
+		body)
+      (when (not (eq ,initial-place ,place))
+	(nreverse ,place)))))
+
 (defun beginning-of-string-p (beginning string &optional ignore-case)
   "Check that STRING starts with BEGINNING.
 If IGNORE-CASE, well, ignore case."
