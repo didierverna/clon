@@ -36,7 +36,8 @@
 (dolist (symbol '(select-keys remove-keys
 		  add-to
 		  convert-value convert-environment
-		  push-cmdline-option push-unknown-option))
+		  push-cmdline-option push-unknown-option
+		  make-face))
   (put symbol 'common-lisp-indent-function 1))
 
 (dolist (symbol '(with-winsize

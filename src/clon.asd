@@ -179,7 +179,8 @@ The most important features of Clon are:
 	       (:file "synopsis" :depends-on ("group"))
 	       (:module "output"
 		 :depends-on ("synopsis" "retrieval")
-		 :components ((:file "sheet")))
+		 :components ((:file "face")
+			      (:file "sheet" :depends-on ("face"))))
 	       (:file "context" :depends-on ("output"))))
 
 

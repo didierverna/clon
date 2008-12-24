@@ -48,6 +48,9 @@
 	       :type (integer 1)
 	       :reader line-width
 	       :initarg :line-width)
+   (faces :documentation "The sheet's faces."
+	  :reader faces
+	  :initform (make-faces))
    (column :documentation "The sheet's current column."
 	   :type (integer 0)
 	   :accessor column
