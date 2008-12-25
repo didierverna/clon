@@ -34,14 +34,14 @@
 (in-package :clon)
 (in-readtable :clon)
 
-(defstruct (face (:constructor make-face-1))
+(defstruct (face (:constructor %make-face))
   name
   item-separator
   faces)
 
 (defun make-face (name &rest keys &key item-separator face)
   "Make a new face named NAME."
-  (apply #'make-face-1
+  (apply #'%make-face
     :name name
     :faces (remove :face (select-keys keys :face))
     (remove-keys keys :face)))

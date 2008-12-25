@@ -254,6 +254,32 @@ output reaches the rightmost bound."
   (decf (in-group sheet))
   (setf (last-action sheet) :close-group))
 
+(defmacro with-face ((name name-symbol) &body body)
+  `(let ((,name ,name-symbol))
+    ,@body))
+
+(defgeneric %print-help (sheet help-spec)
+  (:documentation "Print HELP-SPEC on SHEET.")
+  (:method (sheet (help-spec character))
+    "Print HELP-SPEC on SHEET."
+    (princ-char sheet help-spec))
+  (:method (sheet (help-spec string))
+    "Print HELP-SPEC on SHEET."
+    (output-string sheet help-spec))
+  (:method (sheet (help-spec list))
+    "Print the CDR of HELP-SPEC on SHEET.
+The CAR of HELP-SPEC should be a symbol naming the face to use for printing.
+The HELP-SPEC items to print are separated with the contents of the face's
+:item-separator property."
+    (with-face (face (car help-spec))
+      (mapc (lambda (spec) (%print-help sheet spec))
+	    (reduce (lambda (spec1 spec2)
+		      (if spec2
+			  (list* spec1 #\space #+()(face-item-separator face) spec2)
+			  (list spec1)))
+		    (cdr help-spec)
+		    :from-end t :initial-value nil)))))
+
 (defun print-help (sheet help-spec)
   "Print HELP-SPEC on SHEET."
   (if (and (listp help-spec) (not (symbolp (car help-spec))))
@@ -262,7 +288,7 @@ output reaches the rightmost bound."
       ;; case we have the list of synopsis and all synopsis items.
       (push 'default help-spec)
       (setq help-spec `(default ,help-spec)))
-  (print help-spec (output-stream sheet)))
+  (%print-help sheet help-spec))
 
 
 
@@ -300,7 +326,7 @@ output reaches the rightmost bound."
   "Flush SHEET."
   (assert (= (length (frames sheet)) 1))
   (close-frame-1 sheet)
-  (princ-char sheet #\newline))
+  (terpri (output-stream sheet)))
 
 
 ;;; sheet.lisp ends here
