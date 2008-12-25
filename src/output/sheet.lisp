@@ -254,44 +254,14 @@ output reaches the rightmost bound."
   (decf (in-group sheet))
   (setf (last-action sheet) :close-group))
 
-(defmacro within-group (sheet &body body)
-  `(progn
-    (open-group ,sheet)
-    ,@body
-    (close-group ,sheet)))
-
-(defun output-text (sheet text)
-  "Output a TEXT component to SHEET."
-  (maybe-output-newline sheet)
-  (when (and text (not (zerop (length text))))
-    (output-string sheet text))
-  (setf (last-action sheet) :put-text))
-
-(defun output-header (sheet pathname minus-pack plus-pack postfix)
-  "Output a usage header to SHEET."
-  (princ-string sheet "Usage: ")
-  (princ-string sheet pathname)
-  (when minus-pack
-    (princ-string sheet " [")
-    (princ-char sheet #\-)
-    (princ-string sheet minus-pack)
-    (princ-char sheet #\]))
-  (when plus-pack
-    (princ-string sheet " [")
-    (princ-char sheet #\+)
-    (princ-string sheet plus-pack)
-    (princ-char sheet #\]))
-  (princ-string sheet " [")
-  (princ-string sheet "OPTIONS")
-  (princ-char sheet #\])
-  (when postfix
-    (princ-char sheet #\space)
-    (princ-string sheet postfix))
-  (output-newline sheet)
-  (setf (last-action sheet) :put-header))
-
 (defun print-help (sheet help-spec)
   "Print HELP-SPEC on SHEET."
+  (if (and (listp help-spec) (not (symbolp (car help-spec))))
+      ;; There's already an enclosing list when help for a container is
+      ;; requested directly, or when the complete help is requested, in which
+      ;; case we have the list of synopsis and all synopsis items.
+      (push 'default help-spec)
+      (setq help-spec `(default ,help-spec)))
   (print help-spec (output-stream sheet)))
 
 
