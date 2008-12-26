@@ -48,9 +48,12 @@
 	       :type (integer 1)
 	       :reader line-width
 	       :initarg :line-width)
-   (faces :documentation "The sheet's faces."
-	  :reader faces
-	  :initform (make-faces))
+   (face-tree :documentation "The sheet's face tree."
+	      :reader face-tree
+	      :initform (make-face-tree))
+   (current-face :documentation "The current position in the face tree."
+		 :accessor current-face
+		 :initform nil)
    (column :documentation "The sheet's current column."
 	   :type (integer 0)
 	   :accessor column
@@ -254,12 +257,36 @@ output reaches the rightmost bound."
   (decf (in-group sheet))
   (setf (last-action sheet) :close-group))
 
-(defmacro with-face ((name name-symbol) &body body)
-  `(let ((,name ,name-symbol))
-    ,@body))
+(defun open-face (sheet name)
+  "Find the closest face named NAME in SHEET's face tree.
+FACE can be a subface of the current face, or one up the face tree.
+Return two values: the face, and whether it was found as a subface (in which
+case it should be popped afterwards."
+  (let ((face (cond ((null (current-face sheet))
+		     (assert (eql name 'help))
+		     (unless (eql (face-name (face-tree sheet)) 'help)
+		       (error "Help face not found."))
+		     (face-tree sheet))
+		    (t
+		     (find-face name (current-face sheet))))))
+    (setf (current-face sheet) face)
+    (open-frame-1 sheet 0 (line-width sheet))))
+
+(defun close-face (sheet)
+  "Close SHEET's current face."
+  (close-frame-1 sheet)
+  (setf (current-face sheet) (face-parent (current-face sheet))))
+
+(defmacro with-face (sheet face &body body)
+  `(progn
+    (open-face ,sheet ,face)
+    ,@body
+    (close-face ,sheet)))
 
 (defgeneric %print-help (sheet help-spec)
   (:documentation "Print HELP-SPEC on SHEET.")
+  (:method (sheet (help-spec (eql #\newline)))
+    (output-newline sheet))
   (:method (sheet (help-spec character))
     "Print HELP-SPEC on SHEET."
     (princ-char sheet help-spec))
@@ -271,14 +298,18 @@ output reaches the rightmost bound."
 The CAR of HELP-SPEC should be a symbol naming the face to use for printing.
 The HELP-SPEC items to print are separated with the contents of the face's
 :item-separator property."
-    (with-face (face (car help-spec))
+    (with-face sheet (car help-spec)
       (mapc (lambda (spec) (%print-help sheet spec))
-	    (reduce (lambda (spec1 spec2)
-		      (if spec2
-			  (list* spec1 #\space #+()(face-item-separator face) spec2)
-			  (list spec1)))
-		    (cdr help-spec)
-		    :from-end t :initial-value nil)))))
+	    (if (face-item-separator (current-face sheet))
+		(reduce (lambda (spec1 spec2)
+			  (if spec2
+			      (list* spec1
+				     (face-item-separator (current-face sheet))
+				     spec2)
+			      (list spec1)))
+			(cdr help-spec)
+			:from-end t :initial-value nil)
+		(cdr help-spec))))))
 
 (defun print-help (sheet help-spec)
   "Print HELP-SPEC on SHEET."
@@ -286,8 +317,8 @@ The HELP-SPEC items to print are separated with the contents of the face's
       ;; There's already an enclosing list when help for a container is
       ;; requested directly, or when the complete help is requested, in which
       ;; case we have the list of synopsis and all synopsis items.
-      (push 'default help-spec)
-      (setq help-spec `(default ,help-spec)))
+      (push 'help help-spec)
+      (setq help-spec `(help ,help-spec)))
   (%print-help sheet help-spec))
 
 
@@ -295,11 +326,6 @@ The HELP-SPEC items to print are separated with the contents of the face's
 ;; ==========================================================================
 ;; Sheet Instance Creation
 ;; ==========================================================================
-
-(defmethod initialize-instance :after
-    ((sheet sheet) &key output-stream line-width search-path theme)
-  (declare (ignore output-stream line-width search-path theme))
-  (open-frame-1 sheet 0 (line-width sheet)))
 
 (defun make-sheet (&key output-stream search-path theme line-width highlight)
   "Make a new SHEET."
@@ -324,8 +350,7 @@ The HELP-SPEC items to print are separated with the contents of the face's
 
 (defun flush-sheet (sheet)
   "Flush SHEET."
-  (assert (= (length (frames sheet)) 1))
-  (close-frame-1 sheet)
+  (assert (null (current-face sheet)))
   (terpri (output-stream sheet)))
 
 

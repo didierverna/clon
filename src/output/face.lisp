@@ -34,43 +34,81 @@
 (in-package :clon)
 (in-readtable :clon)
 
+
+;; =========================================================================
+;; The Face Structure
+;; =========================================================================
+
 (defstruct (face (:constructor %make-face))
   name
-  item-separator
-  faces)
+  (item-separator nil)
+  (faces nil)
+  (parent nil))
 
 (defun make-face (name &rest keys &key item-separator face)
   "Make a new face named NAME."
-  (apply #'%make-face
-    :name name
-    :faces (remove :face (select-keys keys :face))
-    (remove-keys keys :face)))
+  (declare (ignore item-separator face))
+  (let ((new-face (apply #'%make-face
+		    :name name
+		    :faces (remove :face (select-keys keys :face))
+		    (remove-keys keys :face))))
+    (mapc (lambda (child) (setf (face-parent child) new-face))
+	  (face-faces new-face))
+    new-face))
 
-(defun make-faces ()
-  (make-face "default"
+(defun copy-face-tree (face)
+  "Return a copy of FACE tree."
+  (let ((new-face (copy-face face)))
+    (setf (face-faces new-face) (mapcar #'copy-face-tree (face-faces new-face)))
+    (mapc (lambda (subface) (setf (face-parent subface) new-face))
+	  (face-faces new-face))
+    new-face))
+
+(defun subfacep (name face)
+  "Return subface named NAME from FACE, or nil."
+  (find name (face-faces face) :key #'face-name))
+
+(defun find-face (name face)
+  "Find face named NAME in face FACE.
+Face should be either a direct subface of FACE (in which case it is simply
+returned) or a subface of one of FACE's parents (in which case the whole face
+tree is copied as a new subface of FACE)."
+  (or (subfacep name face)
+      (loop :for super := (face-parent face) :then (face-parent super)
+	    :while super
+	    :for found := (subfacep name super)
+	    :when found
+	    :do (let ((new-tree (copy-face-tree found)))
+		  (setf (face-parent new-tree) face)
+		  (push new-tree (face-faces face))
+		  (return-from find-face new-tree))
+	    :finally (error "Face ~A not found." name))))
+
+(defun make-face-tree ()
+  (make-face 'help
     :item-separator #\newline
-    :face (make-face "synopsis"
+    :face (make-face 'synopsis
 	    :item-separator #\space
-	    :face (make-face "program")
-	    :face (make-face "minus-pack")
-	    :face (make-face "plus-pack")
-	    :face (make-face "options")
-	    :face (make-face "postfix"))
-    :face (make-face "text")
-    :face (make-face "option"
-	    :item-separator #\newline
-	    :face (make-face "syntax"
+	    :face (make-face 'program)
+	    :face (make-face 'minus-pack)
+	    :face (make-face 'plus-pack)
+	    :face (make-face 'options)
+	    :face (make-face 'postfix))
+    :face (make-face 'text)
+    :face (make-face 'option
+	    :item-separator #\space
+	    :face (make-face 'syntax
 		    :item-separator ", "
-		    :face (make-face "short-name"
-			    :face (make-face "argument"))
-		    :face (make-face "long-name"
-			    :face (make-face "argument")))
-	    :face (make-face "description"
+		    :face (make-face 'short-name
+			    :face (make-face 'argument))
+		    :face (make-face 'long-name
+			    :face (make-face 'argument)))
+	    :face (make-face 'description
 		    :item-separator #\newline
-		    :face (make-face "fallback")
-		    :face (make-face "default")
-		    :face (make-face "environment")))
-    :face (make-face "group"
+		    :face (make-face 'fallback)
+		    :face (make-face 'default)
+		    :face (make-face 'environment)))
+    :face (make-face 'group
 	    :item-separator #\newline)))
 
 
