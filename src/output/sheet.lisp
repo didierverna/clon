@@ -299,17 +299,11 @@ The CAR of HELP-SPEC should be a symbol naming the face to use for printing.
 The HELP-SPEC items to print are separated with the contents of the face's
 :item-separator property."
     (with-face sheet (car help-spec)
-      (mapc (lambda (spec) (%print-help sheet spec))
-	    (if (face-item-separator (current-face sheet))
-		(reduce (lambda (spec1 spec2)
-			  (if spec2
-			      (list* spec1
-				     (face-item-separator (current-face sheet))
-				     spec2)
-			      (list spec1)))
-			(cdr help-spec)
-			:from-end t :initial-value nil)
-		(cdr help-spec))))))
+      (loop :for spec :on (cdr help-spec)
+	    :while spec
+	    :do (%print-help sheet (car spec))
+	    (when (and (cdr spec) (face-item-separator (current-face sheet)))
+	      (%print-help sheet (face-item-separator (current-face sheet))))))))
 
 (defun print-help (sheet help-spec)
   "Print HELP-SPEC on SHEET."
