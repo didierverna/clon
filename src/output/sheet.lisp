@@ -270,7 +270,8 @@ case it should be popped afterwards."
 		    (t
 		     (find-face name (current-face sheet))))))
     (setf (current-face sheet) face)
-    (open-frame-1 sheet 0 (line-width sheet))))
+    (open-frame-1 sheet 0 (line-width sheet))
+    (face-separator (current-face sheet))))
 
 (defun close-face (sheet)
   "Close SHEET's current face."
@@ -278,21 +279,24 @@ case it should be popped afterwards."
   (setf (current-face sheet) (face-parent (current-face sheet))))
 
 (defmacro with-face (sheet face &body body)
-  `(progn
-    (open-face ,sheet ,face)
+  `(let ((separator (open-face ,sheet ,face)))
     ,@body
-    (close-face ,sheet)))
+    (close-face ,sheet)
+    separator))
 
 (defgeneric %print-help (sheet help-spec)
   (:documentation "Print HELP-SPEC on SHEET.")
   (:method (sheet (help-spec (eql #\newline)))
-    (output-newline sheet))
+    (output-newline sheet)
+    (values))
   (:method (sheet (help-spec character))
     "Print HELP-SPEC on SHEET."
-    (princ-char sheet help-spec))
+    (princ-char sheet help-spec)
+    (values))
   (:method (sheet (help-spec string))
     "Print HELP-SPEC on SHEET."
-    (output-string sheet help-spec))
+    (output-string sheet help-spec)
+    (values))
   (:method (sheet (help-spec list))
     "Print the CDR of HELP-SPEC on SHEET.
 The CAR of HELP-SPEC should be a symbol naming the face to use for printing.
@@ -300,10 +304,14 @@ The HELP-SPEC items to print are separated with the contents of the face's
 :item-separator property."
     (with-face sheet (car help-spec)
       (loop :for spec :on (cdr help-spec)
-	    :while spec
-	    :do (%print-help sheet (car spec))
-	    (when (and (cdr spec) (face-item-separator (current-face sheet)))
-	      (%print-help sheet (face-item-separator (current-face sheet))))))))
+	    :do
+	    (let ((separator (%print-help sheet (car spec))))
+	      (when (cdr spec)
+		(when separator
+		  (%print-help sheet separator))
+		(when (face-item-separator (current-face sheet))
+		  (%print-help sheet
+			       (face-item-separator (current-face sheet))))))))))
 
 (defun print-help (sheet help-spec)
   "Print HELP-SPEC on SHEET."

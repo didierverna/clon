@@ -41,13 +41,14 @@
 
 (defstruct (face (:constructor %make-face))
   name
+  (separator nil)
   (item-separator nil)
   (faces nil)
   (parent nil))
 
-(defun make-face (name &rest keys &key item-separator face)
+(defun make-face (name &rest keys &key separator item-separator face)
   "Make a new face named NAME."
-  (declare (ignore item-separator face))
+  (declare (ignore separator item-separator face))
   (let ((new-face (apply #'%make-face
 		    :name name
 		    :faces (remove :face (select-keys keys :face))
@@ -88,6 +89,7 @@ tree is copied as a new subface of FACE)."
   (make-face 'help
     :item-separator #\newline
     :face (make-face 'synopsis
+	    :separator #\newline
 	    :item-separator #\space
 	    :face (make-face 'program)
 	    :face (make-face 'minus-pack)
