@@ -62,6 +62,7 @@
 	      :description "long name, required argument"
 	      :argument-type :required))
     (group
+     (text :contents "String Options:")
      (stropt :short-name "f" :long-name "first-name"
 	     :description "both names, required argument (default)")
      (stropt :short-name "F" :long-name "family-name"
