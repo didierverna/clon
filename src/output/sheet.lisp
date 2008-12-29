@@ -90,17 +90,14 @@ Bind FRAME to each frame when evaluating BODY."
 ;; ==========================================================================
 
 (defstruct frame
-  left-margin right-margin)
+  left-margin)
 
 (defun left-margin (sheet)
   (frame-left-margin (car (frames sheet))))
 
-(defun right-margin (sheet)
-  (frame-right-margin (car (frames sheet))))
-
-(defun open-frame-1 (sheet left-margin right-margin)
-  "Open a new frame on SHEET between LEFT-MARGIN and RIGHT-MARGIN."
-  (push (make-frame :left-margin left-margin :right-margin right-margin)
+(defun open-frame-1 (sheet left-margin)
+  "Open a new frame on SHEET starting at LEFT-MARGIN."
+  (push (make-frame :left-margin left-margin)
 	(frames sheet)))
 
 (defun close-frame-1 (sheet)
@@ -124,31 +121,26 @@ Bind FRAME to each frame when evaluating BODY."
 (defun reach-column (sheet column)
   "Reach COLUMN on SHEET."
   (assert (<= (column sheet) column))
-  (assert (<= column (right-margin sheet)))
   (map-frames frame (sheet :reverse t)
     (unless (<= (frame-left-margin frame) (column sheet))
       (princ-spaces sheet (- (frame-left-margin frame) (column sheet)))))
   (princ-spaces sheet (- column (column sheet))))
 
-(defun open-frame (sheet left-margin right-margin)
+(defun open-frame (sheet left-margin)
   (assert (frames sheet))
   (assert (>= left-margin (left-margin sheet)))
   (assert (<= (column sheet) left-margin))
-  (when (<= right-margin 0)
-    (setq right-margin (+ (right-margin sheet) right-margin)))
   (reach-column sheet left-margin)
-  (open-frame-1 sheet left-margin right-margin))
+  (open-frame-1 sheet left-margin))
 
 (defun close-frame (sheet)
   (assert (frames sheet))
-  (princ-spaces sheet (- (right-margin sheet) (column sheet)))
+  (princ-spaces sheet (- (line-width sheet) (column sheet)))
   (close-frame-1 sheet))
 
 (defun output-newline (sheet)
   "Output a newline to SHEET's stream."
   ;; #### FIXME: don't I need to honor changes of faces ??
-  (map-frames frame (sheet)
-    (princ-spaces sheet (- (frame-right-margin frame) (column sheet))))
   (princ-spaces sheet (- (line-width sheet) (column sheet)))
   (terpri (output-stream sheet))
   (setf (column sheet) 0))
@@ -173,8 +165,8 @@ Bind FRAME to each frame when evaluating BODY."
       (princ-spaces sheet (- (frame-left-margin frame) (column sheet))))))
 
 (defun maybe-next-line (sheet)
-  "Go to the next line if we're already past SHEET's right margin."
-  (if (>= (column sheet) (right-margin sheet))
+  "Go to the next line if we're already past SHEET's line width."
+  (if (>= (column sheet) (line-width sheet))
       (next-line sheet)))
 
 ;; #### FIXME: This routine does not handle special characters (the ones that
@@ -187,7 +179,7 @@ STRING is output within the current frame's bounds.
 Spacing characters are honored but newlines might replace spaces when the
 output reaches the rightmost bound."
   (assert (<= 0 (left-margin sheet)))
-  (assert (< (left-margin sheet) (right-margin sheet)))
+  (assert (< (left-margin sheet) (line-width sheet)))
   (assert (and string (not (zerop (length string)))))
   ;; #### FIXME: I don't remember, but this might not work: don't I need to
   ;; honor the frames'faces here instead of blindly spacing ?? Or am I sure
@@ -212,12 +204,12 @@ output reaches the rightmost bound."
 				  8)
 			       (column sheet))
 			    (left-margin sheet))))
-	     (cond ((< (+ (column sheet) spaces) (right-margin sheet))
+	     (cond ((< (+ (column sheet) spaces) (line-width sheet))
 		    (princ-spaces sheet spaces))
 		   (t
 		    (next-line sheet)
 		    (princ-spaces sheet (- (+ (column sheet) spaces)
-					   (right-margin sheet))))))
+					   (line-width sheet))))))
 	   (incf i))
 	  (#\newline
 	   (next-line sheet)
@@ -230,7 +222,7 @@ output reaches the rightmost bound."
 			   :start i)
 			  len)))
 	     (cond ((or (= (column sheet) (left-margin sheet))
-			(< (+ (column sheet) (- end i)) (right-margin sheet)))
+			(< (+ (column sheet) (- end i)) (line-width sheet)))
 		    ;; If we're at the tabbing pos, we output the word right
 		    ;; here, since it couldn't fit anywhere else. Otherwise,
 		    ;; we can add it here if it ends before ARRAY_LAST
@@ -248,7 +240,7 @@ output reaches the rightmost bound."
   (let ((indent 2))
     (incf (in-group sheet))
     (maybe-output-newline sheet)
-    (open-frame sheet (* (nesting-level (in-group sheet)) indent) 0)
+    (open-frame sheet (* (nesting-level (in-group sheet)) indent))
     (setf (last-action sheet) :open-group)))
 
 (defun close-group (sheet)
@@ -260,7 +252,7 @@ output reaches the rightmost bound."
 (defun %open-face (sheet face)
   "Open face FACE on SHEET."
   (setf (current-face sheet) face)
-  (open-frame-1 sheet 0 (line-width sheet))
+  (open-frame-1 sheet 0)
   (face-separator (current-face sheet)))
 
 (defun open-face (sheet name)
