@@ -80,8 +80,8 @@ Bind FRAME to each frame when evaluating BODY."
   `(mapc (lambda (,frame)
 	   ,@body)
     ,(if reverse
-	 `(cdr (nreverse (copy-list (frames ,sheet))))
-	 `(butlast (frames ,sheet)))))
+	 `(nreverse (copy-list (frames ,sheet)))
+	 `(frames ,sheet))))
 
 
 
@@ -93,15 +93,9 @@ Bind FRAME to each frame when evaluating BODY."
   left-margin)
 
 (defun left-margin (sheet)
-  (frame-left-margin (car (frames sheet))))
-
-(defun open-frame-1 (sheet left-margin)
-  "Open a new frame on SHEET starting at LEFT-MARGIN."
-  (push (make-frame :left-margin left-margin)
-	(frames sheet)))
-
-(defun close-frame-1 (sheet)
-  (pop (frames sheet)))
+  (if (frames sheet)
+      (frame-left-margin (car (frames sheet)))
+      0))
 
 (defun princ-char (sheet char)
   "Princ CHAR on SHEET's stream."
@@ -125,18 +119,6 @@ Bind FRAME to each frame when evaluating BODY."
     (unless (<= (frame-left-margin frame) (column sheet))
       (princ-spaces sheet (- (frame-left-margin frame) (column sheet)))))
   (princ-spaces sheet (- column (column sheet))))
-
-(defun open-frame (sheet left-margin)
-  (assert (frames sheet))
-  (assert (>= left-margin (left-margin sheet)))
-  (assert (<= (column sheet) left-margin))
-  (reach-column sheet left-margin)
-  (open-frame-1 sheet left-margin))
-
-(defun close-frame (sheet)
-  (assert (frames sheet))
-  (princ-spaces sheet (- (line-width sheet) (column sheet)))
-  (close-frame-1 sheet))
 
 (defun output-newline (sheet)
   "Output a newline to SHEET's stream."
@@ -235,24 +217,9 @@ output reaches the rightmost bound."
 (defun nesting-level (level)
   (if (or (= level 0) (= level 1)) 0 (1- level)))
 
-(defun open-group (sheet)
-  "Open a new group on SHEET."
-  (let ((indent 2))
-    (incf (in-group sheet))
-    (maybe-output-newline sheet)
-    (open-frame sheet (* (nesting-level (in-group sheet)) indent))
-    (setf (last-action sheet) :open-group)))
-
-(defun close-group (sheet)
-  "Close the current group on SHEET."
-  (close-frame sheet)
-  (decf (in-group sheet))
-  (setf (last-action sheet) :close-group))
-
 (defun %open-face (sheet face)
   "Open face FACE on SHEET."
   (setf (current-face sheet) face)
-  (open-frame-1 sheet 0)
   (face-separator (current-face sheet)))
 
 (defun open-face (sheet name)
@@ -264,7 +231,10 @@ case it should be popped afterwards."
 
 (defun close-face (sheet)
   "Close SHEET's current face."
-  (close-frame-1 sheet)
+  (when (and (< (column sheet) (line-width sheet))
+	     (eq (face-display (current-face sheet)) :block))
+    (princ-spaces sheet (- (line-width sheet) (column sheet))))
+  (pop (frames sheet))
   (setf (current-face sheet) (face-parent (current-face sheet))))
 
 (defmacro with-face (sheet face &body body)
