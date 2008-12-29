@@ -257,21 +257,18 @@ output reaches the rightmost bound."
   (decf (in-group sheet))
   (setf (last-action sheet) :close-group))
 
+(defun %open-face (sheet face)
+  "Open face FACE on SHEET."
+  (setf (current-face sheet) face)
+  (open-frame-1 sheet 0 (line-width sheet))
+  (face-separator (current-face sheet)))
+
 (defun open-face (sheet name)
   "Find the closest face named NAME in SHEET's face tree.
 FACE can be a subface of the current face, or one up the face tree.
 Return two values: the face, and whether it was found as a subface (in which
 case it should be popped afterwards."
-  (let ((face (cond ((null (current-face sheet))
-		     (assert (eql name 'help))
-		     (unless (eql (face-name (face-tree sheet)) 'help)
-		       (error "Help face not found."))
-		     (face-tree sheet))
-		    (t
-		     (find-face name (current-face sheet))))))
-    (setf (current-face sheet) face)
-    (open-frame-1 sheet 0 (line-width sheet))
-    (face-separator (current-face sheet))))
+  (%open-face sheet (find-face name (current-face sheet))))
 
 (defun close-face (sheet)
   "Close SHEET's current face."
@@ -283,6 +280,32 @@ case it should be popped afterwards."
     ,@body
     (close-face ,sheet)
     separator))
+
+(defun open-help-face (sheet)
+  "Open the help face on SHEET."
+  (unless (eql (face-name (face-tree sheet)) 'help)
+    (error "Help face not found."))
+  (%open-face sheet (face-tree sheet)))
+
+(defmacro with-help-face (sheet &body body)
+  `(progn
+    (open-help-face ,sheet)
+    ,@body
+    (close-face ,sheet)))
+
+;; #### NOTE: this is where I would like more dispatch capability from CLOS.
+;; Something like defmethod %print-help (sheet (help-spec (list symbol *)))
+(defun %print-help-spec-items (sheet items)
+  "Print help specification ITEMS on SHEET."
+  (loop :for spec :on items
+	:do
+	(let ((separator (%print-help sheet (car spec))))
+	  (when (cdr spec)
+	    (when separator
+	      (%print-help sheet separator))
+	    (when (face-item-separator (current-face sheet))
+	      (%print-help sheet
+			   (face-item-separator (current-face sheet))))))))
 
 (defgeneric %print-help (sheet help-spec)
   (:documentation "Print HELP-SPEC on SHEET.")
@@ -303,25 +326,21 @@ The CAR of HELP-SPEC should be a symbol naming the face to use for printing.
 The HELP-SPEC items to print are separated with the contents of the face's
 :item-separator property."
     (with-face sheet (car help-spec)
-      (loop :for spec :on (cdr help-spec)
-	    :do
-	    (let ((separator (%print-help sheet (car spec))))
-	      (when (cdr spec)
-		(when separator
-		  (%print-help sheet separator))
-		(when (face-item-separator (current-face sheet))
-		  (%print-help sheet
-			       (face-item-separator (current-face sheet))))))))))
+      (%print-help-spec-items sheet (cdr help-spec)))))
 
 (defun print-help (sheet help-spec)
   "Print HELP-SPEC on SHEET."
-  (if (and (listp help-spec) (not (symbolp (car help-spec))))
-      ;; There's already an enclosing list when help for a container is
-      ;; requested directly, or when the complete help is requested, in which
-      ;; case we have the list of synopsis and all synopsis items.
-      (push 'help help-spec)
-      (setq help-spec `(help ,help-spec)))
-  (%print-help sheet help-spec))
+  (with-help-face sheet
+    (%print-help-spec-items sheet
+			    (if (and (listp help-spec)
+				     (not (symbolp (car help-spec))))
+				;; There's already an enclosing list when help
+				;; for a container is requested directly, or
+				;; when the complete help is requested, in
+				;; which case we have the list of synopsis and
+				;; all synopsis items.
+				help-spec
+				(list help-spec)))))
 
 
 
