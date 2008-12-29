@@ -219,6 +219,13 @@ output reaches the rightmost bound."
 
 (defun %open-face (sheet face)
   "Open face FACE on SHEET."
+  (let ((left-margin (econd ((numberp (face-left-padding face))
+			     (+ (left-margin sheet) (face-left-padding face)))
+			    ((eq (face-left-padding face) :self)
+			     (column sheet)))))
+    (when (<= (column sheet) left-margin)
+      (princ-spaces sheet (- left-margin (column sheet))))
+    (push (make-frame :left-margin left-margin) (frames sheet)))
   (setf (current-face sheet) face)
   (face-separator (current-face sheet)))
 

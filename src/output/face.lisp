@@ -42,7 +42,7 @@
 (defstruct (face (:constructor %make-face))
   name
   (display :block)
-  (indentation 0)
+  (left-padding 0)
   (separator nil)
   (item-separator nil)
   (faces nil)
@@ -50,9 +50,9 @@
 
 (defun make-face (name
 		  &rest keys
-		  &key display indentation separator item-separator face)
+		  &key display left-padding separator item-separator face)
   "Make a new face named NAME."
-  (declare (ignore display indentation separator item-separator face))
+  (declare (ignore display left-padding separator item-separator face))
   (let ((new-face (apply #'%make-face
 		    :name name
 		    :faces (remove :face (select-keys keys :face))
@@ -104,7 +104,7 @@ tree is copied as a new subface of FACE)."
 	    :face (make-face 'postfix :display :inline))
     :face (make-face 'text)
     :face (make-face 'option
-	    :indentation 2
+	    :left-padding 2
 	    :item-separator #\space
 	    :face (make-face 'syntax
 		    :display :inline
@@ -116,11 +116,13 @@ tree is copied as a new subface of FACE)."
 			    :display :inline
 			    :face (make-face 'argument :display :inline)))
 	    :face (make-face 'description
+		    :left-padding :self
 		    :item-separator #\newline
 		    :face (make-face 'fallback :display :inline)
 		    :face (make-face 'default :display :inline)
 		    :face (make-face 'environment :display :inline)))
     :face (make-face 'group
+	    :left-padding 2
 	    :item-separator #\newline)))
 
 
