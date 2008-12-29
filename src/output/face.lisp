@@ -41,15 +41,18 @@
 
 (defstruct (face (:constructor %make-face))
   name
+  (display :block)
   (indentation 0)
   (separator nil)
   (item-separator nil)
   (faces nil)
   (parent nil))
 
-(defun make-face (name &rest keys &key indentation separator item-separator face)
+(defun make-face (name
+		  &rest keys
+		  &key display indentation separator item-separator face)
   "Make a new face named NAME."
-  (declare (ignore indentation separator item-separator face))
+  (declare (ignore display indentation separator item-separator face))
   (let ((new-face (apply #'%make-face
 		    :name name
 		    :faces (remove :face (select-keys keys :face))
@@ -86,32 +89,37 @@ tree is copied as a new subface of FACE)."
 		  (return-from find-face new-tree))
 	    :finally (error "Face ~A not found." name))))
 
+;; #### FIXME: face properties should be inherited from the parent face
+;; instead of provided with the structure default value.
 (defun make-face-tree ()
   (make-face 'help
     :item-separator #\newline
     :face (make-face 'synopsis
 	    :separator #\newline
 	    :item-separator #\space
-	    :face (make-face 'program)
-	    :face (make-face 'minus-pack)
-	    :face (make-face 'plus-pack)
-	    :face (make-face 'options)
-	    :face (make-face 'postfix))
+	    :face (make-face 'program :display :inline)
+	    :face (make-face 'minus-pack  :display :inline)
+	    :face (make-face 'plus-pack :display :inline)
+	    :face (make-face 'options :display :inline)
+	    :face (make-face 'postfix :display :inline))
     :face (make-face 'text)
     :face (make-face 'option
 	    :indentation 2
 	    :item-separator #\space
 	    :face (make-face 'syntax
+		    :display :inline
 		    :item-separator ", "
 		    :face (make-face 'short-name
-			    :face (make-face 'argument))
+			    :display :inline
+			    :face (make-face 'argument :display :inline))
 		    :face (make-face 'long-name
-			    :face (make-face 'argument)))
+			    :display :inline
+			    :face (make-face 'argument :display :inline)))
 	    :face (make-face 'description
 		    :item-separator #\newline
-		    :face (make-face 'fallback)
-		    :face (make-face 'default)
-		    :face (make-face 'environment)))
+		    :face (make-face 'fallback :display :inline)
+		    :face (make-face 'default :display :inline)
+		    :face (make-face 'environment :display :inline)))
     :face (make-face 'group
 	    :item-separator #\newline)))
 
