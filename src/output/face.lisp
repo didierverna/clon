@@ -41,14 +41,15 @@
 
 (defstruct (face (:constructor %make-face))
   name
+  (indentation 0)
   (separator nil)
   (item-separator nil)
   (faces nil)
   (parent nil))
 
-(defun make-face (name &rest keys &key separator item-separator face)
+(defun make-face (name &rest keys &key indentation separator item-separator face)
   "Make a new face named NAME."
-  (declare (ignore separator item-separator face))
+  (declare (ignore indentation separator item-separator face))
   (let ((new-face (apply #'%make-face
 		    :name name
 		    :faces (remove :face (select-keys keys :face))
@@ -98,6 +99,7 @@ tree is copied as a new subface of FACE)."
 	    :face (make-face 'postfix))
     :face (make-face 'text)
     :face (make-face 'option
+	    :indentation 2
 	    :item-separator #\space
 	    :face (make-face 'syntax
 		    :item-separator ", "
