@@ -45,6 +45,7 @@
 		  make-internal-flag
 		  make-internal-switch
 		  make-internal-stropt
+		  make-internal-lispobj
 		  make-internal-path
 		  make-internal-enum
 		  make-internal-xswitch
