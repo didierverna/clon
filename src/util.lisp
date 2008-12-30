@@ -143,6 +143,11 @@ KEY should provide a way to get a string from each LIST element."
 ;; CLOS Utility Routines
 ;; ==========================================================================
 
+
+;; ----------------
+;; Abstract classes
+;; ----------------
+
 (defclass abstract-class (standard-class)
   ()
   (:documentation "The ABSTRACT-CLASS class.
@@ -168,6 +173,29 @@ This is the meta-class for abstract classes."))
 (defmethod sb-mop:validate-superclass
     ((class standard-class) (superclass abstract-class))
   t)
+
+
+;; ----------------
+;; Instance copying
+;; ----------------
+
+(defgeneric copy-instance (instance)
+  (:documentation "Return a copy of INSTANCE.")
+  (:method (instance)
+    "Return a copy of INSTANCE.
+Both instances share the same slot values."
+    (let* ((class (class-of instance))
+	   ;; #### PORTME.
+	   (slots (sb-mop:class-slots class))
+	   (new-instance (make-instance class)))
+      (loop :for slot :in slots
+	    :do (setf (slot-value new-instance
+				  ;; #### PORTME.
+				  (sb-mop:slot-definition-name slot))
+		      (slot-value instance
+				  ;; #### PORTME.
+				  (sb-mop:slot-definition-name slot))))
+      new-instance)))
 
 
 
