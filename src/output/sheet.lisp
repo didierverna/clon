@@ -265,7 +265,7 @@ case it should be popped afterwards."
     (values))
   (:method (sheet (help-spec character))
     "Print HELP-SPEC on SHEET."
-    (princ-char sheet help-spec)
+    (%print-help sheet (make-string 1 :initial-element help-spec))
     (values))
   (:method (sheet (help-spec string))
     "Print HELP-SPEC on SHEET."
