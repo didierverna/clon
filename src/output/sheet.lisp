@@ -65,11 +65,7 @@
    (in-group :documentation "The current group imbrication."
 	     :type (integer 0)
 	     :accessor in-group
-	     :initform 0)
-   (last-action :documentation "The last action performed on the sheet."
-		:type symbol
-		:accessor last-action
-		:initform :none))
+	     :initform 0))
   (:documentation "The SHEET class.
 This class implements the notion of sheet for printing Clon help."))
 
