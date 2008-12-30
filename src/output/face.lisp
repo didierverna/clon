@@ -154,7 +154,8 @@ tree is copied as a new subface of FACE)."
 
 
 ;; #### NOTE: face properties are all inherited now, but I'm not sure that's a
-;; good idea for all of them, especially the layout ones.
+;; good idea for all of them, especially the layout ones. Only highlight
+;; properties should probably be inherited; not layout ones.
 (defun make-face-tree ()
   (make-face 'help
     :subface (make-face 'synopsis
