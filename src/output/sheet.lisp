@@ -85,51 +85,69 @@ Bind FRAME to each frame when evaluating BODY."
 ;; Sheet Processing
 ;; ==========================================================================
 
-(defstruct frame
-  left-margin)
-
-(defun left-margin (sheet)
-  (if (frames sheet)
-      (frame-left-margin (car (frames sheet)))
-      0))
+;; ----------------
+;; Low level output
+;; ----------------
 
 (defun princ-char (sheet char)
-  "Princ CHAR on SHEET's stream."
-  (assert (and (char/= char #\newline) (char/= char #\tab)))
+  "Princ CHAR on SHEET's stream and increment the column position.
+The effect of printing CHAR must be exactly to move right by one column, so
+control characters, as well as newlines and tabs are forbidden here."
+  ;; #### FIXME: control chars not handled.
+  (assert (not (member char '(#\newline #\tab))))
   (princ char (output-stream sheet))
   (incf (column sheet)))
 
 (defun princ-string (sheet string)
-  "Princ STRING on SHEET's stream."
+  "Princ STRING on SHEET's stream and update the column position.
+The effect of printing STRING must be exactly to move right by the
+corresponding string length, so control characters, as well as newlines and
+tabs are forbidden here."
+  ;; #### FIXME: control chars not handled.
+  (assert (notany (lambda (char) (member char '(#\newline #\tab))) string))
   (princ string (output-stream sheet))
   (setf (column sheet) (+ (length string) (column sheet))))
 
 (defun princ-spaces (sheet number)
-  "Princ NUMBER spaces to SHEET."
+  "Princ NUMBER spaces to SHEET's stream and update the column position."
   (princ-string sheet (make-string number :initial-element #\space)))
 
-(defun reach-column (sheet column)
-  "Reach COLUMN on SHEET."
-  (assert (<= (column sheet) column))
-  (map-frames frame (sheet :reverse t)
-    (unless (<= (frame-left-margin frame) (column sheet))
-      (princ-spaces sheet (- (frame-left-margin frame) (column sheet)))))
-  (princ-spaces sheet (- column (column sheet))))
+
+;; --------------
+;; Logical output
+;; --------------
+
+(defstruct frame
+  "The FRAME structure."
+  left-margin)
+
+(defun left-margin (sheet)
+  "Return SHEET's current left-margin."
+  (if (frames sheet)
+      (frame-left-margin (car (frames sheet)))
+      0))
 
 (defun close-line (sheet)
-  "Terminate current line and output a newline character."
-  ;; #### WARNING: when I do right-margins, I will need to map the frames
-  ;; here.
-  (princ-spaces sheet (- (line-width sheet) (column sheet)))
+  "Close all frames on SHEET's current line and go to next line."
+  ;; #### NOTE: the reason why the current column might be past the line width
+  ;; is that we don't do hyphenation and words might not fit anywhere
+  ;; properly. See comment in output-string.
+  (when (< (column sheet) (line-width sheet))
+    (princ-spaces sheet (- (line-width sheet) (column sheet))))
   (terpri (output-stream sheet))
   (setf (column sheet) 0))
 
-(defun open-next-line (sheet)
-  "Reach start of the current frame on the line."
-  (close-line sheet)
+(defun open-line (sheet)
+  "Open all frames on SHEET's current line."
+  (assert (zerop (column sheet)))
   (map-frames frame (sheet :reverse t)
     (unless (zerop (frame-left-margin frame))
       (princ-spaces sheet (- (frame-left-margin frame) (column sheet))))))
+
+(defun open-next-line (sheet)
+  "Close SHEET's current line and open the next one."
+  (close-line sheet)
+  (open-line sheet))
 
 (defun maybe-open-next-line (sheet)
   "Go to the next line if we're already past SHEET's line width."
@@ -145,66 +163,83 @@ Bind FRAME to each frame when evaluating BODY."
 STRING is output within the current frame's bounds.
 Spacing characters are honored but newlines might replace spaces when the
 output reaches the rightmost bound."
-  (assert (<= 0 (left-margin sheet)))
-  (assert (< (left-margin sheet) (line-width sheet)))
   (assert (and string (not (zerop (length string)))))
   ;; #### FIXME: I don't remember, but this might not work: don't I need to
   ;; honor the frames'faces here instead of blindly spacing ?? Or am I sure
   ;; I'm in the proper frame/face ?
   ;; First, adjust the tabbing.
-  (if (< (column sheet) (left-margin sheet))
-      (princ-spaces sheet (- (left-margin sheet) (column sheet))))
-  (loop :with len = (length string)
-	:with i = 0
+  (loop :with len = (length string) :and i = 0
 	:while (< i len)
-	:do (maybe-open-next-line sheet)
-	(case (aref string i)
-	  (#\space
-	   (princ-char sheet #\space)
-	   (incf i))
-	  (#\tab
-	   ;; #### FIXME: get a real tabsize
-	   (let ((spaces (+ (- (* (+ (floor (/ (- (column sheet)
-						  (left-margin sheet))
-					       8))
-				     1)
-				  8)
-			       (column sheet))
-			    (left-margin sheet))))
-	     (cond ((< (+ (column sheet) spaces) (line-width sheet))
-		    (princ-spaces sheet spaces))
-		   (t
-		    (open-next-line sheet)
-		    (princ-spaces sheet (- (+ (column sheet) spaces)
-					   (line-width sheet))))))
-	   (incf i))
-	  (#\newline
-	   (open-next-line sheet)
-	   (incf i))
-	  (otherwise
-	   (let ((end (or (position-if
-			   (lambda (char)
-			     (member char '(#\space #\tab #\newline)))
-			   string
-			   :start i)
-			  len)))
-	     (cond ((or (= (column sheet) (left-margin sheet))
-			(< (+ (column sheet) (- end i)) (line-width sheet)))
-		    ;; If we're at the tabbing pos, we output the word right
-		    ;; here, since it couldn't fit anywhere else. Otherwise,
-		    ;; we can add it here if it ends before ARRAY_LAST
-		    ;; (sheet->frame_stack).right_margin
-		    (princ-string sheet (subseq string i end))
-		    (setq i end))
-		   (t
-		    (open-next-line sheet))))))))
+	:do (case (aref string i)
+	      (#\space
+	       (if (>= (column sheet) (line-width sheet))
+		   ;; If we're at the end of the line, turn the space into a
+		   ;; newline.
+		   (open-next-line sheet)
+		   ;; Otherwise, just output it.
+		   (princ-char sheet #\space))
+	       (incf i))
+	      (#\tab
+	       ;; Here, we get the real number of spaces to insert in order to
+	       ;; reach the next tab position with respect to the current
+	       ;; frame. #### FIXME: get a real tabsize
+	       (let ((spaces (+ (- (* (ceiling (/ (- (column sheet)
+						     (left-margin sheet))
+						  8))
+				      8)
+				   (column sheet))
+				(left-margin sheet))))
+		 (cond ((< (+ (column sheet) spaces) (line-width sheet))
+			(princ-spaces sheet spaces))
+		       (t
+			;; If the requested tab position is too far away, we
+			;; simply go next line. There's not much that we can
+			;; do to repair the layout anyway.
+			(open-next-line sheet))))
+	       (incf i))
+	      (#\newline
+	       (open-next-line sheet)
+	       (incf i))
+	      (otherwise
+	       (let ((end (or (position-if
+			       (lambda (char)
+				 (member char '(#\space #\tab #\newline)))
+			       string
+			       :start i)
+			      len)))
+		 (cond ((= (column sheet) (left-margin sheet))
+			;; If we're at the left-margin, we output the word
+			;; right here, since it couldn't fit anywhere else.
+			;; Note that since I don't do hyphenation, the word
+			;; might extend past the line-width. This is bad, but
+			;; this is life.
+			(princ-string sheet (subseq string i end))
+			(setq i end))
+		       ((< (+ (column sheet) (- end i)) (line-width sheet))
+			;; Otherwise, we also output the word right here if it
+			;; fits on the current-line.
+			(princ-string sheet (subseq string i end))
+			(setq i end))
+		       (t
+			;; Otherwise, we have to go next line. Note that we
+			;; don't actually output the word right now. This will
+			;; be handled by the next LOOP iteration.
+			(open-next-line sheet))))))))
+
+
+;; ---------------
+;; Face management
+;; ---------------
 
 (defun %open-face (sheet face)
-  "Open face FACE on SHEET."
+  "Open face FACE on SHEET, and return its separator."
   (let ((left-margin (econd ((numberp (left-padding face))
 			     (+ (left-margin sheet) (left-padding face)))
 			    ((eq (left-padding face) :self)
 			     (column sheet)))))
+    (when (>= left-margin (line-width sheet))
+      ;; Now, we're in trouble... just stay where we are.
+      (setq left-margin (column sheet)))
     (when (<= (column sheet) left-margin)
       (princ-spaces sheet (- left-margin (column sheet))))
     (push (make-frame :left-margin left-margin) (frames sheet)))
@@ -214,8 +249,7 @@ output reaches the rightmost bound."
 (defun open-face (sheet name)
   "Find the closest face named NAME in SHEET's face tree.
 FACE can be a subface of the current face, or one up the face tree.
-Return two values: the face, and whether it was found as a subface (in which
-case it should be popped afterwards."
+Return the face separator."
   (%open-face sheet (find-face name (current-face sheet))))
 
 (defun close-face (sheet)
@@ -243,6 +277,12 @@ case it should be popped afterwards."
     (open-help-face ,sheet)
     ,@body
     (close-face ,sheet)))
+
+
+
+;; =========================================================================
+;; The Print Help Protocol
+;; =========================================================================
 
 ;; #### NOTE: this is where I would like more dispatch capability from CLOS.
 ;; Something like defmethod %print-help (sheet (help-spec (list symbol *)))
