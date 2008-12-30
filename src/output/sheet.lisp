@@ -116,36 +116,25 @@ Bind FRAME to each frame when evaluating BODY."
       (princ-spaces sheet (- (frame-left-margin frame) (column sheet)))))
   (princ-spaces sheet (- column (column sheet))))
 
-(defun output-newline (sheet)
-  "Output a newline to SHEET's stream."
-  ;; #### FIXME: don't I need to honor changes of faces ??
+(defun close-line (sheet)
+  "Terminate current line and output a newline character."
+  ;; #### WARNING: when I do right-margins, I will need to map the frames
+  ;; here.
   (princ-spaces sheet (- (line-width sheet) (column sheet)))
   (terpri (output-stream sheet))
   (setf (column sheet) 0))
 
-(defun maybe-output-newline (sheet)
-  "Output a newline to SHEET if needed."
-  (ecase (last-action sheet)
-    ((:none :open-group)
-     (values))
-    ((:put-header :put-text #+():put-option #+():close-group)
-     (output-newline sheet))))
-
-(defun next-line (sheet)
-  "Go to the next line and reach the proper left position."
-  ;; First, close the current line
-  ;; #### NOTE: Actually, output-newline would better be named close-line.
-  (output-newline sheet)
+(defun open-next-line (sheet)
+  "Reach start of the current frame on the line."
+  (close-line sheet)
   (map-frames frame (sheet :reverse t)
-    ;; Next, skip frames starting at position 0 and reach the proper column,
-    ;; opening the needed faces.
     (unless (zerop (frame-left-margin frame))
       (princ-spaces sheet (- (frame-left-margin frame) (column sheet))))))
 
-(defun maybe-next-line (sheet)
+(defun maybe-open-next-line (sheet)
   "Go to the next line if we're already past SHEET's line width."
   (if (>= (column sheet) (line-width sheet))
-      (next-line sheet)))
+      (open-next-line sheet)))
 
 ;; #### FIXME: This routine does not handle special characters (the ones that
 ;; don't actually display anything. Since this is for short description
@@ -168,7 +157,7 @@ output reaches the rightmost bound."
   (loop :with len = (length string)
 	:with i = 0
 	:while (< i len)
-	:do (maybe-next-line sheet)
+	:do (maybe-open-next-line sheet)
 	(case (aref string i)
 	  (#\space
 	   (princ-char sheet #\space)
@@ -185,12 +174,12 @@ output reaches the rightmost bound."
 	     (cond ((< (+ (column sheet) spaces) (line-width sheet))
 		    (princ-spaces sheet spaces))
 		   (t
-		    (next-line sheet)
+		    (open-next-line sheet)
 		    (princ-spaces sheet (- (+ (column sheet) spaces)
 					   (line-width sheet))))))
 	   (incf i))
 	  (#\newline
-	   (next-line sheet)
+	   (open-next-line sheet)
 	   (incf i))
 	  (otherwise
 	   (let ((end (or (position-if
@@ -208,10 +197,7 @@ output reaches the rightmost bound."
 		    (princ-string sheet (subseq string i end))
 		    (setq i end))
 		   (t
-		    (next-line sheet))))))))
-
-(defun nesting-level (level)
-  (if (or (= level 0) (= level 1)) 0 (1- level)))
+		    (open-next-line sheet))))))))
 
 (defun %open-face (sheet face)
   "Open face FACE on SHEET."
@@ -275,7 +261,7 @@ case it should be popped afterwards."
 (defgeneric %print-help (sheet help-spec)
   (:documentation "Print HELP-SPEC on SHEET.")
   (:method (sheet (help-spec (eql #\newline)))
-    (output-newline sheet)
+    (open-next-line sheet)
     (values))
   (:method (sheet (help-spec character))
     "Print HELP-SPEC on SHEET."
