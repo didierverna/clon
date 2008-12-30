@@ -201,15 +201,15 @@ output reaches the rightmost bound."
 
 (defun %open-face (sheet face)
   "Open face FACE on SHEET."
-  (let ((left-margin (econd ((numberp (face-left-padding face))
-			     (+ (left-margin sheet) (face-left-padding face)))
-			    ((eq (face-left-padding face) :self)
+  (let ((left-margin (econd ((numberp (left-padding face))
+			     (+ (left-margin sheet) (left-padding face)))
+			    ((eq (left-padding face) :self)
 			     (column sheet)))))
     (when (<= (column sheet) left-margin)
       (princ-spaces sheet (- left-margin (column sheet))))
     (push (make-frame :left-margin left-margin) (frames sheet)))
   (setf (current-face sheet) face)
-  (face-separator (current-face sheet)))
+  (separator (current-face sheet)))
 
 (defun open-face (sheet name)
   "Find the closest face named NAME in SHEET's face tree.
@@ -221,10 +221,10 @@ case it should be popped afterwards."
 (defun close-face (sheet)
   "Close SHEET's current face."
   (when (and (< (column sheet) (line-width sheet))
-	     (eq (face-display (current-face sheet)) :block))
+	     (eq (display (current-face sheet)) :block))
     (princ-spaces sheet (- (line-width sheet) (column sheet))))
   (pop (frames sheet))
-  (setf (current-face sheet) (face-parent (current-face sheet))))
+  (setf (current-face sheet) (parent (current-face sheet))))
 
 (defmacro with-face (sheet face &body body)
   `(let ((separator (open-face ,sheet ,face)))
@@ -234,7 +234,7 @@ case it should be popped afterwards."
 
 (defun open-help-face (sheet)
   "Open the help face on SHEET."
-  (unless (eql (face-name (face-tree sheet)) 'help)
+  (unless (eql (name (face-tree sheet)) 'help)
     (error "Help face not found."))
   (%open-face sheet (face-tree sheet)))
 
@@ -254,9 +254,9 @@ case it should be popped afterwards."
 	  (when (cdr spec)
 	    (when separator
 	      (%print-help sheet separator))
-	    (when (face-item-separator (current-face sheet))
+	    (when (item-separator (current-face sheet))
 	      (%print-help sheet
-			   (face-item-separator (current-face sheet))))))))
+			   (item-separator (current-face sheet))))))))
 
 (defgeneric %print-help (sheet help-spec)
   (:documentation "Print HELP-SPEC on SHEET.")
