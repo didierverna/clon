@@ -144,10 +144,11 @@ If you don't want any search path at all, use this option with no argument."
 			  global-path))
 		       :env-var "SEARCH_PATH"))
       (add-to subgrp (make-internal-stropt "theme"
-			 "Set Clon's output theme.
-If you don't want any theme at all, use this option with no argument. Unless
-starting with /, ./ or ../, files are looked for in the Clon search path. The
-cth extension can be omitted."
+			 ~"Set Clon's output theme.
+If you don't want any theme at all, use this option with no argument. "
+			 ~"Unless starting with /, ./ or ../, files are looked "
+			 ~"for in the Clon search path. The cth extension can "
+			 ~"be omitted."
 		       :argument-name "FILE"
 		       :argument-type :optional
 		       :nullablep t
@@ -155,12 +156,12 @@ cth extension can be omitted."
 		       :default-value "default"
 		       :env-var "THEME"))
       (add-to subgrp (make-internal-lispobj "line-width"
-			 "Set Clon's output line width.
-If not given, the terminal size will be used when possible. Otherwise, 80
-columns will be assumed."
-		       :argument-name "WIDTH"
-		       :env-var "LINE_WIDTH"
-		       :typespec '(integer 1)))
+			 ~"Set Clon's output line width.
+If not given, the terminal size will be used when possible. Otherwise, 80 "
+			 ~"columns will be assumed."
+			 :argument-name "WIDTH"
+			 :env-var "LINE_WIDTH"
+			 :typespec '(integer 1)))
       (add-to subgrp (make-internal-xswitch "highlight"
 			 "Set Clon's output highlighting to on/off/auto.
 Auto (the default) means on for tty output and off otherwise."
