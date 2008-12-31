@@ -281,7 +281,7 @@ PADDING is returned when it does not exceed SHEET's line width."
   "Find the closest face named NAME in SHEET's face tree.
 FACE can be a subface of the current face, or one up the face tree.
 Return the face separator."
-  (%open-face sheet (find-face name (current-face sheet))))
+  (%open-face sheet (find-face (current-face sheet) name)))
 
 (defun close-face (sheet)
   "Close SHEET's current face."

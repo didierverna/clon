@@ -95,8 +95,10 @@ Otherwise, trigger an error."
 ;; The Face Tree Copy Protocol
 ;; =========================================================================
 
-(defun attach-face-tree (face tree)
-  "Create a copy of TREE, attach it to FACE and return it."
+(defun attach-face-tree (face face-tree)
+  "Create a copy of FACE-TREE, attach it to FACE and return it.
+Apart from the parenting information, the copied faces share slot values with
+the original ones."
   (let ((new-tree (copy-instance tree)))
     (setf (slot-value new-tree 'subfaces)
 	  (mapcar (lambda (subtree)
@@ -106,22 +108,50 @@ Otherwise, trigger an error."
     (push new-tree (slot-value face 'subfaces))
     new-tree))
 
-(defun subfacep (name face)
-  "Return subface named NAME from FACE, or nil."
-  (find name (subfaces face) :key #'name))
+(defgeneric subface (face |name(s)|)
+  (:documentation "Return subface of FACE named NAME(S) or nil.
+If a list of names is provided instead of a single one, follow a subface
+branch matching those names to find the last one.")
+  (:method (face (name symbol))
+    "Return FACE'subface named NAME, or nil."
+    (find name (subfaces face) :key #'name))
+  (:method (face (names list))
+    "Return the leaf face from FACE'subbranch matching NAMES, or nil."
+    (let ((branch (subface face (car names))))
+      (or (when (null (cdr names))
+	    branch)
+	  (when branch
+	    (subface branch (cdr names)))))))
 
-;; #### FIXME: we should also look for all subtrees in the ancestor hierarchy.
-(defun find-face (name face)
-  "Find face named NAME in face FACE.
-Face should be either a direct subface of FACE (in which case it is simply
-returned) or a subface of one of FACE's parents (in which case the whole face
-tree is copied as a new subface of FACE)."
-  (or (subfacep name face)
+(defun search-face (face names)
+  "Search for a face branch named NAMES starting at FACE.
+The branch is searched for as a direct subbranch of FACE, or as a direct
+subbranch of one of FACE's parents.
+Return the leaf face or nil."
+  (or (subface face names)
       (loop :for parent := (parent face) :then (parent parent)
 	    :while parent
-	    :for found := (subfacep name parent)
+	    :for found := (subface parent names)
 	    :when found
-	    :do (return (attach-face-tree face found))
+	    :return found
+	    :finally (return nil))))
+
+(defun find-face (face name)
+  "Find a face named NAME starting at FACE.
+The face is looked for as a direct subface of FACE (in which case it is simply
+returned), or up in the hierarchy and by successive upper branches (in which
+case it is copied and attached to FACE).
+If no face is found, trigger an error."
+  (or (subface face name)
+      (loop :with names := (list name)
+	    :for child := face :then (parent child)
+	    :for parent := (parent child) :then (parent parent)
+	    :while parent
+	    :for found := (search-face parent names)
+	    :if found
+	    :return (attach-face-tree face found)
+	    :else
+	    :do (push (name child) names)
 	    :finally (error "Face ~A not found." name))))
 
 (defun parent-generation (face parent-name)
