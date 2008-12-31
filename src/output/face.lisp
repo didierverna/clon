@@ -43,18 +43,24 @@
   ((name :documentation "The face name."
 	 :initarg :name
 	 :reader name)
+   ;; Layout properties:
    (display :documentation "The face display mode."
 	    :initarg :display
+	    :initform :inilne
 	    :reader display)
    (left-padding :documentation "The face left padding."
 		 :initarg :left-padding
+		 :initform 0
 		 :reader left-padding)
    (separator :documentation "The face separator."
 	      :initarg :separator
+	      :initform nil
 	      :reader separator)
    (item-separator :documentation "The face item separator."
 		   :initarg :item-separator
+		   :initform #\space
 		   :reader item-separator)
+   ;; Tree structure:
    (subfaces :documentation "The face children."
 	     :initarg :subfaces
 	     :reader subfaces)
@@ -70,16 +76,13 @@
 ;; =========================================================================
 
 ;; #### FIXME: investigate why define-constant doesn't work here.
-(defvar *face-properties* '((display :block)
-			    (left-padding 0)
-			    (separator nil)
-			    (item-separator #\newline))
-  "The face properties and their default value.")
+(defvar *highlight-face-properties* '()
+  "The highlight face properties and their default value.")
 
 (defmethod slot-unbound (class (face face) slot)
-  "Look up SLOT's value in FACE's parent if it's a property.
+  "Look up SLOT's value in FACE's parent if it's a highlight property.
 Otherwise, trigger an error."
-  (let ((property (assoc slot *face-properties*)))
+  (let ((property (assoc slot *highlight-face-properties*)))
     (if property
 	(if (parent face)
 	    (slot-value (parent face) slot)
@@ -171,21 +174,21 @@ etc. If PARENT-NAME does not name one of FACE's ancestors, trigger an error."
 ;; properties should probably be inherited; not layout ones.
 (defun make-face-tree ()
   (make-face 'help
+    :display :block
+    :item-separator #\newline
     :subface (make-face 'synopsis
+	       :display :block
 	       :separator #\newline
-	       :item-separator #\space
-	       :subface (make-face 'program :display :inline :separator nil)
-	       :subface (make-face 'minus-pack :display :inline :separator nil)
-	       :subface (make-face 'plus-pack :display :inline :separator nil)
-	       :subface (make-face 'options :display :inline :separator nil)
-	       :subface (make-face 'postfix :display :inline :separator nil))
-    :subface (make-face 'text)
+	       :subface (make-face 'program)
+	       :subface (make-face 'minus-pack)
+	       :subface (make-face 'plus-pack)
+	       :subface (make-face 'options)
+	       :subface (make-face 'postfix))
+    :subface (make-face 'text :display :block)
     :subface (make-face 'option
+	       :display :block
 	       :left-padding 2
-	       :item-separator #\space
 	       :subface (make-face 'syntax
-			  :left-padding 0
-			  :display :inline
 			  :item-separator ", "
 			  :subface (make-face 'short-name
 				     :item-separator nil
@@ -194,12 +197,14 @@ etc. If PARENT-NAME does not name one of FACE's ancestors, trigger an error."
 				     :item-separator nil
 				     :subface (make-face 'argument)))
 	       :subface (make-face 'description
+			  :display :block
 			  :left-padding '(30 :absolute)
 			  :item-separator #\newline
-			  :subface (make-face 'fallback :display :inline)
-			  :subface (make-face 'default :display :inline)
-			  :subface (make-face 'environment :display :inline)))
+			  :subface (make-face 'fallback)
+			  :subface (make-face 'default)
+			  :subface (make-face 'environment)))
     :subface (make-face 'group
+	       :display :block
 	       :left-padding 2
 	       :item-separator #\newline)))
 
