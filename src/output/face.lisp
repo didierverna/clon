@@ -143,20 +143,28 @@ etc. If PARENT-NAME does not name one of FACE's ancestors, trigger an error."
 ;; Face Instance Creation
 ;; =========================================================================
 
-(defmethod initialize-instance :around
-    ((face face)
-     &rest keys
-     &key name display left-padding separator item-separator subface)
+;; #### NOTE: although we don't use it explicitely, the SUBFACE initarg is
+;; declared valid below.
+(defmethod initialize-instance :around ((face face) &rest keys &key subface)
   "Compute :subfaces initarg from the :subface ones."
-  (declare (ignore name display left-padding separator item-separator subface))
+  (declare (ignore subface))
   (apply #'call-next-method face
 	 :subfaces (remove :subface (select-keys keys :subface))
 	 (remove-keys keys :subface)))
 
-(defmethod initialize-instance :after
-    ((face face) &key name display left-padding separator item-separator subface)
+;; #### NOTE: we use the NAME keyword here because we're in the before method,
+;; hence FACE name has not been initialized yet.
+(defmethod initialize-instance :before ((face face) &key name subfaces)
+  "Check for unicity of FACE subfaces."
+  (loop :for faces :on subfaces
+	:while (cdr faces)
+	:when (member (name (car faces))
+		      (mapcar #'name (cdr faces)))
+	:do (error "Duplicate subface ~A for face ~A."
+		   (name (car faces)) name)))
+
+(defmethod initialize-instance :after ((face face) &key)
   "Fill in the parent slot of all subfaces."
-  (declare (ignore name display left-padding separator item-separator subface))
   (mapc (lambda (child)
 	  (setf (slot-value child 'parent) face))
 	(subfaces face)))
