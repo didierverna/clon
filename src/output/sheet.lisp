@@ -106,7 +106,7 @@ tabs are forbidden here."
   ;; #### FIXME: control chars not handled.
   (assert (notany (lambda (char) (member char '(#\newline #\tab))) string))
   (princ string (output-stream sheet))
-  (setf (column sheet) (+ (length string) (column sheet))))
+  (incf (column sheet) (length string)))
 
 (defun princ-spaces (sheet number)
   "Princ NUMBER spaces to SHEET's stream and update the column position."
@@ -264,7 +264,8 @@ PADDING is returned when it does not exceed SHEET's line width."
 				    (left-margin
 				     (frame-left-margin
 				      ;; #### WARNING: we have not open the
-				      ;; new frame yet !!
+				      ;; new frame yet, so decrement the
+				      ;; generation level !!
 				      (nth (1- generation) (frames sheet)))))
 			       (incf padding left-margin)
 			       (safe-padding sheet padding))))))
