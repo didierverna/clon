@@ -231,6 +231,17 @@ output reaches the rightmost bound."
 ;; Face management
 ;; ---------------
 
+;; In practice, it could happen that the level of indentation exceeds the
+;; line-width (either the theme has something crazy in it, or we just have too
+;; many nested levels of indentation) ... We're in trouble here, so let's just
+;; stay where we are.
+(defun safe-padding (sheet padding)
+  "Return either PADDING or SHEET's current column.
+PADDING is returned when it does not exceed SHEET's line width."
+  (or (when (< padding (line-width sheet))
+	padding)
+      (column sheet)))
+
 (defun %open-face (sheet face)
   "Open face FACE on SHEET, and return its separator."
   (let ((left-margin
@@ -245,17 +256,21 @@ output reaches the rightmost bound."
 				      (eq face-name :sheet)))
 			     ;; Absolute positions are OK as long as we don't
 			     ;; roll back outside the enclosing frame.
-			     (max padding (left-margin sheet))))))
+			     (max padding (left-margin sheet)))
+			    ((and (eq relative-to :relative-to)
+				  (symbolp face-name))
+			     (let* ((generation
+				     (parent-generation face face-name))
+				    (left-margin
+				     (frame-left-margin
+				      ;; #### WARNING: we have not open the
+				      ;; new frame yet !!
+				      (nth (1- generation) (frames sheet)))))
+			       (incf padding left-margin)
+			       (safe-padding sheet padding))))))
 		  ((numberp padding-spec)
 		   (incf padding-spec (left-margin sheet))
-		   ;; In practice, it could happen that the level of
-		   ;; indentation exceeds the line-width (either the theme has
-		   ;; something crazy in it, or we just have too many groups)
-		   ;; ... We're in trouble here, so let's just stay where we
-		   ;; are.
-		   (or (when (>= padding-spec (line-width sheet))
-			 (column sheet))
-		       padding-spec))))))
+		   (safe-padding sheet padding-spec))))))
     (when (<= (column sheet) left-margin)
       (princ-spaces sheet (- left-margin (column sheet))))
     (push (make-frame :left-margin left-margin) (frames sheet)))

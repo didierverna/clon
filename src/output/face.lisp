@@ -122,6 +122,18 @@ tree is copied as a new subface of FACE)."
 		  (return-from find-face new-tree))
 	    :finally (error "Face ~A not found." name))))
 
+(defun parent-generation (face parent-name)
+  "Return FACE's parent generation for PARENT-NAME.
+That is, 1 if PARENT-NAME names FACE's parent, 2 if it names its grand-parent
+etc. If PARENT-NAME does not name one of FACE's ancestors, trigger an error."
+  (loop :for generation :from 1
+	:for parent := (parent face) :then (parent parent)
+	:while parent
+	:when (eql (name parent) parent-name)
+	:do (return generation)
+	:finally (error "Parent face ~A for face ~A not found."
+			parent-name (name face))))
+
 
 
 ;; =========================================================================
