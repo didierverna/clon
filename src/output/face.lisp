@@ -105,6 +105,7 @@ Otherwise, trigger an error."
   "Return subface named NAME from FACE, or nil."
   (find name (subfaces face) :key #'name))
 
+;; #### FIXME: we should also look for all subtrees in the ancestor hierarchy.
 (defun find-face (name face)
   "Find face named NAME in face FACE.
 Face should be either a direct subface of FACE (in which case it is simply
