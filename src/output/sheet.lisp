@@ -234,23 +234,28 @@ output reaches the rightmost bound."
 (defun %open-face (sheet face)
   "Open face FACE on SHEET, and return its separator."
   (let ((left-margin
-	 (let ((left-padding (left-padding face)))
-	   (econd ((eq left-padding :self)
+	 (let ((padding-spec (left-padding face)))
+	   (econd ((eq padding-spec :self)
 		   (column sheet))
-		  #+()((eq left-padding :absolute)
-		   ;; Absolute positions are OK as long as we don't roll back
-		   ;; outside the enclosing frame.
-		   (max left-padding (left-margin sheet)))
-		  ((numberp left-padding)
-		   (incf left-padding (left-margin sheet))
+		  ((listp padding-spec)
+		   (destructuring-bind (padding relative-to &optional face-name)
+		       padding-spec
+		     (econd ((or (eq relative-to :absolute)
+				 (and (eq relative-to :relative-to)
+				      (eq face-name :sheet)))
+			     ;; Absolute positions are OK as long as we don't
+			     ;; roll back outside the enclosing frame.
+			     (max padding (left-margin sheet))))))
+		  ((numberp padding-spec)
+		   (incf padding-spec (left-margin sheet))
 		   ;; In practice, it could happen that the level of
 		   ;; indentation exceeds the line-width (either the theme has
 		   ;; something crazy in it, or we just have too many groups)
 		   ;; ... We're in trouble here, so let's just stay where we
 		   ;; are.
-		   (or (when (>= left-padding (line-width sheet))
+		   (or (when (>= padding-spec (line-width sheet))
 			 (column sheet))
-		       left-padding))))))
+		       padding-spec))))))
     (when (<= (column sheet) left-margin)
       (princ-spaces sheet (- left-margin (column sheet))))
     (push (make-frame :left-margin left-margin) (frames sheet)))

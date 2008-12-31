@@ -181,7 +181,7 @@ tree is copied as a new subface of FACE)."
 				     :item-separator nil
 				     :subface (make-face 'argument)))
 	       :subface (make-face 'description
-			  :left-padding :self
+			  :left-padding '(30 :absolute)
 			  :item-separator #\newline
 			  :subface (make-face 'fallback :display :inline)
 			  :subface (make-face 'default :display :inline)
