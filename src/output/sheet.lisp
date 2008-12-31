@@ -233,13 +233,24 @@ output reaches the rightmost bound."
 
 (defun %open-face (sheet face)
   "Open face FACE on SHEET, and return its separator."
-  (let ((left-margin (econd ((numberp (left-padding face))
-			     (+ (left-margin sheet) (left-padding face)))
-			    ((eq (left-padding face) :self)
-			     (column sheet)))))
-    (when (>= left-margin (line-width sheet))
-      ;; Now, we're in trouble... just stay where we are.
-      (setq left-margin (column sheet)))
+  (let ((left-margin
+	 (let ((left-padding (left-padding face)))
+	   (econd ((eq left-padding :self)
+		   (column sheet))
+		  #+()((eq left-padding :absolute)
+		   ;; Absolute positions are OK as long as we don't roll back
+		   ;; outside the enclosing frame.
+		   (max left-padding (left-margin sheet)))
+		  ((numberp left-padding)
+		   (incf left-padding (left-margin sheet))
+		   ;; In practice, it could happen that the level of
+		   ;; indentation exceeds the line-width (either the theme has
+		   ;; something crazy in it, or we just have too many groups)
+		   ;; ... We're in trouble here, so let's just stay where we
+		   ;; are.
+		   (or (when (>= left-padding (line-width sheet))
+			 (column sheet))
+		       left-padding))))))
     (when (<= (column sheet) left-margin)
       (princ-spaces sheet (- left-margin (column sheet))))
     (push (make-frame :left-margin left-margin) (frames sheet)))
