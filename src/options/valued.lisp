@@ -257,10 +257,8 @@ subclasses of the VALUED-OPTION class."))
 (defvar *valued-option-names* nil
   "The list of known valued option names.")
 
-(defmethod initialize-instance :after
-    ((class valued-option-class) &key direct-superclasses direct-slots)
+(defmethod initialize-instance :after ((class valued-option-class) &key)
   "Register CLASS as a new valued option class."
-  (declare (ignore direct-superclasses direct-slots))
   (pushnew (symbol-name (class-name class)) *valued-option-names*))
 
 (defmacro defoption (class superclasses slots &rest options)
@@ -403,9 +401,7 @@ This class provides support for options including boolean values."))
   (:documentation "The ENUM-BASE abstract class.
 This class provides support for options including enumerated values."))
 
-(defmethod initialize-instance :before
-    ((enum-base enum-base) &rest keys &key enum)
-  (declare (ignore keys))
+(defmethod initialize-instance :before ((enum-base enum-base) &key enum)
   (unless enum
     (error "Enum based option ~S: empty enum." enum-base)))
 
