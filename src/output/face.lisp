@@ -95,14 +95,16 @@ Otherwise, trigger an error."
 ;; The Face Tree Copy Protocol
 ;; =========================================================================
 
-(defun copy-face-tree (face)
-  "Return a copy of FACE tree."
-  (let ((new-face (copy-instance face)))
-    (setf (slot-value new-face 'subfaces)
-	  (mapcar #'copy-face-tree (subfaces new-face)))
-    (mapc (lambda (subface) (setf (slot-value subface 'parent) new-face))
-	  (subfaces new-face))
-    new-face))
+(defun attach-face-tree (face tree)
+  "Create a copy of TREE, attach it to FACE and return it."
+  (let ((new-tree (copy-instance tree)))
+    (setf (slot-value new-tree 'subfaces)
+	  (mapcar (lambda (subtree)
+		    (attach-face-tree new-tree subtree))
+		  (subfaces new-tree)))
+    (setf (slot-value new-tree 'parent) face)
+    (push new-tree (slot-value face 'subfaces))
+    new-tree))
 
 (defun subfacep (name face)
   "Return subface named NAME from FACE, or nil."
@@ -119,10 +121,7 @@ tree is copied as a new subface of FACE)."
 	    :while parent
 	    :for found := (subfacep name parent)
 	    :when found
-	    :do (let ((new-tree (copy-face-tree found)))
-		  (setf (slot-value new-tree 'parent) face)
-		  (push new-tree (slot-value face 'subfaces))
-		  (return-from find-face new-tree))
+	    :do (return (attach-face-tree face found))
 	    :finally (error "Face ~A not found." name))))
 
 (defun parent-generation (face parent-name)
@@ -175,7 +174,6 @@ etc. If PARENT-NAME does not name one of FACE's ancestors, trigger an error."
   "Make a new face named NAME."
   (declare (ignore display left-padding separator item-separator subface))
   (apply #'make-instance 'face :name name keys))
-
 
 ;; #### NOTE: face properties are all inherited now, but I'm not sure that's a
 ;; good idea for all of them, especially the layout ones. Only highlight
