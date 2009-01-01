@@ -137,6 +137,17 @@ KEY should provide a way to get a string from each LIST element."
 	:unless (member key removed)
 	:nconc (list key val)))
 
+(defmacro replace-in-keys ((key val) keys the-key form)
+  "Replace every occurrence of THE-KEY in KEYS with FORM.
+At every KEYS round, KEY and VAL are bound to the current key-value pair.
+FORM is evaluated each time and should return a key-value list."
+  `(loop :for ,key :in ,keys :by #'cddr
+    :for ,val :in (cdr ,keys) :by #'cddr
+    :if (eql ,key ,the-key)
+    :nconc ,form
+    :else
+    :nconc (list ,key ,val)))
+
 ;; #### NOTE: that's the typical situation where I would like a
 ;; destructuring-cond, but it seems difficult to do so because of the
 ;; standard imprecision of the reported error in case of a pattern matching
@@ -164,47 +175,33 @@ REPLACEMENT can take the following forms:
 	       (= (length replacement) 2)
 	       (symbolp (car replacement))
 	       (symbolp (cadr replacement)))
-	  (loop :for key :in keys :by #'cddr
-		:for val :in (cdr keys) :by #'cddr
-		:if (eql key (car replacement))
-		:nconc (list (cadr replacement) val)
-		:else
-		:nconc (list key val)))
+	  (replace-in-keys (key val) keys (car replacement)
+	    (list (cadr replacement) val)))
 	 ((and (listp replacement)
 	       (> (length replacement) 2)
 	       (symbolp (car replacement))
 	       (symbolp (cadr replacement)))
-	  (loop :for key :in keys :by #'cddr
-		:for val :in (cdr keys) :by #'cddr
-		:if (eql key (car replacement))
-		:nconc (list
-			(cadr replacement)
-			(let ((match
-			       (assoc val (cddr replacement)
-				      :test (lambda (val val-or-vals)
-					      (if (listp val-or-vals)
-						  (member val val-or-vals)
-						  (eql val val-or-vals))))))
-			  (if match (cadr match) val)))
-		:else
-		:nconc (list key val)))
+	  (replace-in-keys (key val) keys (car replacement)
+	    (list (cadr replacement)
+		  (let ((match
+			 (assoc val (cddr replacement)
+				:test (lambda (val val-or-vals)
+					(if (listp val-or-vals)
+					    (member val val-or-vals)
+					    (eql val val-or-vals))))))
+		    (if match (cadr match) val)))))
 	 ((and (listp replacement)
 	       (> (length replacement) 1)
 	       (symbolp (car replacement)))
-	  (loop :for key :in keys :by #'cddr
-		:for val :in (cdr keys) :by #'cddr
-		:if (eql key (car replacement))
-		:nconc (let ((match
-			      (assoc val (cdr replacement)
-				     :test (lambda (val val-or-vals)
-					     (if (listp val-or-vals)
-						 (member val val-or-vals)
-						 (eql val val-or-vals))))))
-			 (if match
-			     (list (cadr match) (caddr match))
-			     (list key val)))
-		:else
-		:nconc (list key val)))))
+	  (replace-in-keys (key val) keys (car replacement)
+	    (let ((match (assoc val (cdr replacement)
+				:test (lambda (val val-or-vals)
+					(if (listp val-or-vals)
+					    (member val val-or-vals)
+					    (eql val val-or-vals))))))
+	      (if match
+		  (list (cadr match) (caddr match))
+		  (list key val)))))))
 
 (defun replace-keys (keys &rest replacements)
   "Return a new property list from KEYS with REPLACEMENTS.
