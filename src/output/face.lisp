@@ -99,7 +99,7 @@ Otherwise, trigger an error."
   "Create a copy of FACE-TREE, attach it to FACE and return it.
 Apart from the parenting information, the copied faces share slot values with
 the original ones."
-  (let ((new-tree (copy-instance tree)))
+  (let ((new-tree (copy-instance face-tree)))
     (setf (slot-value new-tree 'subfaces)
 	  (mapcar (lambda (subtree)
 		    (attach-face-tree new-tree subtree))
