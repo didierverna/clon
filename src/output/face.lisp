@@ -205,9 +205,6 @@ etc. If PARENT-NAME does not name one of FACE's ancestors, trigger an error."
   (declare (ignore display left-padding separator item-separator subface))
   (apply #'make-instance 'face :name name keys))
 
-;; #### NOTE: face properties are all inherited now, but I'm not sure that's a
-;; good idea for all of them, especially the layout ones. Only highlight
-;; properties should probably be inherited; not layout ones.
 (defun make-face-tree ()
   (make-face 'help
     :display :block
