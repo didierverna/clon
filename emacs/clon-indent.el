@@ -33,7 +33,7 @@
 
 ;;; Code:
 
-(dolist (symbol '(select-keys remove-keys
+(dolist (symbol '(select-keys remove-keys replace-keys
 		  add-to
 		  convert-value convert-environment
 		  push-cmdline-option push-unknown-option
