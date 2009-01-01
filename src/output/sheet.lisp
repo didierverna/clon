@@ -85,6 +85,59 @@ Bind FRAME to each frame when evaluating BODY."
 ;; Sheet Processing
 ;; ==========================================================================
 
+;; ---------------------
+;; ISO/IEC 6429 handling
+;; ---------------------
+
+(defmacro ISO/IEC-6429-property-ecase (property value &body clauses)
+  "Create an ECASE form to extract PROPERTY's VALUE escape sequence.
+Each clause looks like: (PROPERTY-NAME (VALUE-OR-VALUE-LIST ESCAPE-SEQUENCE)*).
+The value-matching part will itself be enclosed in an ECASE expression.
+In addition, the special clause syntax (BOOLEAN <PROPERTY-NAME> <YES> <NO>)
+is a shortcut for: (PROPERTY-NAME ((:on t) YES) ((:off nil) NO))."
+  `(ecase ,property
+    ,@(mapcar (lambda (clause)
+		(if (eq (car clause) 'boolean)
+		    `(,(cadr clause)
+		      (ecase ,value
+			((:on t)    ,(caddr  clause))
+			((:off nil) ,(cadddr clause))))
+		    `(,(car clause)
+		      (ecase ,value
+			,@(cdr clause)))))
+	      clauses)))
+
+(defun ISO/IEC-6429-property-escape-sequence (property &optional value)
+  "Return ISO/IEC 6429 PROPERTY's VALUE escape sequence."
+  (ISO/IEC-6429-property-ecase property value
+    ;; FAINT is not well supported ...
+    (:intensity (:bold 1) (:faint 2) (:normal 22))
+    ;; ... so BOLD convenient instead
+    (boolean :bold 1 22)
+    (boolean :italic 3 23)
+    ;; DOUBLE is not well supported
+    (:underline ((:single :on t) 4) (:double 21) ((:none :off nil) 24))
+    ;; RAPID is not well supported
+    (:blink ((:slow :on t) 5) (:rapid 6) ((:off nil) 25))
+    (boolean :inverse 7 27)
+    (boolean :concealed 8 28)
+    ;; a convenience opposite to CONCEAL
+    (boolean :revealed 28 8)
+    ;; I've seen the following two properties in some code, but I'm not sure
+    ;; I've seen them work anywhere.
+    (boolean :crossed-out 9 29)
+    (boolean :framed 51 54)
+    (:foreground (:black 30) (:red 31) (:green 32) (:yellow 33) (:blue 34)
+		 (:magenta 35) (:cyan 36) (:white 37) (:reset 39))
+    (:background (:black 40) (:red 41) (:green 42) (:yellow 43) (:blue 44)
+		 (:magenta 45) (:cyan 46) (:white 47) (:reset 49))))
+
+(defun princ-ISO/IEC-6429-escape-sequence (sheet sequence &rest other-sequences)
+  "Princ ISO/IEC 6429 ESCAPE-SEQUENCE on SHEET's stream.
+Optionally princ OTHER-SEQUENCES at the same time."
+  (format (output-stream sheet) "\033[~A~{;~A~}m" sequence other-sequences))
+
+
 ;; ----------------
 ;; Low level output
 ;; ----------------
