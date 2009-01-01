@@ -60,6 +60,37 @@
 		   :initarg :item-separator
 		   :initform #\space
 		   :reader item-separator)
+   ;; Highlight (ISO/IEC 6429 SGR) properties:
+   (intensity :documentation "The face intensity."
+	      :initarg :intensity
+	      :reader intensity)
+   (italicp :documentation "The face's italic status."
+	    :initarg :italicp
+	    :reader italicp)
+   (underline :documentation "The face's underline level."
+	      :initarg :underline
+	      :reader underline)
+   (blink :documentation "The face's blink speed."
+	  :initarg :blink
+	  :reader blink)
+   (inversep :documentation "The face's inverse video status."
+	     :initarg :inversep
+	     :reader inversep)
+   (concealedp :documentation "The face's concealed status."
+	       :initarg :concealedp
+	       :reader concealedp)
+   (crossed-out-p :documentation "The face's crossed out status."
+		  :initarg :crossed-out-p
+		  :reader crossed-out-p)
+   (framedp :documentation "The face's framed status."
+	    :initarg :framedp
+	    :reader framedp)
+   (foreground :documentation "The face foreground."
+	       :initarg :foreground
+	       :reader foreground)
+   (background :documentation "The face background."
+	       :initarg :background
+	       :reader background)
    ;; Tree structure:
    (subfaces :documentation "The face children."
 	     :initarg :subfaces
@@ -76,17 +107,18 @@
 ;; =========================================================================
 
 ;; #### FIXME: investigate why define-constant doesn't work here.
-(defvar *highlight-face-properties* '()
-  "The highlight face properties and their default value.")
+(defvar *highlight-face-properties*
+  '(intensity italicp underline blink inversep concealedp crossed-out-p
+    framedp foreground background)
+  "The highlight face properties.")
 
 (defmethod slot-unbound (class (face face) slot)
   "Look up SLOT's value in FACE's parent if it's a highlight property.
 Otherwise, trigger an error."
-  (let ((property (assoc slot *highlight-face-properties*)))
+  (let ((property (member slot *highlight-face-properties*)))
     (if property
-	(if (parent face)
-	    (slot-value (parent face) slot)
-	    (cadr property))
+	(when (parent face)
+	  (slot-value (parent face) slot))
 	(call-next-method))))
 
 
