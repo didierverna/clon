@@ -110,10 +110,8 @@ is a shortcut for: (PROPERTY-NAME ((:on t) YES) ((:off nil) NO))."
 (defun ISO/IEC-6429-property-escape-sequence (property &optional value)
   "Return ISO/IEC 6429 PROPERTY's VALUE escape sequence."
   (ISO/IEC-6429-property-ecase property value
-    ;; FAINT is not well supported ...
+    ;; FAINT is not well supported
     (:intensity (:bold 1) (:faint 2) (:normal 22))
-    ;; ... so BOLD convenient instead
-    (boolean :bold 1 22)
     (boolean :italic 3 23)
     ;; DOUBLE is not well supported
     (:underline ((:single :on t) 4) (:double 21) ((:none :off nil) 24))
@@ -121,8 +119,6 @@ is a shortcut for: (PROPERTY-NAME ((:on t) YES) ((:off nil) NO))."
     (:blink ((:slow :on t) 5) (:rapid 6) ((:off nil) 25))
     (boolean :inverse 7 27)
     (boolean :concealed 8 28)
-    ;; a convenience opposite to CONCEAL
-    (boolean :revealed 28 8)
     ;; I've seen the following two properties in some code, but I'm not sure
     ;; I've seen them work anywhere.
     (boolean :crossed-out 9 29)

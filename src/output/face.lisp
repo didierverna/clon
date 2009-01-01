@@ -61,11 +61,16 @@
 		   :initform #\space
 		   :reader item-separator)
    ;; Highlight (ISO/IEC 6429 SGR) properties:
+   ;; Note that although we have some boolean slots below, their initargs
+   ;; don't follow the usual *p convention. That's because they would look
+   ;; strange when used as declarative properties in a theme file, where it is
+   ;; not obvious to the end-user that she's actually calling instantiation
+   ;; functions with initargs.
    (intensity :documentation "The face intensity."
 	      :initarg :intensity
 	      :reader intensity)
    (italicp :documentation "The face's italic status."
-	    :initarg :italicp
+	    :initarg :italic
 	    :reader italicp)
    (underline :documentation "The face's underline level."
 	      :initarg :underline
@@ -74,16 +79,16 @@
 	  :initarg :blink
 	  :reader blink)
    (inversep :documentation "The face's inverse video status."
-	     :initarg :inversep
+	     :initarg :inverse
 	     :reader inversep)
    (concealedp :documentation "The face's concealed status."
-	       :initarg :concealedp
+	       :initarg :concealed
 	       :reader concealedp)
    (crossed-out-p :documentation "The face's crossed out status."
-		  :initarg :crossed-out-p
+		  :initarg :crossed-out
 		  :reader crossed-out-p)
    (framedp :documentation "The face's framed status."
-	    :initarg :framedp
+	    :initarg :framed
 	    :reader framedp)
    (foreground :documentation "The face foreground."
 	       :initarg :foreground
@@ -204,14 +209,20 @@ etc. If PARENT-NAME does not name one of FACE's ancestors, trigger an error."
 ;; Face Instance Creation
 ;; =========================================================================
 
-;; #### NOTE: although we don't use it explicitely, the SUBFACE initarg is
-;; declared valid below.
-(defmethod initialize-instance :around ((face face) &rest keys &key subface)
-  "Compute :subfaces initarg from the :subface ones."
-  (declare (ignore subface))
+;; #### NOTE: although we don't use them explicitely, the SUBFACE, BOLD and
+;; REVEALED  initargs are declared valid below.
+(defmethod initialize-instance :around
+    ((face face) &rest keys &key subface bold revealed)
+  "Canonicalize initialization arguments.
+This involves:
+- computing :subfaces initarg from the :subface ones,
+- handling convenience highlight properties."
+  (declare (ignore subface bold revealed))
   (apply #'call-next-method face
 	 :subfaces (remove :subface (select-keys keys :subface))
-	 (remove-keys keys :subface)))
+	 (replace-keys keys :subface
+		       '(:bold :intensity (t :bold) (nil :normal))
+		       '(:revealed :concealed (t nil) (nil t)))))
 
 ;; #### NOTE: we use the NAME keyword here because we're in the before method,
 ;; hence FACE name has not been initialized yet.
@@ -232,9 +243,15 @@ etc. If PARENT-NAME does not name one of FACE's ancestors, trigger an error."
 
 (defun make-face (name
 		  &rest keys
-		  &key display left-padding separator item-separator subface)
+		  &key display left-padding separator item-separator subface
+		       intensity bold italicp underline blink inverse
+		       concealed revealed crossed-out-p framedp foreground
+		       background)
   "Make a new face named NAME."
-  (declare (ignore display left-padding separator item-separator subface))
+  (declare (ignore display left-padding separator item-separator subface
+		   intensity bold italicp underline blink inverse
+		   concealed revealed crossed-out-p framedp foreground
+		   background))
   (apply #'make-instance 'face :name name keys))
 
 (defun make-face-tree ()
@@ -251,6 +268,7 @@ etc. If PARENT-NAME does not name one of FACE's ancestors, trigger an error."
 	       :subface (make-face 'postfix))
     :subface (make-face 'text :display :block)
     :subface (make-face 'option
+	       :bold t
 	       :display :block
 	       :left-padding 2
 	       :subface (make-face 'syntax
