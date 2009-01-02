@@ -66,6 +66,10 @@
   (:documentation "The SHEET class.
 This class implements the notion of sheet for printing Clon help."))
 
+(defun current-frame (sheet)
+  "Return SHEET's current frame."
+  (car (frames sheet)))
+
 (defmacro map-frames (frame (sheet &key reverse) &body body)
   "Map BODY over SHEET's frames.
 If REVERSE, map in reverse order.
@@ -170,22 +174,23 @@ tabs are forbidden here."
   left-margin
   highlight-properties)
 
+;; 3 Shortcut accessors to the top frame:
 (defun current-face (sheet)
   "Return SHEET's current face or nil."
   (if (frames sheet)
-      (frame-face (car (frames sheet)))
+      (frame-face (current-frame sheet))
       nil))
 
 (defun current-left-margin (sheet)
   "Return SHEET's current left margin or 0."
   (if (frames sheet)
-      (frame-left-margin (car (frames sheet)))
+      (frame-left-margin (current-frame sheet))
       0))
 
 (defun current-highlight-properties (sheet)
   "Return SHEET's current highlight properties or nil."
   (if (frames sheet)
-      (frame-highlight-properties (car (frames sheet)))
+      (frame-highlight-properties (current-frame sheet))
       nil))
 
 (defun close-line (sheet)
