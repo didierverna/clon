@@ -85,11 +85,11 @@ Bind FRAME to each frame when evaluating BODY."
 ;; Sheet Processing
 ;; ==========================================================================
 
-;; ---------------------
-;; ISO/IEC 6429 handling
-;; ---------------------
+;; -------------------------
+;; ISO/IEC 6429 SGR handling
+;; -------------------------
 
-(defmacro ISO/IEC-6429-property-ecase (property value &body clauses)
+(defmacro highlight-property-ecase (property value &body clauses)
   "Create an ECASE form to extract PROPERTY's VALUE escape sequence.
 Each clause looks like: (PROPERTY-NAME (VALUE-OR-VALUE-LIST ESCAPE-SEQUENCE)*).
 The value-matching part will itself be enclosed in an ECASE expression.
@@ -107,31 +107,32 @@ is a shortcut for: (PROPERTY-NAME ((:on t) YES) ((:off nil) NO))."
 			,@(cdr clause)))))
 	      clauses)))
 
-(defun ISO/IEC-6429-property-escape-sequence (property &optional value)
-  "Return ISO/IEC 6429 PROPERTY's VALUE escape sequence."
-  (ISO/IEC-6429-property-ecase property value
+(defun highlight-property-escape-sequence (property &optional value)
+  "Return PROPERTY's VALUE escape sequence."
+  (highlight-property-ecase property value
     ;; FAINT is not well supported
-    (:intensity (:bold 1) (:faint 2) (:normal 22))
-    (boolean :italic 3 23)
+    (intensity (:bold 1) (:faint 2) ((:normal nil) 22))
+    (boolean italicp 3 23)
     ;; DOUBLE is not well supported
-    (:underline ((:single :on t) 4) (:double 21) ((:none :off nil) 24))
+    (underline ((:single :on t) 4) (:double 21) ((:none :off nil) 24))
     ;; RAPID is not well supported
-    (:blink ((:slow :on t) 5) (:rapid 6) ((:off nil) 25))
-    (boolean :inverse 7 27)
-    (boolean :concealed 8 28)
+    (blink ((:slow :on t) 5) (:rapid 6) ((:off nil) 25))
+    (boolean inversep 7 27)
+    (boolean concealedp 8 28)
     ;; I've seen the following two properties in some code, but I'm not sure
     ;; I've seen them work anywhere.
-    (boolean :crossed-out 9 29)
-    (boolean :framed 51 54)
-    (:foreground (:black 30) (:red 31) (:green 32) (:yellow 33) (:blue 34)
-		 (:magenta 35) (:cyan 36) (:white 37) (:reset 39))
-    (:background (:black 40) (:red 41) (:green 42) (:yellow 43) (:blue 44)
-		 (:magenta 45) (:cyan 46) (:white 47) (:reset 49))))
+    (boolean crossed-out-p 9 29)
+    (boolean framedp 51 54)
+    (foreground (:black 30) (:red 31) (:green 32) (:yellow 33) (:blue 34)
+		 (:magenta 35) (:cyan 36) (:white 37) ((:reset nil) 39))
+    (background (:black 40) (:red 41) (:green 42) (:yellow 43) (:blue 44)
+		 (:magenta 45) (:cyan 46) (:white 47) ((:reset nil) 49))))
 
-(defun princ-ISO/IEC-6429-escape-sequence (sheet sequence &rest other-sequences)
-  "Princ ISO/IEC 6429 ESCAPE-SEQUENCE on SHEET's stream.
-Optionally princ OTHER-SEQUENCES at the same time."
-  (format (output-stream sheet) "\033[~A~{;~A~}m" sequence other-sequences))
+(defun princ-highlight-properties-escape-sequences (sheet sequences)
+  "Princ ESCAPE-SEQUENCES on SHEET's stream."
+  ;; #### FIXME: #\esc is not a standard name (see CLHS 13.1.7):
+  (format (output-stream sheet) "~C[~A~{;~A~}m"
+    #\esc (car sequences) (cdr sequences)))
 
 
 ;; ----------------
@@ -168,13 +169,20 @@ tabs are forbidden here."
 
 (defstruct frame
   "The FRAME structure."
-  left-margin)
+  left-margin
+  highlight-properties)
 
 (defun left-margin (sheet)
   "Return SHEET's current left-margin."
   (if (frames sheet)
       (frame-left-margin (car (frames sheet)))
       0))
+
+(defun highlight-properties (sheet)
+  "Return SHEET's current highlight escape sequences."
+  (if (frames sheet)
+      (frame-highlight-properties (car (frames sheet)))
+      nil))
 
 (defun close-line (sheet)
   "Close all frames on SHEET's current line and go to next line."
@@ -293,6 +301,7 @@ PADDING is returned when it does not exceed SHEET's line width."
 
 (defun %open-face (sheet face)
   "Open face FACE on SHEET, and return its separator."
+  ;; Prepare the new frame:
   (let ((left-margin
 	 (let ((padding-spec (left-padding face)))
 	   (econd ((eq padding-spec :self)
@@ -320,11 +329,28 @@ PADDING is returned when it does not exceed SHEET's line width."
 			       (safe-padding sheet padding))))))
 		  ((numberp padding-spec)
 		   (incf padding-spec (left-margin sheet))
-		   (safe-padding sheet padding-spec))))))
-    (when (<= (column sheet) left-margin)
-      (princ-spaces sheet (- left-margin (column sheet))))
-    (push (make-frame :left-margin left-margin) (frames sheet)))
+		   (safe-padding sheet padding-spec)))))
+	(highlight-properties
+	 (loop :for property :in *highlight-face-properties*
+	       :when (slot-boundp face property)
+	       :collect (list property (slot-value face property)))))
+    ;; Update the frame stack and the current face:
+    (push (make-frame :left-margin left-margin
+		      :highlight-properties highlight-properties)
+	  (frames sheet)))
   (setf (current-face sheet) face)
+  ;; Now handle the output: move to the beginning of the new frame and output
+  ;; new highlight properties:
+  (when (<= (column sheet) (left-margin sheet))
+    (princ-spaces sheet (- (left-margin sheet) (column sheet))))
+  (when (highlight-properties sheet)
+    (princ-highlight-properties-escape-sequences
+     sheet
+     (mapcar
+      (lambda (property)
+	(highlight-property-escape-sequence (car property) (cadr property)))
+      (highlight-properties sheet))))
+  ;; Finally, return the face separator:
   (separator (current-face sheet)))
 
 (defun open-face (sheet name)
@@ -335,9 +361,21 @@ Return the face separator."
 
 (defun close-face (sheet)
   "Close SHEET's current face."
+  ;; Reach the end of the face block:
   (when (and (< (column sheet) (line-width sheet))
 	     (eq (display (current-face sheet)) :block))
     (princ-spaces sheet (- (line-width sheet) (column sheet))))
+  ;; Restore previous highlight properties:
+  (when (highlight-properties sheet)
+    (princ-highlight-properties-escape-sequences
+     sheet
+     (mapcar (lambda (property)
+	       (highlight-property-escape-sequence
+		(car property)
+		(when (parent (current-face sheet))
+		  (slot-value (parent (current-face sheet)) (car property)))))
+	     (highlight-properties sheet))))
+  ;; Restore the previous frame and face:
   (pop (frames sheet))
   (setf (current-face sheet) (parent (current-face sheet))))
 

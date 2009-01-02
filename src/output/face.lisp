@@ -268,10 +268,10 @@ This involves:
 	       :subface (make-face 'postfix))
     :subface (make-face 'text :display :block)
     :subface (make-face 'option
-	       :bold t
 	       :display :block
 	       :left-padding 2
 	       :subface (make-face 'syntax
+			  :bold t
 			  :item-separator ", "
 			  :subface (make-face 'short-name
 				     :item-separator nil
