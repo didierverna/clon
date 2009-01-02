@@ -210,6 +210,23 @@ properties."
 		(car property) (cadr property)))
 	     (frame-highlight-properties frame)))))
 
+(defun close-frame (sheet frame)
+  "Close frame FRAME on SHEET.
+This involves reaching the the end of line if FRAME's face has a :block
+display property, and restoring the upper frame's highlight properties."
+  (when (and (eq (display (frame-face frame)) :block)
+	     (< (column sheet) (line-width sheet)))
+    (princ-spaces sheet (- (line-width sheet) (column sheet))))
+  (when (frame-highlight-properties frame)
+    (princ-highlight-properties-escape-sequences
+     sheet
+     (mapcar (lambda (property)
+	       (highlight-property-escape-sequence
+		(car property)
+		(when (parent (frame-face frame))
+		  (slot-value (parent (frame-face frame)) (car property)))))
+	     (frame-highlight-properties frame)))))
+
 (defun close-line (sheet)
   "Close all frames on SHEET's current line and go to next line."
   ;; #### NOTE: the reason why the current column might be past the line width
@@ -371,21 +388,7 @@ Return the face separator."
 
 (defun close-face (sheet)
   "Close SHEET's current face."
-  ;; Reach the end of the face block:
-  (when (and (< (column sheet) (line-width sheet))
-	     (eq (display (current-face sheet)) :block))
-    (princ-spaces sheet (- (line-width sheet) (column sheet))))
-  ;; Restore previous highlight properties:
-  (when (current-highlight-properties sheet)
-    (princ-highlight-properties-escape-sequences
-     sheet
-     (mapcar (lambda (property)
-	       (highlight-property-escape-sequence
-		(car property)
-		(when (parent (current-face sheet))
-		  (slot-value (parent (current-face sheet)) (car property)))))
-	     (current-highlight-properties sheet))))
-  ;; Restore the previous frame:
+  (close-frame sheet (current-frame sheet))
   (pop (frames sheet)))
 
 (defmacro with-face (sheet face &body body)
