@@ -193,6 +193,23 @@ tabs are forbidden here."
       (frame-highlight-properties (current-frame sheet))
       nil))
 
+(defun open-frame (sheet frame)
+  "Open FRAME on SHEET.
+This involves reaching the frame's left margin, and outputting its highlight
+properties."
+  ;; #### NOTE: the current column might in fact be already past the frame's
+  ;; left margin, in case we had to print something too long (that's because
+  ;; we don't do hyphenation).
+  (when (<= (column sheet) (frame-left-margin frame))
+    (princ-spaces sheet (- (frame-left-margin frame) (column sheet))))
+  (when (frame-highlight-properties frame)
+    (princ-highlight-properties-escape-sequences
+     sheet
+     (mapcar (lambda (property)
+	       (highlight-property-escape-sequence
+		(car property) (cadr property)))
+	     (frame-highlight-properties frame)))))
+
 (defun close-line (sheet)
   "Close all frames on SHEET's current line and go to next line."
   ;; #### NOTE: the reason why the current column might be past the line width
@@ -207,17 +224,7 @@ tabs are forbidden here."
   "Open all frames on SHEET's current line."
   (assert (zerop (column sheet)))
   (map-frames frame (sheet :reverse t)
-    ;; Reach the frame's left margin:
-    (unless (zerop (frame-left-margin frame))
-      (princ-spaces sheet (- (frame-left-margin frame) (column sheet))))
-    ;; Output the frame's highlight properties:
-    (when (frame-highlight-properties frame)
-      (princ-highlight-properties-escape-sequences
-       sheet
-       (mapcar (lambda (property)
-		 (highlight-property-escape-sequence
-		  (car property) (cadr property)))
-	       (frame-highlight-properties frame))))))
+    (open-frame sheet frame)))
 
 (defun open-next-line (sheet)
   "Close SHEET's current line and open the next one."
@@ -314,7 +321,7 @@ PADDING is returned when it does not exceed SHEET's line width."
 
 (defun %open-face (sheet face)
   "Open face FACE on SHEET, and return its separator."
-  ;; Prepare the new frame:
+  ;; Create the new frame:
   (let ((left-margin
 	 (let ((padding-spec (left-padding face)))
 	   (econd ((eq padding-spec :self)
@@ -347,23 +354,13 @@ PADDING is returned when it does not exceed SHEET's line width."
 	 (loop :for property :in *highlight-face-properties*
 	       :when (slot-boundp face property)
 	       :collect (list property (slot-value face property)))))
-    ;; Update the frame stack:
     (push (make-frame :face face
 		      :left-margin left-margin
 		      :highlight-properties highlight-properties)
 	  (frames sheet)))
-  ;; Now handle the output: move to the beginning of the new frame and output
-  ;; new highlight properties:
-  (when (<= (column sheet) (current-left-margin sheet))
-    (princ-spaces sheet (- (current-left-margin sheet) (column sheet))))
-  (when (current-highlight-properties sheet)
-    (princ-highlight-properties-escape-sequences
-     sheet
-     (mapcar
-      (lambda (property)
-	(highlight-property-escape-sequence (car property) (cadr property)))
-      (current-highlight-properties sheet))))
-  ;; Finally, return the face separator:
+  ;; Open the new frame:
+  (open-frame sheet (current-frame sheet))
+  ;; Return the current face separator:
   (separator (current-face sheet)))
 
 (defun open-face (sheet name)
