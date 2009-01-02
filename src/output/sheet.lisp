@@ -179,13 +179,18 @@ tabs are forbidden here."
 ;; Logical output
 ;; --------------
 
+(defstruct highlight-property-instance
+  "The HIGHLIGHT-PROEPRTY-INSTANCE structure."
+  name
+  value)
+
 (defstruct frame
   "The FRAME structure."
   face
   left-margin
-  highlight-properties)
+  highlight-property-instances)
 
-;; 3 Shortcut accessors to the top frame:
+;; 3 shortcut accessors to the top frame:
 (defun current-face (sheet)
   "Return SHEET's current face or nil."
   (if (frames sheet)
@@ -198,28 +203,29 @@ tabs are forbidden here."
       (frame-left-margin (current-frame sheet))
       0))
 
-(defun current-highlight-properties (sheet)
-  "Return SHEET's current highlight properties or nil."
+(defun current-highlight-property-instances (sheet)
+  "Return SHEET's current highlight property instances."
   (if (frames sheet)
-      (frame-highlight-properties (current-frame sheet))
+      (frame-highlight-property-instances (current-frame sheet))
       nil))
 
 (defun open-frame (sheet frame)
   "Open FRAME on SHEET.
-This involves reaching the frame's left margin, and outputting its highlight
+This involves reaching the frame's left margin and outputting its highlight
 properties."
   ;; #### NOTE: the current column might in fact be already past the frame's
   ;; left margin, in case we had to print something too long (that's because
   ;; we don't do hyphenation).
   (when (<= (column sheet) (frame-left-margin frame))
     (princ-spaces sheet (- (frame-left-margin frame) (column sheet))))
-  (when (frame-highlight-properties frame)
+  (when (frame-highlight-property-instances frame)
     (princ-highlight-properties-escape-sequences
      sheet
      (mapcar (lambda (property)
 	       (highlight-property-escape-sequence
-		(car property) (cadr property)))
-	     (frame-highlight-properties frame)))))
+		(highlight-property-instance-name property)
+		(highlight-property-instance-value property)))
+	     (frame-highlight-property-instances frame)))))
 
 (defun close-frame (sheet frame)
   "Close frame FRAME on SHEET.
@@ -228,15 +234,16 @@ display property, and restoring the upper frame's highlight properties."
   (when (and (eq (display (frame-face frame)) :block)
 	     (< (column sheet) (line-width sheet)))
     (princ-spaces sheet (- (line-width sheet) (column sheet))))
-  (when (frame-highlight-properties frame)
+  (when (frame-highlight-property-instances frame)
     (princ-highlight-properties-escape-sequences
      sheet
      (mapcar (lambda (property)
 	       (highlight-property-escape-sequence
-		(car property)
+		(highlight-property-instance-name property)
 		(when (parent (frame-face frame))
-		  (slot-value (parent (frame-face frame)) (car property)))))
-	     (frame-highlight-properties frame)))))
+		  (slot-value (parent (frame-face frame))
+			      (highlight-property-instance-name property)))))
+	     (frame-highlight-property-instances frame)))))
 
 (defun close-line (sheet)
   "Close all frames on SHEET's current line and go to next line."
@@ -378,13 +385,16 @@ PADDING is returned when it does not exceed SHEET's line width."
 		  ((numberp padding-spec)
 		   (incf padding-spec (current-left-margin sheet))
 		   (safe-padding sheet padding-spec)))))
-	(highlight-properties
+	(highlight-property-instances
 	 (loop :for property :in *highlight-face-properties*
 	       :when (slot-boundp face property)
-	       :collect (list property (slot-value face property)))))
-    (push-frame sheet (make-frame :face face
-				  :left-margin left-margin
-				  :highlight-properties highlight-properties)))
+	       :collect (make-highlight-property-instance
+			 :name property :value (slot-value face property)))))
+    (push-frame sheet
+		(make-frame :face face
+			    :left-margin left-margin
+			    :highlight-property-instances
+			    highlight-property-instances)))
   ;; Open the new frame:
   (open-frame sheet (current-frame sheet))
   ;; Return the current face separator:
