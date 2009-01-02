@@ -447,7 +447,7 @@ Return the face separator."
   (:method (face (help-spec string))
     t)
   (:method (face (help-spec list))
-    "Return t if HELP-SPEC's face is visible."
+    "Return t if HELP-SPEC visible and at least one subspec will print."
     (let ((subface (find-face face (car help-spec))))
       (and (visiblep subface)
 	   (some (lambda (spec) (will-print subface spec))
