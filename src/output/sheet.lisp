@@ -229,11 +229,8 @@ display property, and restoring the upper frame's highlight properties."
 
 (defun close-line (sheet)
   "Close all frames on SHEET's current line and go to next line."
-  ;; #### NOTE: the reason why the current column might be past the line width
-  ;; is that we don't do hyphenation and words might not fit anywhere
-  ;; properly. See comment in output-string.
-  (when (< (column sheet) (line-width sheet))
-    (princ-spaces sheet (- (line-width sheet) (column sheet))))
+  (map-frames frame (sheet)
+    (close-frame sheet frame))
   (terpri (output-stream sheet))
   (setf (column sheet) 0))
 
