@@ -174,6 +174,14 @@ tabs are forbidden here."
   "Princ NUMBER spaces to SHEET's stream and update the column position."
   (princ-string sheet (make-string number :initial-element #\space)))
 
+;; #### NOTE: the current column might in fact be already past the desired
+;; one. For instance, since we don't do hyphenation, something too big to fit
+;; in the current frame will overfull it.
+(defun reach-column (sheet column)
+  "Reach COLUMN on SHEET by princ'ing spaces."
+  (when (< (column sheet) column)
+    (princ-spaces sheet (- column (column sheet)))))
+
 
 ;; --------------
 ;; Logical output
@@ -213,11 +221,7 @@ tabs are forbidden here."
   "Open FRAME on SHEET.
 This involves reaching the frame's left margin and outputting its highlight
 properties."
-  ;; #### NOTE: the current column might in fact be already past the frame's
-  ;; left margin, in case we had to print something too long (that's because
-  ;; we don't do hyphenation).
-  (when (<= (column sheet) (frame-left-margin frame))
-    (princ-spaces sheet (- (frame-left-margin frame) (column sheet))))
+  (reach-column sheet (frame-left-margin frame))
   (when (frame-highlight-property-instances frame)
     (princ-highlight-properties-escape-sequences
      sheet
@@ -231,9 +235,8 @@ properties."
   "Close frame FRAME on SHEET.
 This involves reaching the the end of line if FRAME's face has a :block
 display property, and restoring the upper frame's highlight properties."
-  (when (and (eq (display (frame-face frame)) :block)
-	     (< (column sheet) (line-width sheet)))
-    (princ-spaces sheet (- (line-width sheet) (column sheet))))
+  (when (eq (display (frame-face frame)) :block)
+    (reach-column sheet (line-width sheet)))
   (when (frame-highlight-property-instances frame)
     (princ-highlight-properties-escape-sequences
      sheet
