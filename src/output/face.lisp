@@ -107,6 +107,10 @@
 	   :reader parent))
   (:documentation "The FACE class."))
 
+(defun visiblep (face)
+  "Return t if FACE's display property is not :hidden."
+  (not (eq (display face) :hidden)))
+
 
 
 ;; =========================================================================
