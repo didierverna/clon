@@ -39,6 +39,11 @@
 ;; The Face Class
 ;; =========================================================================
 
+;; Note that although we have some boolean slots below, their initargs don't
+;; follow the usual *p convention. That's because they would look strange when
+;; used as declarative properties in a theme file, where it is not obvious to
+;; the end-user that she's actually calling instantiation functions with
+;; initargs.
 (defclass face ()
   ((name :documentation "The face name."
 	 :initarg :name
@@ -61,13 +66,8 @@
 		   :initform #\space
 		   :reader item-separator)
    ;; Highlight properties (ISO/IEC 6429 SGR):
-   ;; Note that although we have some boolean slots below, their initargs
-   ;; don't follow the usual *p convention. That's because they would look
-   ;; strange when used as declarative properties in a theme file, where it is
-   ;; not obvious to the end-user that she's actually calling instantiation
-   ;; functions with initargs.
-   ;; Note as well that the readers are in fact not used anywhere, because
-   ;; highlight properties are treated in batch.
+   ;; Note that the readers are in fact not used anywhere, because highlight
+   ;; properties are treated in batch.
    (intensity :documentation "The face intensity."
 	      :initarg :intensity
 	      :reader intensity)
@@ -259,13 +259,13 @@ This involves:
 		  &rest keys
 		  &key display left-padding separator item-separator subface
 		       intensity bold italicp underline blink inverse
-		       concealed revealed crossed-out-p framedp foreground
-		       background)
+		       concealed revealed crossed-out-p framedp
+		       foreground background)
   "Make a new face named NAME."
   (declare (ignore display left-padding separator item-separator subface
-		   intensity bold italicp underline blink inverse
-		   concealed revealed crossed-out-p framedp foreground
-		   background))
+		   intensity bold italicp underline blink inverse concealed
+		   revealed crossed-out-p framedp
+		   foreground background))
   (apply #'make-instance 'face :name name keys))
 
 (defun make-face-tree ()
