@@ -275,7 +275,8 @@ output reaches the rightmost bound."
 	       ;; reach the next tab position with respect to the current
 	       ;; frame. #### FIXME: get a real tabsize
 	       (let ((spaces (+ (- (* (ceiling (/ (- (column sheet)
-						     (current-left-margin sheet))
+						     (current-left-margin
+						      sheet))
 						  8))
 				      8)
 				   (column sheet))
@@ -299,11 +300,11 @@ output reaches the rightmost bound."
 			       :start i)
 			      len)))
 		 (cond ((= (column sheet) (current-left-margin sheet))
-			;; If we're at the current-left-margin, we output the word
-			;; right here, since it couldn't fit anywhere else.
-			;; Note that since I don't do hyphenation, the word
-			;; might extend past the line-width. This is bad, but
-			;; this is life.
+			;; If we're at the current-left-margin, we output the
+			;; word right here, since it couldn't fit anywhere
+			;; else. Note that since I don't do hyphenation, the
+			;; word might extend past the line-width. This is bad,
+			;; but this is life.
 			(princ-string sheet (subseq string i end))
 			(setq i end))
 		       ((< (+ (column sheet) (- end i)) (line-width sheet))
