@@ -412,11 +412,15 @@ Return the face separator."
   (close-frame sheet (current-frame sheet))
   (pop-frame sheet))
 
-(defmacro with-face (sheet face &body body)
-  `(let ((separator (open-face ,sheet ,face)))
-    ,@body
-    (close-face ,sheet)
-    separator))
+(defmacro with-face (sheet name &body body)
+  "Evaluate BODY with SHEET's current face set to the one named NAME."
+  (let ((face (gensym "face")))
+    `(let ((,face (find-face (current-face ,sheet) ,name)))
+      (when (visiblep ,face)
+	(let ((separator (%open-face ,sheet ,face)))
+	  ,@body
+	  (close-face ,sheet)
+	  separator)))))
 
 (defun open-help-face (sheet)
   "Open the help face on SHEET."
@@ -436,19 +440,33 @@ Return the face separator."
 ;; The Print Help Protocol
 ;; =========================================================================
 
+(defgeneric will-print (face help-spec)
+  (:documentation "Return t if HELP-SPEC will print something within FACE.")
+  (:method (face (help-spec character))
+    t)
+  (:method (face (help-spec string))
+    t)
+  (:method (face (help-spec list))
+    "Return t if HELP-SPEC's face is visible."
+    (let ((subface (find-face face (car help-spec))))
+      (and (visiblep subface)
+	   (some (lambda (spec) (will-print subface spec))
+		 (cdr help-spec))))))
+
 ;; #### NOTE: this is where I would like more dispatch capability from CLOS.
 ;; Something like defmethod %print-help (sheet (help-spec (list symbol *)))
 (defun %print-help-spec-items (sheet items)
   "Print help specification ITEMS on SHEET."
   (loop :for spec :on items
 	:do
-	(let ((separator (%print-help sheet (car spec))))
-	  (when (cdr spec)
-	    (when separator
-	      (%print-help sheet separator))
-	    (when (item-separator (current-face sheet))
-	      (%print-help sheet
-			   (item-separator (current-face sheet))))))))
+	(when (will-print (current-face sheet) (car spec))
+	  (let ((separator (%print-help sheet (car spec))))
+	    (when (and (cdr spec) (will-print (current-face sheet) (cadr spec)))
+	      (when separator
+		(%print-help sheet separator))
+	      (when (item-separator (current-face sheet))
+		(%print-help sheet
+			     (item-separator (current-face sheet)))))))))
 
 (defgeneric %print-help (sheet help-spec)
   (:documentation "Print HELP-SPEC on SHEET.")
