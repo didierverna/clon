@@ -83,12 +83,10 @@ This class implements the notion of sheet for printing Clon help."))
   "Return SHEET's current frame."
   (car (frames sheet)))
 
-(defmacro map-frames (frame (sheet &key reverse) &body body)
-  "Map BODY over SHEET's frames.
-If REVERSE, map in reverse order.
-Bind FRAME to each frame when evaluating BODY."
-  `(mapc (lambda (,frame)
-	   ,@body)
+(defmacro map-frames (function (sheet &key reverse))
+  "Map FUNCTION over SHEET's frames.
+If REVERSE, map in reverse order."
+  `(mapc ,function
     ,(if reverse
 	 `(nreverse (copy-list (frames ,sheet)))
 	 `(frames ,sheet))))
@@ -242,16 +240,18 @@ display property, and restoring the upper frame's highlight properties."
 
 (defun close-line (sheet)
   "Close all frames on SHEET's current line and go to next line."
-  (map-frames frame (sheet)
-    (close-frame sheet frame))
+  (map-frames (lambda (frame)
+		(close-frame sheet frame))
+      (sheet))
   (terpri (output-stream sheet))
   (setf (column sheet) 0))
 
 (defun open-line (sheet)
   "Open all frames on SHEET's current line."
   (assert (zerop (column sheet)))
-  (map-frames frame (sheet :reverse t)
-    (open-frame sheet frame)))
+  (map-frames (lambda (frame)
+		(open-frame sheet frame))
+      (sheet :reverse t)))
 
 (defun open-next-line (sheet)
   "Close SHEET's current line and open the next one."
