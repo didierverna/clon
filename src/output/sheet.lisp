@@ -66,6 +66,19 @@
   (:documentation "The SHEET class.
 This class implements the notion of sheet for printing Clon help."))
 
+
+;; ------------
+;; Frame access
+;; ------------
+
+(defun push-frame (sheet frame)
+  "Push a new frame to SHEET's frames."
+  (push frame (frames sheet)))
+
+(defun pop-frame (sheet)
+  "Pop SHEET's current frame."
+  (pop (frames sheet)))
+
 (defun current-frame (sheet)
   "Return SHEET's current frame."
   (car (frames sheet)))
@@ -369,10 +382,9 @@ PADDING is returned when it does not exceed SHEET's line width."
 	 (loop :for property :in *highlight-face-properties*
 	       :when (slot-boundp face property)
 	       :collect (list property (slot-value face property)))))
-    (push (make-frame :face face
-		      :left-margin left-margin
-		      :highlight-properties highlight-properties)
-	  (frames sheet)))
+    (push-frame sheet (make-frame :face face
+				  :left-margin left-margin
+				  :highlight-properties highlight-properties)))
   ;; Open the new frame:
   (open-frame sheet (current-frame sheet))
   ;; Return the current face separator:
@@ -387,7 +399,7 @@ Return the face separator."
 (defun close-face (sheet)
   "Close SHEET's current face."
   (close-frame sheet (current-frame sheet))
-  (pop (frames sheet)))
+  (pop-frame sheet))
 
 (defmacro with-face (sheet face &body body)
   `(let ((separator (open-face ,sheet ,face)))
