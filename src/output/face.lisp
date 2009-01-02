@@ -60,12 +60,14 @@
 		   :initarg :item-separator
 		   :initform #\space
 		   :reader item-separator)
-   ;; Highlight (ISO/IEC 6429 SGR) properties:
+   ;; Highlight properties (ISO/IEC 6429 SGR):
    ;; Note that although we have some boolean slots below, their initargs
    ;; don't follow the usual *p convention. That's because they would look
    ;; strange when used as declarative properties in a theme file, where it is
    ;; not obvious to the end-user that she's actually calling instantiation
    ;; functions with initargs.
+   ;; Note as well that the readers are in fact not used anywhere, because
+   ;; highlight properties are treated in batch.
    (intensity :documentation "The face intensity."
 	      :initarg :intensity
 	      :reader intensity)
@@ -112,19 +114,31 @@
 ;; =========================================================================
 
 ;; #### FIXME: investigate why define-constant doesn't work here.
-(defvar *highlight-face-properties*
+(defvar *highlight-properties*
   '(intensity italicp underline blink inversep concealedp crossed-out-p
     framedp foreground background)
   "The highlight face properties.")
 
 (defmethod slot-unbound (class (face face) slot)
   "Look up SLOT's value in FACE's parent if it's a highlight property.
-Otherwise, trigger an error."
-  (let ((property (member slot *highlight-face-properties*)))
+If FACE has no parent, return nil.
+For other properties, trigger an error."
+  (let ((property (member slot *highlight-properties*)))
     (if property
 	(when (parent face)
 	  (slot-value (parent face) slot))
 	(call-next-method))))
+
+(defun face-highlight-property-set-p (face property)
+  "Return t if PROPERTY is set explicitely in FACE."
+  (slot-boundp face property))
+
+(defun face-highlight-property-value (face property)
+  "Return PROPERTY's value in FACE.
+Since faces inherit highlight properties, the actual value might come from one
+of FACE's ancestors.
+if PROPERTY is not et, return nil."
+  (slot-value face property))
 
 
 

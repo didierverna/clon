@@ -386,10 +386,11 @@ PADDING is returned when it does not exceed SHEET's line width."
 		   (incf padding-spec (current-left-margin sheet))
 		   (safe-padding sheet padding-spec)))))
 	(highlight-property-instances
-	 (loop :for property :in *highlight-face-properties*
-	       :when (slot-boundp face property)
+	 (loop :for property :in *highlight-properties*
+	       :when (face-highlight-property-set-p face property)
 	       :collect (make-highlight-property-instance
-			 :name property :value (slot-value face property)))))
+			 :name property
+			 :value (face-highlight-property-value face property)))))
     (push-frame sheet
 		(make-frame :face face
 			    :left-margin left-margin
