@@ -356,6 +356,7 @@ PADDING is returned when it does not exceed SHEET's line width."
 
 (defun %open-face (sheet face)
   "Open face FACE on SHEET, and return its separator."
+  (assert (visiblep face))
   ;; Create the new frame:
   (let ((left-margin
 	 (let ((padding-spec (left-padding face)))
@@ -414,25 +415,10 @@ Return the face separator."
 
 (defmacro with-face (sheet name &body body)
   "Evaluate BODY with SHEET's current face set to the one named NAME."
-  (let ((face (gensym "face")))
-    `(let ((,face (find-face (current-face ,sheet) ,name)))
-      (when (visiblep ,face)
-	(let ((separator (%open-face ,sheet ,face)))
-	  ,@body
-	  (close-face ,sheet)
-	  separator)))))
-
-(defun open-help-face (sheet)
-  "Open the help face on SHEET."
-  (unless (eql (name (face-tree sheet)) 'help)
-    (error "Help face not found."))
-  (%open-face sheet (face-tree sheet)))
-
-(defmacro with-help-face (sheet &body body)
-  `(progn
-    (open-help-face ,sheet)
+  `(let ((separator (open-face ,sheet ,name)))
     ,@body
-    (close-face ,sheet)))
+    (close-face ,sheet)
+    separator))
 
 
 
@@ -440,18 +426,22 @@ Return the face separator."
 ;; The Print Help Protocol
 ;; =========================================================================
 
+(defun %will-print (face specs)
+  "Return t if FACE is visible and at least one of its SPECS will print."
+  (and (visiblep face)
+       (some (lambda (spec)
+	       (will-print face spec))
+	     specs)))
+
 (defgeneric will-print (face help-spec)
-  (:documentation "Return t if HELP-SPEC will print something within FACE.")
+  (:documentation "Return t if HELP-SPEC will print in the context of FACE.")
   (:method (face (help-spec character))
     t)
   (:method (face (help-spec string))
     t)
   (:method (face (help-spec list))
-    "Return t if HELP-SPEC visible and at least one subspec will print."
     (let ((subface (find-face face (car help-spec))))
-      (and (visiblep subface)
-	   (some (lambda (spec) (will-print subface spec))
-		 (cdr help-spec))))))
+      (%will-print subface (cdr help-spec)))))
 
 ;; #### NOTE: this is where I would like more dispatch capability from CLOS.
 ;; Something like defmethod %print-help (sheet (help-spec (list symbol *)))
@@ -491,17 +481,20 @@ The HELP-SPEC items to print are separated with the contents of the face's
 
 (defun print-help (sheet help-spec)
   "Print HELP-SPEC on SHEET."
-  (with-help-face sheet
-    (%print-help-spec-items sheet
-			    (if (and (listp help-spec)
-				     (not (symbolp (car help-spec))))
-				;; There's already an enclosing list when help
-				;; for a container is requested directly, or
-				;; when the complete help is requested, in
-				;; which case we have the list of synopsis and
-				;; all synopsis items.
-				help-spec
-				(list help-spec)))))
+  (unless (eql (name (face-tree sheet)) 'help)
+    (error "Help face not found."))
+  (let ((help-spec
+	 (if (and (listp help-spec) (not (symbolp (car help-spec))))
+	     ;; There's already an enclosing list when help for a container is
+	     ;; requested directly, or when the complete help is requested, in
+	     ;; which case we have the list of synopsis and all synopsis
+	     ;; items.
+	     help-spec
+	     (list help-spec))))
+    (when (%will-print (face-tree sheet) help-spec)
+      (%open-face sheet (face-tree sheet))
+      (%print-help-spec-items sheet help-spec)
+      (close-face sheet))))
 
 
 
