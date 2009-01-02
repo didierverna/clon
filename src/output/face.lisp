@@ -46,7 +46,7 @@
    ;; Layout properties:
    (display :documentation "The face display mode."
 	    :initarg :display
-	    :initform :inilne
+	    :initform :inline
 	    :reader display)
    (left-padding :documentation "The face left padding."
 		 :initarg :left-padding
