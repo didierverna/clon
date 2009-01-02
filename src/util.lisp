@@ -175,33 +175,36 @@ REPLACEMENT can take the following forms:
 	       (= (length replacement) 2)
 	       (symbolp (car replacement))
 	       (symbolp (cadr replacement)))
-	  (replace-in-keys (key val) keys (car replacement)
-	    (list (cadr replacement) val)))
+	  (destructuring-bind (old-key new-key) replacement
+	    (replace-in-keys (key val) keys old-key
+	      (list new-key val))))
 	 ((and (consp replacement)
 	       (> (length replacement) 2)
 	       (symbolp (car replacement))
 	       (symbolp (cadr replacement)))
-	  (replace-in-keys (key val) keys (car replacement)
-	    (list (cadr replacement)
-		  (let ((match
-			 (assoc val (cddr replacement)
-				:test (lambda (val val-or-vals)
-					(if (consp val-or-vals)
-					    (member val val-or-vals)
-					    (eql val val-or-vals))))))
-		    (if match (cadr match) val)))))
+	  (destructuring-bind (old-key new-key &rest replacements) replacement
+	    (replace-in-keys (key val) keys old-key
+	      (list new-key
+		    (let ((match
+			   (assoc val replacements
+				  :test (lambda (val val-or-vals)
+					  (if (consp val-or-vals)
+					      (member val val-or-vals)
+					      (eql val val-or-vals))))))
+		      (if match (cadr match) val))))))
 	 ((and (consp replacement)
 	       (> (length replacement) 1)
 	       (symbolp (car replacement)))
-	  (replace-in-keys (key val) keys (car replacement)
-	    (let ((match (assoc val (cdr replacement)
-				:test (lambda (val val-or-vals)
-					(if (consp val-or-vals)
-					    (member val val-or-vals)
-					    (eql val val-or-vals))))))
-	      (if match
-		  (list (cadr match) (caddr match))
-		  (list key val)))))))
+	  (destructuring-bind (old-key &rest replacements) replacement
+	    (replace-in-keys (key val) keys old-key
+	      (let ((match (assoc val replacements
+				  :test (lambda (val val-or-vals)
+					  (if (consp val-or-vals)
+					      (member val val-or-vals)
+					      (eql val val-or-vals))))))
+		(if match
+		    (list (cadr match) (caddr match))
+		    (list key val))))))))
 
 (defun replace-keys (keys &rest replacements)
   "Return a new property list from KEYS with REPLACEMENTS.
