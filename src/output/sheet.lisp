@@ -206,11 +206,6 @@ tabs are forbidden here."
   (close-line sheet)
   (open-line sheet))
 
-(defun maybe-open-next-line (sheet)
-  "Go to the next line if we're already past SHEET's line width."
-  (if (>= (column sheet) (line-width sheet))
-      (open-next-line sheet)))
-
 ;; #### FIXME: This routine does not handle special characters (the ones that
 ;; don't actually display anything. Since this is for short description
 ;; strings, this would not be normally a problem, but the current situation is
