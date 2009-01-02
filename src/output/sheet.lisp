@@ -119,7 +119,7 @@ is a shortcut for: (PROPERTY-NAME ((:on t) YES) ((:off nil) NO))."
 			,@(cdr clause)))))
 	      clauses)))
 
-(defun highlight-property-escape-sequence (property &optional value)
+(defun highlight-property-escape-sequence (property value)
   "Return PROPERTY's VALUE escape sequence."
   (highlight-property-ecase property value
     ;; FAINT is not well supported
