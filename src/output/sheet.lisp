@@ -198,8 +198,17 @@ tabs are forbidden here."
   "Open all frames on SHEET's current line."
   (assert (zerop (column sheet)))
   (map-frames frame (sheet :reverse t)
+    ;; Reach the frame's left margin:
     (unless (zerop (frame-left-margin frame))
-      (princ-spaces sheet (- (frame-left-margin frame) (column sheet))))))
+      (princ-spaces sheet (- (frame-left-margin frame) (column sheet))))
+    ;; Output the frame's highlight properties:
+    (when (frame-highlight-properties frame)
+      (princ-highlight-properties-escape-sequences
+       sheet
+       (mapcar (lambda (property)
+		 (highlight-property-escape-sequence
+		  (car property) (cadr property)))
+	       (frame-highlight-properties frame))))))
 
 (defun open-next-line (sheet)
   "Close SHEET's current line and open the next one."

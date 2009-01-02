@@ -280,6 +280,7 @@ This involves:
 				     :item-separator nil
 				     :subface (make-face 'argument)))
 	       :subface (make-face 'description
+			  :background :cyan
 			  :display :block
 			  :left-padding '(30 :absolute)
 			  :item-separator #\newline
