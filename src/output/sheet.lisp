@@ -119,9 +119,11 @@ is a shortcut for: (PROPERTY-NAME ((:on t) YES) ((:off nil) NO))."
 			,@(cdr clause)))))
 	      clauses)))
 
-(defun highlight-property-escape-sequence (property value)
-  "Return PROPERTY's VALUE escape sequence."
-  (highlight-property-ecase property value
+(defun highlight-property-instance-escape-sequence (instance)
+  "Return highlight property INSTANCE's escape sequence."
+  (highlight-property-ecase
+      (highlight-property-instance-name instance)
+      (highlight-property-instance-value instance)
     ;; FAINT is not well supported
     (intensity (:bold 1) (:faint 2) ((:normal nil) 22))
     (boolean italicp 3 23)
@@ -136,15 +138,19 @@ is a shortcut for: (PROPERTY-NAME ((:on t) YES) ((:off nil) NO))."
     (boolean crossed-out-p 9 29)
     (boolean framedp 51 54)
     (foreground (:black 30) (:red 31) (:green 32) (:yellow 33) (:blue 34)
-		 (:magenta 35) (:cyan 36) (:white 37) ((:reset nil) 39))
+		(:magenta 35) (:cyan 36) (:white 37) ((:reset nil) 39))
     (background (:black 40) (:red 41) (:green 42) (:yellow 43) (:blue 44)
-		 (:magenta 45) (:cyan 46) (:white 47) ((:reset nil) 49))))
+		(:magenta 45) (:cyan 46) (:white 47) ((:reset nil) 49))))
 
-(defun princ-highlight-properties-escape-sequences (sheet sequences)
-  "Princ ESCAPE-SEQUENCES on SHEET's stream."
+(defun princ-highlight-property-instances (sheet instances)
+  "Princ highlight proeprty INSTANCES on SHEET's stream."
   ;; #### FIXME: #\esc is not a standard name (see CLHS 13.1.7):
-  (format (output-stream sheet) "~C[~A~{;~A~}m"
-    #\esc (car sequences) (cdr sequences)))
+  (when instances
+    (format (output-stream sheet) "~C[~A~{;~A~}m"
+      #\esc
+      (highlight-property-instance-escape-sequence (car instances))
+      (mapcar #'highlight-property-instance-escape-sequence
+	      (cdr instances)))))
 
 
 ;; ----------------
@@ -211,25 +217,13 @@ tabs are forbidden here."
       (frame-left-margin (current-frame sheet))
       0))
 
-(defun current-highlight-property-instances (sheet)
-  "Return SHEET's current highlight property instances."
-  (if (frames sheet)
-      (frame-highlight-property-instances (current-frame sheet))
-      nil))
-
 (defun open-frame (sheet frame)
   "Open FRAME on SHEET.
 This involves reaching the frame's left margin and outputting its highlight
 properties."
   (reach-column sheet (frame-left-margin frame))
-  (when (frame-highlight-property-instances frame)
-    (princ-highlight-properties-escape-sequences
-     sheet
-     (mapcar (lambda (property)
-	       (highlight-property-escape-sequence
-		(highlight-property-instance-name property)
-		(highlight-property-instance-value property)))
-	     (frame-highlight-property-instances frame)))))
+  (princ-highlight-property-instances
+   sheet (frame-highlight-property-instances frame)))
 
 (defun close-frame (sheet frame)
   "Close frame FRAME on SHEET.
@@ -237,16 +231,16 @@ This involves reaching the the end of line if FRAME's face has a :block
 display property, and restoring the upper frame's highlight properties."
   (when (eq (display (frame-face frame)) :block)
     (reach-column sheet (line-width sheet)))
-  (when (frame-highlight-property-instances frame)
-    (princ-highlight-properties-escape-sequences
-     sheet
-     (mapcar (lambda (property)
-	       (highlight-property-escape-sequence
-		(highlight-property-instance-name property)
-		(when (parent (frame-face frame))
-		  (slot-value (parent (frame-face frame))
-			      (highlight-property-instance-name property)))))
-	     (frame-highlight-property-instances frame)))))
+  (princ-highlight-property-instances
+   sheet
+   (mapcar (lambda (instance)
+	     (make-highlight-property-instance
+	      :name (highlight-property-instance-name instance)
+	      :value (when (parent (frame-face frame))
+		       (face-highlight-property-value
+			(parent (frame-face frame))
+			(highlight-property-instance-name instance)))))
+	   (frame-highlight-property-instances frame))))
 
 (defun close-line (sheet)
   "Close all frames on SHEET's current line and go to next line."
