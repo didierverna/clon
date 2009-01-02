@@ -51,9 +51,6 @@
    (face-tree :documentation "The sheet's face tree."
 	      :reader face-tree
 	      :initform (make-face-tree))
-   (current-face :documentation "The current position in the face tree."
-		 :accessor current-face
-		 :initform nil)
    (column :documentation "The sheet's current column."
 	   :type (integer 0)
 	   :accessor column
@@ -169,17 +166,24 @@ tabs are forbidden here."
 
 (defstruct frame
   "The FRAME structure."
+  face
   left-margin
   highlight-properties)
 
-(defun left-margin (sheet)
-  "Return SHEET's current left-margin."
+(defun current-face (sheet)
+  "Return SHEET's current face or nil."
+  (if (frames sheet)
+      (frame-face (car (frames sheet)))
+      nil))
+
+(defun current-left-margin (sheet)
+  "Return SHEET's current left margin or 0."
   (if (frames sheet)
       (frame-left-margin (car (frames sheet)))
       0))
 
-(defun highlight-properties (sheet)
-  "Return SHEET's current highlight escape sequences."
+(defun current-highlight-properties (sheet)
+  "Return SHEET's current highlight properties or nil."
   (if (frames sheet)
       (frame-highlight-properties (car (frames sheet)))
       nil))
@@ -245,11 +249,11 @@ output reaches the rightmost bound."
 	       ;; reach the next tab position with respect to the current
 	       ;; frame. #### FIXME: get a real tabsize
 	       (let ((spaces (+ (- (* (ceiling (/ (- (column sheet)
-						     (left-margin sheet))
+						     (current-left-margin sheet))
 						  8))
 				      8)
 				   (column sheet))
-				(left-margin sheet))))
+				(current-left-margin sheet))))
 		 (cond ((< (+ (column sheet) spaces) (line-width sheet))
 			(princ-spaces sheet spaces))
 		       (t
@@ -268,8 +272,8 @@ output reaches the rightmost bound."
 			       string
 			       :start i)
 			      len)))
-		 (cond ((= (column sheet) (left-margin sheet))
-			;; If we're at the left-margin, we output the word
+		 (cond ((= (column sheet) (current-left-margin sheet))
+			;; If we're at the current-left-margin, we output the word
 			;; right here, since it couldn't fit anywhere else.
 			;; Note that since I don't do hyphenation, the word
 			;; might extend past the line-width. This is bad, but
@@ -318,7 +322,7 @@ PADDING is returned when it does not exceed SHEET's line width."
 				      (eq face-name :sheet)))
 			     ;; Absolute positions are OK as long as we don't
 			     ;; roll back outside the enclosing frame.
-			     (max padding (left-margin sheet)))
+			     (max padding (current-left-margin sheet)))
 			    ((and (eq relative-to :relative-to)
 				  (symbolp face-name))
 			     (let* ((generation
@@ -332,28 +336,28 @@ PADDING is returned when it does not exceed SHEET's line width."
 			       (incf padding left-margin)
 			       (safe-padding sheet padding))))))
 		  ((numberp padding-spec)
-		   (incf padding-spec (left-margin sheet))
+		   (incf padding-spec (current-left-margin sheet))
 		   (safe-padding sheet padding-spec)))))
 	(highlight-properties
 	 (loop :for property :in *highlight-face-properties*
 	       :when (slot-boundp face property)
 	       :collect (list property (slot-value face property)))))
-    ;; Update the frame stack and the current face:
-    (push (make-frame :left-margin left-margin
+    ;; Update the frame stack:
+    (push (make-frame :face face
+		      :left-margin left-margin
 		      :highlight-properties highlight-properties)
 	  (frames sheet)))
-  (setf (current-face sheet) face)
   ;; Now handle the output: move to the beginning of the new frame and output
   ;; new highlight properties:
-  (when (<= (column sheet) (left-margin sheet))
-    (princ-spaces sheet (- (left-margin sheet) (column sheet))))
-  (when (highlight-properties sheet)
+  (when (<= (column sheet) (current-left-margin sheet))
+    (princ-spaces sheet (- (current-left-margin sheet) (column sheet))))
+  (when (current-highlight-properties sheet)
     (princ-highlight-properties-escape-sequences
      sheet
      (mapcar
       (lambda (property)
 	(highlight-property-escape-sequence (car property) (cadr property)))
-      (highlight-properties sheet))))
+      (current-highlight-properties sheet))))
   ;; Finally, return the face separator:
   (separator (current-face sheet)))
 
@@ -370,7 +374,7 @@ Return the face separator."
 	     (eq (display (current-face sheet)) :block))
     (princ-spaces sheet (- (line-width sheet) (column sheet))))
   ;; Restore previous highlight properties:
-  (when (highlight-properties sheet)
+  (when (current-highlight-properties sheet)
     (princ-highlight-properties-escape-sequences
      sheet
      (mapcar (lambda (property)
@@ -378,10 +382,9 @@ Return the face separator."
 		(car property)
 		(when (parent (current-face sheet))
 		  (slot-value (parent (current-face sheet)) (car property)))))
-	     (highlight-properties sheet))))
-  ;; Restore the previous frame and face:
-  (pop (frames sheet))
-  (setf (current-face sheet) (parent (current-face sheet))))
+	     (current-highlight-properties sheet))))
+  ;; Restore the previous frame:
+  (pop (frames sheet)))
 
 (defmacro with-face (sheet face &body body)
   `(let ((separator (open-face ,sheet ,face)))
