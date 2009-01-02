@@ -266,6 +266,7 @@ Both instances share the same slot values."
 	   (slots (sb-mop:class-slots class))
 	   (new-instance (make-instance class)))
       (loop :for slot :in slots
+	    :when (slot-boundp instance (sb-mop:slot-definition-name slot))
 	    :do (setf (slot-value new-instance
 				  ;; #### PORTME.
 				  (sb-mop:slot-definition-name slot))
