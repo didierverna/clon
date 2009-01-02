@@ -358,7 +358,7 @@ PADDING is returned when it does not exceed SHEET's line width."
       (column sheet)))
 
 (defun %open-face (sheet face)
-  "Open face FACE on SHEET, and return its separator."
+  "Open FACE on SHEET."
   (assert (visiblep face))
   ;; Create the new frame:
   (let ((left-margin
@@ -401,14 +401,11 @@ PADDING is returned when it does not exceed SHEET's line width."
 			    :highlight-property-instances
 			    highlight-property-instances)))
   ;; Open the new frame:
-  (open-frame sheet (current-frame sheet))
-  ;; Return the current face separator:
-  (separator (current-face sheet)))
+  (open-frame sheet (current-frame sheet)))
 
 (defun open-face (sheet name)
   "Find the closest face named NAME in SHEET's face tree.
-FACE can be a subface of the current face, or one up the face tree.
-Return the face separator."
+FACE can be a subface of the current face, or one up the face tree."
   (%open-face sheet (find-face (current-face sheet) name)))
 
 (defun close-face (sheet)
@@ -418,10 +415,10 @@ Return the face separator."
 
 (defmacro with-face (sheet name &body body)
   "Evaluate BODY with SHEET's current face set to the one named NAME."
-  `(let ((separator (open-face ,sheet ,name)))
+  `(progn
+    (open-face ,sheet ,name)
     ,@body
-    (close-face ,sheet)
-    separator))
+    (close-face ,sheet)))
 
 
 
@@ -446,6 +443,15 @@ Return the face separator."
     (let ((subface (find-face face (car help-spec))))
       (%will-print subface (cdr help-spec)))))
 
+(defgeneric get-separator (face help-spec)
+  (:documentation "Get HELP-SPEC separator in the context of FACE.")
+  (:method (face (help-spec character))
+    nil)
+  (:method (face (help-spec string))
+    nil)
+  (:method (face (help-spec list))
+    (separator (find-face face (car help-spec)))))
+
 ;; #### NOTE: this is where I would like more dispatch capability from CLOS.
 ;; Something like defmethod %print-help (sheet (help-spec (list symbol *)))
 (defun %print-help-spec-items (sheet items)
@@ -453,27 +459,24 @@ Return the face separator."
   (loop :for spec :on items
 	:do
 	(when (will-print (current-face sheet) (car spec))
-	  (let ((separator (%print-help sheet (car spec))))
+	  (%print-help sheet (car spec))
 	    (when (and (cdr spec) (will-print (current-face sheet) (cadr spec)))
-	      (when separator
-		(%print-help sheet separator))
+	      (let ((separator (get-separator (current-face sheet) (car spec))))
+		(when separator
+		  (%print-help sheet separator)))
 	      (when (item-separator (current-face sheet))
-		(%print-help sheet
-			     (item-separator (current-face sheet)))))))))
+		(%print-help sheet (item-separator (current-face sheet))))))))
 
 (defgeneric %print-help (sheet help-spec)
   (:documentation "Print HELP-SPEC on SHEET.")
   (:method (sheet (help-spec (eql #\newline)))
-    (open-next-line sheet)
-    (values))
+    (open-next-line sheet))
   (:method (sheet (help-spec character))
     "Print HELP-SPEC on SHEET."
-    (%print-help sheet (make-string 1 :initial-element help-spec))
-    (values))
+    (%print-help sheet (make-string 1 :initial-element help-spec)))
   (:method (sheet (help-spec string))
     "Print HELP-SPEC on SHEET."
-    (output-string sheet help-spec)
-    (values))
+    (output-string sheet help-spec))
   (:method (sheet (help-spec list))
     "Print the CDR of HELP-SPEC on SHEET.
 The CAR of HELP-SPEC should be a symbol naming the face to use for printing.
