@@ -48,6 +48,9 @@
 	       :type (integer 1)
 	       :reader line-width
 	       :initarg :line-width)
+   (highlightp :documentation "Whether to highlight SHEET's output."
+	       :initarg :highlightp
+	       :reader highlightp)
    (face-tree :documentation "The sheet's face tree."
 	      :reader face-tree
 	      :initform (make-face-tree))
@@ -193,15 +196,20 @@ tabs are forbidden here."
 ;; Logical output
 ;; --------------
 
+(defstruct frame
+  "The FRAME structure.
+This structure hold layout properties used for printing."
+  face
+  left-margin)
+
 (defstruct highlight-property-instance
   "The HIGHLIGHT-PROEPRTY-INSTANCE structure."
   name
   value)
 
-(defstruct frame
-  "The FRAME structure."
-  face
-  left-margin
+(defstruct (highlight-frame (:include frame))
+  "The HIGHLIGHT-FRAME structure.
+This structure holds both layout and highlight properties used for printing."
   highlight-property-instances)
 
 ;; 3 shortcut accessors to the top frame:
@@ -217,30 +225,36 @@ tabs are forbidden here."
       (frame-left-margin (current-frame sheet))
       0))
 
-(defun open-frame (sheet frame)
-  "Open FRAME on SHEET.
-This involves reaching the frame's left margin and outputting its highlight
-properties."
-  (reach-column sheet (frame-left-margin frame))
-  (princ-highlight-property-instances
-   sheet (frame-highlight-property-instances frame)))
+(defgeneric open-frame (sheet frame)
+  (:documentation "Open FRAME on SHEET.")
+  (:method-combination progn :most-specific-last)
+  (:method progn (sheet (frame frame))
+    "Reach the frame's left margin."
+    (reach-column sheet (frame-left-margin frame)))
+  (:method progn (sheet (frame highlight-frame))
+    "Reach the frame's left margin and output its highlight properties."
+    (princ-highlight-property-instances
+     sheet (highlight-frame-highlight-property-instances frame))))
 
-(defun close-frame (sheet frame)
-  "Close frame FRAME on SHEET.
-This involves reaching the the end of line if FRAME's face has a :block
-display property, and restoring the upper frame's highlight properties."
-  (when (eq (display (frame-face frame)) :block)
-    (reach-column sheet (line-width sheet)))
-  (princ-highlight-property-instances
-   sheet
-   (mapcar (lambda (instance)
-	     (make-highlight-property-instance
-	      :name (highlight-property-instance-name instance)
-	      :value (when (parent (frame-face frame))
-		       (face-highlight-property-value
-			(parent (frame-face frame))
-			(highlight-property-instance-name instance)))))
-	   (frame-highlight-property-instances frame))))
+(defgeneric close-frame (sheet frame)
+  (:documentation "Close FRAME on SHEET.")
+  (:method-combination progn :most-specific-last)
+  (:method progn (sheet (frame frame))
+    "Reach the the end of line if FRAME's face has a :block display property."
+    (when (eq (display (frame-face frame)) :block)
+      (reach-column sheet (line-width sheet))))
+  (:method progn (sheet (frame highlight-frame))
+    "Restore the upper frame's highlight properties."
+    (princ-highlight-property-instances
+     sheet
+     (mapcar (lambda (instance)
+	       (make-highlight-property-instance
+		:name (highlight-property-instance-name instance)
+		:value (when (parent (frame-face frame))
+			 (face-highlight-property-value
+			  (parent (frame-face frame))
+			  (highlight-property-instance-name instance)))))
+	     (highlight-frame-highlight-property-instances frame)))))
 
 (defun close-line (sheet)
   "Close all frames on SHEET's current line and go to next line."
@@ -384,18 +398,23 @@ PADDING is returned when it does not exceed SHEET's line width."
 				 (safe-padding sheet padding))))))
 		    ((numberp padding-spec)
 		     (incf padding-spec (current-left-margin sheet))
-		     (safe-padding sheet padding-spec)))))
-	  (highlight-property-instances
-	   (loop :for property :in *highlight-properties*
-		 :when (face-highlight-property-set-p face property)
-		 :collect (make-highlight-property-instance
-			   :name property
-			   :value (face-highlight-property-value face property)))))
+		     (safe-padding sheet padding-spec))))))
       (push-frame sheet
-		  (make-frame :face face
-			      :left-margin left-margin
-			      :highlight-property-instances
-			      highlight-property-instances)))
+		  (if (highlightp sheet)
+		      (let ((highlight-property-instances
+			     (loop :for property :in *highlight-properties*
+				   :when (face-highlight-property-set-p
+					  face property)
+				   :collect (make-highlight-property-instance
+					     :name property
+					     :value
+					     (face-highlight-property-value
+					      face property)))))
+			(make-highlight-frame :face face
+					      :left-margin left-margin
+					      :highlight-property-instances
+					      highlight-property-instances))
+		      (make-frame :face face  :left-margin left-margin))))
     ;; Open the new frame:
     (open-frame sheet (current-frame sheet)))
   (:method (sheet (name symbol))
@@ -502,26 +521,41 @@ The HELP-SPEC items to print are separated with the contents of the face's
 ;; Sheet Instance Creation
 ;; ==========================================================================
 
-(defun make-sheet (&key output-stream search-path theme line-width highlight)
-  "Make a new SHEET."
-  (declare (ignore search-path theme highlight))
-  (unless line-width
-    ;; #### PORTME.
+(defmethod initialize-instance :around
+    ((sheet sheet) &rest keys &key output-stream line-width highlight)
+  "Handle unset line width and AUTO highlight according to OUTPUT-STREAM."
+  (when (or (not line-width) (eq highlight :auto))
+    ;; #### NOTE: it is somewhat abusive to TIOCGWINSZ even if LINE-WIDTH is
+    ;; specified, but this allows us to handle the ENOTTY error, and possibly
+    ;; turn highlighting off if is it set to :AUTO.
     (handler-case
+	;; #### PORTME.
 	(with-winsize winsize ()
 	  (sb-posix:ioctl (stream-file-stream output-stream :output)
 			  +tiocgwinsz+
 			  winsize)
-	  (setq line-width (winsize-ws-col winsize)))
+	  (unless line-width
+	    (setq line-width (winsize-ws-col winsize)))
+	  (when (eq highlight :auto)
+	    (setq highlight t)))
       (sb-posix:syscall-error (error)
 	;; ENOTTY error should remain silent, but no the others.
 	(unless (= (sb-posix:syscall-errno error) sb-posix:enotty)
 	  (let (*print-escape*) (print-object error *error-output*)))
-	(setq line-width 80))))
-  ;; See the --clon-line-width option specification
-  (assert (typep line-width '(integer 1)))
-  (funcall #'make-instance 'sheet
-	   :output-stream output-stream :line-width line-width))
+	(unless line-width
+	  (setq line-width 80))
+	(when (eq highlight :auto)
+	  (setq highlight nil)))))
+  (apply #'call-next-method sheet
+	 :line-width line-width
+	 :highlightp highlight
+	 (remove-keys keys :line-width :highlight)))
+
+(defun make-sheet
+    (&rest keys &key output-stream search-path theme line-width highlight)
+  "Make a new SHEET."
+  (declare (ignore output-stream search-path theme line-width highlight))
+  (apply #'make-instance 'sheet (remove-keys keys :theme :search-path)))
 
 (defun flush-sheet (sheet)
   "Flush SHEET."

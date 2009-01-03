@@ -131,7 +131,7 @@
 		:reader search-path)
    (theme :documentation "The theme filename."
 	  :reader theme)
-   (highlight :documentation "Whether to highlight Clon's output."
+   (highlight :documentation "Clon's output highlight mode."
 	      :reader highlight)
    (line-width :documentation "The line width for help display."
 	       :reader line-width
