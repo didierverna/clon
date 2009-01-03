@@ -61,11 +61,7 @@
    (frames :documentation "The stack of currently open frames."
 	   :type list
 	   :accessor frames
-	   :initform nil)
-   (in-group :documentation "The current group imbrication."
-	     :type (integer 0)
-	     :accessor in-group
-	     :initform 0))
+	   :initform nil))
   (:documentation "The SHEET class.
 This class implements the notion of sheet for printing Clon help."))
 
