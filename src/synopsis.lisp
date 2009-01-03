@@ -155,7 +155,7 @@ If you don't want any theme at all, use this option with no argument. "
 		       :type :file
 		       :nullablep t
 		       :fallback-value nil
-		       :default-value (make-pathname :name "default")
+		       :default-value (make-pathname :name "raw")
 		       :env-var "THEME"))
       (add-to subgrp (make-internal-lispobj "line-width"
 			 ~"Set Clon's output line width.
