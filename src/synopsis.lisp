@@ -123,6 +123,7 @@ FMT can be `number', `short' or `long'."
 			 "Set Clon's search path.
 If you don't want any search path at all, use this option with no argument."
 		       :argument-type :optional
+		       :type :directory-list
 		       :fallback-value nil ;; paths are nullable by default
 		       ;; #### PORTME. I'm using Unix-like default for
 		       ;; everything here, plus OSX specific values that I
@@ -143,7 +144,7 @@ If you don't want any search path at all, use this option with no argument."
 			   local-path)
 			  global-path))
 		       :env-var "SEARCH_PATH"))
-      (add-to subgrp (make-internal-stropt "theme"
+      (add-to subgrp (make-internal-path "theme"
 			 ~"Set Clon's output theme.
 If you don't want any theme at all, use this option with no argument. "
 			 ~"Unless starting with /, ./ or ../, files are looked "
@@ -151,9 +152,10 @@ If you don't want any theme at all, use this option with no argument. "
 			 ~"be omitted."
 		       :argument-name "FILE"
 		       :argument-type :optional
+		       :type :file
 		       :nullablep t
 		       :fallback-value nil
-		       :default-value "default"
+		       :default-value (make-pathname :name "default")
 		       :env-var "THEME"))
       (add-to subgrp (make-internal-lispobj "line-width"
 			 ~"Set Clon's output line width.

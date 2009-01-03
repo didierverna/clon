@@ -45,9 +45,14 @@
    (nullablep ;; inherited from the VALUED-OPTION class
     ;; Note that this doesn't really matter, as empty paths are already
     ;; handled below.
-    :initform t))
+    :initform t)
+   (path-type :documentation "The path type."
+	      :initarg :type
+	      :initform nil
+	      :reader path-type))
   (:documentation "The PATH class.
-This class implements options whose values are colon-separated directory names."))
+This class implements options whose values are (colon-separated lists of)
+pathnames."))
 
 
 ;; -------------------
@@ -70,42 +75,58 @@ This class implements options whose values are colon-separated directory names."
 ;; Value check subprotocol
 (defmethod check-value ((path path) value)
   "Check that VALUE is a valid PATH."
-  (cond (value
-	 (unless (listp value)
-	   (error 'invalid-value
-		  :option path
-		  :value value
-		  :comment "Value must be a list of directory pathnames."))
-	 (mapc (lambda (elt)
-		 (unless (pathnamep elt)
-		   (error 'invalid-value
-			  :option path
-			  :value value
-			  :comment (format nil "~S is not a pathname." elt)))
-		 (unless (directory-pathname-p elt)
-		   (error 'invalid-value
-			  :option path
-			  :value value
-			  :comment (format nil "~S is not a directory pathname."
-				     elt)))
-		 (when (wild-pathname-p elt)
-		   (error 'invalid-value
-			  :option path
-			  :value value
-			  :comment (format nil "~S contains wildcards." elt)))
-		 (when (string= (cadr (pathname-directory elt)) "~")
-		   (error 'invalid-value
-			  :option path
-			  :value value
-			  :comment
-			  (format nil "~S contains a ~~/ abbreviation." elt))))
-	       value))
-	(t
-	 (assert (not (nullablep path)))
-	 (error 'invalid-value
-		:option path
-		:value value
-		:comment "Null path forbidden."))))
+  (flet ((check-pathname (pathname &key as-file as-directory)
+	   "Check that PATHNAME is valid.
+If AS-FILE, ensure that it denotes a file.
+If AS-DIRECTORY, ensure that it denotes a directory."
+	   (unless (pathnamep pathname)
+	     (error 'invalid-value
+		    :option path
+		    :value value
+		    :comment (format nil "~S is not a pathname." pathname)))
+	   (when (and as-file (directory-pathname-p pathname))
+	     (error 'invalid-value
+		    :option path
+		    :value value
+		    :comment (format nil "~S denotes a directory." pathname)))
+	   (when (and as-directory (not (directory-pathname-p pathname)))
+	     (error 'invalid-value
+		    :option path
+		    :value value
+		    :comment (format nil "~S does not denote a directory."
+			       pathname)))
+	   (when (wild-pathname-p pathname)
+	     (error 'invalid-value
+		    :option path
+		    :value value
+		    :comment (format nil "~S contains wildcards." pathname)))
+	   (when (string= (cadr (pathname-directory pathname)) "~")
+	     (error 'invalid-value
+		    :option path
+		    :value value
+		    :comment
+		    (format nil "~S contains a ~~/ abbreviation." pathname)))
+	   pathname))
+    (ecase (path-type path)
+      (:file
+       (check-pathname value :as-file t))
+      (:directory
+       (check-pathname value :as-directory t))
+      (:file-list
+       (mapc (lambda (pathname)
+	       (check-pathname pathname :as-file t))
+	     value)
+       value)
+      (:directory-list
+       (mapc (lambda (pathname)
+	       (check-pathname pathname :as-directory t))
+	     value)
+       value)
+      ((nil)
+       (mapc (lambda (pathname)
+	       (check-pathname pathname))
+	     value)
+       value))))
 
 (defun split-path (path)
   "Split PATH into a list of directories."
@@ -116,43 +137,62 @@ This class implements options whose values are colon-separated directory names."
 	:while path))
 
 (defmethod convert ((path path) argument)
-  "Convert ARGUMENT to PATH's value.
-ARGUMENT must be a colon-separated list of directory names."
-  (let ((value
-	 (mapcar (lambda (dirname)
-		   (let ((pathname (pathname dirname)))
-		     (when (wild-pathname-p pathname)
-		       (error 'invalid-argument
-			      :option path
-			      :argument argument
-			      :comment "Path contains wildcards."))
-		     (unless (directory-pathname-p pathname)
-		       (setq pathname
-			     (make-pathname
-			      :directory
-			      (append (or (pathname-directory pathname)
-					  (list :relative))
-				      (list (file-namestring pathname)))
-			      :name nil
-			      :type nil
-			      :defaults pathname)))
-		     (when (string= (cadr (pathname-directory pathname)) "~")
-		       (setq pathname
-			     (merge-pathnames
-			      (make-pathname
-			       :directory
-			       (list* :relative
-				      (cddr (pathname-directory pathname)))
-			       :defaults pathname)
-			      (user-homedir-pathname))))
-		     pathname))
-		 (split-path argument))))
-    (if value
-	value
-	(error 'invalid-argument
-	       :option path
-	       :argument argument
-	       :comment "Null path forbidden."))))
+  "Convert ARGUMENT to PATH's value."
+  (flet ((string-pathname (string &key as-file as-directory)
+	   "Make a pathname from STRING.
+If AS-FILE, make sure the resulting pathname does not denote a directory.
+If AS-DIRECTORY, make sure the resulting pathname denotes a directory."
+	   (let ((pathname (pathname string)))
+	     (when (wild-pathname-p pathname)
+	       (error 'invalid-argument
+		      :option path
+		      :argument argument
+		      :comment "Path contains wildcards."))
+	     (when (and as-file (directory-pathname-p pathname))
+	       (error 'invalid-argument
+		      :option path
+		      :argument argument
+		      ;; #### FIXME: misleading error message when a single
+		      ;; path is requested.
+		      :comment "Path is or contains a directory."))
+	     ;; #### NOTE: instead of forcing users to end their directories
+	     ;; with a slash (and hence triggering an error here if it
+	     ;; doesn't), we simply convert a normal pathname into a directory
+	     ;; one.
+	     (when (and as-directory (not (directory-pathname-p pathname)))
+	       (setq pathname
+		     (make-pathname
+		      :directory (append (or (pathname-directory pathname)
+					     (list :relative))
+					 (list (file-namestring pathname)))
+		      :name nil
+		      :type nil
+		      :defaults pathname)))
+	     (when (string= (cadr (pathname-directory pathname)) "~")
+	       (setq pathname
+		     (merge-pathnames
+		      (make-pathname
+		       :directory
+		       (list* :relative (cddr (pathname-directory pathname)))
+		       :defaults pathname)
+		      (user-homedir-pathname))))
+	     pathname)))
+    (ecase (path-type path)
+      (:file
+       (string-pathname argument :as-file t))
+      (:directory
+       (string-pathname argument :as-directory t))
+      (:file-list
+       (mapcar (lambda (filename)
+		 (string-pathname filename :as-file t))
+	       (split-path argument)))
+      (:directory-list
+       (mapcar (lambda (dirname)
+		 (string-pathname dirname :as-directory t))
+	       (split-path argument)))
+      ((nil)
+       (mapcar #'string-pathname
+	       (split-path argument))))))
 
 
 
@@ -164,7 +204,7 @@ ARGUMENT must be a colon-separated list of directory names."
 		  &key short-name long-name description
 		       argument-name argument-type
 		       env-var fallback-value default-value
-		       nullablep)
+		       nullablep type)
   "Make a new path option.
 - SHORT-NAME is the option's short name (without the dash).
   It defaults to nil.
@@ -181,17 +221,19 @@ ARGUMENT must be a colon-separated list of directory names."
 - FALLBACK-VALUE is the option's fallback value (for missing optional
   arguments), if any.
 - DEFAULT-VALUE is the option's default value, if any.
-- NULLABLEP indicates whether this option accepts nil as a value."
+- NULLABLEP indicates whether this option accepts nil as a value.
+- TYPE is the pathname type. It can be one of :file, :directory, :file-list,
+  :directory-list or nil meaning that everything is allowed."
   (declare (ignore short-name long-name description env-var
 		  argument-name argument-type fallback-value default-value
-		  nullablep))
+		  nullablep type))
   (apply #'make-instance 'path keys))
 
 (defun make-internal-path (long-name description
 			    &rest keys
 			    &key argument-name argument-type
 				 env-var fallback-value default-value
-				 nullablep)
+				 nullablep type)
   "Make a new internal (Clon-specific) path option.
 - LONG-NAME is the option's long-name, minus the 'clon-' prefix.
   (Internal options don't have short names.)
@@ -205,10 +247,12 @@ ARGUMENT must be a colon-separated list of directory names."
 - FALLBACK-VALUE is the option's fallback value (for missing optional
   arguments), if any.
 - DEFAULT-VALUE is the option's default value, if any.
-- NULLABLEP indicates whether this option accepts nil as a value."
+- NULLABLEP indicates whether this option accepts nil as a value.
+- TYPE is the pathname type. It can be one of :file, :directory, :file-list,
+  :directory-list or nil meaning that everything is allowed."
   (declare (ignore argument-name argument-type
 		   env-var fallback-value default-value
-		   nullablep))
+		   nullablep type))
   (apply #'make-instance 'path
 	 :long-name long-name
 	 :description description
