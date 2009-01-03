@@ -521,8 +521,12 @@ The HELP-SPEC items to print are separated with the contents of the face's
 ;; Sheet Instance Creation
 ;; ==========================================================================
 
+;; #### NOTE: I need to bind output-stream here (which is early) because it is
+;; required to do the TIOCGWINSZ business.
 (defmethod initialize-instance :around
-    ((sheet sheet) &rest keys &key output-stream line-width highlight)
+    ((sheet sheet) &rest keys &key (output-stream *standard-output*)
+				  line-width
+				  (highlight :auto))
   "Handle unset line width and AUTO highlight according to OUTPUT-STREAM."
   (when (or (not line-width) (eq highlight :auto))
     ;; #### NOTE: it is somewhat abusive to TIOCGWINSZ even if LINE-WIDTH is
@@ -547,9 +551,10 @@ The HELP-SPEC items to print are separated with the contents of the face's
 	(when (eq highlight :auto)
 	  (setq highlight nil)))))
   (apply #'call-next-method sheet
+	 :output-stream output-stream
 	 :line-width line-width
 	 :highlightp highlight
-	 (remove-keys keys :line-width :highlight)))
+	 (remove-keys keys :output-stream :line-width :highlight)))
 
 (defun make-sheet
     (&rest keys &key output-stream search-path theme line-width highlight)

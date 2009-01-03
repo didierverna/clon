@@ -131,11 +131,11 @@
 		:reader search-path)
    (theme :documentation "The theme filename."
 	  :reader theme)
-   (highlight :documentation "Clon's output highlight mode."
-	      :reader highlight)
    (line-width :documentation "The line width for help display."
 	       :reader line-width
 	       :initform nil)
+   (highlight :documentation "Clon's output highlight mode."
+	      :reader highlight)
    (error-handler :documentation ~"The behavior to adopt on errors "
 			       ~"at command-line parsing time."
 		  :type symbol
@@ -198,29 +198,28 @@ options based on it."))
 ;; The Help Protocol
 ;; =========================================================================
 
-(defun make-context-sheet (context output-stream)
-  "Create a CONTEXT based sheet for printing on OUTPUT-STRREAM."
-  (make-sheet :output-stream output-stream
-	      :search-path (search-path context)
-	      :theme (theme context)
-	      :line-width (line-width context)
-	      :highlight (highlight context)))
-
-;; #### FIXME: inconsistency. Why do I have a line-width slot in CONTEXT but
-;; not an output-stream one ?
-(defmacro with-context-sheet ((sheet context output-stream) &body body)
-  `(let ((,sheet (make-context-sheet ,context ,output-stream)))
-    ,@body
-    (flush-sheet ,sheet)))
+;; #### NOTE: all help related parameters but OUTPUT-STREAM have a
+;; corresponding slot in contexts that act as a default value. The idea is
+;; that users can in turn specify their preferences in the corresponding
+;; environment variables. I don't think it would make much sense to provide an
+;; option for OUTPUT-STREAM. At the end-user level, you can redirect to a file
+;; from the shell.
 
 (defun help (context &key (item (synopsis context))
-		     (    output-stream *standard-output*))
-  "Print CONTEXT's ITEM help on OUTPUT-STREAM.
-ITEM defaults to the whole program'synopsis.
-OUTPUT-STREAM defaults to standard output."
-  (with-context-sheet (sheet context output-stream)
+			  (output-stream *standard-output*)
+			  (search-path (search-path context))
+			  (theme (theme context))
+			  (line-width (line-width context))
+			  (highlight (highlight context)))
+  "Print CONTEXT's help."
+  (let ((sheet (make-sheet :output-stream output-stream
+			   :search-path search-path
+			   :theme theme
+			   :line-width line-width
+			   :highlight highlight)))
     (print-help sheet
-		(help-spec item :program (pathname-name (progname context))))))
+		(help-spec item :program (pathname-name (progname context))))
+    (flush-sheet sheet)))
 
 
 
@@ -676,8 +675,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.~%"
   (setf (slot-value context 'highlight)
 	(getopt context :long-name "clon-highlight"))
   (when (getopt context :long-name "clon-help")
-    (with-context-sheet (sheet context *standard-output*)
-      (print-help sheet (help-spec (clon-options-group context))))
+    (help context :item (clon-options-group context))
     (quit 0)))
 
 (defun make-context
