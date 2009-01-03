@@ -230,15 +230,15 @@ etc. If PARENT-NAME does not name one of FACE's ancestors, trigger an error."
 ;; #### NOTE: although we don't use them explicitely, the SUBFACE, BOLD and
 ;; REVEALED  initargs are declared valid below.
 (defmethod initialize-instance :around
-    ((face face) &rest keys &key subface bold revealed)
+    ((instance face) &rest keys &key face bold revealed)
   "Canonicalize initialization arguments.
 This involves:
-- computing :subfaces initarg from the :subface ones,
+- computing :subfaces initarg from the :face ones,
 - handling convenience highlight properties."
-  (declare (ignore subface bold revealed))
-  (apply #'call-next-method face
-	 :subfaces (remove :subface (select-keys keys :subface))
-	 (replace-keys keys :subface
+  (declare (ignore face bold revealed))
+  (apply #'call-next-method instance
+	 :subfaces (remove :face (select-keys keys :face))
+	 (replace-keys keys :face
 		       '(:bold :intensity (t :bold) (nil :normal))
 		       '(:revealed :concealed (t nil) (nil t)))))
 
@@ -261,12 +261,12 @@ This involves:
 
 (defun make-face (name
 		  &rest keys
-		  &key display left-padding separator item-separator subface
+		  &key display left-padding separator item-separator face
 		       intensity bold italicp underline blink inverse
 		       concealed revealed crossed-out-p framedp
 		       foreground background)
   "Make a new face named NAME."
-  (declare (ignore display left-padding separator item-separator subface
+  (declare (ignore display left-padding separator item-separator face
 		   intensity bold italicp underline blink inverse concealed
 		   revealed crossed-out-p framedp
 		   foreground background))
@@ -276,39 +276,39 @@ This involves:
   (make-face 'help
     :display :block
     :item-separator #\newline
-    :subface (make-face 'synopsis
-	       :display :block
-	       :separator #\newline
-	       :subface (make-face 'program)
-	       :subface (make-face 'minus-pack)
-	       :subface (make-face 'plus-pack)
-	       :subface (make-face 'options)
-	       :subface (make-face 'postfix))
-    :subface (make-face 'text :display :block)
-    :subface (make-face 'option
-	       :display :block
-	       :left-padding 2
-	       :subface (make-face 'syntax
-			  :bold t
-			  :item-separator ", "
-			  :subface (make-face 'short-name
-				     :item-separator nil
-				     :subface (make-face 'argument))
-			  :subface (make-face 'long-name
-				     :item-separator nil
-				     :subface (make-face 'argument)))
-	       :subface (make-face 'description
-			  :background :cyan
-			  :display :block
-			  :left-padding '(30 :absolute)
-			  :item-separator #\newline
-			  :subface (make-face 'fallback)
-			  :subface (make-face 'default)
-			  :subface (make-face 'environment)))
-    :subface (make-face 'group
-	       :display :block
-	       :left-padding 2
-	       :item-separator #\newline)))
+    :face (make-face 'synopsis
+	    :display :block
+	    :separator #\newline
+	    :face (make-face 'program)
+	    :face (make-face 'minus-pack)
+	    :face (make-face 'plus-pack)
+	    :face (make-face 'options)
+	    :face (make-face 'postfix))
+    :face (make-face 'text :display :block)
+    :face (make-face 'option
+	    :display :block
+	    :left-padding 2
+	    :face (make-face 'syntax
+		    :bold t
+		    :item-separator ", "
+		    :face (make-face 'short-name
+			    :item-separator nil
+			    :face (make-face 'argument))
+		    :face (make-face 'long-name
+			    :item-separator nil
+			    :face (make-face 'argument)))
+	    :face (make-face 'description
+		    :background :cyan
+		    :display :block
+		    :left-padding '(30 :absolute)
+		    :item-separator #\newline
+		    :face (make-face 'fallback)
+		    :face (make-face 'default)
+		    :face (make-face 'environment)))
+    :face (make-face 'group
+	    :display :block
+	    :left-padding 2
+	    :item-separator #\newline)))
 
 
 ;;; face.lisp ends here
