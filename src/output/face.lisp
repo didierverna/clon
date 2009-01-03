@@ -273,7 +273,7 @@ This involves:
   (apply #'make-instance 'face :name name keys))
 
 
-(defgeneric %make-face-tree (definition)
+(defgeneric make-face-tree (definition)
   (:documentation "Make a face tree from DEFINITION.")
   (:method ((definition list))
     "Create a face tree from a list of face name and initargs."
@@ -281,51 +281,49 @@ This involves:
 	   (loop :for key :in (cdr definition) :by #'cddr
 		 :for val :in (cddr definition) :by #'cddr
 		 :if (eq key :face)
-		 :nconc (list :face (%make-face-tree val))
+		 :nconc (list :face (make-face-tree val))
 		 :else
 		 :nconc (list key val))))
   (:method ((name symbol))
     "Create a face named NAME."
     (make-face name)))
 
-(defun make-face-tree ()
-  (%make-face-tree
-   '(help
-     :display :block
-     :item-separator #\newline
-     :face (synopsis
-	    :display :block
-	    :separator #\newline
-	    :face program
-	    :face minus-pack
-	    :face plus-pack
-	    :face options
-	    :face postfix)
-     :face (text :display :block)
-     :face (option
-	    :display :block
-	    :left-padding 2
-	    :face (syntax
-		   :bold t
-		   :item-separator ", "
-		   :face (short-name
-			  :item-separator nil
-			  :face argument)
-		   :face (long-name
-			  :item-separator nil
-			  :face argument))
-	    :face (description
-		   :background :cyan
-		   :display :block
-		   :left-padding (30 :absolute)
-		   :item-separator #\newline
-		   :face fallback
-		    :face default
-		   :face environment))
-     :face (group
-	    :display :block
-	    :left-padding 2
-	    :item-separator #\newline))))
+(defun make-raw-face-tree ()
+  "Make a raw (simple but functional) face tree."
+  (make-face-tree '(help
+		    :display :block
+		    :item-separator #\newline
+		    :face (synopsis
+			   :display :block
+			   :separator #\newline
+			   :face program
+			   :face minus-pack
+			   :face plus-pack
+			   :face options
+			   :face postfix)
+		    :face (text :display :block)
+		    :face (option
+			   :left-padding 2
+			   :display :block
+			   :face (syntax
+				  :item-separator ", "
+				  :face (short-name
+					 :item-separator nil
+					 :face argument)
+				  :face (long-name
+					 :item-separator nil
+					 :face argument))
+			   :face (description
+				  :display :block
+				  :left-padding (30 :absolute)
+				  :item-separator #\newline
+				  :face fallback
+				  :face default
+				  :face environment))
+		    :face (group
+			   :display :block
+			   :separator #\newline
+			   :item-separator #\newline))))
 
 
 ;;; face.lisp ends here

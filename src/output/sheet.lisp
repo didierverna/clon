@@ -53,7 +53,7 @@
 	       :reader highlightp)
    (face-tree :documentation "The sheet's face tree."
 	      :reader face-tree
-	      :initform (make-face-tree))
+	      :initform (make-raw-face-tree))
    (column :documentation "The sheet's current column."
 	   :type (integer 0)
 	   :accessor column
@@ -552,11 +552,17 @@ The HELP-SPEC items to print are separated with the contents of the face's
 	 :highlightp highlight
 	 (remove-keys keys :output-stream :line-width :highlight)))
 
+(defmethod initialize-instance :after ((sheet sheet) &key theme search-path)
+  "Compute SHEET's face tree from THEME and SEARCH-PATH."
+  (print search-path)
+  (print theme)
+  )
+
 (defun make-sheet
     (&rest keys &key output-stream search-path theme line-width highlight)
   "Make a new SHEET."
-  (declare (ignore output-stream search-path theme line-width highlight))
-  (apply #'make-instance 'sheet (remove-keys keys :theme :search-path)))
+  (declare (ignore output-stream line-width highlight))
+  (apply #'make-instance 'sheet keys))
 
 (defun flush-sheet (sheet)
   "Flush SHEET."
