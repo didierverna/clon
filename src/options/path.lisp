@@ -59,6 +59,10 @@ pathnames."))
 ;; Conversion protocol
 ;; -------------------
 
+;; #### FIXME: (not the right place here). We should always call check-value
+;; on the converted values. That would make convert methods simpler sometimes
+;; because they would not have to duplicate the work in check-value.
+
 ;; Some parts of the code below are stolen or adapted from Peter Seibel's
 ;; Practical Common Lisp book, Chapter 15: A Portable Pahtname Library.
 
