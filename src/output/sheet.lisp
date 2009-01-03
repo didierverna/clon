@@ -52,8 +52,7 @@
 	       :initarg :highlightp
 	       :reader highlightp)
    (face-tree :documentation "The sheet's face tree."
-	      :reader face-tree
-	      :initform (make-raw-face-tree))
+	      :reader face-tree)
    (column :documentation "The sheet's current column."
 	   :type (integer 0)
 	   :accessor column
@@ -552,11 +551,37 @@ The HELP-SPEC items to print are separated with the contents of the face's
 	 :highlightp highlight
 	 (remove-keys keys :output-stream :line-width :highlight)))
 
+(defun read-face-tree (pathname)
+  "Read a face tree from PATHNAME.")
+
+(defun %read-theme (pathname)
+  "Read theme from PATHNAME."
+  (print pathname)
+  (when (open pathname :direction :probe)
+    (read-face-tree pathname)))
+
+(defun read-theme (pathname)
+  "Read theme from PATHNAME, possibly adding the \"cth\" extension."
+  (or (%read-theme pathname)
+      (unless (string= (pathname-type pathname) "cth")
+	(%read-theme (merge-pathnames pathname (make-pathname :type "cth"))))))
+
 (defmethod initialize-instance :after ((sheet sheet) &key theme search-path)
   "Compute SHEET's face tree from THEME and SEARCH-PATH."
-  (print search-path)
-  (print theme)
-  )
+  (setf (slot-value sheet 'face-tree)
+	(cond ((and theme
+		    (or (not search-path)
+			(pathname-directory theme)))
+	       (or (read-theme theme)
+		   (make-raw-face-tree)))
+	      (theme
+	       (loop :for path :in search-path
+		     :for face-tree := (read-theme
+					(merge-pathnames theme path))
+		     :until face-tree
+		     :finally (return (or face-tree (make-raw-face-tree)))))
+	      (t
+	       (make-raw-face-tree)))))
 
 (defun make-sheet
     (&rest keys &key output-stream search-path theme line-width highlight)
