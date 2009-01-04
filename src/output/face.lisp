@@ -289,7 +289,7 @@ This involves:
     (make-face name)))
 
 (defun make-raw-face-tree ()
-  "Make a raw (simple but functional) face tree."
+  "Make a raw (boring yet functional) face tree."
   (make-face-tree '(help
 		    :display :block
 		    :item-separator #\newline
