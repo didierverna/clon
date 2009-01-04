@@ -38,7 +38,7 @@ SHARE := /Library/Application\ Support
 CLON_SHARE := $(SHARE)/Clon
 THEMES := $(CLON_SHARE)/Themes
 else
-SHARE := /usr/local/share/clon
+SHARE := /usr/local/share
 CLON_SHARE := $(SHARE)/clon
 THEMES := $(CLON_SHARE)/themes
 endif
