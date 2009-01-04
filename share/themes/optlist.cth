@@ -14,7 +14,7 @@
 
 ;;; Code:
 
-;; Note that when faces have the :hidden display property, then the normally
+;; Note that when faces have the :hidden display property, then the otherwise
 ;; necessary subfaces can be omitted.
 
 (help :display :block
