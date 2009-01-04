@@ -322,7 +322,6 @@ This involves:
 				  :face environment))
 		    :face (group
 			   :display :block
-			   :separator #\newline
 			   :item-separator #\newline))))
 
 

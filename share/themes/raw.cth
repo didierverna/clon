@@ -1,0 +1,42 @@
+;;; raw.cth --- Raw theme for Clon                                -*- lisp -*-
+
+;; Author:        Didier Verna <didier@lrde.epita.fr>
+;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
+;; Created:       Sun Jan  4 13:32:27 2009
+;; Last Revision: Sun Jan  4 13:38:20 2009
+
+
+;;; Commentary:
+
+;; Contents management by FCM version 0.1.
+
+;;; Code:
+
+(help :display :block
+      :item-separator #\newline
+      :face (synopsis :display :block
+		      :separator #\newline
+		      :face program
+		      :face minus-pack
+		      :face plus-pack
+		      :face options
+		      :face postfix)
+      :face (text :display :block)
+      :face (option :left-padding 2
+		    :display :block
+		    :face (syntax :item-separator ", "
+				  :face (short-name :item-separator nil
+						    :face argument)
+				  :face (long-name  :item-separator nil
+						    :face argument))
+		    :face (description :display :block
+				       :left-padding (30 :absolute)
+				       :item-separator #\newline
+				       :face fallback
+				       :face default
+				       :face environment))
+      :face (group :display :block
+		   :item-separator #\newline))
+
+
+;;; raw.cth ends here
