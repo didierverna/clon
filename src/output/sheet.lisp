@@ -552,19 +552,22 @@ The HELP-SPEC items to print are separated with the contents of the face's
 	 (remove-keys keys :output-stream :line-width :highlight)))
 
 (defun read-face-tree (pathname)
-  "Read a face tree from PATHNAME.")
+  "Read a face tree from PATHNAME."
+  (make-face-tree
+   (let ((*package* (find-package :clon)))
+     (read (open pathname)))))
 
-(defun %read-theme (pathname)
-  "Read theme from PATHNAME."
-  (print pathname)
+(defun try-read-face-tree (pathname)
+  "Read a face tree from PATHNAME if it exists or return nil."
   (when (open pathname :direction :probe)
     (read-face-tree pathname)))
 
-(defun read-theme (pathname)
-  "Read theme from PATHNAME, possibly adding the \"cth\" extension."
-  (or (%read-theme pathname)
+(defun try-read-theme (pathname)
+  "Read a theme from PATHNAME or PATHNAME.cth if it exists or return nil."
+  (or (try-read-face-tree pathname)
       (unless (string= (pathname-type pathname) "cth")
-	(%read-theme (merge-pathnames pathname (make-pathname :type "cth"))))))
+	(try-read-face-tree (merge-pathnames pathname
+					     (make-pathname :type "cth"))))))
 
 (defmethod initialize-instance :after ((sheet sheet) &key theme search-path)
   "Compute SHEET's face tree from THEME and SEARCH-PATH."
@@ -572,11 +575,11 @@ The HELP-SPEC items to print are separated with the contents of the face's
 	(cond ((and theme
 		    (or (not search-path)
 			(pathname-directory theme)))
-	       (or (read-theme theme)
+	       (or (try-read-theme theme)
 		   (make-raw-face-tree)))
 	      (theme
 	       (loop :for path :in search-path
-		     :for face-tree := (read-theme
+		     :for face-tree := (try-read-theme
 					(merge-pathnames theme path))
 		     :until face-tree
 		     :finally (return (or face-tree (make-raw-face-tree)))))
@@ -586,7 +589,7 @@ The HELP-SPEC items to print are separated with the contents of the face's
 (defun make-sheet
     (&rest keys &key output-stream search-path theme line-width highlight)
   "Make a new SHEET."
-  (declare (ignore output-stream line-width highlight))
+  (declare (ignore output-stream search-path theme line-width highlight))
   (apply #'make-instance 'sheet keys))
 
 (defun flush-sheet (sheet)
