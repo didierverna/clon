@@ -578,6 +578,10 @@ The HELP-SPEC items to print are separated with the contents of the face's
 	       (or (try-read-theme theme)
 		   (make-raw-face-tree)))
 	      (theme
+	       (setq theme
+		     (merge-pathnames theme
+				      (make-pathname
+				       :directory '(:relative "themes"))))
 	       (loop :for path :in search-path
 		     :for face-tree := (try-read-theme
 					(merge-pathnames theme path))
