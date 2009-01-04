@@ -295,7 +295,7 @@ This involves:
 		    :item-separator #\newline
 		    :face (synopsis
 			   :display :block
-			   :separator #\newline
+			   :separator #(#\newline #\newline)
 			   :face program
 			   :face minus-pack
 			   :face plus-pack
