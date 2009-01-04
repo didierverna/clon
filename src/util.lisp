@@ -308,6 +308,10 @@ invalid direction: ~S"
 ;; Wrappers around non ANSI features
 ;; ==========================================================================
 
+(defun mac-os-x-p ()
+  "Return t if running on Mac OS X."
+  (string= (software-type) "Darwin"))
+
 (defun quit (status)
   "Quit the Lisp environment"
   ;; #### PORTME.
