@@ -470,10 +470,11 @@ PADDING is returned when it does not exceed SHEET's line width."
 	  (%print-help sheet (car spec))
 	    (when (and (cdr spec) (will-print (current-face sheet) (cadr spec)))
 	      (let ((separator (get-separator (current-face sheet) (car spec))))
-		(when separator
-		  (%print-help sheet separator)))
-	      (when (item-separator (current-face sheet))
-		(%print-help sheet (item-separator (current-face sheet))))))))
+		(if separator
+		    (%print-help sheet separator)
+		    (if (item-separator (current-face sheet))
+			(%print-help sheet
+				     (item-separator (current-face sheet))))))))))
 
 (defgeneric %print-help (sheet help-spec)
   (:documentation "Print HELP-SPEC on SHEET.")
