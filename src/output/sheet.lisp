@@ -443,9 +443,7 @@ PADDING is returned when it does not exceed SHEET's line width."
 
 (defgeneric will-print (face help-spec)
   (:documentation "Return t if HELP-SPEC will print in the context of FACE.")
-  (:method (face (help-spec character))
-    t)
-  (:method (face (help-spec string))
+  (:method (face help-spec)
     t)
   (:method (face (help-spec list))
     (let ((subface (find-face face (car help-spec))))
@@ -453,9 +451,7 @@ PADDING is returned when it does not exceed SHEET's line width."
 
 (defgeneric get-separator (face help-spec)
   (:documentation "Get HELP-SPEC separator in the context of FACE.")
-  (:method (face (help-spec character))
-    nil)
-  (:method (face (help-spec string))
+  (:method (face help-spec)
     nil)
   (:method (face (help-spec list))
     (separator (find-face face (car help-spec)))))
@@ -488,10 +484,8 @@ PADDING is returned when it does not exceed SHEET's line width."
     "Print HELP-SPEC on SHEET."
     (output-string sheet help-spec))
   (:method (sheet (help-spec list))
-    "Print the CDR of HELP-SPEC on SHEET.
-The CAR of HELP-SPEC should be a symbol naming the face to use for printing.
-The HELP-SPEC items to print are separated with the contents of the face's
-:item-separator property."
+    "Print all items in the CDR of HELP-SPEC on SHEET.
+The CAR of HELP-SPEC should be a symbol naming the face to use for printing."
     (with-face sheet (car help-spec)
       (%print-help-spec-items sheet (cdr help-spec)))))
 
