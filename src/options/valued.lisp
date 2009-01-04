@@ -127,15 +127,26 @@ If OPTION matches, return its short name's length; otherwise 0."
 	      (argument-name option))))))
     (accumulate (description)
       (description option)
-      (accumulate (fallback)
-	(when (slot-boundp option 'fallback-value)
-	  (format nil "Fallback: ~A" (fallback-value option))))
-      (accumulate (default)
-	(when (slot-boundp option 'default-value)
-	  (format nil "Default: ~A" (default-value option))))
-      (accumulate (environment)
-	(when (env-var option)
-	  (format nil "Environment: ~A" (env-var option)))))))
+      ;; #### FIXME: for the 2 cases below, we should have specialized methods
+      ;; for outputting the printed representation of values. The default one
+      ;; is not cool; we should probably print not the /values/, but their
+      ;; /argument/ form, before conversion (hence we would required the
+      ;; inverse of the conversion function !!).
+      (when (slot-boundp option 'fallback-value)
+	(accumulate (fallback)
+	  "Fallback:"
+	  (accumulate (value)
+	    (format nil "~A" (fallback-value option)))))
+      (when (slot-boundp option 'default-value)
+	(accumulate (default)
+	  "Default:"
+	  (accumulate (value)
+	    (format nil "~A" (default-value option)))))
+      (when (env-var option)
+	(accumulate (environment)
+	  "Environment:"
+	  (accumulate (variable)
+	    (env-var option)))))))
 
 
 

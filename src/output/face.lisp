@@ -317,9 +317,9 @@ This involves:
 				  :display :block
 				  :left-padding (30 :absolute)
 				  :item-separator #\newline
-				  :face fallback
-				  :face default
-				  :face environment))
+				  :face (fallback :face value)
+				  :face (default :face value)
+				  :face (environment :face variable)))
 		    :face (group
 			   :display :block
 			   :item-separator #\newline))))
