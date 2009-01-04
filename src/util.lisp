@@ -305,7 +305,7 @@ invalid direction: ~S"
 
 
 ;; ==========================================================================
-;; Wrappers around non ANSI features
+;; Wrappers around non ANSI features and operating system stuff
 ;; ==========================================================================
 
 (defun mac-os-x-p ()
