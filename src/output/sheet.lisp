@@ -478,8 +478,6 @@ PADDING is returned when it does not exceed SHEET's line width."
 
 (defgeneric %print-help (sheet help-spec)
   (:documentation "Print HELP-SPEC on SHEET.")
-  (:method (sheet (help-spec (eql #\newline)))
-    (open-next-line sheet))
   (:method (sheet (help-spec character))
     "Print HELP-SPEC on SHEET."
     (%print-help sheet (make-string 1 :initial-element help-spec)))
