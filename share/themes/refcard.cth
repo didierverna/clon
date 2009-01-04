@@ -1,0 +1,36 @@
+;;; refcard.cth --- Reference card theme for Clon                 -*- lisp -*-
+
+;; Author:        Didier Verna <didier@lrde.epita.fr>
+;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
+;; Created:       Sun Jan  4 13:32:27 2009
+;; Last Revision: Sun Jan  4 15:12:47 2009
+
+
+;;; Commentary:
+
+;; Contents management by FCM version 0.1.
+
+;; This is a theme providing a compact list of options by group.
+
+
+;;; Code:
+
+;; Note that when faces have the :hidden display property, then the normally
+;; necessary subfaces can be omitted.
+
+(help :display :block
+      :item-separator #\newline
+      :face (synopsis :display :hidden)
+      :face (text :bold t :separator #\space)
+      :face (option :left-padding 2
+		    :separator ", "
+		    :face (syntax :item-separator " "
+				  :face (short-name :item-separator nil
+						    :face argument)
+				  :face (long-name  :item-separator nil
+						    :face argument))
+		    :face (description :display :hidden))
+      :face (group :item-separator #\newline))
+
+
+;;; refcard.cth ends here
