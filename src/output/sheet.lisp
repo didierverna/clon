@@ -482,6 +482,9 @@ PADDING is returned when it does not exceed SHEET's line width."
   (:method (sheet (help-spec character))
     "Print HELP-SPEC on SHEET."
     (%print-help sheet (make-string 1 :initial-element help-spec)))
+  (:method (sheet (help-spec simple-vector))
+    "Print HELP-SPEC on SHEET."
+    (%print-help sheet (coerce help-spec 'string)))
   (:method (sheet (help-spec string))
     "Print HELP-SPEC on SHEET."
     (output-string sheet help-spec))
