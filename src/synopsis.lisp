@@ -94,106 +94,10 @@
 		   :reader potential-pack)
    (clon-options-group :documentation "The Clon options group."
 		       :type group
+		       :initarg :clon-options-group
 		       :reader clon-options-group))
   (:documentation "The SYNOPSIS class.
 This class handles the description of the program's command-line options."))
-
-
-;; ----------------
-;; Sealing protocol
-;; ----------------
-
-(defmethod seal :around ((synopsis synopsis))
-  "Add Clon specific options to SYNOPSIS."
-  (let ((grp (make-group)))
-    (add-to grp (make-text :contents "Clon specific options:"))
-    (add-to grp (make-internal-flag "banner" "Display the full Clon banner."))
-    (add-to grp (make-internal-enum "version"
-		    "Display Clon's version number.
-FMT can be `number', `short' or `long'."
-		  :argument-name "FMT"
-		  :argument-type :optional
-		  :enum '(:number :short :long)
-		  :fallback-value :long
-		  #|:env-var "VERSION_FORMAT"|#))
-    (add-to grp (make-internal-flag "help" "Display Clon-specific help."))
-    (let ((subgrp (make-group)))
-      (add-to subgrp (make-text :contents "Clon output:"))
-      (add-to subgrp (make-internal-path "search-path"
-			 "Set Clon's search path.
-If you don't want any search path at all, use this option with no argument."
-		       :argument-type :optional
-		       :type :directory-list
-		       :fallback-value nil ;; paths are nullable by default
-		       ;; #### PORTME. I'm using Unix-like default for
-		       ;; everything here, plus OSX specific values that I
-		       ;; know of. Not sure about Windows or anything else.
-		       :default-value
-		       (let ((local-path '(".clon/" "share/clon/"))
-			     (global-path '(#p"/usr/local/share/clon/"
-					    #p"/usr/share/clon/")))
-			 (when (mac-os-x-p)
-			   (push "Library/Application Support/Clon/"
-				 local-path)
-			   (push #p"/Library/Application Support/Clon/"
-				 global-path))
-			 (append
-			  (mapcar
-			   (lambda (subdir)
-			     (merge-pathnames subdir (user-homedir-pathname)))
-			   local-path)
-			  global-path))
-		       :env-var "SEARCH_PATH"))
-      (add-to subgrp (make-internal-path "theme"
-			 ~"Set Clon's output theme.
-If you don't want any theme at all, use this option with no argument. "
-			 ~"Unless starting with /, ./ or ../, files are looked "
-			 ~"for in the Clon search path. The cth extension can "
-			 ~"be omitted."
-		       :argument-name "FILE"
-		       :argument-type :optional
-		       :type :file
-		       :nullablep t
-		       :fallback-value nil
-		       :default-value (make-pathname :name "raw")
-		       :env-var "THEME"))
-      (add-to subgrp (make-internal-lispobj "line-width"
-			 ~"Set Clon's output line width.
-If not given, the terminal size will be used when possible. Otherwise, 80 "
-			 ~"columns will be assumed."
-			 :argument-name "WIDTH"
-			 :env-var "LINE_WIDTH"
-			 :typespec '(integer 1)))
-      (add-to subgrp (make-internal-xswitch "highlight"
-			 "Set Clon's output highlighting to on/off/auto.
-Auto (the default) means on for tty output and off otherwise."
-			 :enum '(:auto)
-			 :env-var "HIGHLIGHT"
-			 :default-value :auto))
-      (seal subgrp)
-      (add-to grp subgrp))
-    (seal grp)
-    (add-to synopsis grp)
-    (setf (slot-value synopsis 'clon-options-group) grp))
-  (call-next-method))
-
-(defmethod seal :after ((synopsis synopsis))
-  "Compute the SYNOSPSIS' minus and plus packs."
-  (let (potential-pack minus-pack plus-pack)
-    (do-options (option synopsis)
-      (let ((potential-pack-char (potential-pack-char option :as-string))
-	    (minus-pack-char (minus-pack-char option :as-string))
-	    (plus-pack-char (plus-pack-char option  :as-string)))
-	(when potential-pack-char
-	  (setq potential-pack
-		(concatenate 'string potential-pack potential-pack-char)))
-	(when minus-pack-char
-	  (setq minus-pack (concatenate 'string minus-pack minus-pack-char)))
-	(when plus-pack-char
-	  (setq plus-pack (concatenate 'string plus-pack plus-pack-char)))))
-    (setf (slot-value synopsis 'potential-pack) potential-pack)
-    (setf (slot-value synopsis 'minus-pack) minus-pack)
-    (setf (slot-value synopsis 'plus-pack) plus-pack)))
 
 
 ;; ---------------------------
@@ -240,48 +144,103 @@ Auto (the default) means on for tty output and off otherwise."
 ;; Synopsis Instance Creation
 ;; ==========================================================================
 
-(defun make-synopsis (&rest keys &key postfix)
+(defmethod initialize-instance :around ((synopsis synopsis) &rest keys)
+  "Prepare Clon specific options."
+  (let ((grp (make-group
+	      :title "Clon specific options:"
+	      :item (make-internal-flag "banner" "Display the full Clon banner.")
+	      :item (make-internal-enum "version"
+			"Display Clon's version number.
+FMT can be `number', `short' or `long'."
+		      :argument-name "FMT"
+		      :argument-type :optional
+		      :enum '(:number :short :long)
+		      :fallback-value :long
+		      #|:env-var "VERSION_FORMAT"|#)
+	      :item (make-internal-flag "help" "Display Clon-specific help.")
+	      :item (make-group
+		     :title "Clon output:"
+		     :item (make-internal-path "search-path"
+			       "Set Clon's search path.
+If you don't want any search path at all, use this option with no argument."
+			     :argument-type :optional
+			     :type :directory-list
+			     :fallback-value nil ;; paths are nullable by
+			     ;; default #### PORTME. I'm using Unix-like
+			     ;; default for everything here, plus OSX specific
+			     ;; values that I know of. Not sure about Windows
+			     ;; or anything else.
+			     :default-value
+			     (let ((local-path '(".clon/" "share/clon/"))
+				   (global-path '(#p"/usr/local/share/clon/"
+						  #p"/usr/share/clon/")))
+			       (when (mac-os-x-p)
+				 (push "Library/Application Support/Clon/"
+				       local-path)
+				 (push #p"/Library/Application Support/Clon/"
+				       global-path))
+			       (append
+				(mapcar
+				 (lambda (subdir)
+				   (merge-pathnames subdir
+						    (user-homedir-pathname)))
+				 local-path)
+				global-path))
+			     :env-var "SEARCH_PATH")
+		     :item (make-internal-path "theme"
+			       ~"Set Clon's output theme.
+If you don't want any theme at all, use this option with no argument. "
+			       ~"Unless starting with /, ./ or ../, files are looked "
+			       ~"for in the Clon search path. The cth extension can "
+			       ~"be omitted."
+			       :argument-name "FILE"
+			       :argument-type :optional
+			       :type :file
+			       :nullablep t
+			       :fallback-value nil
+			       :default-value (make-pathname :name "raw")
+			       :env-var "THEME")
+		     :item (make-internal-lispobj "line-width"
+			       ~"Set Clon's output line width.
+If not given, the terminal size will be used when possible. Otherwise, 80 "
+			       ~"columns will be assumed."
+			       :argument-name "WIDTH"
+			       :env-var "LINE_WIDTH"
+			       :typespec '(integer 1))
+		     :item (make-internal-xswitch "highlight"
+			       "Set Clon's output highlighting to on/off/auto.
+Auto (the default) means on for tty output and off otherwise."
+			     :enum '(:auto)
+			     :env-var "HIGHLIGHT"
+			     :default-value :auto)))))
+    (apply #'call-next-method synopsis
+	   :clon-options-group grp
+	   (nconc keys (list :item grp)))))
+
+(defmethod initialize-instance :after ((synopsis synopsis) &key)
+  "Compute SYNOSPSIS's minus and plus packs."
+  (let (potential-pack minus-pack plus-pack)
+    (do-options (option synopsis)
+      (let ((potential-pack-char (potential-pack-char option :as-string))
+	    (minus-pack-char (minus-pack-char option :as-string))
+	    (plus-pack-char (plus-pack-char option  :as-string)))
+	(when potential-pack-char
+	  (setq potential-pack
+		(concatenate 'string potential-pack potential-pack-char)))
+	(when minus-pack-char
+	  (setq minus-pack (concatenate 'string minus-pack minus-pack-char)))
+	(when plus-pack-char
+	  (setq plus-pack (concatenate 'string plus-pack plus-pack-char)))))
+    (setf (slot-value synopsis 'potential-pack) potential-pack)
+    (setf (slot-value synopsis 'minus-pack) minus-pack)
+    (setf (slot-value synopsis 'plus-pack) plus-pack)))
+
+(defun make-synopsis (&rest keys &key postfix item)
   "Make a new SYNOPSIS.
 - POSTFIX is a string to append to the program synopsis, in case it accepts a
 remainder."
-  (declare (ignore postfix))
+  (declare (ignore postfix item))
   (apply #'make-instance 'synopsis keys))
-
-(defmacro define-synopsis (synopsis (&rest keys) &body body)
-  "Evaluate BODY with SYNOPSIS bound to a new synopsis, seal it and return it.
-KEYS are passed to `make-synopsis'."
-  (push 'make-synopsis keys)
-  `(let ((,synopsis ,keys))
-    ,@body
-    (seal ,synopsis)
-    ,synopsis))
-
-;; #### FIXME: there's duplication from the declare-group macro.
-(defmacro declare-synopsis ((&rest keys) &body forms)
-  "Define a new synopsis, add FORMS to it, seal it and return it.
-FORMS should be a list of shortcut expressions matching calls to make-group,
-make-text, or make-<option>, only with the 'make-' prefix omitted. Each
-resulting group, text or option created will be automatically added to the
-synopsis."
-  (let* ((synopsis (gensym "synopsis"))
-	 (forms (mapcar (lambda (form)
-			 (list (intern "ADD-TO" 'clon) synopsis form))
-		       forms))
-	 (group (intern "GROUP"))
-	 (text (intern "TEXT"))
-	 (flag (intern "FLAG")))
-    `(macrolet ((,group (&rest args) `(declare-group ,@args))
-		(,text (&rest args) `(make-text ,@args))
-		(,flag (&rest args) `(make-flag ,@args))
-		,@(mapcar
-		   (lambda (name)
-		     (let ((macro-name (intern name))
-			   (make-name (intern (concatenate 'string "MAKE-" name)
-					      'clon)))
-		       `(,macro-name (&rest args) `(,',make-name ,@args))))
-		   *valued-option-names*))
-      (define-synopsis ,synopsis ,keys
-	,@forms))))
 
 
 ;;; synopsis.lisp ends here

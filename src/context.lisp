@@ -388,11 +388,6 @@ command-line) and retrieved value."
 ;; Context Instance Creation
 ;; ==========================================================================
 
-(defmethod initialize-instance :before ((context context) &key synopsis)
-  "Ensure that SYNOPSIS is sealed."
-  (unless (sealedp synopsis)
-    (error "Initializing context ~A: synopsis ~A not sealed." context synopsis)))
-
 (defun read-long-name ()
   "Read an option's long name from standard input."
   (format t "Please type in the correct option's long name:~%")

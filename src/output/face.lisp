@@ -233,7 +233,7 @@ etc. If PARENT-NAME does not name one of FACE's ancestors, trigger an error."
     ((instance face) &rest keys &key face bold revealed)
   "Canonicalize initialization arguments.
 This involves:
-- computing :subfaces initarg from the :face ones,
+- computing the :subfaces initarg from the :face ones,
 - handling convenience highlight properties."
   (declare (ignore face bold revealed))
   (apply #'call-next-method instance

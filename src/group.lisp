@@ -67,42 +67,8 @@ implementing hierarchical program command-line."))
 
 (defun make-group (&rest keys &key title item)
   "Make a new group."
-  (make-instance 'group))
-
-(defmacro define-group (group &body body)
-  "Evaluate BODY with GROUP bound to a new group, seal it and return it."
-  `(let ((,group (make-group)))
-    ,@body
-    (seal ,group)
-    ,group))
-
-(defmacro declare-group (&body forms)
-  "Define a new group, add FORMS to it, seal it and return it.
-FORMS should be a list of shortcut expressions matching calls to make-group,
-make-text, or make-<option> (<option> being an option class, either a Clon
-built-in one, or one defined with DEFOPTION), only with the 'make-' prefix
-omitted. Each resulting group, text or option created will be automatically
-added to the group."
-  (let* ((grp (gensym "grp"))
-	 (forms (mapcar
-		 (lambda (form)
-		   (list (intern "ADD-TO" 'clon) grp form))
-		 forms))
-	 (group (intern "GROUP"))
-	 (text (intern "TEXT"))
-	 (flag (intern "FLAG")))
-    `(macrolet ((,group (&rest args) `(declare-group ,@args))
-		(,text (&rest args) `(make-text ,@args))
-		(,flag (&rest args) `(make-flag ,@args))
-		,@(mapcar
-		   (lambda (name)
-		     (let ((macro-name (intern name))
-			   (make-name (intern (concatenate 'string "MAKE-" name)
-					      'clon)))
-		       `(,macro-name (&rest args) `(,',make-name ,@args))))
-		   *valued-option-names*))
-      (define-group ,grp
-	,@forms))))
+  (declare (ignore title item))
+  (apply #'make-instance 'group keys))
 
 
 ;;; group.lisp ends here

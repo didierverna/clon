@@ -43,10 +43,8 @@
   ((items :documentation "The items in the container."
 	  :type list
 	  :initform nil
-	  :accessor container-items)
-   (sealedp :documentation "Whether the container is sealed."
-	    :initform nil
-	    :accessor sealedp))
+	  :initarg :container-items
+	  :reader container-items))
   (:documentation "The CONTAINER class.
 This class is a mixin used in synopsis and groups to represent the program's
 command-line hierarchy."))
@@ -95,45 +93,24 @@ command-line hierarchy."))
 
 
 ;; ==========================================================================
-;; The Sealing Protocol
+;; Container Instance Creation
 ;; ==========================================================================
 
-(defgeneric seal (container)
-  (:documentation "Seal CONTAINER.")
-  (:method :before ((container container))
-    "Ensure that CONTAINER is not already sealed, and perform name clash check."
-    (when (sealedp container)
-      (error "Sealing container ~A: already sealed." container))
-    (loop :for items :on (container-items container)
-	  :while (cdr items)
-	  :do (loop :for item2 in (cdr items)
-		    :do (check-name-clash (car items) item2))))
-  (:method ((container container))
-    "Mark CONTAINER as sealed."
-    (setf (sealedp container) t)))
+(defmethod initialize-instance :around
+    ((container container) &rest keys &key item)
+  "Canonicalize initialization arguments.
+This involves:
+- computing the :container-items initarg from the :item ones."
+  (declare (ignore item))
+  (funcall #'call-next-method container
+	   :container-items (remove :item (select-keys keys :item))))
 
-
-
-;; ==========================================================================
-;; The Addition Protocol
-;; ==========================================================================
-
-;; #### NOTE: there's actually only one primary method for this function, as
-;; defined below. The use of a generic function is a bit overkill, but it
-;; allows to specialize the before-method below to perform some sanity checks.
-(defgeneric add-to (container item)
-  (:documentation "Add ITEM to CONTAINER.")
-  (:method :before ((container container) (item container))
-    "Ensure that container ITEM is sealed and that CONTAINER is not."
-    (when (sealedp container)
-      (error "Adding item ~A to container ~A: container sealed."
-	     item container))
-    (unless (sealedp item)
-      (error "Adding item ~A to container ~A: item not sealed."
-	     item container)))
-  (:method ((container container) item)
-    "Add ITEM to CONTAINER."
-    (endpush item (container-items container))))
+(defmethod initialize-instance :after ((container container) &key)
+  "Perform name clash check on CONTAINER's items."
+  (loop :for items :on (container-items container)
+	:while (cdr items)
+	:do (loop :for item2 in (cdr items)
+		  :do (check-name-clash (car items) item2))))
 
 
 ;;; container.lisp ends here
