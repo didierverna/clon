@@ -40,7 +40,8 @@
 				       :face (default :face value)
 				       :face (environment :face variable)))
       :face (group :display :block
-		   :item-separator #\newline))
+		   :item-separator #\newline
+		   :face title))
 
 
 ;;; raw.cth ends here

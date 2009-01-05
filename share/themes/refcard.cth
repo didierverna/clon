@@ -30,7 +30,8 @@
 				  :face (long-name  :item-separator nil
 						    :face argument))
 		    :face (description :display :hidden))
-      :face (group :item-separator #\newline))
+      :face (group
+	     :face (title :bold t)))
 
 
 ;;; refcard.cth ends here

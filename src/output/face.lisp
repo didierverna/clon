@@ -322,7 +322,8 @@ This involves:
 				  :face (environment :face variable)))
 		    :face (group
 			   :display :block
-			   :item-separator #\newline))))
+			   :item-separator #\newline
+			   :face title))))
 
 
 ;;; face.lisp ends here

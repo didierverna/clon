@@ -30,7 +30,8 @@
 						    :face argument))
 		    :face (description :display :hidden))
       :face (group :display :block
-		   :item-separator #\newline))
+		   :item-separator #\newline
+		   :face (title :display :hidden)))
 
 
 ;;; optlist.cth ends here
