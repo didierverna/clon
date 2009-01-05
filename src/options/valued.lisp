@@ -256,18 +256,6 @@ Available restarts are:
 
 
 ;; ==========================================================================
-;; Valued Option Subclass Creation
-;; ==========================================================================
-
-(defmacro defoption (class superclasses slots &rest options)
-  "Wrapper around defclass for defining a new Clon valued option class."
-  `(defclass ,class (,@superclasses valued-option)
-    ,slots
-    ,@options))
-
-
-
-;; ==========================================================================
 ;; Valued Option Instance Creation
 ;; ==========================================================================
 
@@ -317,6 +305,12 @@ ARGUMENT-REQUIRED-P slot."
     (handler-case (check-value option default-value)
       (invalid-value ()
 	(error "Option ~A: invalid default value ~S." option default-value)))))
+
+(defmacro defoption (class superclasses slots &rest options)
+  "Wrapper around defclass for defining a new Clon valued option class."
+  `(defclass ,class (,@superclasses valued-option)
+    ,slots
+    ,@options))
 
 
 
