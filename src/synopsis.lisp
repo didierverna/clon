@@ -256,6 +256,7 @@ KEYS are passed to `make-synopsis'."
     (seal ,synopsis)
     ,synopsis))
 
+;; #### FIXME: there's duplication from the declare-group macro.
 (defmacro declare-synopsis ((&rest keys) &body forms)
   "Define a new synopsis, add FORMS to it, seal it and return it.
 FORMS should be a list of shortcut expressions matching calls to make-group,
