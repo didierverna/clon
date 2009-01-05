@@ -259,27 +259,11 @@ Available restarts are:
 ;; Valued Option Subclass Creation
 ;; ==========================================================================
 
-(defclass valued-option-class (standard-class)
-  ()
-  (:documentation "The VALUED-OPTION-CLASS class.
-This is the meta-class for all valued options, that is, for all
-subclasses of the VALUED-OPTION class."))
-
-(defvar *valued-option-names* nil
-  "The list of known valued option names.")
-
-(defmethod initialize-instance :after ((class valued-option-class) &key)
-  "Register CLASS as a new valued option class."
-  (pushnew (symbol-name (class-name class)) *valued-option-names*))
-
 (defmacro defoption (class superclasses slots &rest options)
   "Wrapper around defclass for defining a new Clon valued option class."
-  (when (assoc :metaclass options)
-    (error "Defining valued option class ~S: explicit meta-class option." class))
   `(defclass ,class (,@superclasses valued-option)
     ,slots
-    ,@options
-    (:metaclass valued-option-class)))
+    ,@options))
 
 
 
@@ -349,11 +333,6 @@ ARGUMENT-REQUIRED-P slot."
   ()
   (:documentation "The PLUS-CALLABLE Class.
 This class is a mixin used to authorize the +-syntax for the switch hierarchy."))
-
-;; #### PORTME.
-(defmethod sb-mop:validate-superclass
-    ((class valued-option-class) (superclass standard-class))
-  t)
 
 
 ;; ---------------------------
