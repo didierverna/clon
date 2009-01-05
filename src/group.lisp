@@ -40,7 +40,10 @@
 ;; ==========================================================================
 
 (defclass group (container)
-  ()
+  ((title :documentation "The group's title."
+	  :initform nil
+	  :initarg :title
+	  :reader title))
   (:documentation "The GROUP class.
 This class groups other groups, options or strings together, effectively
 implementing hierarchical program command-line."))
@@ -62,7 +65,7 @@ implementing hierarchical program command-line."))
 ;; Group Instance Creation
 ;; ==========================================================================
 
-(defun make-group ()
+(defun make-group (&rest keys &key title item)
   "Make a new group."
   (make-instance 'group))
 
