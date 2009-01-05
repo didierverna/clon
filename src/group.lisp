@@ -70,5 +70,31 @@ implementing hierarchical program command-line."))
   (declare (ignore title item))
   (apply #'make-instance 'group keys))
 
+(defmacro %defgroup (internalp (&rest keys) &body forms)
+  "Define a new group."
+  `(make-group ,@keys
+    ,@(loop :for form :in forms
+	    :nconc (list :item
+			 (let ((operation (symbol-name (car form))))
+			   (list* (intern
+				   (cond ((string= operation "GROUP")
+					  "%DEFGROUP")
+					 (t
+					  (format nil "MAKE-~:[~;INTERNAL-~]~A"
+					    internalp operation)))
+				   :clon)
+				  (if (string= operation "GROUP")
+				      (list* internalp (cdr form))
+				      (cdr form))))))))
+
+(defmacro defgroup ((&rest keys) &body forms)
+  "Define a new group.
+KEYS are initargs to MAKE-GROUP (currently, only :title).
+Each form in FORMS will be treated as a new :item.
+The CAR of each form is the name of the operation to perform: TEXT, GROUP, or
+an option class name. The rest are the arguments to the MAKE-<OP> function or
+the DEFGROUP macro."
+  `(%defgroup nil ,keys ,@forms))
+
 
 ;;; group.lisp ends here

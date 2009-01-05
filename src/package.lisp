@@ -52,8 +52,8 @@
 	   :make-flag
 	   :make-switch
 	   :make-stropt :make-enum :make-xswitch :make-lispobj :make-path
-	   :make-group :define-group :declare-group
-	   :make-synopsis :define-synopsis :declare-synopsis
+	   :make-group :defgroup
+	   :make-synopsis :defsynopsis
 	   :make-context
 	   :getopt
 	   :getopt-cmdline :multiple-value-getopt-cmdline :do-cmdline-options

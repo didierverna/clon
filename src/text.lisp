@@ -79,5 +79,11 @@ This class implements plain text objects appearing in a synopsis."))
   (declare (ignore contents))
   (apply #'make-instance 'text keys))
 
+;; #### NOTE: currently, there is no difference between internal and external
+;; text, but this might change in the future. Besides, having this function it
+;; simplifies the defgroup and defsynopsis macros.
+(defun make-internal-text (&rest keys &key contents)
+  (declare (ignore contents))
+  (apply #'make-text keys))
 
 ;;; text.lisp ends here

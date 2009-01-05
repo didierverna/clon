@@ -37,55 +37,50 @@
 
 ;; Create and fill the program synopsis:
 (defvar *synopsis*
-  (clon:make-synopsis
-   :postfix "FILES..."
-   :item (clon:make-text :contents "Demonstration of Clon.")
-   :item (clon:make-group
-	  :title "Flags:"
-	  :item (clon:make-flag :short-name "h" :long-name "help"
-				:description "both names.")
-	  :item (clon:make-flag :short-name "v" :description "short name.")
-	  :item (clon:make-flag :long-name "version" :description "long name."))
-   :item (clon:make-group
-	  :title "Switches:"
-	  :item (clon:make-switch :short-name "d" :long-name "debug"
-				  :description "both names, optional argument yes/no (the default)"
-				  :env-var "DEBUG")
-	  :item (clon:make-switch :short-name "i" :long-name "interactive"
-				  :description "both names, argument required, another name"
-				  :argument-style :on/off
-				  :argument-type :required
-				  :default-value t)
-	  :item (clon:make-switch :short-name "n"
-				  :description "short name, whatever the argument")
-	  :item (clon:make-switch  :long-name "verbose"
-				   :description "long name, optional argument, yet another name"
-				   :argument-style :true/false)
-	  :item (clon:make-switch  :long-name "simulate"
-				   :description "long name, required argument"
-				   :argument-type :required))
-   :item (clon:make-group
-	  :title "String Options:"
-	  :item (clon:make-stropt :short-name "f" :long-name "first-name"
-				  :description "both names, required argument (default)")
-	  :item (clon:make-stropt :short-name "F" :long-name "family-name"
-				  :description "both names, optional argument, another name"
-				  :argument-type :optional
-				  :argument-name "NAME"
-				  :fallback-value "unknown")
-	  :item (clon:make-stropt :short-name "a" :description "short name, required argument")
-	  :item (clon:make-stropt :short-name "c"
-				  :description "short name, optional argument"
-				  :argument-type :optional
-				  :default-value "GNU GPL")
-	  :item (clon:make-stropt :long-name "phone" :description "long name, required argument")
-	  :item (clon:make-stropt :long-name "fax"
-				  :description "long name, optional argument"
-				  :argument-type :optional
-				  :default-value "/same as phone/"))
-   :item (clon:make-group
-	  :item (clon:make-group
-		 :item (clon:make-text :contents "This is a demo of the group imbrication feature."))))
+  (clon:defsynopsis (:postfix "FILES...")
+    (text :contents "Demonstration of Clon.")
+    (group (:title "Flags:")
+      (flag :short-name "h" :long-name "help" :description "both names.")
+      (flag :short-name "v" :description "short name.")
+      (flag :long-name "version" :description "long name."))
+    (group (:title "Switches:")
+      (switch :short-name "d" :long-name "debug"
+	      :description "both names, optional argument yes/no (the default)"
+	      :env-var "DEBUG")
+      (switch :short-name "i" :long-name "interactive"
+	      :description "both names, argument required, another name"
+	      :argument-style :on/off
+	      :argument-type :required
+	      :default-value t)
+      (switch :short-name "n"
+	      :description "short name, whatever the argument")
+      (switch  :long-name "verbose"
+	       :description "long name, optional argument, yet another name"
+	       :argument-style :true/false)
+      (switch  :long-name "simulate"
+	       :description "long name, required argument"
+	       :argument-type :required))
+    (group (:title "String Options:")
+      (stropt :short-name "f" :long-name "first-name"
+	      :description "both names, required argument (default)")
+      (stropt :short-name "F" :long-name "family-name"
+	      :description "both names, optional argument, another name"
+	      :argument-type :optional
+	      :argument-name "NAME"
+	      :fallback-value "unknown")
+      (stropt :short-name "a" :description "short name, required argument")
+      (stropt :short-name "c"
+	      :description "short name, optional argument"
+	      :argument-type :optional
+	      :default-value "GNU GPL")
+      (stropt :long-name "phone" :description "long name, required argument")
+      (stropt :long-name "fax"
+	      :description "long name, optional argument"
+	      :argument-type :optional
+	      :default-value "/same as phone/"))
+    (group (:title "Group imbrication demonstration:")
+      (group (:title "This group is the child of his father.")
+	(text :contents "This is a demo of the group imbrication feature."))))
   "This program's synopsis .")
 
 (defun main ()

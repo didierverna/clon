@@ -146,73 +146,71 @@ This class handles the description of the program's command-line options."))
 
 (defmethod initialize-instance :around ((synopsis synopsis) &rest keys)
   "Prepare Clon specific options."
-  (let ((grp (make-group
-	      :title "Clon specific options:"
-	      :item (make-internal-flag "banner" "Display the full Clon banner.")
-	      :item (make-internal-enum "version"
-			"Display Clon's version number.
+  (let ((grp (%defgroup t (:title "Clon specific options:")
+	       (flag "banner" "Display the full Clon banner.")
+	       (enum "version"
+		     "Display Clon's version number.
 FMT can be `number', `short' or `long'."
-		      :argument-name "FMT"
-		      :argument-type :optional
-		      :enum '(:number :short :long)
-		      :fallback-value :long
-		      #|:env-var "VERSION_FORMAT"|#)
-	      :item (make-internal-flag "help" "Display Clon-specific help.")
-	      :item (make-group
-		     :title "Clon output:"
-		     :item (make-internal-path "search-path"
-			       "Set Clon's search path.
+		     :argument-name "FMT"
+		     :argument-type :optional
+		     :enum '(:number :short :long)
+		     :fallback-value :long
+		     #|:env-var "VERSION_FORMAT"|#)
+	       (flag "help" "Display Clon-specific help.")
+	       (group (:title "Clon output:")
+		 (path "search-path"
+		       "Set Clon's search path.
 If you don't want any search path at all, use this option with no argument."
-			     :argument-type :optional
-			     :type :directory-list
-			     :fallback-value nil ;; paths are nullable by
-			     ;; default #### PORTME. I'm using Unix-like
-			     ;; default for everything here, plus OSX specific
-			     ;; values that I know of. Not sure about Windows
-			     ;; or anything else.
-			     :default-value
-			     (let ((local-path '(".clon/" "share/clon/"))
-				   (global-path '(#p"/usr/local/share/clon/"
-						  #p"/usr/share/clon/")))
-			       (when (mac-os-x-p)
-				 (push "Library/Application Support/Clon/"
-				       local-path)
-				 (push #p"/Library/Application Support/Clon/"
-				       global-path))
-			       (append
-				(mapcar
-				 (lambda (subdir)
-				   (merge-pathnames subdir
-						    (user-homedir-pathname)))
+		       :argument-type :optional
+		       :type :directory-list
+		       :fallback-value nil
+		       ;; paths are nullable by default #### PORTME. I'm using
+		       ;; Unix-like default for everything here, plus OSX
+		       ;; specific values that I know of. Not sure about
+		       ;; Windows or anything else.
+		       :default-value
+		       (let ((local-path '(".clon/" "share/clon/"))
+			     (global-path '(#p"/usr/local/share/clon/"
+					    #p"/usr/share/clon/")))
+			 (when (mac-os-x-p)
+			   (push "Library/Application Support/Clon/"
 				 local-path)
-				global-path))
-			     :env-var "SEARCH_PATH")
-		     :item (make-internal-path "theme"
-			       ~"Set Clon's output theme.
+			   (push #p"/Library/Application Support/Clon/"
+				 global-path))
+			 (append
+			  (mapcar
+			   (lambda (subdir)
+			     (merge-pathnames subdir
+					      (user-homedir-pathname)))
+			   local-path)
+			  global-path))
+		       :env-var "SEARCH_PATH")
+		 (path "theme"
+		       ~"Set Clon's output theme.
 If you don't want any theme at all, use this option with no argument. "
-			       ~"Unless starting with /, ./ or ../, files are looked "
-			       ~"for in the Clon search path. The cth extension can "
-			       ~"be omitted."
-			       :argument-name "FILE"
-			       :argument-type :optional
-			       :type :file
-			       :nullablep t
-			       :fallback-value nil
-			       :default-value (make-pathname :name "raw")
-			       :env-var "THEME")
-		     :item (make-internal-lispobj "line-width"
-			       ~"Set Clon's output line width.
+		       ~"Unless starting with /, ./ or ../, files are looked "
+		       ~"for in the Clon search path. The cth extension can "
+		       ~"be omitted."
+		       :argument-name "FILE"
+		       :argument-type :optional
+		       :type :file
+		       :nullablep t
+		       :fallback-value nil
+		       :default-value (make-pathname :name "raw")
+		       :env-var "THEME")
+		 (lispobj "line-width"
+			  ~"Set Clon's output line width.
 If not given, the terminal size will be used when possible. Otherwise, 80 "
-			       ~"columns will be assumed."
-			       :argument-name "WIDTH"
-			       :env-var "LINE_WIDTH"
-			       :typespec '(integer 1))
-		     :item (make-internal-xswitch "highlight"
-			       "Set Clon's output highlighting to on/off/auto.
+			  ~"columns will be assumed."
+			  :argument-name "WIDTH"
+			  :env-var "LINE_WIDTH"
+			  :typespec '(integer 1))
+		 (xswitch "highlight"
+			  "Set Clon's output highlighting to on/off/auto.
 Auto (the default) means on for tty output and off otherwise."
-			     :enum '(:auto)
-			     :env-var "HIGHLIGHT"
-			     :default-value :auto)))))
+			  :enum '(:auto)
+			  :env-var "HIGHLIGHT"
+			  :default-value :auto)))))
     (apply #'call-next-method synopsis
 	   :clon-options-group grp
 	   (nconc keys (list :item grp)))))
@@ -241,6 +239,20 @@ Auto (the default) means on for tty output and off otherwise."
 remainder."
   (declare (ignore postfix item))
   (apply #'make-instance 'synopsis keys))
+
+(defmacro defsynopsis ((&rest keys) &body forms)
+  "Define a new synopsis."
+  `(make-synopsis ,@keys
+    ,@(loop :for form :in forms
+	    :nconc (list :item
+			 (let ((operation (symbol-name (car form))))
+			   (list* (intern
+				   (cond ((string= operation "GROUP")
+					  "DEFGROUP")
+					 (t
+					  (format nil "MAKE-~A" operation)))
+				   :clon)
+				  (cdr form)))))))
 
 
 ;;; synopsis.lisp ends here
