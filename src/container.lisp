@@ -102,8 +102,9 @@ command-line hierarchy."))
 This involves:
 - computing the :items initarg from the :item ones."
   (declare (ignore item))
-  (funcall #'call-next-method container
-	   :items (remove :item (select-keys keys :item))))
+  (apply #'call-next-method container
+	 :items (remove :item (select-keys keys :item))
+	 (remove-keys keys :item)))
 
 (defmethod initialize-instance :after ((container container) &key)
   "Perform name clash check on CONTAINER's items."

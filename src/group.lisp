@@ -55,9 +55,13 @@ implementing hierarchical program command-line."))
 
 (defmethod help-spec ((group group) &key)
   "Return GROUP's help specification."
-  (let ((dpy (call-next-method)))
-    (when dpy
-      (push 'group dpy))))
+  ;; this brings us the container's help-spec.
+  (let ((help-spec (call-next-method)))
+    (when help-spec
+      (when (title group)
+	(push `(title ,(title group)) help-spec))
+      (push 'group help-spec))
+    help-spec))
 
 
 
