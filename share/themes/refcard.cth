@@ -20,8 +20,14 @@
 
 (help :display :block
       :item-separator #\newline
-      :face (synopsis :display :hidden)
-      :face (text :bold t :separator #\space)
+      :face (synopsis :bold t
+		      :separator #(#\newline #\newline)
+		      :face program
+		      :face minus-pack
+		      :face plus-pack
+		      :face options
+		      :face postfix)
+      :face (text :display :hidden)
       :face (option :left-padding 2
 		    :separator ", "
 		    :face (syntax :item-separator " "

@@ -26,8 +26,7 @@
 		      :face plus-pack
 		      :face options
 		      :face postfix)
-      :face (text :display :block
-		  :bold t)
+      :face (text :display :block)
       :face (option :left-padding 2
 		    :display :block
 		    :face (syntax :bold t
