@@ -43,8 +43,8 @@
   ((items :documentation "The items in the container."
 	  :type list
 	  :initform nil
-	  :initarg :container-items
-	  :reader container-items))
+	  :initarg :items
+	  :reader items))
   (:documentation "The CONTAINER class.
 This class is a mixin used in synopsis and groups to represent the program's
 command-line hierarchy."))
@@ -56,7 +56,7 @@ command-line hierarchy."))
 
 (defmethod untraverse ((container container))
   "Untraverse all CONTAINER items."
-  (dolist (item (container-items container))
+  (dolist (item (items container))
     (untraverse item))
   container)
 
@@ -67,18 +67,18 @@ command-line hierarchy."))
 
 (defmethod check-name-clash ((container container) item2)
   "Check for name clash between CONTAINER's options and ITEM2's ones."
-  (dolist (item1 (container-items container))
+  (dolist (item1 (items container))
     (check-name-clash item1 item2)))
 
 (defmethod check-name-clash (item1 (container container))
   "Check for name clash between ITEM1's options and CONTAINER's ones."
-  (dolist (item2 (container-items container))
+  (dolist (item2 (items container))
     (check-name-clash item1 item2)))
 
 (defmethod check-name-clash ((container1 container) (container2 container))
   "Check for name clash between CONTAINER1's options and CONTAINER2's ones."
-  (dolist (item1 (container-items container1))
-    (dolist (item2 (container-items container2))
+  (dolist (item1 (items container1))
+    (dolist (item2 (items container2))
       (check-name-clash item1 item2))))
 
 
@@ -88,7 +88,7 @@ command-line hierarchy."))
 
 (defmethod help-spec ((container container) &key)
   "Return CONTAINER's help specification."
-  `(,@(mapcar #'help-spec (container-items container))))
+  `(,@(mapcar #'help-spec (items container))))
 
 
 
@@ -100,14 +100,14 @@ command-line hierarchy."))
     ((container container) &rest keys &key item)
   "Canonicalize initialization arguments.
 This involves:
-- computing the :container-items initarg from the :item ones."
+- computing the :items initarg from the :item ones."
   (declare (ignore item))
   (funcall #'call-next-method container
-	   :container-items (remove :item (select-keys keys :item))))
+	   :items (remove :item (select-keys keys :item))))
 
 (defmethod initialize-instance :after ((container container) &key)
   "Perform name clash check on CONTAINER's items."
-  (loop :for items :on (container-items container)
+  (loop :for items :on (items container)
 	:while (cdr items)
 	:do (loop :for item2 in (cdr items)
 		  :do (check-name-clash (car items) item2))))

@@ -59,7 +59,7 @@
   (:method (func (container container))
     "Map FUNC over all containers or options in CONTAINER."
     (unless (traversedp container)
-      (dolist (item (container-items container))
+      (dolist (item (items container))
 	(mapoptions func item))))
   (:method (func (option option))
     "Call FUNC on OPTION."
