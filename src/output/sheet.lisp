@@ -207,7 +207,7 @@ This structure hold layout properties used for printing."
 This structure holds both layout and highlight properties used for printing."
   highlight-property-instances)
 
-;; 3 shortcut accessors to the top frame:
+;; Shortcut accessors to the top frame:
 (defun current-face (sheet)
   "Return SHEET's current face or nil."
   (if (frames sheet)
@@ -275,7 +275,7 @@ This structure holds both layout and highlight properties used for printing."
 ;; don't actually display anything. Since this is for short description
 ;; strings, this would not be normally a problem, but the current situation is
 ;; not totally clean.
-(defun output-string (sheet string)
+(defun print-string (sheet string)
   "Output STRING to SHEET.
 STRING is output within the current frame's bounds.
 Spacing characters are honored but newlines might replace spaces when the
@@ -434,76 +434,84 @@ PADDING is returned when it does not exceed SHEET's line width."
 ;; The Print Help Protocol
 ;; =========================================================================
 
-(defun %will-print (face specs)
-  "Return t if FACE is visible and at least one of its SPECS will print."
+(defun help-spec-items-will-print (face items)
+  "Return t if at least one of ITEMS will print under FACE."
   (and (visiblep face)
-       (some (lambda (spec)
-	       (will-print face spec))
-	     specs)))
+       (some (lambda (help-spec)
+	       (help-spec-will-print face help-spec))
+	     items)))
 
-(defgeneric will-print (face help-spec)
-  (:documentation "Return t if HELP-SPEC will print in the context of FACE.")
+(defgeneric help-spec-will-print (face help-spec)
+  (:documentation
+   "Return t if HELP-SPEC will print under FACE.")
   (:method (face help-spec)
+    "Basic help specifications (chars, strings etc) do print."
     t)
   (:method (face (help-spec list))
+    "Return t if HELP-SPEC's items will print under HELP-SPEC's face."
     (let ((subface (find-face face (car help-spec))))
-      (%will-print subface (cdr help-spec)))))
+      (help-spec-items-will-print subface (cdr help-spec)))))
 
 (defgeneric get-separator (face help-spec)
-  (:documentation "Get HELP-SPEC separator in the context of FACE.")
+  (:documentation "Get HELP-SPEC's separator under FACE.")
   (:method (face help-spec)
+    "Basic help specifications (chars, strings etc) don't provide a separator."
     nil)
   (:method (face (help-spec list))
+    "Return the separator of HELP-SPEC's face."
     (separator (find-face face (car help-spec)))))
 
 ;; #### NOTE: this is where I would like more dispatch capability from CLOS.
-;; Something like defmethod %print-help (sheet (help-spec (list symbol *)))
-(defun %print-help-spec-items (sheet items)
-  "Print help specification ITEMS on SHEET."
-  (loop :for spec :on items
+;; Something like defmethod print-help-spec (sheet (help-spec (list symbol *)))
+(defun print-help-spec-items (sheet items)
+  "Print all help specification ITEMS on SHEET with the current face."
+  (loop :for help-specs :on items
 	:do
-	(when (will-print (current-face sheet) (car spec))
-	  (%print-help sheet (car spec))
-	  (when (and (cdr spec) (%will-print (current-face sheet) (cdr spec)))
-	    (let ((separator (get-separator (current-face sheet) (car spec))))
+	(when (help-spec-will-print (current-face sheet) (car help-specs))
+	  (print-help-spec sheet (car help-specs))
+	  (when (and (cdr help-specs)
+		     (help-spec-items-will-print (current-face sheet)
+						 (cdr help-specs)))
+	    (let ((separator (get-separator (current-face sheet)
+					    (car help-specs))))
 	      (if separator
-		  (%print-help sheet separator)
+		  (print-help-spec sheet separator)
 		  (if (item-separator (current-face sheet))
-		      (%print-help sheet
-				   (item-separator (current-face sheet))))))))))
+		      (print-help-spec sheet
+				       (item-separator
+					(current-face sheet))))))))))
 
-(defgeneric %print-help (sheet help-spec)
+(defgeneric print-help-spec (sheet help-spec)
   (:documentation "Print HELP-SPEC on SHEET.")
-  (:method (sheet (help-spec character))
-    "Print HELP-SPEC on SHEET."
-    (%print-help sheet (make-string 1 :initial-element help-spec)))
-  (:method (sheet (help-spec simple-vector))
-    "Print HELP-SPEC on SHEET."
-    (%print-help sheet (coerce help-spec 'string)))
-  (:method (sheet (help-spec string))
-    "Print HELP-SPEC on SHEET."
-    (output-string sheet help-spec))
+  (:method (sheet (char character))
+    "Print CHAR on SHEET with the current face."
+    (print-help-spec sheet (make-string 1 :initial-element char)))
+  (:method (sheet (char-vector simple-vector))
+    "Print CHAR-VECTOR on SHEET with the current face."
+    (print-help-spec sheet (coerce char-vector 'string)))
+  (:method (sheet (string string))
+    "Print STRING on SHEET with the current face."
+    (print-string sheet string))
   (:method (sheet (help-spec list))
-    "Print all items in the CDR of HELP-SPEC on SHEET.
-The CAR of HELP-SPEC should be a symbol naming the face to use for printing."
+    "Open HELP-SPEC's face and print all of its items with it."
     (with-face sheet (car help-spec)
-      (%print-help-spec-items sheet (cdr help-spec)))))
+      (print-help-spec-items sheet (cdr help-spec)))))
 
-(defun print-help (sheet help-spec)
-  "Print HELP-SPEC on SHEET."
+(defun print-help (sheet help)
+  "Open the toplevel help face and print HELP on SHEET with it."
   (unless (eql (name (face-tree sheet)) 'help)
     (error "Help face not found."))
-  (let ((help-spec
-	 (if (and (listp help-spec) (not (symbolp (car help-spec))))
+  (let ((items
+	 (if (and (listp help) (not (symbolp (car help))))
 	     ;; There's already an enclosing list when help for a container is
 	     ;; requested directly, or when the complete help is requested, in
 	     ;; which case we have the list of synopsis and all synopsis
 	     ;; items.
-	     help-spec
-	     (list help-spec))))
-    (when (%will-print (face-tree sheet) help-spec)
+	     help
+	     (list help))))
+    (when (help-spec-items-will-print (face-tree sheet) items)
       (open-face sheet (face-tree sheet))
-      (%print-help-spec-items sheet help-spec)
+      (print-help-spec-items sheet items)
       (close-face sheet))))
 
 
