@@ -558,8 +558,14 @@ PADDING is returned when it does not exceed SHEET's line width."
 (defun read-face-tree (pathname)
   "Read a face tree from PATHNAME."
   (make-face-tree
-   (let ((*package* (find-package :clon)))
-     (read (open pathname)))))
+   (list* 'help
+	  (with-open-file (stream pathname)
+	    (let ((*package* (find-package :clon)))
+	      (loop :for item := (read stream nil stream)
+		    :if (eql item stream)
+		    :return items
+		    :else
+		    :collect item :into items))))))
 
 (defun try-read-face-tree (pathname)
   "Read a face tree from PATHNAME if it exists or return nil."
