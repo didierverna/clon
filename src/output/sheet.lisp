@@ -520,6 +520,8 @@ PADDING is returned when it does not exceed SHEET's line width."
 ;; Sheet Instance Creation
 ;; ==========================================================================
 
+;; #### WARNING: remove that after upgrading SBCL
+(declaim (sb-ext:muffle-conditions sb-ext:compiler-note))
 ;; #### NOTE: I need to bind output-stream here (which is early) because it is
 ;; required to do the TIOCGWINSZ business.
 (defmethod initialize-instance :around

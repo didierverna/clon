@@ -281,8 +281,6 @@ Both instances share the same slot values."
 ;; Stream to file-stream conversion (thanks Nikodemus !)
 ;; ==========================================================================
 
-;; #### WARNING: remove that after upgrading SBCL
-(declaim (sb-ext:muffle-conditions sb-ext:compiler-note))
 (defgeneric stream-file-stream (stream &optional direction)
   (:documentation "Convert STREAM to a file-stream.")
   (:method ((stream file-stream) &optional direction)
