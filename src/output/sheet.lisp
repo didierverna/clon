@@ -499,8 +499,8 @@ PADDING is returned when it does not exceed SHEET's line width."
 
 (defun print-help (sheet help)
   "Open the toplevel help face and print HELP on SHEET with it."
-  (unless (eql (name (face-tree sheet)) 'help)
-    (error "Help face not found."))
+  (unless (eql (name (face-tree sheet)) 'toplevel)
+    (error "Toplevel face not found."))
   (let ((items
 	 (if (and (listp help) (not (symbolp (car help))))
 	     ;; There's already an enclosing list when help for a container is
@@ -560,7 +560,7 @@ PADDING is returned when it does not exceed SHEET's line width."
 (defun read-face-tree (pathname)
   "Read a face tree from PATHNAME."
   (make-face-tree
-   (list* 'help
+   (list* 'toplevel
 	  (with-open-file (stream pathname)
 	    (let ((*package* (find-package :clon)))
 	      (loop :for item := (read stream nil stream)

@@ -290,7 +290,7 @@ This involves:
 
 (defun make-raw-face-tree ()
   "Make a raw (boring yet functional) face tree."
-  (make-face-tree '(help
+  (make-face-tree '(toplevel
 		    :display :block
 		    :item-separator #\newline
 		    :face (synopsis
