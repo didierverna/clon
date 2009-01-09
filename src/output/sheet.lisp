@@ -504,8 +504,6 @@ PADDING is returned when it does not exceed SHEET's line width."
 
 (defun print-help (sheet help)
   "Open the toplevel help face and print HELP on SHEET with it."
-  (unless (eql (name (face-tree sheet)) 'toplevel)
-    (error "Toplevel face not found."))
   (let ((items
 	 (if (and (listp help) (not (symbolp (car help))))
 	     ;; There's already an enclosing list when help for a container is
@@ -593,26 +591,24 @@ This involves:
 - computing SHEET's face tree from THEME and SEARCH-PATH."
   (setf (slot-value sheet 'current-raw-face) (raw-face-tree sheet))
   (setf (slot-value sheet 'face-tree)
-	(cond ((and theme
-		    (or (not search-path)
-			(pathname-directory theme)))
-	       (or (try-read-theme theme)
-		   (make-raw-face-tree)))
-	      (theme
-	       (setq theme
-		     (merge-pathnames theme
-				      (make-pathname
-				       :directory `(:relative
-						    ,(if (mac-os-x-p)
-							 "Themes"
-							 "themes")))))
-	       (loop :for path :in search-path
-		     :for face-tree := (try-read-theme
-					(merge-pathnames theme path))
-		     :until face-tree
-		     :finally (return (or face-tree (make-raw-face-tree)))))
-	      (t
-	       (make-raw-face-tree)))))
+	(or (cond ((and theme
+			(or (not search-path)
+			    (pathname-directory theme)))
+		   (try-read-theme theme))
+		  (theme
+		   (setq theme
+			 (merge-pathnames theme
+					  (make-pathname
+					   :directory `(:relative
+							,(if (mac-os-x-p)
+							     "Themes"
+							     "themes")))))
+		   (loop :for path :in search-path
+			 :for face-tree := (try-read-theme
+					    (merge-pathnames theme path))
+			 :until face-tree
+			 :finally (return face-tree))))
+	    (make-raw-face-tree))))
 
 (defun make-sheet
     (&rest keys &key output-stream search-path theme line-width highlight)
