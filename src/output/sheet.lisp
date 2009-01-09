@@ -51,6 +51,11 @@
    (highlightp :documentation "Whether to highlight SHEET's output."
 	       :initarg :highlightp
 	       :reader highlightp)
+   (raw-face-tree :documentation "The sheet's raw face tree."
+		  :initform (make-raw-face-tree)
+		  :reader raw-face-tree)
+   (current-raw-face :documentation "The sheet's current raw face."
+		     :reader current-raw-face)
    (face-tree :documentation "The sheet's face tree."
 	      :reader face-tree)
    (column :documentation "The sheet's current column."
@@ -582,7 +587,11 @@ PADDING is returned when it does not exceed SHEET's line width."
 					     (make-pathname :type "cth"))))))
 
 (defmethod initialize-instance :after ((sheet sheet) &key theme search-path)
-  "Compute SHEET's face tree from THEME and SEARCH-PATH."
+  "Finish initialization of SHEET.
+This involves:
+- Initializing SHEET's current raw face,
+- computing SHEET's face tree from THEME and SEARCH-PATH."
+  (setf (slot-value sheet 'current-raw-face) (raw-face-tree sheet))
   (setf (slot-value sheet 'face-tree)
 	(cond ((and theme
 		    (or (not search-path)
