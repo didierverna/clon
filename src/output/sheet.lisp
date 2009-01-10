@@ -54,8 +54,6 @@
    (raw-face-tree :documentation "The sheet's raw face tree."
 		  :initform (make-raw-face-tree)
 		  :reader raw-face-tree)
-   (current-raw-face :documentation "The sheet's current raw face."
-		     :reader current-raw-face)
    (face-tree :documentation "The sheet's face tree."
 	      :reader face-tree)
    (column :documentation "The sheet's current column."
@@ -200,6 +198,7 @@ tabs are forbidden here."
   "The FRAME structure.
 This structure hold layout properties used for printing."
   face
+  raw-face
   left-margin)
 
 (defstruct highlight-property-instance
@@ -217,6 +216,12 @@ This structure holds both layout and highlight properties used for printing."
   "Return SHEET's current face or nil."
   (if (frames sheet)
       (frame-face (current-frame sheet))
+      nil))
+
+(defun current-raw-face (sheet)
+  "Return SHEET's current raw face or nil."
+  (if (frames sheet)
+      (frame-raw-face (current-frame sheet))
       nil))
 
 (defun current-left-margin (sheet)
@@ -365,9 +370,23 @@ PADDING is returned when it does not exceed SHEET's line width."
 	padding)
       (column sheet)))
 
-(defgeneric open-face (sheet face)
-  (:documentation "Open FACE on SHEET.")
-  (:method (sheet (face face))
+(defun find-sheet-face (face raw-face name)
+  "Find a face starting at either FACE or RAW-FACE named NAME.
+If the face can't be found in FACE tree, find one in RAW-FACE tree instead,
+and make a copy of it."
+  (let* ((new-raw-face (find-face raw-face name :error-me))
+	 (new-face (or (find-face face name)
+		       (let ((new-face (copy-face new-raw-face)))
+			 ;; #### FIXME: I need a add-subface function
+			 (setf (slot-value new-face 'parent) face)
+			 (push new-face (slot-value face 'subfaces))
+			 new-face))))
+    (values new-face new-raw-face)))
+
+
+(defun open-face-1 (sheet face raw-face)
+  ;(:documentation "Open FACE on SHEET.")
+  ;(:method (sheet (face face))
     "Create a frame for FACE and open it."
     (assert (visiblep face))
     ;; Create the new frame:
@@ -410,16 +429,25 @@ PADDING is returned when it does not exceed SHEET's line width."
 					     :value
 					     (face-highlight-property-value
 					      face property)))))
-			(make-highlight-frame :face face
+			(make-highlight-frame :raw-face raw-face
+					      :face face
 					      :left-margin left-margin
 					      :highlight-property-instances
 					      highlight-property-instances))
-		      (make-frame :face face  :left-margin left-margin))))
+		      (make-frame :raw-face raw-face
+				  :face face
+				  :left-margin left-margin))))
     ;; Open the new frame:
     (open-frame sheet (current-frame sheet)))
-  (:method (sheet (name symbol))
+
+(defun open-face (sheet name)
+;  (:method (sheet (name symbol))
     "Find a face named NAME in SHEET's face tree and open it."
-    (open-face sheet (find-face (current-face sheet) name))))
+    (multiple-value-bind (face raw-face)
+	(find-sheet-face (current-face sheet)
+			 (current-raw-face sheet)
+			 name)
+      (open-face-1 sheet face raw-face)))
 
 (defun close-face (sheet)
   "Close SHEET's current face."
@@ -439,32 +467,33 @@ PADDING is returned when it does not exceed SHEET's line width."
 ;; The Print Help Protocol
 ;; =========================================================================
 
-(defun help-spec-items-will-print (face items)
+(defun help-spec-items-will-print (face raw-face items)
   "Return t if at least one of ITEMS will print under FACE."
   (and (visiblep face)
        (some (lambda (help-spec)
-	       (help-spec-will-print face help-spec))
+	       (help-spec-will-print face raw-face help-spec))
 	     items)))
 
-(defgeneric help-spec-will-print (face help-spec)
+(defgeneric help-spec-will-print (face raw-face help-spec)
   (:documentation
    "Return t if HELP-SPEC will print under FACE.")
-  (:method (face help-spec)
+  (:method (face raw-face help-spec)
     "Basic help specifications (chars, strings etc) do print."
     t)
-  (:method (face (help-spec list))
+  (:method (face raw-face (help-spec list))
     "Return t if HELP-SPEC's items will print under HELP-SPEC's face."
-    (let ((subface (find-face face (car help-spec))))
-      (help-spec-items-will-print subface (cdr help-spec)))))
+    (multiple-value-bind (subface raw-subface)
+	(find-sheet-face face raw-face (car help-spec))
+      (help-spec-items-will-print subface raw-subface (cdr help-spec)))))
 
-(defgeneric get-separator (face help-spec)
+(defgeneric get-separator (face raw-face help-spec)
   (:documentation "Get HELP-SPEC's separator under FACE.")
-  (:method (face help-spec)
+  (:method (face raw-face help-spec)
     "Basic help specifications (chars, strings etc) don't provide a separator."
     nil)
-  (:method (face (help-spec list))
+  (:method (face raw-face (help-spec list))
     "Return the separator of HELP-SPEC's face."
-    (separator (find-face face (car help-spec)))))
+    (separator (find-sheet-face face raw-face (car help-spec)))))
 
 ;; #### NOTE: this is where I would like more dispatch capability from CLOS.
 ;; Something like defmethod print-help-spec (sheet (help-spec (list symbol *)))
@@ -472,12 +501,16 @@ PADDING is returned when it does not exceed SHEET's line width."
   "Print all help specification ITEMS on SHEET with the current face."
   (loop :for help-specs :on items
 	:do
-	(when (help-spec-will-print (current-face sheet) (car help-specs))
+	(when (help-spec-will-print (current-face sheet)
+				    (current-raw-face sheet)
+				    (car help-specs))
 	  (print-help-spec sheet (car help-specs))
 	  (when (and (cdr help-specs)
 		     (help-spec-items-will-print (current-face sheet)
+						 (current-raw-face sheet)
 						 (cdr help-specs)))
 	    (let ((separator (get-separator (current-face sheet)
+					    (current-raw-face sheet)
 					    (car help-specs))))
 	      (if separator
 		  (print-help-spec sheet separator)
@@ -512,8 +545,9 @@ PADDING is returned when it does not exceed SHEET's line width."
 	     ;; items.
 	     help
 	     (list help))))
-    (when (help-spec-items-will-print (face-tree sheet) items)
-      (open-face sheet (face-tree sheet))
+    (when (help-spec-items-will-print (face-tree sheet) (raw-face-tree sheet)
+				      items)
+      (open-face-1 sheet (face-tree sheet) (raw-face-tree sheet))
       (print-help-spec-items sheet items)
       (close-face sheet))))
 
@@ -589,7 +623,7 @@ PADDING is returned when it does not exceed SHEET's line width."
 This involves:
 - Initializing SHEET's current raw face,
 - computing SHEET's face tree from THEME and SEARCH-PATH."
-  (setf (slot-value sheet 'current-raw-face) (raw-face-tree sheet))
+  (setf (slot-value sheet 'raw-face-tree) (raw-face-tree sheet))
   (setf (slot-value sheet 'face-tree)
 	(or (cond ((and theme
 			(or (not search-path)

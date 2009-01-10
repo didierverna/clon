@@ -19,15 +19,8 @@
 :display :block
 :item-separator #\newline
 
-:face (synopsis :display :block
-		:separator #(#\newline #\newline)
-		:face program
-		:face minus-pack
-		:face plus-pack
-		:face options
-		:face postfix)
+:face (synopsis :display :block :separator #(#\newline #\newline))
 :face (text :display :block)
-
 :face (option :left-padding 2
 	      :display :block
 	      :face (syntax :item-separator ", "
@@ -42,9 +35,7 @@
 				 :face (default :face value)
 				 :face (environment :face variable)))
 
-:face (group :display :block
-	     :item-separator #\newline
-	     :face title)
+:face (group :display :block :item-separator #\newline)
 
 
 ;;; raw.cth ends here

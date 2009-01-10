@@ -21,12 +21,7 @@
 
 :face (synopsis :display :block
 		:bold t
-		:separator #(#\newline #\newline)
-		:face program
-		:face minus-pack
-		:face plus-pack
-		:face options
-		:face postfix)
+		:separator #(#\newline #\newline))
 
 :face (text :display :block)
 

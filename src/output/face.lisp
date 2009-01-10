@@ -191,7 +191,7 @@ Return the leaf face or nil."
 	    :return found
 	    :finally (return nil))))
 
-(defun find-face (face name)
+(defun find-face (face name &optional error-me)
   "Find a face named NAME starting at FACE.
 The face is looked for as a direct subface of FACE (in which case it is simply
 returned), or up in the hierarchy and by successive upper branches (in which
@@ -207,7 +207,7 @@ If no face is found, trigger an error."
 	    :return (attach-face-tree face found)
 	    :else
 	    :do (push (name child) names)
-	    :finally (error "Face ~A not found." name))))
+	    :finally (when error-me (error "Face ~A not found." name)))))
 
 (defun parent-generation (face parent-name)
   "Return FACE's parent generation for PARENT-NAME.
@@ -272,6 +272,14 @@ This involves:
 		   foreground background))
   (apply #'make-instance 'face :name name keys))
 
+(defun copy-face (face)
+  "Return a copy of FACE.
+This function does not consider FACE as a face tree: only face properties are
+copied; the face parent of children are set to nil."
+  (let ((new-face (copy-instance face)))
+    (setf (slot-value new-face 'parent) nil)
+    (setf (slot-value new-face 'subfaces) nil)
+    new-face))
 
 (defgeneric make-face-tree (definition)
   (:documentation "Make a face tree from DEFINITION.")
