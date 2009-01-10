@@ -613,9 +613,7 @@ and make a copy of it."
 (defmethod initialize-instance :after ((sheet sheet) &key theme search-path)
   "Finish initialization of SHEET.
 This involves:
-- Initializing SHEET's current raw face,
 - computing SHEET's face tree from THEME and SEARCH-PATH."
-  (setf (slot-value sheet 'raw-face-tree) (raw-face-tree sheet))
   (setf (slot-value sheet 'face-tree)
 	(or (cond ((and theme
 			(or (not search-path)
@@ -634,7 +632,7 @@ This involves:
 					    (merge-pathnames theme path))
 			 :until face-tree
 			 :finally (return face-tree))))
-	    (make-raw-face-tree))))
+	    (make-face 'toplevel))))
 
 (defun make-sheet
     (&rest keys &key output-stream search-path theme line-width highlight)
