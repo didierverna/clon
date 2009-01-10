@@ -199,7 +199,7 @@ Return the leaf face or nil."
 The face is looked for as a direct subface of FACE (in which case it is simply
 returned), or up in the hierarchy and by successive upper branches (in which
 case it is copied and attached to FACE).
-If no face is found, trigger an error."
+If ERROR-ME, trigger an error if no face is found; otherwise, return nil."
   (or (subface face name)
       (loop :with names := (list name)
 	    :for child := face :then (parent child)
@@ -278,7 +278,7 @@ This involves:
 (defun copy-face (face)
   "Return a copy of FACE.
 This function does not consider FACE as a face tree: only face properties are
-copied; the face parent or children are set to nil."
+copied; the face parent and children are set to nil."
   (let ((new-face (copy-instance face)))
     (setf (slot-value new-face 'parent) nil)
     (setf (slot-value new-face 'subfaces) nil)
