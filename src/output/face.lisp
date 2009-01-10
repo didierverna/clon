@@ -220,7 +220,7 @@ etc. If PARENT-NAME does not name one of FACE's ancestors, trigger an error."
 	:for parent := (parent face) :then (parent parent)
 	:while parent
 	:when (eql (name parent) parent-name)
-	:do (return generation)
+	:return generation
 	:finally (error "Parent face ~A for face ~A not found."
 			parent-name (name face))))
 
