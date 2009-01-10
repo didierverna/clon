@@ -111,6 +111,11 @@
   "Return t if FACE's display property is not :hidden."
   (not (eq (display face) :hidden)))
 
+(defun add-subface (face subface)
+  "Add SUBFACE to FACE's subfaces and return it."
+  (setf (slot-value subface 'parent) face)
+  (push subface (slot-value face 'subfaces))
+  subface)
 
 
 ;; =========================================================================
@@ -159,9 +164,7 @@ the original ones."
 	  (mapcar (lambda (subtree)
 		    (attach-face-tree new-tree subtree))
 		  (subfaces new-tree)))
-    (setf (slot-value new-tree 'parent) face)
-    (push new-tree (slot-value face 'subfaces))
-    new-tree))
+    (add-subface face new-tree)))
 
 (defgeneric subface (face |name(s)|)
   (:documentation "Return subface of FACE named NAME(S) or nil.
@@ -275,7 +278,7 @@ This involves:
 (defun copy-face (face)
   "Return a copy of FACE.
 This function does not consider FACE as a face tree: only face properties are
-copied; the face parent of children are set to nil."
+copied; the face parent or children are set to nil."
   (let ((new-face (copy-instance face)))
     (setf (slot-value new-face 'parent) nil)
     (setf (slot-value new-face 'subfaces) nil)

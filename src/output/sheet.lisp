@@ -376,78 +376,71 @@ If the face can't be found in FACE tree, find one in RAW-FACE tree instead,
 and make a copy of it."
   (let* ((new-raw-face (find-face raw-face name :error-me))
 	 (new-face (or (find-face face name)
-		       (let ((new-face (copy-face new-raw-face)))
-			 ;; #### FIXME: I need a add-subface function
-			 (setf (slot-value new-face 'parent) face)
-			 (push new-face (slot-value face 'subfaces))
-			 new-face))))
+		       (add-subface face (copy-face new-raw-face)))))
     (values new-face new-raw-face)))
 
 
 (defun open-face-1 (sheet face raw-face)
-  ;(:documentation "Open FACE on SHEET.")
-  ;(:method (sheet (face face))
-    "Create a frame for FACE and open it."
-    (assert (visiblep face))
-    ;; Create the new frame:
-    (let ((left-margin
-	   (let ((padding-spec (left-padding face)))
-	     (econd ((eq padding-spec :self)
-		     (column sheet))
-		    ((listp padding-spec)
-		     (destructuring-bind (padding relative-to &optional face-name)
-			 padding-spec
-		       (econd ((or (eq relative-to :absolute)
-				   (and (eq relative-to :relative-to)
-					(eq face-name :sheet)))
-			       ;; Absolute positions are OK as long as we
-			       ;; don't roll back outside the enclosing frame.
-			       (max padding (current-left-margin sheet)))
-			      ((and (eq relative-to :relative-to)
-				    (symbolp face-name))
-			       (let* ((generation
-				       (parent-generation face face-name))
-				      (left-margin
-				       (frame-left-margin
-					;; #### WARNING: we have not open the
-					;; new frame yet, so decrement the
-					;; generation level !!
-					(nth (1- generation) (frames sheet)))))
-				 (incf padding left-margin)
-				 (safe-padding sheet padding))))))
-		    ((numberp padding-spec)
-		     (incf padding-spec (current-left-margin sheet))
-		     (safe-padding sheet padding-spec))))))
-      (push-frame sheet
-		  (if (highlightp sheet)
-		      (let ((highlight-property-instances
-			     (loop :for property :in *highlight-properties*
-				   :when (face-highlight-property-set-p
-					  face property)
-				   :collect (make-highlight-property-instance
-					     :name property
-					     :value
-					     (face-highlight-property-value
-					      face property)))))
-			(make-highlight-frame :raw-face raw-face
-					      :face face
-					      :left-margin left-margin
-					      :highlight-property-instances
-					      highlight-property-instances))
-		      (make-frame :raw-face raw-face
-				  :face face
-				  :left-margin left-margin))))
-    ;; Open the new frame:
-    (open-frame sheet (current-frame sheet)))
+  "Create a frame for FACE and open it."
+  (assert (visiblep face))
+  ;; Create the new frame:
+  (let ((left-margin
+	 (let ((padding-spec (left-padding face)))
+	   (econd ((eq padding-spec :self)
+		   (column sheet))
+		  ((listp padding-spec)
+		   (destructuring-bind (padding relative-to &optional face-name)
+		       padding-spec
+		     (econd ((or (eq relative-to :absolute)
+				 (and (eq relative-to :relative-to)
+				      (eq face-name :sheet)))
+			     ;; Absolute positions are OK as long as we
+			     ;; don't roll back outside the enclosing frame.
+			     (max padding (current-left-margin sheet)))
+			    ((and (eq relative-to :relative-to)
+				  (symbolp face-name))
+			     (let* ((generation
+				     (parent-generation face face-name))
+				    (left-margin
+				     (frame-left-margin
+				      ;; #### WARNING: we have not open the
+				      ;; new frame yet, so decrement the
+				      ;; generation level !!
+				      (nth (1- generation) (frames sheet)))))
+			       (incf padding left-margin)
+			       (safe-padding sheet padding))))))
+		  ((numberp padding-spec)
+		   (incf padding-spec (current-left-margin sheet))
+		   (safe-padding sheet padding-spec))))))
+    (push-frame sheet
+		(if (highlightp sheet)
+		    (let ((highlight-property-instances
+			   (loop :for property :in *highlight-properties*
+				 :when (face-highlight-property-set-p
+					face property)
+				 :collect (make-highlight-property-instance
+					   :name property
+					   :value
+					   (face-highlight-property-value
+					    face property)))))
+		      (make-highlight-frame :raw-face raw-face
+					    :face face
+					    :left-margin left-margin
+					    :highlight-property-instances
+					    highlight-property-instances))
+		    (make-frame :raw-face raw-face
+				:face face
+				:left-margin left-margin))))
+  ;; Open the new frame:
+  (open-frame sheet (current-frame sheet)))
 
 (defun open-face (sheet name)
-;  (:method (sheet (name symbol))
-    "Find a face named NAME in SHEET's face tree and open it."
-    (multiple-value-bind (face raw-face)
-	(find-sheet-face (current-face sheet)
-			 (current-raw-face sheet)
-			 name)
-      (open-face-1 sheet face raw-face)))
+  "Find a face named NAME in SHEET's face tree and open it."
+  (multiple-value-bind (face raw-face)
+      (find-sheet-face (current-face sheet)
+		       (current-raw-face sheet)
+		       name)
+    (open-face-1 sheet face raw-face)))
 
 (defun close-face (sheet)
   "Close SHEET's current face."
