@@ -374,11 +374,10 @@ PADDING is returned when it does not exceed SHEET's line width."
   "Find a face starting at either FACE or RAW-FACE named NAME.
 If the face can't be found in FACE tree, find one in RAW-FACE tree instead,
 and make a copy of it."
-  (let* ((new-raw-face (find-face raw-face name :error-me))
-	 (new-face (or (find-face face name)
+  (let* ((new-raw-face (search-face raw-face name :error-me))
+	 (new-face (or (search-face face name)
 		       (add-subface face (copy-face new-raw-face)))))
     (values new-face new-raw-face)))
-
 
 (defun open-face-1 (sheet face raw-face)
   "Create a frame for FACE and open it."

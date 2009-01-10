@@ -169,7 +169,7 @@ the original ones."
 (defgeneric subface (face |name(s)|)
   (:documentation "Return subface of FACE named NAME(S) or nil.
 If a list of names is provided instead of a single one, follow a subface
-branch matching those names to find the last one.")
+branch matching those names to find the leaf face.")
   (:method (face (name symbol))
     "Return FACE'subface named NAME, or nil."
     (find name (subfaces face) :key #'name))
@@ -181,11 +181,11 @@ branch matching those names to find the last one.")
 	  (when branch
 	    (subface branch (cdr names)))))))
 
-(defun search-face (face names)
-  "Search for a face branch named NAMES starting at FACE.
+(defun search-branch (face names)
+  "Search for a branch of faces named NAMES starting at FACE.
 The branch is searched for as a direct subbranch of FACE, or as a direct
-subbranch of one of FACE's parents.
-Return the leaf face or nil."
+subbranch of FACE's ancestors.
+If a branch is found, return its leaf face. Otherwise return nil."
   (or (subface face names)
       (loop :for parent := (parent face) :then (parent parent)
 	    :while parent
@@ -194,8 +194,8 @@ Return the leaf face or nil."
 	    :return found
 	    :finally (return nil))))
 
-(defun find-face (face name &optional error-me)
-  "Find a face named NAME starting at FACE.
+(defun search-face (face name &optional error-me)
+  "Search for a face named NAME starting at FACE.
 The face is looked for as a direct subface of FACE (in which case it is simply
 returned), or up in the hierarchy and by successive upper branches (in which
 case it is copied and attached to FACE).
@@ -205,7 +205,7 @@ If ERROR-ME, trigger an error if no face is found; otherwise, return nil."
 	    :for child := face :then (parent child)
 	    :for parent := (parent child) :then (parent parent)
 	    :while parent
-	    :for found := (search-face parent names)
+	    :for found := (search-branch parent names)
 	    :if found
 	    :return (attach-face-tree face found)
 	    :else
