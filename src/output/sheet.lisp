@@ -194,12 +194,23 @@ tabs are forbidden here."
 ;; Logical output
 ;; --------------
 
+(defstruct sface
+  "The SFace structure.
+An SFace is the association of a face and its raw sibling. The sibling is used
+to create subfaces which would be missing from the original one."
+  face
+  sibling)
+
 (defstruct frame
   "The FRAME structure.
 This structure hold layout properties used for printing."
-  face
-  raw-face
+  sface
   left-margin)
+
+;; convenience shortcut
+(defun frame-face (frame)
+  "Return FRAME's face."
+  (sface-face (frame-sface frame)))
 
 (defstruct highlight-property-instance
   "The HIGHLIGHT-PROEPRTY-INSTANCE structure."
@@ -212,17 +223,15 @@ This structure holds both layout and highlight properties used for printing."
   highlight-property-instances)
 
 ;; Shortcut accessors to the top frame:
+(defun current-sface (sheet)
+  "Return SHEET's current sface or nil."
+  (when (frames sheet)
+    (frame-sface (current-frame sheet))))
+
 (defun current-face (sheet)
   "Return SHEET's current face or nil."
-  (if (frames sheet)
-      (frame-face (current-frame sheet))
-      nil))
-
-(defun current-raw-face (sheet)
-  "Return SHEET's current raw face or nil."
-  (if (frames sheet)
-      (frame-raw-face (current-frame sheet))
-      nil))
+  (when (frames sheet)
+    (sface-face (current-sface sheet))))
 
 (defun current-left-margin (sheet)
   "Return SHEET's current left margin or 0."
@@ -370,21 +379,21 @@ PADDING is returned when it does not exceed SHEET's line width."
 	padding)
       (column sheet)))
 
-(defun find-sheet-face (face raw-face name)
-  "Find a face starting at either FACE or RAW-FACE named NAME.
-If the face can't be found in FACE tree, find one in RAW-FACE tree instead,
-and make a copy of it."
-  (let* ((new-raw-face (search-face raw-face name :error-me))
-	 (new-face (or (search-face face name)
-		       (add-subface face (copy-face new-raw-face)))))
-    (values new-face new-raw-face)))
+(defun find-sface (sface name)
+  "Find a face starting at SFACE named NAME.
+If the face can't be found in SFACE's face tree, find one in SFACE's sibling
+instead, and make a copy of it."
+  (let* ((sibling (search-face (sface-sibling sface) name :error-me))
+	 (face (or (search-face (sface-face sface) name)
+		   (add-subface (sface-face sface) (copy-face sibling)))))
+    (make-sface :face face :sibling sibling)))
 
-(defun open-face-1 (sheet face raw-face)
-  "Create a frame for FACE and open it."
-  (assert (visiblep face))
+(defun open-sface (sheet sface)
+  "Create a frame for SFACE and open it."
+  (assert (visiblep (sface-face sface)))
   ;; Create the new frame:
   (let ((left-margin
-	 (let ((padding-spec (left-padding face)))
+	 (let ((padding-spec (left-padding (sface-face sface))))
 	   (econd ((eq padding-spec :self)
 		   (column sheet))
 		  ((listp padding-spec)
@@ -399,7 +408,8 @@ and make a copy of it."
 			    ((and (eq relative-to :relative-to)
 				  (symbolp face-name))
 			     (let* ((generation
-				     (parent-generation face face-name))
+				     (parent-generation (sface-face sface)
+							face-name))
 				    (left-margin
 				     (frame-left-margin
 				      ;; #### WARNING: we have not open the
@@ -416,30 +426,23 @@ and make a copy of it."
 		    (let ((highlight-property-instances
 			   (loop :for property :in *highlight-properties*
 				 :when (face-highlight-property-set-p
-					face property)
+					(sface-face sface) property)
 				 :collect (make-highlight-property-instance
 					   :name property
 					   :value
 					   (face-highlight-property-value
-					    face property)))))
-		      (make-highlight-frame :raw-face raw-face
-					    :face face
+					    (sface-face sface) property)))))
+		      (make-highlight-frame :sface sface
 					    :left-margin left-margin
 					    :highlight-property-instances
 					    highlight-property-instances))
-		    (make-frame :raw-face raw-face
-				:face face
-				:left-margin left-margin))))
+		    (make-frame :sface sface :left-margin left-margin))))
   ;; Open the new frame:
   (open-frame sheet (current-frame sheet)))
 
 (defun open-face (sheet name)
   "Find a face named NAME in SHEET's face tree and open it."
-  (multiple-value-bind (face raw-face)
-      (find-sheet-face (current-face sheet)
-		       (current-raw-face sheet)
-		       name)
-    (open-face-1 sheet face raw-face)))
+  (open-sface sheet (find-sface (current-sface sheet) name)))
 
 (defun close-face (sheet)
   "Close SHEET's current face."
@@ -459,33 +462,32 @@ and make a copy of it."
 ;; The Print Help Protocol
 ;; =========================================================================
 
-(defun help-spec-items-will-print (face raw-face items)
+(defun help-spec-items-will-print (sface items)
   "Return t if at least one of ITEMS will print under FACE."
-  (and (visiblep face)
+  (and (visiblep (sface-face sface))
        (some (lambda (help-spec)
-	       (help-spec-will-print face raw-face help-spec))
+	       (help-spec-will-print sface help-spec))
 	     items)))
 
-(defgeneric help-spec-will-print (face raw-face help-spec)
+(defgeneric help-spec-will-print (sface help-spec)
   (:documentation
    "Return t if HELP-SPEC will print under FACE.")
-  (:method (face raw-face help-spec)
+  (:method (sface help-spec)
     "Basic help specifications (chars, strings etc) do print."
     t)
-  (:method (face raw-face (help-spec list))
+  (:method (sface (help-spec list))
     "Return t if HELP-SPEC's items will print under HELP-SPEC's face."
-    (multiple-value-bind (subface raw-subface)
-	(find-sheet-face face raw-face (car help-spec))
-      (help-spec-items-will-print subface raw-subface (cdr help-spec)))))
+    (help-spec-items-will-print (find-sface sface (car help-spec))
+				(cdr help-spec))))
 
-(defgeneric get-separator (face raw-face help-spec)
+(defgeneric get-separator (sface help-spec)
   (:documentation "Get HELP-SPEC's separator under FACE.")
-  (:method (face raw-face help-spec)
+  (:method (sface help-spec)
     "Basic help specifications (chars, strings etc) don't provide a separator."
     nil)
-  (:method (face raw-face (help-spec list))
+  (:method (sface (help-spec list))
     "Return the separator of HELP-SPEC's face."
-    (separator (find-sheet-face face raw-face (car help-spec)))))
+    (separator (sface-face (find-sface sface (car help-spec))))))
 
 ;; #### NOTE: this is where I would like more dispatch capability from CLOS.
 ;; Something like defmethod print-help-spec (sheet (help-spec (list symbol *)))
@@ -493,16 +495,12 @@ and make a copy of it."
   "Print all help specification ITEMS on SHEET with the current face."
   (loop :for help-specs :on items
 	:do
-	(when (help-spec-will-print (current-face sheet)
-				    (current-raw-face sheet)
-				    (car help-specs))
+	(when (help-spec-will-print (current-sface sheet) (car help-specs))
 	  (print-help-spec sheet (car help-specs))
 	  (when (and (cdr help-specs)
-		     (help-spec-items-will-print (current-face sheet)
-						 (current-raw-face sheet)
+		     (help-spec-items-will-print (current-sface sheet)
 						 (cdr help-specs)))
-	    (let ((separator (get-separator (current-face sheet)
-					    (current-raw-face sheet)
+	    (let ((separator (get-separator (current-sface sheet)
 					    (car help-specs))))
 	      (if separator
 		  (print-help-spec sheet separator)
@@ -536,10 +534,11 @@ and make a copy of it."
 	     ;; which case we have the list of synopsis and all synopsis
 	     ;; items.
 	     help
-	     (list help))))
-    (when (help-spec-items-will-print (face-tree sheet) (raw-face-tree sheet)
-				      items)
-      (open-face-1 sheet (face-tree sheet) (raw-face-tree sheet))
+	     (list help)))
+	(sface (make-sface :face (face-tree sheet)
+			   :sibling (raw-face-tree sheet))))
+    (when (help-spec-items-will-print sface items)
+      (open-sface sheet sface)
       (print-help-spec-items sheet items)
       (close-face sheet))))
 
