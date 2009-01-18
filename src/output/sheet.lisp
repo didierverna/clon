@@ -107,14 +107,14 @@ If REVERSE, map in reverse order."
 Each clause looks like: (PROPERTY-NAME (VALUE-OR-VALUE-LIST ESCAPE-SEQUENCE)*).
 The value-matching part will itself be enclosed in an ECASE expression.
 In addition, the special clause syntax (BOOLEAN <PROPERTY-NAME> <YES> <NO>)
-is a shortcut for: (PROPERTY-NAME ((:on t) YES) ((:off nil) NO))."
+is a shortcut for: (PROPERTY-NAME ((on t) YES) ((off nil) NO))."
   `(ecase ,property
     ,@(mapcar (lambda (clause)
 		(if (eq (car clause) 'boolean)
 		    `(,(cadr clause)
 		      (ecase ,value
-			((:on t)    ,(caddr  clause))
-			((:off nil) ,(cadddr clause))))
+			((on t)    ,(caddr  clause))
+			((off nil) ,(cadddr clause))))
 		    `(,(car clause)
 		      (ecase ,value
 			,@(cdr clause)))))
@@ -126,22 +126,22 @@ is a shortcut for: (PROPERTY-NAME ((:on t) YES) ((:off nil) NO))."
       (highlight-property-instance-name instance)
       (highlight-property-instance-value instance)
     ;; FAINT is not well supported
-    (intensity (:bold 1) (:faint 2) ((:normal nil) 22))
+    (intensity (bold 1) (faint 2) ((normal nil) 22))
     (boolean italicp 3 23)
     ;; DOUBLE is not well supported
-    (underline ((:single :on t) 4) (:double 21) ((:none :off nil) 24))
+    (underline ((single on t) 4) (double 21) ((none off nil) 24))
     ;; RAPID is not well supported
-    (blink ((:slow :on t) 5) (:rapid 6) ((:off nil) 25))
+    (blink ((slow on t) 5) (rapid 6) ((off nil) 25))
     (boolean inversep 7 27)
     (boolean concealedp 8 28)
     ;; I've seen the following two properties in some code, but I'm not sure
     ;; I've seen them work anywhere.
     (boolean crossed-out-p 9 29)
     (boolean framedp 51 54)
-    (foreground (:black 30) (:red 31) (:green 32) (:yellow 33) (:blue 34)
-		(:magenta 35) (:cyan 36) (:white 37) ((:reset nil) 39))
-    (background (:black 40) (:red 41) (:green 42) (:yellow 43) (:blue 44)
-		(:magenta 45) (:cyan 46) (:white 47) ((:reset nil) 49))))
+    (foreground (black 30) (red 31) (green 32) (yellow 33) (blue 34)
+		(magenta 35) (cyan 36) (white 37) ((reset nil) 39))
+    (background (black 40) (red 41) (green 42) (yellow 43) (blue 44)
+		(magenta 45) (cyan 46) (white 47) ((reset nil) 49))))
 
 (defun princ-highlight-property-instances (sheet instances)
   "Princ highlight proeprty INSTANCES on SHEET's stream."
@@ -254,8 +254,8 @@ This structure holds both layout and highlight properties used for printing."
   (:documentation "Close FRAME on SHEET.")
   (:method-combination progn :most-specific-last)
   (:method progn (sheet (frame frame))
-    "Reach the the end of line if FRAME's face has a :block display property."
-    (when (eq (display (frame-face frame)) :block)
+    "Reach the the end of line if FRAME's face has a BLOCK display property."
+    (when (eq (display (frame-face frame)) 'block)
       (reach-column sheet (line-width sheet))))
   (:method progn (sheet (frame highlight-frame))
     "Restore the upper frame's highlight properties."
@@ -396,12 +396,12 @@ instead, and make a copy of it."
     ;; Create the new frame:
     (let ((left-margin
 	   (let ((padding-spec (left-padding (sface-face sface))))
-	     (econd ((eq padding-spec :self)
+	     (econd ((eq padding-spec 'self)
 		     (column sheet))
 		    ((listp padding-spec)
 		     (destructuring-bind (padding relative-to &optional face-name)
 			 padding-spec
-		       (econd ((or (eq relative-to :absolute)
+		       (econd ((or (eq relative-to 'absolute)
 				   (and (eq relative-to :relative-to)
 					(eq face-name :sheet)))
 			       ;; Absolute positions are OK as long as we

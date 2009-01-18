@@ -14,25 +14,25 @@
 
 ;;; Code:
 
-:display :block
+:display block
 :item-separator #\newline
 
-:face (synopsis :display :hidden)
+:face (synopsis :display hidden)
 
-:face (text :display :hidden)
+:face (text :display hidden)
 
 :face (option :left-padding 2
-	      :display :block
+	      :display block
 	      :face (syntax :item-separator ", "
 			    :face (short-name :item-separator nil
 					      :face argument)
 			    :face (long-name  :item-separator nil
 					      :face argument))
-	      :face (description :display :hidden))
+	      :face (description :display hidden))
 
-:face (group :display :block
+:face (group :display block
 	     :item-separator #\newline
-	     :face (title :display :hidden))
+	     :face (title :display hidden))
 
 
 ;;; optlist.cth ends here

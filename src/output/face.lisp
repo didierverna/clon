@@ -51,7 +51,7 @@
    ;; Layout properties:
    (display :documentation "The face display mode."
 	    :initarg :display
-	    :initform :inline
+	    :initform 'inline
 	    :reader display)
    (left-padding :documentation "The face left padding."
 		 :initarg :left-padding
@@ -108,8 +108,8 @@
   (:documentation "The FACE class."))
 
 (defun visiblep (face)
-  "Return t if FACE's display property is not :hidden."
-  (not (eq (display face) :hidden)))
+  "Return t if FACE's display property is not HIDDEN."
+  (not (eq (display face) 'hidden)))
 
 (defun add-subface (face subface)
   "Add SUBFACE to FACE's subfaces and return it."
@@ -242,7 +242,7 @@ This involves:
   (apply #'call-next-method instance
 	 :subfaces (remove :face (select-keys keys :face))
 	 (replace-keys keys :face
-		       '(:bold :intensity (t :bold) (nil :normal))
+		       '(:bold :intensity (t bold) (nil normal))
 		       '(:revealed :concealed (t nil) (nil t)))))
 
 ;; #### NOTE: we use the NAME keyword here because we're in the before method,
@@ -302,20 +302,20 @@ copied; the face parent and children are set to nil."
 (defun make-raw-face-tree ()
   "Make a raw (boring yet functional) face tree."
   (make-face-tree '(toplevel
-		    :display :block
+		    :display block
 		    :item-separator #\newline
 		    :face (synopsis
-			   :display :block
+			   :display block
 			   :separator #(#\newline #\newline)
 			   :face program
 			   :face minus-pack
 			   :face plus-pack
 			   :face options
 			   :face postfix)
-		    :face (text :display :block)
+		    :face (text :display block)
 		    :face (option
 			   :left-padding 2
-			   :display :block
+			   :display block
 			   :face (syntax
 				  :item-separator ", "
 				  :face (short-name
@@ -325,14 +325,14 @@ copied; the face parent and children are set to nil."
 					 :item-separator nil
 					 :face argument))
 			   :face (description
-				  :display :block
-				  :left-padding (30 :absolute)
+				  :display block
+				  :left-padding (30 absolute)
 				  :item-separator #\newline
 				  :face (fallback :face value)
 				  :face (default :face value)
 				  :face (environment :face variable)))
 		    :face (group
-			   :display :block
+			   :display block
 			   :item-separator #\newline
 			   :face title))))
 

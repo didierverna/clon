@@ -16,31 +16,31 @@
 
 ;;; Code:
 
-:display :block
+:display block
 :item-separator #\newline
 
-:face (synopsis :display :block
+:face (synopsis :display block
 		:bold t
 		:separator #(#\newline #\newline))
 
-:face (text :display :block)
+:face (text :display block)
 
 :face (option :left-padding 2
-	      :display :block
+	      :display block
 	      :face (syntax :bold t
 			    :item-separator ", "
 			    :face (short-name :item-separator nil
 					      :face argument)
 			    :face (long-name  :item-separator nil
 					      :face argument))
-	      :face (description :display :block
-				 :left-padding (30 :absolute)
+	      :face (description :display block
+				 :left-padding (30 absolute)
 				 :item-separator #\newline
 				 :face (fallback :face value)
 				 :face (default :face value)
 				 :face (environment :face variable)))
 
-:face (group :display :block
+:face (group :display block
 	     :item-separator #\newline
 	     :face (title :bold t))
 

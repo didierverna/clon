@@ -15,13 +15,13 @@
 
 ;;; Code:
 
-:display :block
+:display block
 :item-separator #\newline
 
 :face (synopsis :bold t
 		:separator #(#\newline #\newline))
 
-:face (text :display :hidden)
+:face (text :display hidden)
 
 :face (option :left-padding 2
 	      :separator ", "
@@ -30,7 +30,7 @@
 					      :face argument)
 			    :face (long-name  :item-separator nil
 					      :face argument))
-	      :face (description :display :hidden))
+	      :face (description :display hidden))
 
 :face (group :face (title :bold t))
 
