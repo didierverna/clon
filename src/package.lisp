@@ -47,7 +47,6 @@
 	   :+release-status+ :+release-status-level+
 	   :+release-name+
 	   :version
-	   :add-to :seal
 	   :make-text
 	   :make-flag
 	   :make-switch

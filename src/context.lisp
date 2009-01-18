@@ -35,6 +35,10 @@
 (in-readtable :clon)
 
 
+(defvar *current-context* nil "The current context.")
+
+
+
 ;; ==========================================================================
 ;; Command-line error management (not regarding known options)
 ;; ==========================================================================
@@ -205,12 +209,13 @@ options based on it."))
 ;; option for OUTPUT-STREAM. At the end-user level, you can redirect to a file
 ;; from the shell.
 
-(defun help (context &key (item (synopsis context))
-			  (output-stream *standard-output*)
-			  (search-path (search-path context))
-			  (theme (theme context))
-			  (line-width (line-width context))
-			  (highlight (highlight context)))
+(defun help (&key (context *current-context*)
+		  (item (synopsis context))
+		  (output-stream *standard-output*)
+		  (search-path (search-path context))
+		  (theme (theme context))
+		  (line-width (line-width context))
+		  (highlight (highlight context)))
   "Print CONTEXT's help."
   (let ((sheet (make-sheet :output-stream output-stream
 			   :search-path search-path
@@ -295,9 +300,10 @@ When such an option exists, return two values:
 ;; The Option Retrieval Protocol
 ;; ==========================================================================
 
-(defun getopt (context &rest keys
-		       &key short-name long-name option
-			    (error-handler (getopt-error-handler context)))
+(defun getopt (&rest keys
+	       &key (context *current-context*)
+		    short-name long-name option
+		   (error-handler (getopt-error-handler context)))
   "Get an option's value in CONTEXT.
 The option can be specified either by SHORT-NAME, LONG-NAME, or directly via
 an OPTION object.
@@ -310,7 +316,8 @@ This function returns two values:
 - the value's source."
   (unless option
     (setq option
-	  (apply #'search-option context (remove-keys keys :error-handler))))
+	  (apply #'search-option context
+		 (remove-keys keys :context :error-handler))))
   (unless option
     (error "Getting option ~S from synopsis ~A in context ~A: unknown option."
 	   (or short-name long-name)
@@ -355,7 +362,7 @@ This function returns two values:
 	     (slot-boundp option 'default-value))
     (values (default-value option) (list :default-value))))
 
-(defun getopt-cmdline (context)
+(defun getopt-cmdline (&key (context *current-context*))
   "Get the next cmdline option in CONTEXT.
 This function returns three values:
 - the option object,
@@ -367,20 +374,25 @@ This function returns three values:
 	      (cmdline-option-name cmdline-option)
 	      (cmdline-option-value cmdline-option)))))
 
-(defmacro multiple-value-getopt-cmdline ((option name value) context &body body)
+(defmacro multiple-value-getopt-cmdline
+    ((option name value &key context) &body body)
   "Evaluate BODY on the next command-line option in CONTEXT.
 OPTION, NAME and VALUE are bound to the option's object, name used on the
 command-line) and retrieved value."
-  `(multiple-value-bind (,option ,name ,value) (getopt-cmdline ,context)
+  `(multiple-value-bind (,option ,name ,value)
+    (getopt-cmdline :context (or ,context *current-context*))
     ,@body))
 
-(defmacro do-cmdline-options ((option name value) context &body body)
+(defmacro do-cmdline-options
+    ((option name value &key context) &body body)
   "Evaluate BODY over all command-line options in CONTEXT.
 OPTION, NAME and VALUE are bound to each option's object, name used on the
 command-line) and retrieved value."
-  `(do () ((null (cmdline-options ,context)))
-    (multiple-value-getopt-cmdline (,option ,name ,value) ,context
-      ,@body)))
+  (let ((ctx (gensym "context")))
+    `(let ((,ctx (or ,context *current-context*)))
+      (do () ((null (cmdline-options ,ctx)))
+	(multiple-value-getopt-cmdline (,option ,name ,value :context ,ctx)
+	   ,@body)))))
 
 
 
@@ -647,7 +659,7 @@ CONTEXT is where to look for the options."
       (setf (cmdline-options context) (nreverse cmdline-options))
       (setf (slot-value context 'remainder) remainder)))
   ;; Step two: handle internal options ======================================
-  (when (getopt context :long-name "clon-banner")
+  (when (getopt :context context :long-name "clon-banner")
     (format t "~A is powered by the Clon library, version ~A,
 written by Didier Verna <didier@lrde.epita.fr>.
 
@@ -657,24 +669,25 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.~%"
       (pathname-name (progname context))
       (version :long))
     (quit 0))
-  (let ((version-format (getopt context :long-name "clon-version")))
+  (let ((version-format (getopt :context context :long-name "clon-version")))
     (when version-format
       (format t "~A~%" (version version-format))
       (quit 0)))
   (setf (slot-value context 'search-path)
-	(getopt context :long-name "clon-search-path"))
+	(getopt :context context :long-name "clon-search-path"))
   (setf (slot-value context 'theme)
-	(getopt context :long-name "clon-theme"))
+	(getopt :context context :long-name "clon-theme"))
   (setf (slot-value context 'line-width)
-	(getopt context :long-name "clon-line-width"))
+	(getopt :context context :long-name "clon-line-width"))
   (setf (slot-value context 'highlight)
-	(getopt context :long-name "clon-highlight"))
-  (when (getopt context :long-name "clon-help")
-    (help context :item (clon-options-group context))
+	(getopt :context context :long-name "clon-highlight"))
+  (when (getopt :context context :long-name "clon-help")
+    (help :context context :item (clon-options-group context))
     (quit 0)))
 
 (defun make-context
-    (&rest keys &key synopsis error-handler getopt-error-handler cmdline)
+    (&rest keys
+     &key synopsis error-handler getopt-error-handler cmdline (make-current t))
   "Make a new context.
 - SYNOPSIS is the program synopsis to use in that context.
 - ERROR-HANDLER is the behavior to adopt on errors at command-line parsing time.
@@ -687,9 +700,14 @@ in the functions themselves). It can be one of:
   * :quit, meaning print the error and abort execution,
   * :none, meaning let the debugger handle the situation.
 - CMDLINE is the argument list (strings) to process.
-  It defaults to a POSIX conformant argv."
+  It defaults to a POSIX conformant argv.
+- If MAKE-CURRENT, make the new context current."
   (declare (ignore synopsis error-handler getopt-error-handler cmdline))
-  (apply #'make-instance 'context keys))
+  (let ((context (apply #'make-instance 'context
+			(remove-keys keys :make-current))))
+    (when make-current
+      (setq *current-context* context))
+    context))
 
 
 ;;; context.lisp ends here
