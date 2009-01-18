@@ -42,21 +42,41 @@
     :+release-status+ :+release-status-level+
     :+release-name+
     :version)
-  (:export :+release-major-level+
-	   :+release-minor-level+
-	   :+release-status+ :+release-status-level+
-	   :+release-name+
-	   :version
-	   :make-text
-	   :make-flag
-	   :make-switch
-	   :make-stropt :make-enum :make-xswitch :make-lispobj :make-path
-	   :make-group :defgroup
-	   :make-synopsis :defsynopsis
-	   :make-context
-	   :getopt
-	   :getopt-cmdline :multiple-value-getopt-cmdline :do-cmdline-options
-	   :help))
+  (:export
+   ;; From clon.asd:
+   :+release-major-level+
+   :+release-minor-level+
+   :+release-status+
+   :+release-status-level+
+   :+release-name+
+   :version
+   ;; From text.lisp:
+   :make-text
+   ;; From options/flag.lisp:
+   :make-flag
+   ;; From options/switch.lisp:
+   :make-switch
+   ;; From options/stropt.lisp:
+   :make-stropt
+   ;; From options/lispobj.lisp:
+   :make-lispobj
+   ;; From options/path.lisp:
+   :make-path
+   ;; From options/enum.lisp:
+   :make-enum
+   ;; From options/xswitch.lisp:
+   :make-xswitch
+   ;; From group.lisp:
+   :make-group :defgroup
+   ;; From synopsis.lisp:
+   :make-synopsis :defsynopsis
+   ;; From context.lisp:
+   :make-context
+   :getopt
+   :getopt-cmdline
+   :multiple-value-getopt-cmdline
+   :do-cmdline-options
+   :help))
 
 
 (in-package :clon)
