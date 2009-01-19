@@ -10,8 +10,8 @@
 
 ;; Contents management by FCM version 0.1.
 
-;; This is the default boring theme used internally by Clon when no other
-;; theme is specified or can be found.
+;; This is the equivalent of the default theme used internally by Clon when no
+;; other theme is specified or can be found.
 
 
 ;;; Code:
@@ -20,20 +20,17 @@
 :item-separator #\newline
 
 :face (synopsis :display block :separator #(#\newline #\newline))
+
 :face (text :display block)
+
 :face (option :left-padding 2
 	      :display block
 	      :face (syntax :item-separator ", "
-			    :face (short-name :item-separator nil
-					      :face argument)
-			    :face (long-name  :item-separator nil
-					      :face argument))
+			    :face (short-name :item-separator nil)
+			    :face (long-name  :item-separator nil))
 	      :face (description :display block
 				 :left-padding (30 absolute)
-				 :item-separator #\newline
-				 :face (fallback :face value)
-				 :face (default :face value)
-				 :face (environment :face variable)))
+				 :item-separator #\newline))
 
 :face (group :display block :item-separator #\newline)
 
