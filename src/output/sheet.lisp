@@ -396,33 +396,37 @@ instead, and make a copy of it."
     ;; Create the new frame:
     (let ((left-margin
 	   (let ((padding-spec (left-padding (sface-face sface))))
-	     (econd ((eq padding-spec 'self)
-		     (column sheet))
-		    ((listp padding-spec)
-		     (destructuring-bind (padding relative-to &optional face-name)
-			 padding-spec
-		       (econd ((or (eq relative-to 'absolute)
-				   (and (eq relative-to :relative-to)
-					(eq face-name :sheet)))
-			       ;; Absolute positions are OK as long as we
-			       ;; don't roll back outside the enclosing frame.
-			       (max padding (current-left-margin sheet)))
-			      ((and (eq relative-to :relative-to)
-				    (symbolp face-name))
-			       (let* ((generation
-				       (parent-generation (sface-face sface)
-							  face-name))
-				      (left-margin
-				       (frame-left-margin
-					;; #### WARNING: we have not open the
-					;; new frame yet, so decrement the
-					;; generation level !!
-					(nth (1- generation) (frames sheet)))))
-				 (incf padding left-margin)
-				 (safe-padding sheet padding))))))
-		    ((numberp padding-spec)
-		     (incf padding-spec (current-left-margin sheet))
-		     (safe-padding sheet padding-spec))))))
+	     (econd
+	      ((eq padding-spec 'self)
+	       (column sheet))
+	      ((numberp padding-spec)
+	       (safe-padding sheet (+ padding-spec (current-left-margin sheet))))
+	      ((listp padding-spec)
+	       (safe-padding sheet
+			     (destructuring-bind
+				   (padding relative-to &optional face-name)
+				 padding-spec
+			       ;; #### FIXME: should provide a better error
+			       ;; message
+			       (econd
+				((and (eq relative-to 'absolute)
+				      (null face-name))
+				 ;; Absolute positions are OK as long as we
+				 ;; don't roll back outside the enclosing
+				 ;; frame.
+				 (max padding (current-left-margin sheet)))
+				((and (eq relative-to :relative-to)
+				      (symbolp face-name))
+				 (let* ((generation
+					 (parent-generation (sface-face sface)
+							    face-name))
+					(left-margin
+					 (frame-left-margin
+					  ;; #### WARNING: we have not open
+					  ;; the new frame yet, so decrement
+					  ;; the generation level !!
+					  (nth (1- generation) (frames sheet)))))
+				   (+ padding left-margin)))))))))))
       (push-frame sheet
 		  (if (highlightp sheet)
 		      (let ((highlight-property-instances

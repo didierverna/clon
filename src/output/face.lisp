@@ -53,7 +53,13 @@
 	    :initarg :display
 	    :initform 'inline
 	    :reader display)
-   (left-padding :documentation "The face left padding."
+   (left-padding :documentation "The face left padding.
+This property can take the following forms:
+- <NUMBER>: the padding is relative to the enclosing face,
+- SELF: the padding is set to wherever the face happens to be opened,
+- (<NUMBER> ABSOLUTE): the padding is set in absolute value,
+- (<NUMBER> :RELATIVE-TO <FACE-NAME>): the padding is set relatively to a
+  parent face named FACE-NAME."
 		 :initarg :left-padding
 		 :initform 0
 		 :reader left-padding)
