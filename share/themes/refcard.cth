@@ -10,7 +10,10 @@
 
 ;; Contents management by FCM version 0.1.
 
-;; This is a theme providing a compact list of options by group.
+;; This theme provides a "reference card" compact layout. Elements displayed
+;; are program synopsis, option syntax and group titles. Neither plain text
+;; nor options descriptions appear in the output. Group titles appear in bold
+;; font and options are packed together per group.
 
 
 ;;; Code:
@@ -18,18 +21,14 @@
 :display block
 :item-separator #\newline
 
-:face (synopsis :bold t
-		:separator #(#\newline #\newline))
+:face (synopsis :bold t :separator #(#\newline #\newline))
 
 :face (text :display hidden)
 
 :face (option :left-padding 2
 	      :separator ", "
-	      :face (syntax :item-separator " "
-			    :face (short-name :item-separator nil
-					      :face argument)
-			    :face (long-name  :item-separator nil
-					      :face argument))
+	      :face (syntax :face (short-name :item-separator nil)
+			    :face (long-name  :item-separator nil))
 	      :face (description :display hidden))
 
 :face (group :face (title :bold t))
