@@ -76,3 +76,7 @@ a -d switch and a -v flag. Using -dv will lead to an invalid argument to -d,
 whereas the user probably meant -v -d (or -vd which works). We could improve
 the detection of this situation by catching the invalid argument error, and
 then trying a pack instead of immediately reporting the error.
+
+* Extend the [items-]separator face property
+Item separation would ideally depend on what's before or after the item being
+displayed. 
