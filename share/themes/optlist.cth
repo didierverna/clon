@@ -10,7 +10,9 @@
 
 ;; Contents management by FCM version 0.1.
 
-;; This is a theme providing only a list of option
+;; This theme provides only a list of options and their syntax, but without
+;; description. Group titles or plain texts are not displayed.
+
 
 ;;; Code:
 
@@ -24,10 +26,8 @@
 :face (option :left-padding 2
 	      :display block
 	      :face (syntax :item-separator ", "
-			    :face (short-name :item-separator nil
-					      :face argument)
-			    :face (long-name  :item-separator nil
-					      :face argument))
+			    :face (short-name :item-separator nil)
+			    :face (long-name  :item-separator nil))
 	      :face (description :display hidden))
 
 :face (group :display block
