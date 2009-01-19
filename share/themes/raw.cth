@@ -11,7 +11,8 @@
 ;; Contents management by FCM version 0.1.
 
 ;; This is the equivalent of the default theme used internally by Clon when no
-;; other theme is specified or can be found.
+;; other theme is specified or can be found. Options have an indentation of 2
+;; columns and their descriptions start at column 30.
 
 
 ;;; Code:
