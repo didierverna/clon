@@ -1,0 +1,48 @@
+;;; roomy.cth --- Roomy theme for Clon                            -*- lisp -*-
+
+;; Author:        Didier Verna <didier@lrde.epita.fr>
+;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
+;; Created:       Sun Jan  4 13:32:27 2009
+;; Last Revision: Sun Jan  4 13:38:20 2009
+
+
+;;; Commentary:
+
+;; Contents management by FCM version 0.1.
+
+;; This theme has a lot of space in it. Option descriptions start on their own
+;; line, groups and plain texts are separated by empty lines. Group titles
+;; appear in bold font, and option syntax is underlined.
+
+
+;;; Code:
+
+:display block
+:item-separator #\newline
+
+:face (synopsis :display block :separator #(#\newline #\newline))
+
+:face (text :display block
+	    :separator #(#\newline #\newline))
+
+:face (option :left-padding 2
+	      :display block
+	      :item-separator #\newline
+	      :face (syntax :item-separator ", "
+			    :underline t
+			    :face (short-name :item-separator nil)
+			    :face (long-name  :item-separator nil))
+	      :face (description :display block
+				 :left-padding 5
+				 :item-separator #\newline))
+
+:face (group :display block
+	     :separator #(#\newline #\newline)
+	     :item-separator #\newline
+	     :face (title :bold t)
+	     :face (group :left-padding 2
+			  :separator #(#\newline #\newline)
+			  :item-separator #\newline))
+
+
+;;; raw.cth ends here
