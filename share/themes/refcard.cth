@@ -25,7 +25,7 @@
 
 :face (text :display hidden)
 
-:face (option :left-padding 2
+:face (option :padding-left 2
 	      :separator ", "
 	      :face (syntax :face (short-name :item-separator nil)
 			    :face (long-name  :item-separator nil))

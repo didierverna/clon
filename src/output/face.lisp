@@ -60,7 +60,7 @@ This property can take the following forms:
 - (<NUMBER> ABSOLUTE): the padding is set in absolute value,
 - (<NUMBER> :RELATIVE-TO <FACE-NAME>): the padding is set relatively to a
   parent face named FACE-NAME."
-		 :initarg :left-padding
+		 :initarg :padding-left
 		 :initform 0
 		 :reader left-padding)
    (separator :documentation "The face separator."
@@ -270,12 +270,12 @@ This involves:
 
 (defun make-face (name
 		  &rest keys
-		  &key display left-padding separator item-separator face
+		  &key display padding-left separator item-separator face
 		       intensity bold italicp underline blink inverse
 		       concealed revealed crossed-out-p framedp
 		       foreground background)
   "Make a new face named NAME."
-  (declare (ignore display left-padding separator item-separator face
+  (declare (ignore display padding-left separator item-separator face
 		   intensity bold italicp underline blink inverse concealed
 		   revealed crossed-out-p framedp
 		   foreground background))
@@ -320,7 +320,7 @@ copied; the face parent and children are set to nil."
 			   :face postfix)
 		    :face (text :display block)
 		    :face (option
-			   :left-padding 2
+			   :padding-left 2
 			   :display block
 			   :face (syntax
 				  :item-separator ", "
@@ -332,7 +332,7 @@ copied; the face parent and children are set to nil."
 					 :face argument))
 			   :face (description
 				  :display block
-				  :left-padding (30 absolute)
+				  :padding-left (30 absolute)
 				  :item-separator #\newline
 				  :face (fallback :face value)
 				  :face (default :face value)

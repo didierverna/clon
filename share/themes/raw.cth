@@ -24,13 +24,13 @@
 
 :face (text :display block)
 
-:face (option :left-padding 2
+:face (option :padding-left 2
 	      :display block
 	      :face (syntax :item-separator ", "
 			    :face (short-name :item-separator nil)
 			    :face (long-name  :item-separator nil))
 	      :face (description :display block
-				 :left-padding (30 absolute)
+				 :padding-left (30 absolute)
 				 :item-separator #\newline))
 
 :face (group :display block :item-separator #\newline)

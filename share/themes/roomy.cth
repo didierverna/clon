@@ -25,7 +25,7 @@
 :face (text :display block
 	    :separator #(#\newline #\newline))
 
-:face (option :left-padding 2
+:face (option :padding-left 2
 	      :display block
 	      :item-separator #\newline
 	      :face (syntax :item-separator ", "
@@ -33,14 +33,14 @@
 			    :face (short-name :item-separator nil)
 			    :face (long-name  :item-separator nil))
 	      :face (description :display block
-				 :left-padding 5
+				 :padding-left 5
 				 :item-separator #\newline))
 
 :face (group :display block
 	     :separator #(#\newline #\newline)
 	     :item-separator #\newline
 	     :face (title :bold t)
-	     :face (group :left-padding 2
+	     :face (group :padding-left 2
 			  :separator #(#\newline #\newline)
 			  :item-separator #\newline))
 

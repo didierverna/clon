@@ -25,7 +25,7 @@
 
 :face (text :display block)
 
-:face (option :left-padding 2
+:face (option :padding-left 2
 	      :display block
 	      :face (syntax :bold t
 			    :item-separator ", "
@@ -34,7 +34,7 @@
 			    :face (long-name  :item-separator nil
 					      :face argument))
 	      :face (description :display block
-				 :left-padding (30 absolute)
+				 :padding-left (30 absolute)
 				 :item-separator #\newline
 				 :face (fallback :face value)
 				 :face (default :face value)
