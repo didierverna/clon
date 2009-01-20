@@ -502,9 +502,8 @@ instead, and make a copy of it."
 	:do
 	(when (help-spec-will-print (current-sface sheet) (car help-specs))
 	  (print-help-spec sheet (car help-specs))
-	  (when (and (cdr help-specs)
-		     (help-spec-items-will-print (current-sface sheet)
-						 (cdr help-specs)))
+	  (when (help-spec-items-will-print (current-sface sheet)
+					    (cdr help-specs))
 	    (let ((separator (get-separator (current-sface sheet)
 					    (car help-specs))))
 	      (if separator
