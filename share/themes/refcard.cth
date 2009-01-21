@@ -19,19 +19,27 @@
 ;;; Code:
 
 :display block
-:item-separator #\newline
+:item-separator ", "
 
-:face (synopsis :bold t :separator #(#\newline #\newline))
+:face (synopsis :bold t :padding-bottom 1)
 
 :face (text :display hidden)
 
 :face (option :padding-left 2
-	      :separator ", "
-	      :face (syntax :face (short-name :item-separator nil)
+	      :face (syntax :item-separator "/"
+			    :face (short-name :item-separator nil)
 			    :face (long-name  :item-separator nil))
 	      :face (description :display hidden))
 
-:face (group :face (title :bold t))
+:face (group :padding-top 0
+	     :padding-bottom 0
+	     :item-separator ", "
+	     :face (title :bold t
+			  :separator " ")
+	     :face (group :padding-left 2
+			  :padding-top 0
+			  :padding-bottom 0
+			  :item-separator ", "))
 
 
 ;;; refcard.cth ends here

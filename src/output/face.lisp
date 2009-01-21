@@ -63,6 +63,22 @@ This property can take the following forms:
 		 :initarg :padding-left
 		 :initform 0
 		 :reader left-padding)
+   (top-padding :documentation "The face top padding.
+This property can take the following forms:
+- nil: the output can start right away,
+- 0: the output should start on the next line,
+- N>0: there should be N empty lines before the output."
+		:initarg :padding-top
+		:initform nil
+		:reader top-padding)
+   (bottom-padding :documentation "The face bottom padding.
+This property can take the following forms:
+- nil: the next output can start right at the end of this face's,
+- 0: the next output should start on the next line,
+- N>0: there should be N empty lines before the next output."
+		   :initarg :padding-bottom
+		   :initform nil
+		   :reader bottom-padding)
    (separator :documentation "The face separator."
 	      :initarg :separator
 	      :initform nil
@@ -270,12 +286,14 @@ This involves:
 
 (defun make-face (name
 		  &rest keys
-		  &key display padding-left separator item-separator face
+		  &key display padding-left padding-top padding-bottom
+		       separator item-separator face
 		       intensity bold italicp underline blink inverse
 		       concealed revealed crossed-out-p framedp
 		       foreground background)
   "Make a new face named NAME."
-  (declare (ignore display padding-left separator item-separator face
+  (declare (ignore display padding-left padding-top padding-bottom
+		   separator item-separator face
 		   intensity bold italicp underline blink inverse concealed
 		   revealed crossed-out-p framedp
 		   foreground background))
@@ -309,19 +327,23 @@ copied; the face parent and children are set to nil."
   "Make a raw (boring yet functional) face tree."
   (make-face-tree '(toplevel
 		    :display block
-		    :item-separator #\newline
 		    :face (synopsis
 			   :display block
-			   :separator #(#\newline #\newline)
+			   :padding-bottom 1
 			   :face program
 			   :face minus-pack
 			   :face plus-pack
 			   :face options
 			   :face postfix)
-		    :face (text :display block)
-		    :face (option
-			   :padding-left 2
+		    :face (text
 			   :display block
+			   :padding-top 0
+			   :padding-bottom 0)
+		    :face (option
+			   :display block
+			   :padding-left 2
+			   :padding-top 0
+			   :padding-bottom 0
 			   :face (syntax
 				  :item-separator ", "
 				  :face (short-name
@@ -333,13 +355,19 @@ copied; the face parent and children are set to nil."
 			   :face (description
 				  :display block
 				  :padding-left (30 absolute)
-				  :item-separator #\newline
-				  :face (fallback :face value)
-				  :face (default :face value)
-				  :face (environment :face variable)))
+				  :face (fallback
+					 :padding-top 0
+					 :face value)
+				  :face (default
+					  :padding-top 0
+					  :face value)
+				  :face (environment
+					 :padding-top 0
+					 :face variable)))
 		    :face (group
 			   :display block
-			   :item-separator #\newline
+			   :padding-top 0
+			   :padding-bottom 0
 			   :face title))))
 
 

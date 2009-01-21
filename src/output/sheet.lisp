@@ -475,6 +475,34 @@ instead, and make a copy of it."
       (and (visiblep (sface-face subsface))
 	   (help-spec-items-will-print subsface (cdr help-spec))))))
 
+(defmethod bottom-padding ((sface sface))
+  (bottom-padding (sface-face sface)))
+
+(defgeneric get-bottom-padding (sface help-spec)
+  (:documentation "Get HELP-SPEC's bottom-padding under SFACE.")
+  (:method (sface help-spec)
+    "Basic help specifications (chars, strings etc) don't provide a bottom padding."
+    nil)
+  (:method (sface (help-spec list))
+    "Return the bottom padding of HELP-SPEC's face."
+    (bottom-padding (find-sface sface (car help-spec)))))
+
+(defmethod top-padding (other)
+  nil)
+
+(defmethod top-padding ((sface sface))
+  (top-padding (sface-face sface)))
+
+(defmethod top-padding ((help-spec list))
+  (top-padding (car help-spec)))
+
+(defun get-top-padding (sface items)
+  "Return top padding of the next item in ITEMS that will print under SFACE."
+  (loop :for help-spec :in items
+	:when (help-spec-will-print sface help-spec)
+	:return (when (listp help-spec)
+		  (top-padding (find-sface sface (car help-spec))))))
+
 (defgeneric get-separator (sface help-spec)
   (:documentation "Get HELP-SPEC's separator under SFACE.")
   (:method (sface help-spec)
@@ -500,20 +528,21 @@ instead, and make a copy of it."
 	    (print-help-spec sheet help-spec)
 	    (when (help-spec-items-will-print (current-sface sheet)
 					      (cdr help-specs))
-	      (let (#|(vertical-padding
-		    (max (or (get-bottom-padding (current-sface sheet)
-		    (car help-specs))
-		    -1)
-		    (or (get-top-padding (current-sface sheet)
-		    (cdr help-specs))
-		    -1)))|#
+	      (let ((vertical-padding
+		     (max (or (get-bottom-padding (current-sface sheet) help-spec)
+			      -1)
+			  (or (get-top-padding (current-sface sheet)
+					       (cdr help-specs))
+			      -1)))
 		    (separator (get-separator (current-sface sheet) help-spec)))
-		(if separator
-		    (print-help-spec sheet separator)
-		    (if (item-separator (current-face sheet))
-			(print-help-spec sheet
-					 (item-separator
-					  (current-face sheet)))))))))
+		(cond ((>= vertical-padding 0)
+		       (print-help-spec sheet (make-string (1+ vertical-padding)
+						:initial-element #\newline)))
+		      (separator
+		       (print-help-spec sheet separator))
+		      ((item-separator (current-face sheet))
+		       (print-help-spec sheet (item-separator
+					       (current-face sheet)))))))))
     (close-sface sheet)))
 
 (defgeneric print-help-spec (sheet help-spec)
