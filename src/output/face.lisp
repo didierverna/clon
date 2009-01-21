@@ -79,10 +79,6 @@ This property can take the following forms:
 		   :initarg :padding-bottom
 		   :initform nil
 		   :reader bottom-padding)
-   (separator :documentation "The face separator."
-	      :initarg :separator
-	      :initform nil
-	      :reader separator)
    (item-separator :documentation "The face item separator."
 		   :initarg :item-separator
 		   :initform #\space
@@ -287,13 +283,13 @@ This involves:
 (defun make-face (name
 		  &rest keys
 		  &key display padding-left padding-top padding-bottom
-		       separator item-separator face
+		       item-separator face
 		       intensity bold italicp underline blink inverse
 		       concealed revealed crossed-out-p framedp
 		       foreground background)
   "Make a new face named NAME."
   (declare (ignore display padding-left padding-top padding-bottom
-		   separator item-separator face
+		   item-separator face
 		   intensity bold italicp underline blink inverse concealed
 		   revealed crossed-out-p framedp
 		   foreground background))

@@ -523,15 +523,6 @@ instead, and make a copy of it."
 	:return (when (listp help-spec)
 		  (top-padding (find-sface sface (car help-spec))))))
 
-(defgeneric get-separator (sface help-spec)
-  (:documentation "Get HELP-SPEC's separator under SFACE.")
-  (:method (sface help-spec)
-    "Basic help specifications (chars, strings etc) don't provide a separator."
-    nil)
-  (:method (sface (help-spec list))
-    "Return the separator of HELP-SPEC's face."
-    (separator (sface-face (find-sface sface (car help-spec))))))
-
 ;; #### NOTE: this is where I would like a more expressive dispatch in CLOS.
 ;; This function should be part of print-help-spec, with two cases:
 ;; - (face-name items...)
@@ -553,13 +544,10 @@ instead, and make a copy of it."
 			      -1)
 			  (or (get-top-padding (current-sface sheet)
 					       (cdr help-specs))
-			      -1)))
-		    (separator (get-separator (current-sface sheet) help-spec)))
+			      -1))))
 		(cond ((>= vertical-padding 0)
 		       (print-help-spec sheet (make-string (1+ vertical-padding)
 						:initial-element #\newline)))
-		      (separator
-		       (print-help-spec sheet separator))
 		      ((item-separator (current-face sheet))
 		       (print-help-spec sheet (item-separator
 					       (current-face sheet)))))))))
