@@ -388,27 +388,25 @@ instead, and make a copy of it."
 		   (add-subface (sface-face sface) (copy-face sibling)))))
     (make-sface :face face :sibling sibling)))
 
-(defgeneric open-face (sheet face)
-  (:documentation "Create a frame for FACE and open it.")
-  (:method (sheet (sface sface))
-    "Create a frame for SFACE's face and open it."
-    (assert (visiblep (sface-face sface)))
-    ;; Create the new frame:
-    (let ((left-margin
-	   (let ((padding-spec (left-padding (sface-face sface))))
-	     (econd
-	      ((eq padding-spec 'self)
-	       (column sheet))
-	      ((numberp padding-spec)
-	       (safe-padding sheet (+ padding-spec (current-left-margin sheet))))
-	      ((listp padding-spec)
-	       (safe-padding sheet
-			     (destructuring-bind
-				   (padding relative-to &optional face-name)
-				 padding-spec
-			       ;; #### FIXME: should provide a better error
-			       ;; message
-			       (econd
+(defun open-sface (sheet sface)
+  "Create a frame for SFACE and open it."
+  (assert (visiblep (sface-face sface)))
+  ;; Create the new frame:
+  (let ((left-margin
+	 (let ((padding-spec (left-padding (sface-face sface))))
+	   (econd
+	     ((eq padding-spec 'self)
+	      (column sheet))
+	     ((numberp padding-spec)
+	      (safe-padding sheet (+ padding-spec (current-left-margin sheet))))
+	     ((listp padding-spec)
+	      (safe-padding sheet
+			    (destructuring-bind
+				  (padding relative-to &optional face-name)
+				padding-spec
+			      ;; #### FIXME: should provide a better error
+			      ;; message
+			      (econd
 				((and (eq relative-to 'absolute)
 				      (null face-name))
 				 ;; Absolute positions are OK as long as we
@@ -427,39 +425,29 @@ instead, and make a copy of it."
 					  ;; the generation level !!
 					  (nth (1- generation) (frames sheet)))))
 				   (+ padding left-margin)))))))))))
-      (push-frame sheet
-		  (if (highlightp sheet)
-		      (let ((highlight-property-instances
-			     (loop :for property :in *highlight-properties*
-				   :when (face-highlight-property-set-p
-					  (sface-face sface) property)
-				   :collect (make-highlight-property-instance
-					     :name property
-					     :value
-					     (face-highlight-property-value
-					      (sface-face sface) property)))))
-			(make-highlight-frame :sface sface
-					      :left-margin left-margin
-					      :highlight-property-instances
-					      highlight-property-instances))
-		      (make-frame :sface sface :left-margin left-margin))))
-    ;; Open the new frame:
-    (open-frame sheet (current-frame sheet)))
-  (:method (sheet (name symbol))
-    "Find a face named NAME in SHEET's face tree and open it."
-    (open-face sheet (find-sface (current-sface sheet) name))))
+    (push-frame sheet
+		(if (highlightp sheet)
+		    (let ((highlight-property-instances
+			   (loop :for property :in *highlight-properties*
+				 :when (face-highlight-property-set-p
+					(sface-face sface) property)
+				 :collect (make-highlight-property-instance
+					   :name property
+					   :value
+					   (face-highlight-property-value
+					    (sface-face sface) property)))))
+		      (make-highlight-frame :sface sface
+					    :left-margin left-margin
+					    :highlight-property-instances
+					    highlight-property-instances))
+		    (make-frame :sface sface :left-margin left-margin))))
+  ;; Open the new frame:
+  (open-frame sheet (current-frame sheet)))
 
-(defun close-face (sheet)
-  "Close SHEET's current face."
+(defun close-sface (sheet)
+  "Close SHEET's current sface."
   (close-frame sheet (current-frame sheet))
   (pop-frame sheet))
-
-(defmacro with-face (sheet name &body body)
-  "Evaluate BODY with SHEET's current face set to the one named NAME."
-  `(progn
-    (open-face ,sheet ,name)
-    ,@body
-    (close-face ,sheet)))
 
 
 
@@ -469,21 +457,23 @@ instead, and make a copy of it."
 
 (defun help-spec-items-will-print (sface items)
   "Return t if at least one of ITEMS will print under SFACE."
-  (and (visiblep (sface-face sface))
-       (some (lambda (help-spec)
-	       (help-spec-will-print sface help-spec))
-	     items)))
+  (assert (visiblep (sface-face sface)))
+  (some (lambda (help-spec)
+	  (help-spec-will-print sface help-spec))
+	items))
 
 (defgeneric help-spec-will-print (sface help-spec)
-  (:documentation
-   "Return t if HELP-SPEC will print under FACE.")
+  (:documentation "Return t if HELP-SPEC will print under FACE.")
+  (:method :before (sface help-spec)
+    (assert (visiblep (sface-face sface))))
   (:method (sface help-spec)
     "Basic help specifications (chars, strings etc) do print."
     t)
   (:method (sface (help-spec list))
     "Return t if HELP-SPEC's items will print under HELP-SPEC's face."
-    (help-spec-items-will-print (find-sface sface (car help-spec))
-				(cdr help-spec))))
+    (let ((subsface (find-sface sface (car help-spec))))
+      (and (visiblep (sface-face subsface))
+	   (help-spec-items-will-print subsface (cdr help-spec))))))
 
 (defgeneric get-separator (sface help-spec)
   (:documentation "Get HELP-SPEC's separator under SFACE.")
@@ -494,27 +484,42 @@ instead, and make a copy of it."
     "Return the separator of HELP-SPEC's face."
     (separator (sface-face (find-sface sface (car help-spec))))))
 
-;; #### NOTE: this is where I would like more dispatch capability from CLOS.
-;; Something like defmethod print-help-spec (sheet (help-spec (list symbol *)))
-(defun print-help-spec-items (sheet items)
-  "Print all help specification ITEMS on SHEET with the current face."
-  (loop :for help-specs :on items
-	:do
-	(when (help-spec-will-print (current-sface sheet) (car help-specs))
-	  (print-help-spec sheet (car help-specs))
-	  (when (help-spec-items-will-print (current-sface sheet)
-					    (cdr help-specs))
-	    (let ((separator (get-separator (current-sface sheet)
-					    (car help-specs))))
-	      (if separator
-		  (print-help-spec sheet separator)
-		  (if (item-separator (current-face sheet))
-		      (print-help-spec sheet
-				       (item-separator
-					(current-face sheet))))))))))
+;; #### NOTE: this is where I would like a more expressive dispatch in CLOS.
+;; This function should be part of print-help-spec, with two cases:
+;; - (face-name items...)
+;; - (sface items...)
+(defun print-faced-help-spec (sheet sface items)
+  "Print all help specification ITEMS on SHEET with SFACE."
+  (when (and (visiblep (sface-face sface))
+	     (help-spec-items-will-print sface items))
+    (open-sface sheet sface)
+    (loop :for help-specs :on items
+	  :do
+	  (when (help-spec-will-print (current-sface sheet) (car help-specs))
+	    (print-help-spec sheet (car help-specs))
+	    (when (help-spec-items-will-print (current-sface sheet)
+					      (cdr help-specs))
+	      (let (#|(vertical-padding
+		    (max (or (get-bottom-padding (current-sface sheet)
+		    (car help-specs))
+		    -1)
+		    (or (get-top-padding (current-sface sheet)
+		    (cdr help-specs))
+		    -1)))|#
+		    (separator (get-separator (current-sface sheet)
+					      (car help-specs))))
+		(if separator
+		    (print-help-spec sheet separator)
+		    (if (item-separator (current-face sheet))
+			(print-help-spec sheet
+					 (item-separator
+					  (current-face sheet)))))))))
+    (close-sface sheet)))
 
 (defgeneric print-help-spec (sheet help-spec)
   (:documentation "Print HELP-SPEC on SHEET.")
+  (:method :before (sheet help-spec)
+    (assert (visiblep (current-face sheet))))
   (:method (sheet (char character))
     "Print CHAR on SHEET with the current face."
     (print-help-spec sheet (make-string 1 :initial-element char)))
@@ -526,8 +531,8 @@ instead, and make a copy of it."
     (print-string sheet string))
   (:method (sheet (help-spec list))
     "Open HELP-SPEC's face and print all of its items with it."
-    (with-face sheet (car help-spec)
-      (print-help-spec-items sheet (cdr help-spec)))))
+    (let ((sface (find-sface (current-sface sheet) (car help-spec))))
+      (print-faced-help-spec sheet sface (cdr help-spec)))))
 
 (defun print-help (sheet help)
   "Open the toplevel help face and print HELP on SHEET with it."
@@ -541,10 +546,7 @@ instead, and make a copy of it."
 	     (list help)))
 	(sface (make-sface :face (face-tree sheet)
 			   :sibling (raw-face-tree sheet))))
-    (when (help-spec-items-will-print sface items)
-      (open-face sheet sface)
-      (print-help-spec-items sheet items)
-      (close-face sheet))))
+    (print-faced-help-spec sheet sface items)))
 
 
 
