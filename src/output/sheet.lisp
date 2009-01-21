@@ -494,9 +494,10 @@ instead, and make a copy of it."
 	     (help-spec-items-will-print sface items))
     (open-sface sheet sface)
     (loop :for help-specs :on items
+	  :for help-spec := (car help-specs)
 	  :do
-	  (when (help-spec-will-print (current-sface sheet) (car help-specs))
-	    (print-help-spec sheet (car help-specs))
+	  (when (help-spec-will-print (current-sface sheet) help-spec)
+	    (print-help-spec sheet help-spec)
 	    (when (help-spec-items-will-print (current-sface sheet)
 					      (cdr help-specs))
 	      (let (#|(vertical-padding
@@ -506,8 +507,7 @@ instead, and make a copy of it."
 		    (or (get-top-padding (current-sface sheet)
 		    (cdr help-specs))
 		    -1)))|#
-		    (separator (get-separator (current-sface sheet)
-					      (car help-specs))))
+		    (separator (get-separator (current-sface sheet) help-spec)))
 		(if separator
 		    (print-help-spec sheet separator)
 		    (if (item-separator (current-face sheet))
