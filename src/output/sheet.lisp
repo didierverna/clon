@@ -468,7 +468,7 @@ instead, and make a copy of it."
 ;; =========================================================================
 
 (defun help-spec-items-will-print (sface items)
-  "Return t if at least one of ITEMS will print under FACE."
+  "Return t if at least one of ITEMS will print under SFACE."
   (and (visiblep (sface-face sface))
        (some (lambda (help-spec)
 	       (help-spec-will-print sface help-spec))
@@ -486,7 +486,7 @@ instead, and make a copy of it."
 				(cdr help-spec))))
 
 (defgeneric get-separator (sface help-spec)
-  (:documentation "Get HELP-SPEC's separator under FACE.")
+  (:documentation "Get HELP-SPEC's separator under SFACE.")
   (:method (sface help-spec)
     "Basic help specifications (chars, strings etc) don't provide a separator."
     nil)
