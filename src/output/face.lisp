@@ -125,9 +125,10 @@ This property can take the following forms:
 	   :reader parent))
   (:documentation "The FACE class."))
 
-(defun visiblep (face)
-  "Return t if FACE's display property is not HIDDEN."
-  (not (eq (display face) 'hidden)))
+(defgeneric visiblep (face)
+  (:documentation "Return t if FACE's display property is not HIDDEN.")
+  (:method ((face face))
+    (not (eq (display face) 'hidden))))
 
 (defun add-subface (face subface)
   "Add SUBFACE to FACE's subfaces and return it."

@@ -201,6 +201,20 @@ to create subfaces which would be missing from the original one."
   face
   sibling)
 
+;; Convenience shortcuts:
+(defmethod visiblep ((sface sface))
+  (visiblep (sface-face sface)))
+
+(defmethod left-padding ((sface sface))
+  (left-padding (sface-face sface)))
+
+(defmethod top-padding ((sface sface))
+  (top-padding (sface-face sface)))
+
+(defmethod bottom-padding ((sface sface))
+  (bottom-padding (sface-face sface)))
+
+
 (defstruct frame
   "The FRAME structure.
 This structure hold layout properties used for printing."
@@ -390,10 +404,10 @@ instead, and make a copy of it."
 
 (defun open-sface (sheet sface)
   "Create a frame for SFACE and open it."
-  (assert (visiblep (sface-face sface)))
+  (assert (visiblep sface))
   ;; Create the new frame:
   (let ((left-margin
-	 (let ((padding-spec (left-padding (sface-face sface))))
+	 (let ((padding-spec (left-padding sface)))
 	   (econd
 	     ((eq padding-spec 'self)
 	      (column sheet))
@@ -457,7 +471,7 @@ instead, and make a copy of it."
 
 (defun help-spec-items-will-print (sface items)
   "Return t if at least one of ITEMS will print under SFACE."
-  (assert (visiblep (sface-face sface)))
+  (assert (visiblep sface))
   (some (lambda (help-spec)
 	  (help-spec-will-print sface help-spec))
 	items))
@@ -465,18 +479,15 @@ instead, and make a copy of it."
 (defgeneric help-spec-will-print (sface help-spec)
   (:documentation "Return t if HELP-SPEC will print under FACE.")
   (:method :before (sface help-spec)
-    (assert (visiblep (sface-face sface))))
+    (assert (visiblep sface)))
   (:method (sface help-spec)
     "Basic help specifications (chars, strings etc) do print."
     t)
   (:method (sface (help-spec list))
     "Return t if HELP-SPEC's items will print under HELP-SPEC's face."
     (let ((subsface (find-sface sface (car help-spec))))
-      (and (visiblep (sface-face subsface))
+      (and (visiblep subsface)
 	   (help-spec-items-will-print subsface (cdr help-spec))))))
-
-(defmethod bottom-padding ((sface sface))
-  (bottom-padding (sface-face sface)))
 
 (defgeneric get-bottom-padding (sface help-spec)
   (:documentation "Get HELP-SPEC's bottom-padding under SFACE.")
@@ -489,9 +500,6 @@ instead, and make a copy of it."
 
 (defmethod top-padding (other)
   nil)
-
-(defmethod top-padding ((sface sface))
-  (top-padding (sface-face sface)))
 
 (defmethod top-padding ((help-spec list))
   (top-padding (car help-spec)))
@@ -529,7 +537,7 @@ instead, and make a copy of it."
 ;; - (sface items...)
 (defun print-faced-help-spec (sheet sface items)
   "Print all help specification ITEMS on SHEET with SFACE."
-  (when (and (visiblep (sface-face sface))
+  (when (and (visiblep sface)
 	     (help-spec-items-will-print sface items))
     (open-sface sheet sface)
     (loop :for help-specs :on items
