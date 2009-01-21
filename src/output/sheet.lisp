@@ -496,6 +496,26 @@ instead, and make a copy of it."
 (defmethod top-padding ((help-spec list))
   (top-padding (car help-spec)))
 
+;; #### NOTE: right now, we get the top-padding of the first item that prints.
+;; Note that in case of nested help specifications, the retrieved value is
+;; that of the topmost face, and not that of the leaf (which actually prints
+;; something). It is not clear to me whether this is good or bad, or whether
+;; "it depends". However, I spotted one case in which it gives an unexpected
+;; result.
+
+;; Suppose we have two nested groups with title but no contents. The help spec
+;; is like this: (group (title "Foo") (contents (group (title "Bar")))). With
+;; the refcard theme, the two titles will appear on the same line despite any
+;; padding specification. That is because the separation between the first
+;; title and the sub-group is a #\space. Since the second group is the first
+;; item in the enclosing contents face, its top-padding value is not used.
+
+;; This is bad. I'm not sure what I should do about it. Use the leaf ? Use a
+;; max of *all* enclosing faces padding[1] ? Provide padding options specific
+;; to what's after/before ? Dammit. This is not worth the trouble...
+
+;; Footnotes: [1] the more I think of it, the more I like this option...
+
 (defun get-top-padding (sface items)
   "Return top padding of the next item in ITEMS that will print under SFACE."
   (loop :for help-spec :in items

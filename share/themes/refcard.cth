@@ -31,15 +31,16 @@
 			    :face (long-name  :item-separator nil))
 	      :face (description :display hidden))
 
-:face (group :padding-top 0
-	     :padding-bottom 0
-	     :item-separator ", "
-	     :face (title :bold t
-			  :separator " ")
-	     :face (group :padding-left 2
-			  :padding-top 0
-			  :padding-bottom 0
-			  :item-separator ", "))
+:face (group :padding-top 0 :padding-bottom 0 :item-separator #\space
+	     :face (title :bold t)
+	     :face (contents :item-separator ", "
+			     :face (group :padding-left 2
+					  :padding-top 0
+					  :padding-bottom 0
+					  :item-separator #\space
+					  :face (title :bold t)
+					  :face (contents
+						 :item-separator ", "))))
 
 
 ;;; refcard.cth ends here

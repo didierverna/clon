@@ -368,7 +368,12 @@ copied; the face parent and children are set to nil."
 			   :display block
 			   :padding-top 0
 			   :padding-bottom 0
-			   :face title))))
+			   :face (title
+				  :padding-top 0
+				  :padding-bottom 0)
+			   :face (contents
+				  :padding-top 0
+				  :padding-bottom 0)))))
 
 
 ;;; face.lisp ends here
