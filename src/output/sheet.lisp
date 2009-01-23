@@ -51,11 +51,8 @@
    (highlightp :documentation "Whether to highlight SHEET's output."
 	       :initarg :highlightp
 	       :reader highlightp)
-   (raw-face-tree :documentation "The sheet's raw face tree."
-		  :initform (make-raw-face-tree)
-		  :reader raw-face-tree)
-   (face-tree :documentation "The sheet's face tree."
-	      :reader face-tree)
+   (sface-tree :documentation "The sheet's sface tree."
+	       :reader sface-tree)
    (column :documentation "The sheet's current column."
 	   :type (integer 0)
 	   :accessor column
@@ -194,37 +191,28 @@ tabs are forbidden here."
 ;; Logical output
 ;; --------------
 
-(defstruct sface
-  "The SFace structure.
+(defclass sface (face)
+  ((sibling :documentation "The SFace's raw sibling."
+	    :reader sibling))
+  (:documentation "The SFACE class.
 An SFace is the association of a face and its raw sibling. The sibling is used
-to create subfaces which would be missing from the original one."
-  face
-  sibling)
+to create subfaces which would be missing from the original, user defined one."))
 
-;; Convenience shortcuts:
-(defmethod visiblep ((sface sface))
-  (visiblep (sface-face sface)))
-
-(defmethod left-padding ((sface sface))
-  (left-padding (sface-face sface)))
-
-(defmethod top-padding ((sface sface))
-  (top-padding (sface-face sface)))
-
-(defmethod bottom-padding ((sface sface))
-  (bottom-padding (sface-face sface)))
-
+(defun make-raw-sface (sibling)
+  "Return a new SFace based on SIBLING.
+This function does not consider SIBLING as a face tree: only face properties are
+copied; the face parent and children are set to nil."
+  (let ((sface (copy-instance sibling 'sface)))
+    (setf (slot-value sface 'parent) nil)
+    (setf (slot-value sface 'subfaces) nil)
+    (setf (slot-value sface 'sibling) sibling)
+    sface))
 
 (defstruct frame
   "The FRAME structure.
 This structure hold layout properties used for printing."
   sface
   left-margin)
-
-;; convenience shortcut
-(defun frame-face (frame)
-  "Return FRAME's face."
-  (sface-face (frame-sface frame)))
 
 (defstruct highlight-property-instance
   "The HIGHLIGHT-PROEPRTY-INSTANCE structure."
@@ -241,11 +229,6 @@ This structure holds both layout and highlight properties used for printing."
   "Return SHEET's current sface or nil."
   (when (frames sheet)
     (frame-sface (current-frame sheet))))
-
-(defun current-face (sheet)
-  "Return SHEET's current face or nil."
-  (when (frames sheet)
-    (sface-face (current-sface sheet))))
 
 (defun current-left-margin (sheet)
   "Return SHEET's current left margin or 0."
@@ -268,8 +251,8 @@ This structure holds both layout and highlight properties used for printing."
   (:documentation "Close FRAME on SHEET.")
   (:method-combination progn :most-specific-last)
   (:method progn (sheet (frame frame))
-    "Reach the the end of line if FRAME's face has a BLOCK display property."
-    (when (eq (display (frame-face frame)) 'block)
+    "Reach the the end of line if FRAME's sface has a BLOCK display property."
+    (when (eq (display (frame-sface frame)) 'block)
       (reach-column sheet (line-width sheet))))
   (:method progn (sheet (frame highlight-frame))
     "Restore the upper frame's highlight properties."
@@ -278,9 +261,9 @@ This structure holds both layout and highlight properties used for printing."
      (mapcar (lambda (instance)
 	       (make-highlight-property-instance
 		:name (highlight-property-instance-name instance)
-		:value (when (parent (frame-face frame))
+		:value (when (parent (frame-sface frame))
 			 (face-highlight-property-value
-			  (parent (frame-face frame))
+			  (parent (frame-sface frame))
 			  (highlight-property-instance-name instance)))))
 	     (highlight-frame-highlight-property-instances frame)))))
 
@@ -315,8 +298,8 @@ Spacing characters are honored but newlines might replace spaces when the
 output reaches the rightmost bound."
   (assert (and string (not (zerop (length string)))))
   ;; #### FIXME: I don't remember, but this might not work: don't I need to
-  ;; honor the frames'faces here instead of blindly spacing ?? Or am I sure
-  ;; I'm in the proper frame/face ?
+  ;; honor the frames'sfaces here instead of blindly spacing ?? Or am I sure
+  ;; I'm in the proper frame/sface ?
   ;; First, adjust the tabbing.
   (loop :with len = (length string) :and i = 0
 	:while (< i len)
@@ -379,8 +362,24 @@ output reaches the rightmost bound."
 
 
 ;; ---------------
-;; Face management
+;; SFace management
 ;; ---------------
+
+(defun find-sface (sface name)
+  "Find an sface starting at SFACE named NAME.
+If the sface can't be found in SFACE's face tree, find one in SFACE's sibling
+instead, and make a copy of it."
+  (let* ((sibling (search-face (sibling sface) name :error-me))
+	 (sub-sface (search-face sface name)))
+    (cond (sub-sface
+	   ;; #### NOTE: this is a bit dirty. The sibling might already have
+	   ;; been set before. It might be better to turn the search
+	   ;; procdedure into a generic function, and specialized its
+	   ;; behavior.
+	   (setf (slot-value sub-sface 'sibling) sibling)
+	   sub-sface)
+	  (t
+	   (add-subface sface (make-raw-sface sibling))))))
 
 ;; In practice, it could happen that the level of indentation exceeds the
 ;; line-width (either the theme has something crazy in it, or we just have too
@@ -392,15 +391,6 @@ PADDING is returned when it does not exceed SHEET's line width."
   (or (when (< padding (line-width sheet))
 	padding)
       (column sheet)))
-
-(defun find-sface (sface name)
-  "Find a face starting at SFACE named NAME.
-If the face can't be found in SFACE's face tree, find one in SFACE's sibling
-instead, and make a copy of it."
-  (let* ((sibling (search-face (sface-sibling sface) name :error-me))
-	 (face (or (search-face (sface-face sface) name)
-		   (add-subface (sface-face sface) (copy-face sibling)))))
-    (make-sface :face face :sibling sibling)))
 
 (defun open-sface (sheet sface)
   "Create a frame for SFACE and open it."
@@ -430,8 +420,7 @@ instead, and make a copy of it."
 				((and (eq relative-to :relative-to)
 				      (symbolp face-name))
 				 (let* ((generation
-					 (parent-generation (sface-face sface)
-							    face-name))
+					 (parent-generation sface face-name))
 					(left-margin
 					 (frame-left-margin
 					  ;; #### WARNING: we have not open
@@ -444,12 +433,12 @@ instead, and make a copy of it."
 		    (let ((highlight-property-instances
 			   (loop :for property :in *highlight-properties*
 				 :when (face-highlight-property-set-p
-					(sface-face sface) property)
+					sface property)
 				 :collect (make-highlight-property-instance
 					   :name property
 					   :value
 					   (face-highlight-property-value
-					    (sface-face sface) property)))))
+					    sface property)))))
 		      (make-highlight-frame :sface sface
 					    :left-margin left-margin
 					    :highlight-property-instances
@@ -556,15 +545,15 @@ instead, and make a copy of it."
 		(cond ((>= vertical-padding 0)
 		       (print-help-spec sheet (make-string (1+ vertical-padding)
 						:initial-element #\newline)))
-		      ((item-separator (current-face sheet))
+		      ((item-separator (current-sface sheet))
 		       (print-help-spec sheet (item-separator
-					       (current-face sheet)))))))))
+					       (current-sface sheet)))))))))
     (close-sface sheet)))
 
 (defgeneric print-help-spec (sheet help-spec)
   (:documentation "Print HELP-SPEC on SHEET.")
   (:method :before (sheet help-spec)
-    (assert (visiblep (current-face sheet))))
+    (assert (visiblep (current-sface sheet))))
   (:method (sheet (char character))
     "Print CHAR on SHEET with the current face."
     (print-help-spec sheet (make-string 1 :initial-element char)))
@@ -588,10 +577,8 @@ instead, and make a copy of it."
 	     ;; which case we have the list of synopsis and all synopsis
 	     ;; items.
 	     help
-	     (list help)))
-	(sface (make-sface :face (face-tree sheet)
-			   :sibling (raw-face-tree sheet))))
-    (print-faced-help-spec sheet sface items)))
+	     (list help))))
+    (print-faced-help-spec sheet (sface-tree sheet) items)))
 
 
 
@@ -636,8 +623,8 @@ instead, and make a copy of it."
 	 :highlightp highlight
 	 (remove-keys keys :output-stream :line-width :highlight)))
 
-(defun read-face-tree (pathname)
-  "Read a face tree from PATHNAME."
+(defun read-sface-tree (pathname)
+  "Read an sface tree from PATHNAME."
   (make-face-tree
    (list* 'toplevel
 	  (with-open-file (stream pathname)
@@ -646,28 +633,28 @@ instead, and make a copy of it."
 		    :if (eql item stream)
 		    :return items
 		    :else
-		    :collect item :into items))))))
+		    :collect item :into items))))
+   'sface))
 
-(defun try-read-face-tree (pathname)
-  "Read a face tree from PATHNAME if it exists or return nil."
+(defun try-read-sface-tree (pathname)
+  "Read an sface tree from PATHNAME if it exists or return nil."
   (when (open pathname :direction :probe)
-    (read-face-tree pathname)))
+    (read-sface-tree pathname)))
 
 (defun try-read-theme (pathname)
   "Read a theme from PATHNAME or PATHNAME.cth if it exists or return nil."
-  (or (try-read-face-tree pathname)
+  (or (try-read-sface-tree pathname)
       (unless (string= (pathname-type pathname) "cth")
-	(try-read-face-tree (merge-pathnames pathname
-					     (make-pathname :type "cth"))))))
+	(try-read-sface-tree (merge-pathnames pathname
+					      (make-pathname :type "cth"))))))
 
 (defmethod initialize-instance :after ((sheet sheet) &key theme search-path)
   "Finish initialization of SHEET.
 This involves:
-- computing SHEET's face tree from THEME and SEARCH-PATH."
-  (setf (slot-value sheet 'face-tree)
-	(or (cond ((and theme
-			(or (not search-path)
-			    (pathname-directory theme)))
+- computing SHEET's sface tree from THEME and SEARCH-PATH,
+- initializing SHEET's toplevel sface's sibling to a raw face tree."
+  (setf (slot-value sheet 'sface-tree)
+	(or (cond ((and theme (or (not search-path) (pathname-directory theme)))
 		   (try-read-theme theme))
 		  (theme
 		   (setq theme
@@ -678,11 +665,12 @@ This involves:
 							     "Themes"
 							     "themes")))))
 		   (loop :for path :in search-path
-			 :for face-tree := (try-read-theme
-					    (merge-pathnames theme path))
-			 :until face-tree
-			 :finally (return face-tree))))
-	    (make-face 'toplevel))))
+			 :for sface-tree := (try-read-theme
+					     (merge-pathnames theme path))
+			 :until sface-tree
+			 :finally (return sface-tree))))
+	    (make-instance 'sface :name 'toplevel)))
+  (setf (slot-value (sface-tree sheet) 'sibling) (make-raw-face-tree)))
 
 (defun make-sheet
     (&rest keys &key output-stream search-path theme line-width highlight)
@@ -692,7 +680,7 @@ This involves:
 
 (defun flush-sheet (sheet)
   "Flush SHEET."
-  (assert (null (current-face sheet)))
+  (assert (null (current-sface sheet)))
   (terpri (output-stream sheet)))
 
 

@@ -256,15 +256,16 @@ This is the meta-class for abstract classes."))
 ;; Instance copying
 ;; ----------------
 
-(defgeneric copy-instance (instance)
-  (:documentation "Return a copy of INSTANCE.")
-  (:method (instance)
+(defgeneric copy-instance (instance &optional subclass)
+  (:documentation "Return a copy of INSTANCE.
+Copy is either an object of INSTANCE's class, or INSTANCE's SUBCLASS if given.")
+  (:method (instance &optional subclass)
     "Return a copy of INSTANCE.
 Both instances share the same slot values."
     (let* ((class (class-of instance))
 	   ;; #### PORTME.
 	   (slots (sb-mop:class-slots class))
-	   (new-instance (make-instance class)))
+	   (new-instance (make-instance (or subclass class))))
       (loop :for slot :in slots
 	    :when (slot-boundp instance (sb-mop:slot-definition-name slot))
 	    :do (setf (slot-value new-instance

@@ -125,10 +125,9 @@ This property can take the following forms:
 	   :reader parent))
   (:documentation "The FACE class."))
 
-(defgeneric visiblep (face)
-  (:documentation "Return t if FACE's display property is not HIDDEN.")
-  (:method ((face face))
-    (not (eq (display face) 'hidden))))
+(defun visiblep (face)
+  "Return t if FACE's display property is not HIDDEN."
+  (not (eq (display face) 'hidden)))
 
 (defun add-subface (face subface)
   "Add SUBFACE to FACE's subfaces and return it."
@@ -281,44 +280,21 @@ This involves:
 	  (setf (slot-value child 'parent) face))
 	(subfaces face)))
 
-(defun make-face (name
-		  &rest keys
-		  &key display padding-left padding-top padding-bottom
-		       item-separator face
-		       intensity bold italicp underline blink inverse
-		       concealed revealed crossed-out-p framedp
-		       foreground background)
-  "Make a new face named NAME."
-  (declare (ignore display padding-left padding-top padding-bottom
-		   item-separator face
-		   intensity bold italicp underline blink inverse concealed
-		   revealed crossed-out-p framedp
-		   foreground background))
-  (apply #'make-instance 'face :name name keys))
-
-(defun copy-face (face)
-  "Return a copy of FACE.
-This function does not consider FACE as a face tree: only face properties are
-copied; the face parent and children are set to nil."
-  (let ((new-face (copy-instance face)))
-    (setf (slot-value new-face 'parent) nil)
-    (setf (slot-value new-face 'subfaces) nil)
-    new-face))
-
-(defgeneric make-face-tree (definition)
-  (:documentation "Make a face tree from DEFINITION.")
-  (:method ((definition list))
-    "Create a face tree from a list of face name and initargs."
-    (apply #'make-face (car definition)
+(defgeneric make-face-tree (definition &optional face-class)
+  (:documentation "Make a FACE-CLASS face tree from DEFINITION.")
+  (:method ((definition list) &optional (face-class 'face))
+    "Make a FACE-CLASS face tree from a list of face name and initargs."
+    (apply #'make-instance face-class
+	   :name (car definition)
 	   (loop :for key :in (cdr definition) :by #'cddr
 		 :for val :in (cddr definition) :by #'cddr
 		 :if (eq key :face)
-		 :nconc (list :face (make-face-tree val))
+		 :nconc (list :face (make-face-tree val face-class))
 		 :else
 		 :nconc (list key val))))
-  (:method ((name symbol))
+  (:method ((name symbol) &optional (face-class 'face))
     "Create a face named NAME."
-    (make-face name)))
+    (funcall #'make-instance face-class :name name)))
 
 (defun make-raw-face-tree ()
   "Make a raw (boring yet functional) face tree."
