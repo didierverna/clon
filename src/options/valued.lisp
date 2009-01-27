@@ -134,17 +134,20 @@ If OPTION matches, return its short name's length; otherwise 0."
       ;; inverse of the conversion function !!).
       (when (slot-boundp option 'fallback-value)
 	(accumulate (fallback)
-	  "Fallback:"
+	  (accumulate (title)
+	    "Fallback:")
 	  (accumulate (value)
 	    (format nil "~A" (fallback-value option)))))
       (when (slot-boundp option 'default-value)
 	(accumulate (default)
-	  "Default:"
+	  (accumulate (title)
+	    "Default:")
 	  (accumulate (value)
 	    (format nil "~A" (default-value option)))))
       (when (env-var option)
 	(accumulate (environment)
-	  "Environment:"
+	  (accumulate (title)
+	    "Environment:")
 	  (accumulate (variable)
 	    (env-var option)))))))
 

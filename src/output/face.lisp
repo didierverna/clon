@@ -330,12 +330,15 @@ This involves:
 				  :padding-left (30 absolute)
 				  :face (fallback
 					 :padding-top 0
+					 :face title
 					 :face value)
 				  :face (default
-					  :padding-top 0
+					    :padding-top 0
+					  :face title
 					  :face value)
 				  :face (environment
 					 :padding-top 0
+					 :face title
 					 :face variable)))
 		    :face (group
 			   :display block
