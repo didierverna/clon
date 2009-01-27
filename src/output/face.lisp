@@ -219,16 +219,16 @@ returned), or up in the hierarchy and by successive upper branches (in which
 case it is copied and attached to FACE).
 If ERROR-ME, trigger an error if no face is found; otherwise, return nil."
   (or (subface face name)
-      (loop :with names := (list name)
-	    :for child := face :then (parent child)
-	    :for parent := (parent child) :then (parent parent)
-	    :while parent
-	    :for found := (search-branch parent names)
-	    :if found
-	    :return (attach-face-tree face found)
-	    :else
-	    :do (push (name child) names)
-	    :finally (when error-me (error "Face ~A not found." name)))))
+      (and (parent face)
+	   (loop :for names :on (loop :with names := (list name)
+				      :for parent := face :then (parent parent)
+				      :while parent
+				      :do (push (name parent) names)
+				      :finally (return names))
+		 :for found := (search-branch (parent face) names)
+		 :if found
+		 :return (attach-face-tree face found)))
+      (when error-me (error "Face ~A not found." name))))
 
 (defun parent-generation (face parent-name)
   "Return FACE's parent generation for PARENT-NAME.

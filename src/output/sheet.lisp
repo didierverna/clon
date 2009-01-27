@@ -379,6 +379,11 @@ instead, and make a copy of it."
 	   (setf (slot-value sub-sface 'sibling) sibling)
 	   sub-sface)
 	  (t
+	   ;; #### NOTE: here, we create the missing face *only*. That is, we
+	   ;; don't copy a whole raw face tree. Copying the whole raw face
+	   ;; tree would perhaps create (hence override) other faces
+	   ;; previously defined by the user upper in the face hierarchy, and
+	   ;; we want to avoid that.
 	   (add-subface sface (make-raw-sface sibling))))))
 
 ;; In practice, it could happen that the level of indentation exceeds the
