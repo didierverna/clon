@@ -296,7 +296,7 @@ This involves:
     "Create a face named NAME."
     (funcall #'make-instance face-class :name name)))
 
-(defun make-raw-face-tree ()
+(defun make-raw-face-tree (&optional (face-class 'face))
   "Make a raw (boring yet functional) face tree."
   (make-face-tree '(toplevel
 		    :display block
@@ -349,7 +349,8 @@ This involves:
 				  :padding-bottom 0)
 			   :face (contents
 				  :padding-top 0
-				  :padding-bottom 0)))))
+				  :padding-bottom 0)))
+		  face-class))
 
 
 ;;; face.lisp ends here

@@ -674,7 +674,7 @@ This involves:
 					     (merge-pathnames theme path))
 			 :until sface-tree
 			 :finally (return sface-tree))))
-	    (make-instance 'sface :name 'toplevel)))
+	    (make-raw-face-tree 'sface)))
   (setf (slot-value (sface-tree sheet) 'sibling) (make-raw-face-tree)))
 
 (defun make-sheet
