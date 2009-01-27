@@ -30,29 +30,26 @@
 	      :face (description :display block :padding-left (30 absolute)
 				 :background green
 				 :face (fallback :bold t
-						 :underline t
 						 :foreground yellow
 						 :padding-top 0
-						 :face (value :blink t
-							      :underline nil))
+						 :face (title :underline t)
+						 :face (value :blink t))
 				 :face (default :bold t
-					 :underline t
 					 :foreground yellow
 					 :padding-top 0
-					 :face (value :blink t
-						      :underline nil))
+					 :face (title :underline t)
+					 :face (value :blink t))
 				 :face (environment :bold t
-						    :underline t
 						    :foreground yellow
 						    :padding-top 0
-						    :face (variable :blink t
-								    :underline
-								    nil))))
+						    :face (title :underline t)
+						    :face (variable :blink t))))
 
 :face (group :display block :padding-top 0 :padding-bottom 0
 	     :face (title :padding-top 0 :padding-bottom 0
 			  :underline t :bold t)
-	     :face (contents  :padding-top 0 :padding-bottom 0))
+	     :face (contents  :padding-top 0 :padding-bottom 0)
+	     :face (group :padding-left 2))
 
 
 ;;; christmas.cth ends here
