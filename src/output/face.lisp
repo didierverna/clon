@@ -63,6 +63,16 @@ This property can take the following forms:
 		 :initarg :padding-left
 		 :initform 0
 		 :reader left-padding)
+   (right-padding :documentation "The face right padding.
+This property can take the following forms:
+- <NUMBER>: the padding is relative to the enclosing face,
+- SELF: the padding is set to wherever the face happens to be closed,
+- (<NUMBER> ABSOLUTE): the padding is set in absolute value,
+- (<NUMBER> :RELATIVE-TO <FACE-NAME>): the padding is set relatively to a
+  parent face named FACE-NAME."
+		  :initarg :padding-right
+		  :initform 'self
+		  :reader right-padding)
    (top-padding :documentation "The face top padding.
 This property can take the following forms:
 - nil: the output can start right away,

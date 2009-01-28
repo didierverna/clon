@@ -16,18 +16,24 @@
 ;;; Code:
 
 :display block
+:padding-right 0
 :background blue
 
 :face (synopsis :display block :padding-bottom 1 :bold t)
 
 :face (text :display block :padding-top 0 :padding-bottom 0 :foreground red)
 
-:face (option :display block :padding-left 2 :padding-top 0 :padding-bottom 0
+:face (option :display block
+	      :background cyan
+	      :padding-left 2 :padding-right 2 :padding-top 0 :padding-bottom 0
 	      :face (syntax :item-separator ", "
+			    :padding-right (29 absolute)
 			    :background magenta
 			    :face (short-name :item-separator nil)
 			    :face (long-name  :item-separator nil))
-	      :face (description :display block :padding-left (30 absolute)
+	      :face (description :display block
+				 :padding-left (30 absolute)
+				 :padding-right 0
 				 :background green
 				 :face (fallback :bold t
 						 :foreground yellow
@@ -45,11 +51,11 @@
 						    :face (title :underline t)
 						    :face (variable :blink t))))
 
-:face (group :display block :padding-top 0 :padding-bottom 0
+:face (group :display block :padding-right 0 :padding-top 0 :padding-bottom 0
 	     :face (title :padding-top 0 :padding-bottom 0
 			  :underline t :bold t)
-	     :face (contents  :padding-top 0 :padding-bottom 0)
-	     :face (group :padding-left 2))
+	     :face (contents :padding-right 0 :padding-top 0 :padding-bottom 0)
+	     :face (group :padding-left 2 :padding-right 0))
 
 
 ;;; christmas.cth ends here

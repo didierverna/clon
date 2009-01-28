@@ -212,7 +212,8 @@ copied; the face parent and children are set to nil."
   "The FRAME structure.
 This structure hold layout properties used for printing."
   sface
-  left-margin)
+  left-margin
+  right-margin)
 
 (defstruct highlight-property-instance
   "The HIGHLIGHT-PROEPRTY-INSTANCE structure."
@@ -231,10 +232,27 @@ This structure holds both layout and highlight properties used for printing."
     (frame-sface (current-frame sheet))))
 
 (defun current-left-margin (sheet)
-  "Return SHEET's current left margin or 0."
+  "Return SHEET's current left margin."
   (if (frames sheet)
       (frame-left-margin (current-frame sheet))
       0))
+
+(defun current-right-margin (sheet)
+  "Return SHEET's current right margin."
+  (if (frames sheet)
+      (frame-right-margin (current-frame sheet))
+      (line-width sheet)))
+
+(defun available-right-margin (sheet)
+  "Return SHEET's available right margin.
+This margin is the first non-self margin specified by a frame. All inner self
+frames can potentially write until the available right margin."
+  (map-frames (lambda (frame)
+		(let ((right-margin (frame-right-margin frame)))
+		  (when (numberp right-margin)
+		    (return-from available-right-margin right-margin))))
+    (sheet))
+  (line-width sheet))
 
 (defgeneric open-frame (sheet frame)
   (:documentation "Open FRAME on SHEET.")
@@ -251,9 +269,10 @@ This structure holds both layout and highlight properties used for printing."
   (:documentation "Close FRAME on SHEET.")
   (:method-combination progn :most-specific-last)
   (:method progn (sheet (frame frame))
-    "Reach the the end of line if FRAME's sface has a BLOCK display property."
-    (when (eq (display (frame-sface frame)) 'block)
-      (reach-column sheet (line-width sheet))))
+    "Reach FRAME's right margin if it has one."
+    (let ((right-margin (frame-right-margin frame)))
+      (when (numberp right-margin)
+	(reach-column sheet right-margin))))
   (:method progn (sheet (frame highlight-frame))
     "Restore the upper frame's highlight properties."
     (princ-highlight-property-instances
@@ -305,7 +324,7 @@ output reaches the rightmost bound."
 	:while (< i len)
 	:do (case (aref string i)
 	      (#\space
-	       (if (>= (column sheet) (line-width sheet))
+	       (if (>= (column sheet) (available-right-margin sheet))
 		   ;; If we're at the end of the line, turn the space into a
 		   ;; newline.
 		   (open-next-line sheet)
@@ -323,7 +342,8 @@ output reaches the rightmost bound."
 				      8)
 				   (column sheet))
 				(current-left-margin sheet))))
-		 (cond ((< (+ (column sheet) spaces) (line-width sheet))
+		 (cond ((< (+ (column sheet) spaces)
+			   (available-right-margin sheet))
 			(princ-spaces sheet spaces))
 		       (t
 			;; If the requested tab position is too far away, we
@@ -349,7 +369,8 @@ output reaches the rightmost bound."
 			;; but this is life.
 			(princ-string sheet (subseq string i end))
 			(setq i end))
-		       ((< (+ (column sheet) (- end i)) (line-width sheet))
+		       ((< (+ (column sheet) (- end i))
+			   (available-right-margin sheet))
 			;; Otherwise, we also output the word right here if it
 			;; fits on the current-line.
 			(princ-string sheet (subseq string i end))
@@ -390,49 +411,86 @@ instead, and make a copy of it."
 ;; line-width (either the theme has something crazy in it, or we just have too
 ;; many nested levels of indentation) ... We're in trouble here, so let's just
 ;; stay where we are.
-(defun safe-padding (sheet padding)
-  "Return either PADDING or SHEET's current column.
-PADDING is returned when it does not exceed SHEET's line width."
-  (or (when (< padding (line-width sheet))
-	padding)
-      (column sheet)))
+(defun safe-left-margin (sheet margin)
+  "Return either MARGIN or a safe value instead.
+To be safe, margin must be greater than the current left margin and smaller
+than the currently available margin."
+  (or (when (< margin (current-left-margin sheet))
+	(current-left-margin sheet))
+      (when (> margin (available-right-margin sheet))
+	(available-right-margin sheet))
+      margin))
+
+(defun safe-right-margin (sheet left-margin margin)
+  "Return either MARGIN or a safe value instead.
+To be safe, margin must be greater than LEFT-MARGIN and smaller
+than the currently available right margin."
+  (or (when (or (<= margin left-margin) (> margin (available-right-margin sheet)))
+	(available-right-margin sheet))
+      margin))
 
 (defun open-sface (sheet sface)
   "Create a frame for SFACE and open it."
   (assert (visiblep sface))
   ;; Create the new frame:
-  (let ((left-margin
-	 (let ((padding-spec (left-padding sface)))
-	   (econd
+  (let* ((left-margin
+	  (let ((padding-spec (left-padding sface)))
+	    (econd
 	     ((eq padding-spec 'self)
 	      (column sheet))
 	     ((numberp padding-spec)
-	      (safe-padding sheet (+ padding-spec (current-left-margin sheet))))
+	      (safe-left-margin sheet
+				(+ (current-left-margin sheet) padding-spec)))
 	     ((listp padding-spec)
-	      (safe-padding sheet
-			    (destructuring-bind
-				  (padding relative-to &optional face-name)
-				padding-spec
-			      ;; #### FIXME: should provide a better error
-			      ;; message
-			      (econd
-				((and (eq relative-to 'absolute)
-				      (null face-name))
-				 ;; Absolute positions are OK as long as we
-				 ;; don't roll back outside the enclosing
-				 ;; frame.
-				 (max padding (current-left-margin sheet)))
-				((and (eq relative-to :relative-to)
-				      (symbolp face-name))
-				 (let* ((generation
-					 (parent-generation sface face-name))
-					(left-margin
-					 (frame-left-margin
-					  ;; #### WARNING: we have not open
-					  ;; the new frame yet, so decrement
-					  ;; the generation level !!
-					  (nth (1- generation) (frames sheet)))))
-				   (+ padding left-margin)))))))))))
+	      (destructuring-bind (padding relative-to &optional face-name)
+		  padding-spec
+		;; #### FIXME: should provide better error handling
+		(econd ((and (eq relative-to 'absolute)
+			     (null face-name))
+			(safe-left-margin sheet padding))
+		       ((and (eq relative-to :relative-to) (symbolp face-name))
+			(let* ((generation (parent-generation sface face-name))
+			       (left-margin
+				(frame-left-margin
+				 ;; #### WARNING: we have not open the new
+				 ;; frame yet, so decrement the generation
+				 ;; level !!
+				 (nth (1- generation) (frames sheet)))))
+			  (safe-left-margin sheet
+					    (+ left-margin padding))))))))))
+	 (right-margin
+	  (let ((padding-spec (right-padding sface)))
+	    (econd
+	     ((eq padding-spec 'self)
+	      nil)
+	     ((numberp padding-spec)
+	      (if (numberp (current-right-margin sheet))
+		  (safe-right-margin sheet left-margin
+				     (- (current-right-margin sheet)
+					padding-spec))
+		  (error
+"Right padding (face ~A) can't be :relative-to a self right margin (face ~A)."
+		   (name sface) (name (current-sface sheet)))))
+	     ((listp padding-spec)
+	      (destructuring-bind (padding relative-to &optional face-name)
+		  padding-spec
+		;; #### FIXME: should provide better error handling
+		(econd ((and (eq relative-to 'absolute)
+			     (null face-name))
+			(safe-right-margin sheet left-margin padding))
+		       ((and (eq relative-to :relative-to) (symbolp face-name))
+			(let* ((generation (parent-generation sface face-name))
+			       (right-margin
+				(frame-right-margin
+				 ;; #### WARNING: we have not
+				 ;; open the new frame yet, so
+				 ;; decrement the generation
+				 ;; level !!
+				 (nth (1- generation) (frames sheet)))))
+			  (if (numberp right-margin)
+			      (safe-right-margin sheet left-margin
+						 (- right-margin padding))
+	      (error "Can't be :relative-to a self right margin.")))))))))))
     (push-frame sheet
 		(if (highlightp sheet)
 		    (let ((highlight-property-instances
@@ -446,9 +504,12 @@ PADDING is returned when it does not exceed SHEET's line width."
 					    sface property)))))
 		      (make-highlight-frame :sface sface
 					    :left-margin left-margin
+					    :right-margin right-margin
 					    :highlight-property-instances
 					    highlight-property-instances))
-		    (make-frame :sface sface :left-margin left-margin))))
+		    (make-frame :sface sface
+				:left-margin left-margin
+				:right-margin right-margin))))
   ;; Open the new frame:
   (open-frame sheet (current-frame sheet)))
 
@@ -648,6 +709,7 @@ PADDING is returned when it does not exceed SHEET's line width."
 
 (defun try-read-theme (pathname)
   "Read a theme from PATHNAME or PATHNAME.cth if it exists or return nil."
+  ;; #### FIXME: should warn or err if file doesn't exist.
   (or (try-read-sface-tree pathname)
       (unless (string= (pathname-type pathname) "cth")
 	(try-read-sface-tree (merge-pathnames pathname
