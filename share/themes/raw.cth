@@ -28,9 +28,12 @@
 			    :face (short-name :item-separator nil)
 			    :face (long-name  :item-separator nil))
 	      :face (description :display block :padding-left (30 absolute)
-				 :face (fallback :padding-top 0)
-				 :face (default :padding-top 0)
-				 :face (environment :padding-top 0)))
+				 :face (fallback :padding-top 0
+						 :face title)
+				 :face (default :padding-top 0
+					 :face title)
+				 :face (environment :padding-top 0
+						    :face title)))
 
 :face (group :display block :padding-top 0 :padding-bottom 0
 	     :face (title :padding-top 0 :padding-bottom 0)
