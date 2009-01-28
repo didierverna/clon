@@ -254,15 +254,15 @@ etc. If PARENT-NAME does not name one of FACE's ancestors, trigger an error."
 ;; Face Instance Creation
 ;; =========================================================================
 
-;; #### NOTE: although we don't use them explicitely, the SUBFACE, BOLD and
-;; DISPLAY  initargs are declared valid below.
+;; #### NOTE: although we don't use them explicitely, the SUBFACE, BOLD,
+;; DISPLAY, HIDDEN and REVEALED initargs are declared valid below.
 (defmethod initialize-instance :around
-    ((instance face) &rest keys &key face bold display)
+    ((instance face) &rest keys &key face bold display hidden revealed)
   "Canonicalize initialization arguments.
 This involves:
 - computing the :subfaces initarg from the :face ones,
 - handling convenience highlight properties."
-  (declare (ignore face bold display))
+  (declare (ignore face bold display hidden revealed))
   (apply #'call-next-method instance
 	 :subfaces (remove :face (select-keys keys :face))
 	 (replace-keys keys :face
