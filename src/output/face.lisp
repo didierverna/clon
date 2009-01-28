@@ -43,7 +43,7 @@
 ;; follow the usual *p convention. That's because they would look strange when
 ;; used as declarative properties in a theme file, where it is not obvious to
 ;; the end-user that she's actually calling instantiation functions with
-;; initargs.
+;; initargs (or even using Lisp at all).
 (defclass face ()
   ((name :documentation "The face name."
 	 :initarg :name
