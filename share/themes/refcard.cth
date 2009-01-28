@@ -18,18 +18,17 @@
 
 ;;; Code:
 
-:display block
 :item-separator ", "
 
 :face (synopsis :bold t :padding-bottom 1)
 
-:face (text :display hidden)
+:face (text :hidden t)
 
 :face (option :padding-left 2
 	      :face (syntax :item-separator "/"
 			    :face (short-name :item-separator nil)
 			    :face (long-name  :item-separator nil))
-	      :face (description :display hidden))
+	      :face (description :hidden t))
 
 :face (group :padding-top 0 :padding-bottom 0 :item-separator #\space
 	     :face (title :bold t)

@@ -144,7 +144,7 @@ FORM is evaluated each time and should return a key-value list."
   `(loop :for ,key :in ,keys :by #'cddr
     :for ,val :in (cdr ,keys) :by #'cddr
     :if (eql ,key ,the-key)
-    :nconc ,form
+    :append ,form
     :else
     :nconc (list ,key ,val)))
 
@@ -165,10 +165,11 @@ REPLACEMENT can take the following forms:
   either a value or a list of values. The effect is to replace :KEY with
   :NEW-KEY and a value matching one of the VAL-OR-VALS with the
   corresponding NEW-VAL. Values not matching any VAL-OR-VALS remain unchanged.
-- (:KEY (VAL-OR-VALS :NEW-KEY NEW-VAL)*), with VAL-OR-VALS as above. The
+- (:KEY (VAL-OR-VALS :NEW-KEY NEW-VAL...)*), with VAL-OR-VALS as above. The
   effect is the same as above, but :NEW-KEY additionally depends on the
-  matched value. For values not matching any VAL-OR-VALS, :KEY and its value
-  remain unchanged."
+  matched value. If multiple :NEW-KEY NEW-VAL couples are provided, that many
+  new keys are inserted along with their values. For values not matching any
+  VAL-OR-VALS, :KEY and its value remain unchanged."
   (econd ((symbolp replacement)
 	  (remove-keys keys replacement))
 	 ((and (consp replacement)
@@ -203,7 +204,7 @@ REPLACEMENT can take the following forms:
 					      (member val val-or-vals)
 					      (eql val val-or-vals))))))
 		(if match
-		    (list (cadr match) (caddr match))
+		    (cdr match)
 		    (list key val))))))))
 
 (defun replace-keys (keys &rest replacements)

@@ -16,19 +16,18 @@
 
 ;;; Code:
 
-:display block
+:face (synopsis :hidden t)
 
-:face (synopsis :display hidden)
+:face (text :hidden t)
 
-:face (text :display hidden)
-
-:face (option :display block :padding-left 2 :padding-top 0
+:face (option :padding-left 2 :padding-top 0
 	      :face (syntax :item-separator ", "
 			    :face (short-name :item-separator nil)
 			    :face (long-name  :item-separator nil))
-	      :face (description :display hidden))
+	      :face (description :hidden t))
 
-:face (group :face (title :display hidden))
+:face (group :padding-top 0 :padding-bottom 0
+	     :face (title :hidden t))
 
 
 ;;; optlist.cth ends here

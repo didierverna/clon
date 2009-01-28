@@ -17,34 +17,23 @@
 
 ;;; Code:
 
-:display block
+:face (synopsis :padding-bottom 1)
 
-:face (synopsis :display block :padding-bottom 1)
+:face (text :padding-top 1 :padding-bottom 1)
 
-:face (text :display block :padding-top 1 :padding-bottom 1)
-
-:face (option :display block
-	      :padding-left 2
-	      :padding-top 0
-	      :padding-bottom 0
+:face (option :padding-left 2 :padding-top 0 :padding-bottom 0
 	      :item-separator #\newline
 	      :face (syntax :item-separator ", "
 			    :bold t
 			    :face (short-name :item-separator nil)
 			    :face (long-name  :item-separator nil))
-	      :face (description :display block
-				 :padding-left 5
+	      :face (description :padding-left 5
 				 :item-separator #\newline))
 
-:face (group :display block
-	     :padding-top 1
-	     :padding-bottom 1
+:face (group :padding-top 1 :padding-bottom 1
 	     :item-separator #\newline
 	     :face (title :underline t)
-	     :face (group :display block
-			  :padding-left 2
-			  :padding-top 0
-			  :padding-bottom 0
+	     :face (group :padding-left 2 :padding-top 0 :padding-bottom 0
 			  :item-separator #\newline))
 
 

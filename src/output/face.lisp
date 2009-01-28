@@ -309,9 +309,7 @@ This involves:
 (defun make-raw-face-tree (&optional (face-class 'face))
   "Make a raw (boring yet functional) face tree."
   (make-face-tree '(toplevel
-		    :display block
 		    :face (synopsis
-			   :display block
 			   :padding-bottom 1
 			   :face program
 			   :face minus-pack
@@ -319,11 +317,9 @@ This involves:
 			   :face options
 			   :face postfix)
 		    :face (text
-			   :display block
 			   :padding-top 0
 			   :padding-bottom 0)
 		    :face (option
-			   :display block
 			   :padding-left 2
 			   :padding-top 0
 			   :padding-bottom 0
@@ -336,7 +332,6 @@ This involves:
 					 :item-separator nil
 					 :face argument))
 			   :face (description
-				  :display block
 				  :padding-left (30 absolute)
 				  :face (fallback
 					 :padding-top 0
@@ -351,7 +346,6 @@ This involves:
 					 :face title
 					 :face variable)))
 		    :face (group
-			   :display block
 			   :padding-top 0
 			   :padding-bottom 0
 			   :face (title

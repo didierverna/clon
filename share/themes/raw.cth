@@ -17,17 +17,15 @@
 
 ;;; Code:
 
-:display block
+:face (synopsis :padding-bottom 1)
 
-:face (synopsis :display block :padding-bottom 1)
+:face (text :padding-top 0 :padding-bottom 0)
 
-:face (text :display block :padding-top 0 :padding-bottom 0)
-
-:face (option :display block :padding-left 2 :padding-top 0 :padding-bottom 0
+:face (option :padding-left 2 :padding-top 0 :padding-bottom 0
 	      :face (syntax :item-separator ", "
 			    :face (short-name :item-separator nil)
 			    :face (long-name  :item-separator nil))
-	      :face (description :display block :padding-left (30 absolute)
+	      :face (description :padding-left (30 absolute)
 				 :face (fallback :padding-top 0
 						 :face title)
 				 :face (default :padding-top 0
@@ -35,7 +33,7 @@
 				 :face (environment :padding-top 0
 						    :face title)))
 
-:face (group :display block :padding-top 0 :padding-bottom 0
+:face (group :padding-top 0 :padding-bottom 0
 	     :face (title :padding-top 0 :padding-bottom 0)
 	     :face (contents  :padding-top 0 :padding-bottom 0))
 
