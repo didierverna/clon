@@ -49,10 +49,10 @@
 	 :initarg :name
 	 :reader name)
    ;; Layout properties:
-   (display :documentation "The face display mode."
-	    :initarg :display
-	    :initform 'inline
-	    :reader display)
+   (visiblep :documentation "Whether the face is visible."
+	     :initarg :visible
+	     :initform t
+	     :reader visiblep)
    (left-padding :documentation "The face left padding.
 This property can take the following forms:
 - <NUMBER>: the padding is relative to the enclosing face,
@@ -134,10 +134,6 @@ This property can take the following forms:
 	   :initform nil
 	   :reader parent))
   (:documentation "The FACE class."))
-
-(defun visiblep (face)
-  "Return t if FACE's display property is not HIDDEN."
-  (not (eq (display face) 'hidden)))
 
 (defun add-subface (face subface)
   "Add SUBFACE to FACE's subfaces and return it."
@@ -259,18 +255,22 @@ etc. If PARENT-NAME does not name one of FACE's ancestors, trigger an error."
 ;; =========================================================================
 
 ;; #### NOTE: although we don't use them explicitely, the SUBFACE, BOLD and
-;; REVEALED  initargs are declared valid below.
+;; DISPLAY  initargs are declared valid below.
 (defmethod initialize-instance :around
-    ((instance face) &rest keys &key face bold revealed)
+    ((instance face) &rest keys &key face bold display)
   "Canonicalize initialization arguments.
 This involves:
 - computing the :subfaces initarg from the :face ones,
 - handling convenience highlight properties."
-  (declare (ignore face bold revealed))
+  (declare (ignore face bold display))
   (apply #'call-next-method instance
 	 :subfaces (remove :face (select-keys keys :face))
 	 (replace-keys keys :face
 		       '(:bold :intensity (t bold) (nil normal))
+		       '(:display ((nil hidden) :visible nil)
+				  ((t visible revealed) :concealed nil)
+				  (concealed :concealed t))
+		       '(:hidden :visible (t nil) (nil t))
 		       '(:revealed :concealed (t nil) (nil t)))))
 
 ;; #### NOTE: we use the NAME keyword here because we're in the before method,
