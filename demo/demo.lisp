@@ -84,7 +84,7 @@
   "This program's synopsis .")
 
 (defun main ()
-  "This program's main function."
+  "Entry point for the standalone application."
   ;; This context will use the POSIX command line and is made current by
   ;; default:
   (clon:make-context :synopsis *synopsis* :error-handler :none
