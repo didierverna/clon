@@ -1,0 +1,17 @@
+							      -*- outline -*-
+
+* Installing Clon
+
+Clon comes with the Common Lisp source code in the src directory and some data
+in the share directory. Note that this data is not required in order to
+/build/ a clonified application, but it is required in order to /run/ it.
+
+** Installing the Lisp files
+Since Clon is ASDF aware, installing it simply requires you to:
+1. cd the-common-lisp-systems-directory
+2. ln -s the-path-to-clon-sources/src/clon.asd
+
+** Installing the shared data
+Data files are installed in /usr/local/share by default.
+1. Optionally edit Makefile.cnf to specify a different installation prefix.
+2. Type "make install", either at the toplevel or in the share directory.
