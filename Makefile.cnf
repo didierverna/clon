@@ -1,11 +1,11 @@
-### Makefile --- Makefile for Clon's share directory
+### Makefile.cnf --- Configuration for Clon
 
 ## Copyright (C) 2009 Didier Verna
 
 ## Author:        Didier Verna <didier@lrde.epita.fr>
 ## Maintainer:    Didier Verna <didier@lrde.epita.fr>
-## Created:       Sun Jan  4 14:49:06 2009
-## Last Revision: Sun Jan  4 14:49:06 2009
+## Created:       Sun May 31 17:18:34 2009
+## Last Revision: Sun May 31 17:18:34 2009
 
 ## This file is part of Clon.
 
@@ -31,21 +31,8 @@
 
 ### Code:
 
-include ../Makefile.cnf
-
-SHARE      := $(PREFIX)/share
-CLON_SHARE := $(SHARE)/clon
-THEMES_DIR := $(CLON_SHARE)/themes
+# Installation prefix:
+PREFIX := /usr/local
 
 
-all:
-
-install:
-	install -d -m 755 $(THEMES_DIR)
-	install -m 644 themes/* $(THEMES_DIR)/
-
-
-.PHONY: all install
-
-
-### Makefile ends here
+### Makefile.cnf ends here

@@ -1,11 +1,11 @@
-### Makefile --- Makefile for Clon's share directory
+### Makefile --- Makefile for Clon's src directory
 
 ## Copyright (C) 2009 Didier Verna
 
 ## Author:        Didier Verna <didier@lrde.epita.fr>
 ## Maintainer:    Didier Verna <didier@lrde.epita.fr>
-## Created:       Sun Jan  4 14:49:06 2009
-## Last Revision: Sun Jan  4 14:49:06 2009
+## Created:       Sun May 31 17:24:02 2009
+## Last Revision: Sun May 31 17:24:02 2009
 
 ## This file is part of Clon.
 
@@ -33,17 +33,10 @@
 
 include ../Makefile.cnf
 
-SHARE      := $(PREFIX)/share
-CLON_SHARE := $(SHARE)/clon
-THEMES_DIR := $(CLON_SHARE)/themes
-
 
 all:
 
 install:
-	install -d -m 755 $(THEMES_DIR)
-	install -m 644 themes/* $(THEMES_DIR)/
-
 
 .PHONY: all install
 
