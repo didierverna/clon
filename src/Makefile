@@ -32,11 +32,16 @@
 ### Code:
 
 include ../Makefile.cnf
+include ../Makefile.inc
+
+SYSTEMS_DIR := $(SHARE)/common-lisp/systems
 
 
 all:
 
 install:
+	ln -fs clon.asd $(SYSTEMS_DIR)/
+
 
 .PHONY: all install
 

@@ -33,7 +33,7 @@
 SUBDIRS := src share
 
 include Makefile.cnf
-
+include Makefile.inc
 
 all:
 	$(MAKE) gen TARGET=all
