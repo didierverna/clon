@@ -35,15 +35,17 @@ include ../Makefile.cnf
 include ../Makefile.inc
 
 SYSTEMS_DIR := $(SHARE)/common-lisp/systems
-
+ASDF_FILE   := clon.asd
 
 all:
 
 install:
-	ln -fs clon.asd $(SYSTEMS_DIR)/
+	ln -fs $(ASDF_FILE) $(SYSTEMS_DIR)/
 
+uninstall:
+	-rm -f $(SYSTEMS_DIR)/$(ASDF_FILE)
 
-.PHONY: all install
+.PHONY: all install uninstall
 
 
 ### Makefile ends here

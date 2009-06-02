@@ -44,8 +44,11 @@ install:
 	install -d -m 755 $(THEMES_DIR)
 	install -m 644 themes/* $(THEMES_DIR)/
 
+uninstall:
+	-rm -fr $(CLON_SHARE)
 
-.PHONY: all install
+
+.PHONY: all install uninstall
 
 
 ### Makefile ends here
