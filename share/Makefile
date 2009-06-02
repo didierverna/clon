@@ -47,6 +47,9 @@ install:
 uninstall:
 	-rm -fr $(CLON_SHARE)
 
+clean:
+
+distclean: clean
 
 .PHONY: all install uninstall
 

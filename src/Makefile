@@ -45,7 +45,12 @@ install:
 uninstall:
 	-rm -f $(SYSTEMS_DIR)/$(ASDF_FILE)
 
-.PHONY: all install uninstall
+clean:
+	-rm *~
+
+distclean: clean
+
+.PHONY: all install uninstall clean distclean
 
 
 ### Makefile ends here
