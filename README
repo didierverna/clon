@@ -18,4 +18,13 @@ to modify some installation parameters (if needed).
 These targets (all targets actually) propagate to the subdiretories.
 
 *** Additional notes:
-The build phase generates the documentation (that's actually all it does).
+The build phase generates the documentation (that's actually all it does). By
+default, documentation is built (and installed) in info and PDF formats. If
+you want other formats, type "make all-formats" in the doc directory. You can
+also type individually make "dvi", "ps" and/or "html" in order to get the
+corresponding format.
+
+
+* Uninstallation
+
+Type "make uninstall".
