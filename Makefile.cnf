@@ -31,7 +31,12 @@
 
 ### Code:
 
-# Installation prefix:
+# Installation prefix.
+# - Clon ASDF file will be symlinked in $(PREFIX)/share/common-lisp/systems
+# - Clon data will end up in $(PREFIX)/share/clon/
+# - Clon documentation will end up in $(PREFIX)/share/doc/clon/
+# If any of these are unsatisfactory, you will need to edit the Makefiles, or
+# do the installation by hand.
 PREFIX := /usr/local
 
 
