@@ -9,10 +9,13 @@ The Clon distribution has the following shape:
 ./doc/		;; documentation
 
 
-* Installation
+* Building and Installation
 
 ** Edit Makefile.cnf
 to modify some installation parameters (if needed).
 
 ** Type "make" and then "make install" from the toplevel directory
 These targets (all targets actually) propagate to the subdiretories.
+
+*** Additional notes:
+The build phase generates the documentation (that's actually all it does).
