@@ -30,7 +30,7 @@
 
 ### Code:
 
-SUBDIRS := src share
+SUBDIRS := src share doc
 
 include Makefile.cnf
 include Makefile.inc
