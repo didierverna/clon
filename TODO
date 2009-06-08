@@ -1,0 +1,3 @@
+* no need to remove arguments from property lists
+  (for instance in (apply #'make-instance ...), so I guess my remove-key is
+   not necessary).
