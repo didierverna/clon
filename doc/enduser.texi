@@ -31,16 +31,17 @@
 @c Contents management by FCM version 0.1.
 
 
-@c %** start of header
+@c %**start of header
 @setfilename enduser.info
 @settitle The Clon end-user manual
+@c %**end of header
+
 @setchapternewpage odd
 @setcontentsaftertitlepage
 @dircategory Common Lisp
 @direntry
 * Clon: (clon). The Common Lisp Option Nuker.
 @end direntry
-@c %** end of header
 
 
 @c ====================================================================
@@ -117,6 +118,61 @@ approved by the Free Software Foundation.
 @end titlepage
 
 
+@c ====================================================================
+@c Master menu
+@c ====================================================================
+@ifnottex
+@node Top, Copying, , (dir)
+@comment  node-name,  next,  previous,  up
+@top Clon
+
+Clon is a library design to ease the management of command-line option
+in standalone Common Lisp applications.
+
+This info file is the Clon end-user manual: it describes how to use
+``clonified'' applications, that is, programs using the Clon library.
+This manual corresponds to Clon version @value{VERSION}.
+
+@menu
+* Copying::          The GNU General Public License
+* Introduction::     What Clon is all about
+@end menu
+
+Clon is developed by Didier Verna @email{didier@@lrde.epita.fr}.
+
+@end ifnottex
+
+
+@c ====================================================================
+@c Copying
+@c ====================================================================
+@node Copying, Introduction, Top, Top
+@comment  node-name,  next,  previous,  up
+@unnumbered Copying
+
+Clon is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License version 2,
+as published by the Software Foundation.
+
+Clon is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+
+@c ====================================================================
+@c Introduction
+@c ====================================================================
+@node Introduction, , Copying, Top
+@comment  node-name,  next,  previous,  up
+@chapter Introduction
+
+
 
 @bye
+
 @c enduser.texi ends here
