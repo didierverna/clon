@@ -54,6 +54,18 @@ describes the use of applications powered by Clon.
 
 
 @c ====================================================================
+@c New Commands
+@c ====================================================================
+@macro Clon
+@t{Clon}
+@end macro
+
+@macro tty
+@t{tty}
+@end macro
+
+
+@c ====================================================================
 @c Info Category and Directory
 @c ====================================================================
 @dircategory Common Lisp
@@ -122,13 +134,15 @@ approved by the Free Software Foundation.
 @comment  node-name,  next,  previous,  up
 @top The Clon end-user manual
 
-This is the Clon end-user manual for Clon version @value{VERSION}: it
-describes the use of applications powered by Clon.
+This is the @Clon{} end-user manual for @Clon{} version
+@value{VERSION}: it describes the use of applications powered by
+@Clon{}.
 
 @menu
-* Copying::                     The GNU General Public License
-* Introduction::                What Clon is all about
-* Concept Index::               Concept Index
+* Copying::                   The GNU General Public License
+* Introduction::              What Clon is all about
+* Clonification::             Determining whether a program is powered by Clon
+* Concept Index::             Concept Index
 @end menu
 
 @insertcopying
@@ -143,34 +157,98 @@ describes the use of applications powered by Clon.
 @unnumbered Copying
 
 @quotation
-Clon is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License version 2,
-as published by the Software Foundation.
+@Clon{} is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License version 2, as published by
+the Software Foundation.
 
-Clon is distributed in the hope that it will be useful, but WITHOUT
+@Clon{} is distributed in the hope that it will be useful, but WITHOUT
 ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
 FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
 more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+675 Mass Ave, Cambridge, MA 02139, USA.
 @end quotation
 
 
 @c ====================================================================
 @c Introduction
 @c ====================================================================
-@node Introduction, Concept Index, Copying, Top
+@node Introduction, Clonification, Copying, Top
 @comment node-name, next, previous, up
 @chapter Introduction
 
+@Clon{} is a library for managing command-line options in standalone
+Common Lisp applications. It provides a unified option syntax with both
+short and long names, automatic completion of partial names and
+automatic retrieval/conversion of option values from the command-line,
+associated environment variables or default values. @Clon{} comes with a
+set of extensible option types (numbers, paths, strings etc). @Clon{}
+also provides automatic generation and formatting of help strings, with
+support for highlighting on @tty{}'s through ISO/IEC 6429 SGR. This
+formatting is customizable through ``themes''.
+
+Depending on the target audience, @Clon{} stands for either ``The
+Command-Line Option Nuker'' or ``The Common Lisp Option Nuker''. @Clon{}
+also has a recursive acronym: ``@Clon{} Likes Options Nuking'', and a
+reverse one: ``Never Omit to Link with @Clon{}''.
+
+This manual is for the @Clon{} end-user, that is, the user of an
+application powered by @Clon{}. It describes how to use the command-line
+of clonified@footnote{An application using @Clon{} for its command-line
+option management is said to be ``clonified''. It is also possible to
+say ``clonfiscated''. However, we advise against using ``clonistified''. 
+The term ``clonificated'' is also considered bad style, and the use of
+``clonificationated'' is strictly prohibited.} applications and how to
+customize @Clon{}'s output. Everybody should read this manual first. If
+you want to use @Clon{} in one of your applications, then you are
+considered a @Clon{} @emph{user}, as opposed to a @Clon{}
+@emph{end-user}, and you should then read the corresponding manual
+(@pxref{Top, , , clon-user, The Clon user manual, The Clon user manual}).
+
+
+@c ====================================================================
+@c Clonification
+@c ====================================================================
+@node Clonification, Concept Index, Introduction, Top
+@comment  node-name,  next,  previous,  up
+@chapter Clonification
+
+Before knowing how to handle clonified programs, you must ensure that
+they are indeed @Clon{}-enabled. Perhaps the simplest way to do that is
+to type @kbd{theprogram --clon-help} and see what happens. If you get an
+error, then you're out of luck. Otherwise, you will get a list of
+@Clon{}-specific options. Every clonified application has these options
+built-in. We will describe most of them when appropriate in this manual,
+but here's already the description for a couple of them (in addition to
+@option{--clon-help} that we've just mentioned).
+
+@itemize @bullet
+@item @option{--clon-banner}
+
+This option outputs a whole bunch of information, including the version
+of @Clon{} the application is using, and @Clon{}-specific copyright
+information.
+
+@item @option{--clon-version}
+
+This option outputs the version of @Clon{} the application is using. By
+default (or by using it like this: @kbd{--clon-version=long}), this
+information is provided in ``long'' form (release number, status and
+name; just try it to see what gives). If you ask for
+@kbd{--clon-version=short}, you'll get a more compact version
+information, and if you try @kbd{--clon-version=number}, you will end up
+with a purely numerical version number. For more information on @Clon{}
+version numbering, @xref{Version Numbering, , , clon-user, The Clon user
+manual, The Clon user manual}.
+@end itemize 
 
 
 @c ====================================================================
 @c Concept Index
 @c ====================================================================
-@node Concept Index, , Introduction, Top
+@node Concept Index,  , Clonification, Top
 @comment node-name, next,  previous, up
 @unnumbered Concept Index
 
