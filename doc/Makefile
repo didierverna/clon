@@ -54,11 +54,17 @@ all-formats: all dvi ps html
 install: $(INFO_FILES) $(PDF_FILES)
 	install -d $(INFO_DIR)
 	install -m 644 $(ALL_INFO_FILES) $(INFO_DIR)/
+	for i in $(INFO_FILES); do			\
+	  install-info --info-dir=$(INFO_DIR) $$i;	\
+	done
 	install -d $(CLON_DOC_DIR)
 	install -m 644 $(PDF_FILES) $(CLON_DOC_DIR)/
 
 uninstall:
 	-rm -fr $(CLON_DOC_DIR)
+	for i in $(INFO_FILES); do				\
+	  install-info --delete --info-dir=$(INFO_DIR) $$i;	\
+	done
 	cd $(INFO_DIR) && rm -f $(ALL_INFO_FILES)
 
 info: $(INFO_FILES)
