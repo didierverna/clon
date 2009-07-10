@@ -1,13 +1,13 @@
 \input texinfo
 
-@c enduser.texi --- The Clon end-user manual
+@c clon-enduser.texi --- The Clon end-user manual
 
 @c Copyright (C) 2009 Didier Verna
 
 @c Author:        Didier Verna <didier@lrde.epita.fr>
 @c Maintainer:    Didier Verna <didier@lrde.epita.fr>
 @c Created:       Tue Jun  2 18:29:49 2009
-@c Last Revision: Tue Jun  2 18:29:49 2009
+@c Last Revision: Thu Jul  9 18:32:14 2009
 
 @c This file is part of Clon.
 
@@ -31,40 +31,47 @@
 @c Contents management by FCM version 0.1.
 
 
+@c ====================================================================
+@c Header
+@c ====================================================================
 @c %**start of header
-@setfilename enduser.info
+@setfilename clon-enduser.info
 @settitle The Clon end-user manual
 @c %**end of header
 
+
+@c ====================================================================
+@c Settings
+@c ====================================================================
+@set VERSION 1.0
+@set COPYRIGHT_DATE 2009
 @setchapternewpage odd
 @setcontentsaftertitlepage
+@documentdescription
+This is the Clon end-user manual for Clon version @value{VERSION}: it
+describes the use of applications powered by Clon.
+@end documentdescription
+
+
+@c ====================================================================
+@c Info Category and Directory
+@c ====================================================================
 @dircategory Common Lisp
 @direntry
-* Clon: (clon). The Common Lisp Option Nuker.
+* Clon: (clon-enduser). The End User Manual.
 @end direntry
 
 
 @c ====================================================================
-@c Definitions
+@c Copying
 @c ====================================================================
-@set VERSION 1.0
-@set COPYRIGHT_DATE 2009
-
-
-@c ====================================================================
-@c Copyright
-@c ====================================================================
-@ifinfo
-This file contains the end-user documentation for Clon version
-@value{VERSION}, a library for command-line option management in
-standalone Common Lisp applications.
-
+@copying
+@quotation
 Copyright @copyright{} @value{COPYRIGHT_DATE} Didier Verna.
 
 Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
 preserved on all copies.
-
 
 @ignore
 Permission is granted to process this file through TeX and print the
@@ -84,62 +91,47 @@ Permission is granted to copy and distribute translations of this manual
 into another language, under the above conditions for modified versions,
 except that this permission notice may be stated in a translation
 approved by the Free Software Foundation.
-@end ifinfo
+@end quotation
+@end copying
 
 
 @c ====================================================================
 @c Title Page
 @c ====================================================================
 @titlepage
-@title Clon
-@subtitle The Command-Line Options Nuker
+@title The Clon end-user manual
 @subtitle Version @value{VERSION}
 @author Didier Verna <@email{didier@@lrde.epita.fr}>
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} @value{COPYRIGHT_DATE} Didier Verna.
-
-
-Permission is granted to make and distribute verbatim copies of this
-manual provided the copyright notice and this permission notice are
-preserved on all copies.
-
-Permission is granted to copy and distribute modified versions of this
-manual under the conditions for verbatim copying, provided also that the
-sections entitled ``Copying'' and ``GNU General Public License'' are
-included exactly as in the original, and provided that the entire
-resulting derived work is distributed under the terms of a permission
-notice identical to this one.
-
-Permission is granted to copy and distribute translations of this manual
-into another language, under the above conditions for modified versions,
-except that this permission notice may be stated in a translation
-approved by the Free Software Foundation.
+@insertcopying
 @end titlepage
 
 
 @c ====================================================================
-@c Master menu
+@c Table of Contents
+@c ====================================================================
+@contents
+
+
+@c ====================================================================
+@c Master Menu
 @c ====================================================================
 @ifnottex
-@node Top, Copying, , (dir)
+@node Top, Copying, (dir), (dir)
 @comment  node-name,  next,  previous,  up
-@top Clon
+@top The Clon end-user manual
 
-Clon is a library design to ease the management of command-line option
-in standalone Common Lisp applications.
-
-This info file is the Clon end-user manual: it describes how to use
-``clonified'' applications, that is, programs using the Clon library.
-This manual corresponds to Clon version @value{VERSION}.
+This is the Clon end-user manual for Clon version @value{VERSION}: it
+describes the use of applications powered by Clon.
 
 @menu
-* Copying::          The GNU General Public License
-* Introduction::     What Clon is all about
+* Copying::                     The GNU General Public License
+* Introduction::                What Clon is all about
+* Concept Index::               Concept Index
 @end menu
 
-Clon is developed by Didier Verna @email{didier@@lrde.epita.fr}.
-
+@insertcopying
 @end ifnottex
 
 
@@ -147,9 +139,10 @@ Clon is developed by Didier Verna @email{didier@@lrde.epita.fr}.
 @c Copying
 @c ====================================================================
 @node Copying, Introduction, Top, Top
-@comment  node-name,  next,  previous,  up
+@comment node-name, next, previous, up
 @unnumbered Copying
 
+@quotation
 Clon is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License version 2,
 as published by the Software Foundation.
@@ -162,17 +155,27 @@ more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+@end quotation
 
 
 @c ====================================================================
 @c Introduction
 @c ====================================================================
-@node Introduction, , Copying, Top
-@comment  node-name,  next,  previous,  up
+@node Introduction, Concept Index, Copying, Top
+@comment node-name, next, previous, up
 @chapter Introduction
 
 
 
+@c ====================================================================
+@c Concept Index
+@c ====================================================================
+@node Concept Index, , Introduction, Top
+@comment node-name, next,  previous, up
+@unnumbered Concept Index
+
+@printindex cp
+
 @bye
 
-@c enduser.texi ends here
+@c clon-enduser.texi ends here
