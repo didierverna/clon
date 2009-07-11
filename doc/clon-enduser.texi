@@ -107,6 +107,7 @@ approved by the Free Software Foundation.
 @end copying
 
 
+
 @c ====================================================================
 @c Title Page
 @c ====================================================================
@@ -120,10 +121,12 @@ approved by the Free Software Foundation.
 @end titlepage
 
 
+
 @c ====================================================================
 @c Table of Contents
 @c ====================================================================
 @contents
+
 
 
 @c ====================================================================
@@ -131,7 +134,6 @@ approved by the Free Software Foundation.
 @c ====================================================================
 @ifnottex
 @node Top, Copying, (dir), (dir)
-@comment  node-name,  next,  previous,  up
 @top The Clon end-user manual
 
 This is the @Clon{} end-user manual for @Clon{} version
@@ -139,21 +141,23 @@ This is the @Clon{} end-user manual for @Clon{} version
 @Clon{}.
 
 @menu
-* Copying::                   The GNU General Public License
-* Introduction::              What Clon is all about
-* Clonification::             Determining whether a program is powered by Clon
-* Concept Index::             Concept Index
+* Copying::                     The GNU General Public License
+* Introduction::                What Clon is all about
+* Clonification::               Determining whether a program is powered by Clon
+* Command Line Options::        Making use of @Clon{}'s command-line features
+* Output::                      Understanding and customizing @Clon{}'s output
+* Concept Index::               Concept Index
 @end menu
 
 @insertcopying
 @end ifnottex
 
 
+
 @c ====================================================================
 @c Copying
 @c ====================================================================
 @node Copying, Introduction, Top, Top
-@comment node-name, next, previous, up
 @unnumbered Copying
 
 @quotation
@@ -172,11 +176,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 @end quotation
 
 
+
 @c ====================================================================
 @c Introduction
 @c ====================================================================
 @node Introduction, Clonification, Copying, Top
-@comment node-name, next, previous, up
 @chapter Introduction
 
 @Clon{} is a library for managing command-line options in standalone
@@ -190,9 +194,10 @@ support for highlighting on @tty{}'s through ISO/IEC 6429 SGR. This
 formatting is customizable through ``themes''.
 
 Depending on the target audience, @Clon{} stands for either ``The
-Command-Line Option Nuker'' or ``The Common Lisp Option Nuker''. @Clon{}
+Command Line Option Nuker'' or ``The Common Lisp Option Nuker''. @Clon{}
 also has a recursive acronym: ``@Clon{} Likes Options Nuking'', and a
-reverse one: ``Never Omit to Link with @Clon{}''.
+reverse one: ``Never Omit to Link with @Clon{}''. I think that should be
+enough for now.
 
 This manual is for the @Clon{} end-user, that is, the user of an
 application powered by @Clon{}. It describes how to use the command-line
@@ -208,11 +213,11 @@ considered a @Clon{} @emph{user}, as opposed to a @Clon{}
 (@pxref{Top, , , clon-user, The Clon user manual, The Clon user manual}).
 
 
+
 @c ====================================================================
 @c Clonification
 @c ====================================================================
-@node Clonification, Concept Index, Introduction, Top
-@comment  node-name,  next,  previous,  up
+@node Clonification, Command Line Options, Introduction, Top
 @chapter Clonification
 
 Before knowing how to handle clonified programs, you must ensure that
@@ -245,11 +250,116 @@ manual, The Clon user manual}.
 @end itemize 
 
 
+
+@c ====================================================================
+@c Command Line Options
+@c ====================================================================
+@node Command Line Options, Output, Clonification, Top
+@chapter Command Line Options
+
+When using a clonified application, you will probably encounter a couple
+of familiar concepts, such as option names coming in short form
+(@samp{-h}) or long form (@samp{--help}). @Clon{}, however, also comes
+with a set a specific features such as packs or abbreviated calls that
+you might want to become familiar with in order to use an application's
+command-line to its full extent.
+
+In this chapter, we will look at option syntax, how the command-line is
+organized, and also how you can call options by abbreviated names.
+
+@menu
+* Option Syntax::               
+* Command Line Structure::      
+* Abbreviation::                
+@end menu
+
+
+@c -------------
+@c Option Syntax
+@c -------------
+@node Option Syntax, Command Line Structure, Command Line Options, Command Line Options
+@section Option Syntax
+
+@Clon{} offers a set of precise syntactic rules that every clonified
+application follows implicitely, making them work in a homogeneous way. 
+Although application programmers have the ability to extend @Clon{} by
+defining their own option @emph{types}, even those new options obey the
+same syntactic rules as the built-in ones.
+
+@menu
+* Short or Long Form::          How to avoid filling up your memory
+* Environment::                 Environment variables associated with options
+* Flags::                       Options that stand for themselves
+* Valued Options::              Options that can take arguments
+@end menu
+
+@node Short or Long Form, Environment, Option Syntax, Option Syntax
+@subsection Short or Long Form
+
+An option can come with either a short name, a long name, or both. A
+``short call'' (or ``minus call'') consists of a single dash followed by
+the option's short name (for example @samp{-h}). A ``long call'', on the
+contrary, consists of two dashes followed by the option's long name (for
+example @samp{--help}).
+
+Short names typically consist of a single character. They are concise
+but more difficult to remember. Long names can be whole words, or even
+word sequences. They are easier to remember but longer to type on the
+command-line. That is the conventional usage of short and long names at
+least.
+
+You should be aware of the fact that in a clonified application, neither
+short names nore long ones are restricted in length. In fact, it would
+be perfectly possible to have an option with a short name longer than
+the corresponding long one, although that would make little sense. The
+only real difference is whether you use one or two dashes. Some other
+differences also come into play for valued options (@pxref{Valued
+Options}) though. Yes, life can be complicated sometimes@dots{}
+
+@node Environment, Flags, Short or Long Form, Option Syntax
+@subsection Environment
+
+An application programmer can choose to associate an option with an
+environment variable. When the application tries to retrieve the value
+of an option and the option does not appear on the command-line, the
+associated environment variable (if any) is tried instead. Normally,
+such an association should be advertised in the application's help
+string.
+
+@node Flags, Valued Options, Environment, Option Syntax
+@subsection Flags
+
+
+
+@node Valued Options,  , Flags, Option Syntax
+@subsection Valued Options
+
+
+@c ----------------------
+@c Command Line Structure
+@c ----------------------
+@node Command Line Structure, Abbreviation, Option Syntax, Command Line Options
+@section Command Line Structure
+
+
+@c ------------
+@c Abbreviation
+@c ------------
+@node Abbreviation,  , Command Line Structure, Command Line Options
+@section Abbreviation
+
+
+@c ====================================================================
+@c Output
+@c ====================================================================
+@node Output, Concept Index, Command Line Options, Top
+@chapter Output
+
+
 @c ====================================================================
 @c Concept Index
 @c ====================================================================
-@node Concept Index,  , Clonification, Top
-@comment node-name, next,  previous, up
+@node Concept Index,  , Output, Top
 @unnumbered Concept Index
 
 @printindex cp
