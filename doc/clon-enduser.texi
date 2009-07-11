@@ -329,6 +329,24 @@ string.
 @node Flags, Valued Options, Environment, Option Syntax
 @subsection Flags
 
+Flags are the only options that never take an argument. They just stand
+for themselves: either they are present on the command-line, or they are
+not (actually, that is a lie). A typical example of a flag would be
+displayed like this in a standard help string (but @xref{Output}).
+
+@example
+  -h, --help        Print this help and exit.
+@end example
+
+Flags can still be associated with an environment variable however. For
+such options, the presence of the environment variable in the
+application's environment (regardless of its value, since flags don't
+take any argument) will account for the presence of the flag on the
+command-line (see why I lied before ?). Suppose for instance that an
+application has a @option{--ndebug} flag, associated with the
+environment variable @env{NDEBUG}. Setting this variable in the
+environment will make the application behave as if the option was given
+all the time on the command-line.
 
 
 @node Valued Options,  , Flags, Option Syntax
