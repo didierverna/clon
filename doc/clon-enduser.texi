@@ -268,9 +268,9 @@ In this chapter, we will look at option syntax, how the command-line is
 organized, and also how you can call options by abbreviated names.
 
 @menu
-* Option Syntax::               
-* Command Line Structure::      
-* Abbreviation::                
+* Option Syntax::               Different kinds of options
+* Command Line Structure::      How the command-line is organized
+* Abbreviation::                Abbreviating option names
 @end menu
 
 
@@ -331,9 +331,9 @@ string.
 
 Flags are the only options that never take an argument. They just stand
 for themselves: either they are present on the command-line, or they are
-not (actually, that is a lie). A typical example of a flag would be
-displayed like this in a standard help string (but @xref{Output}).
-
+not (as a matter of fact, that is a lie). A typical example of a flag
+would be displayed like this in a standard help string (but
+@pxref{Output}).
 @example
   -h, --help        Print this help and exit.
 @end example
@@ -342,16 +342,51 @@ Flags can still be associated with an environment variable however. For
 such options, the presence of the environment variable in the
 application's environment (regardless of its value, since flags don't
 take any argument) will account for the presence of the flag on the
-command-line (see why I lied before ?). Suppose for instance that an
-application has a @option{--ndebug} flag, associated with the
-environment variable @env{NDEBUG}. Setting this variable in the
-environment will make the application behave as if the option was given
-all the time on the command-line.
+command-line (now, you should see where the lied was). Suppose for
+instance that an application provides a @option{--ndebug} flag,
+associated with the environment variable @env{NDEBUG}. Setting this
+variable in the environment will make the application behave as if the
+option was given explicitely on the command-line all the time.
 
 
 @node Valued Options,  , Flags, Option Syntax
 @subsection Valued Options
 
+Apart from flags, clonified applications may provide ``valued options'',
+that is, options taking an argument. These options are more complicated
+to use than flags because a number of properties come into play: in
+addition to short and/or long names and environment variable
+association, a valued option's argument may be optional or mandatory, a
+valued option may provide a default value and/or a fallback value (don't
+worry, we'll get to that soon) and finally, there is also an additional
+call syntax for some of them. If everything goes well, you're now
+wondering whether you really want to use a command-line at all.
+
+Because of this additional call syntax we just mentioned, valued options
+can be classified in two main categories: ``standard'' ones, with short
+and long call syntax, and ``switch based'' ones, with some more magic
+involved@dots{}
+
+@menu
+* Standard Valued Options::     With short and long call syntax
+* Switch Based Options::        With an additional call syntax
+@end menu
+
+@node Standard Valued Options, Switch Based Options, Valued Options, Valued Options
+@subsubsection Standard Valued Options
+
+As we said before, standard valued options may exist in short or long
+form. When using the long form, the proper way of giving an argument to
+an option is to append it after an equal sign, like this:
+@samp{--color=black}. When using the short form, the proper way of
+giving an argument to an option is to stick it right behind the option's
+name, like this: @samp{-cblack}. That should sound familiar.
+
+Now, the situation gets a bit more convoluted
+
+
+@node Switch Based Options,  , Standard Valued Options, Valued Options
+@subsubsection Switch Based Options
 
 @c ----------------------
 @c Command Line Structure
