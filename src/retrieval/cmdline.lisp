@@ -223,7 +223,7 @@ This function returns two values:
 - the retrieved value,
 - the new command-line (possibly with the first item popped if the option
   requires an argument).")
-  ;; Method for non-valued options (currently, only falgs):
+  ;; Method for non-valued options (currently, only flags):
   (:method ((option option) cmdline-name  &optional cmdline-argument cmdline)
     ;; CMDLINE-ARGUMENT might be non-nil when a non-valued option was given a
     ;; spurious argument through an =-syntax.
