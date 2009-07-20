@@ -107,7 +107,8 @@
 
 ;; #### PORTME.
 ;(sb-ext:disable-debugger)
-(save-lisp-and-die "demo" :toplevel #'main :executable t)
+(save-lisp-and-die "demo"
+		   :toplevel #'main :executable t :save-runtime-options t)
 
 
 ;;; demo.lisp ends here
