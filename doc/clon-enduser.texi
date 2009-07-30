@@ -223,7 +223,7 @@ considered a @Clon{} @emph{user}, as opposed to a @Clon{}
 Before knowing how to handle clonified programs, you must ensure that
 they are indeed @Clon{}-enabled. Perhaps the simplest way to do that is
 to type @kbd{theprogram --clon-help} and see what happens. If you get an
-error, then you're out of luck. Otherwise, you will get a list of
+error, then you are out of luck. Otherwise, you will get a list of
 @Clon{}-specific options. Every clonified application has these options
 built-in. We will describe most of them when appropriate in this manual,
 but here's already the description for a couple of them (in addition to
@@ -232,16 +232,16 @@ but here's already the description for a couple of them (in addition to
 @itemize @bullet
 @item @option{--clon-banner}
 
-This option outputs a whole bunch of information, including the version
-of @Clon{} the application is using, and @Clon{}-specific copyright
-information.
+When given this option, the application outputs a whole bunch of
+information, including the version of @Clon{} it is using, and
+@Clon{}-specific copyright information.
 
 @item @option{--clon-version}
 
-This option outputs the version of @Clon{} the application is using. By
-default (or by using it like this: @kbd{--clon-version=long}), this
-information is provided in ``long'' form (release number, status and
-name; just try it to see what gives). If you ask for
+This option makes the application output the version of @Clon{} it is
+using. By default (or by using it like this: @kbd{--clon-version=long}),
+this information is provided in ``long'' form (release number, status
+and name; just try it to see what gives). If you ask for
 @kbd{--clon-version=short}, you'll get a more compact version
 information, and if you try @kbd{--clon-version=number}, you will end up
 with a purely numerical version number. For more information on @Clon{}
@@ -270,7 +270,7 @@ organized, and also how you can call options by abbreviated names.
 @menu
 * Option Syntax::               Different kinds of options
 * Command Line Structure::      How the command-line is organized
-* Abbreviation::                Abbreviating option names
+* Option Retrieval::            How an option's value is computed
 @end menu
 
 
@@ -287,119 +287,133 @@ defining their own option @emph{types}, even those new options obey the
 same syntactic rules as the built-in ones.
 
 @menu
-* Short or Long Form::          How to avoid filling up your memory
-* Environment::                 Environment variables associated with options
-* Flags::                       Options that stand for themselves
-* Valued Options::              Options that can take arguments
+* Option Names::                Short or long
+* Option Arguments::            None, mandatory or optional
 @end menu
 
-@node Short or Long Form, Environment, Option Syntax, Option Syntax
-@subsection Short or Long Form
+@node Option Names, Option Arguments, Option Syntax, Option Syntax
+@subsection Option Names
 
-An option can come with either a short name, a long name, or both. A
-``short call'' (or ``minus call'') consists of a single dash followed by
-the option's short name (for example @samp{-h}). A ``long call'', on the
-contrary, consists of two dashes followed by the option's long name (for
-example @samp{--help}).
+An option can come with either a short name, a long name, or both. To
+provide an option by short name, use a ``short call'' (or ``minus
+call''): a single dash followed by the option's short name (for example
+@samp{-h}). To provide an option by long name, use a ``long call'': two
+dashes followed by the option's long name (for example @samp{--help}).
 
 Short names typically consist of a single character. They are concise
 but more difficult to remember. Long names can be whole words, or even
-word sequences. They are easier to remember but longer to type on the
-command-line. That is the conventional usage of short and long names at
-least.
+word sequences (usually separated by dashes). They are easier to
+remember but longer to type on the command-line.
 
 You should be aware of the fact that in a clonified application, neither
 short names nore long ones are restricted in length. In fact, it would
-be perfectly possible to have an option with a short name longer than
-the corresponding long one, although that would make little sense. The
-only real difference is whether you use one or two dashes. Some other
-differences also come into play for valued options (@pxref{Valued
-Options}) though. Yes, life can be complicated sometimes@dots{}
+be perfectly possible to have an option's short name longer than the
+corresponding long one, although that would make little sense. The only
+real difference is whether you use one or two dashes. Some other
+differences also come into play when an option expects an argument
+(@pxref{Option Arguments}) though. Yes, life can be complicated
+sometimes@dots{}
 
-@node Environment, Flags, Short or Long Form, Option Syntax
-@subsection Environment
+@node Option Arguments,  , Option Names, Option Syntax
+@subsection Option Arguments
 
-An application programmer can choose to associate an option with an
-environment variable. When the application tries to retrieve the value
-of an option and the option does not appear on the command-line, the
-associated environment variable (if any) is tried instead. Normally,
-such an association should be advertised in the application's help
-string.
+In @Clon{}, there are different kinds of options: in addition to having
+a short and/or long name, an option may or may not take an argument. For
+those taking one, the argument may be either mandatory or optional. 
+Then, there is also an additional, extended call syntax for some of
+them. But then again, that is not the whole story about getting an
+option's value (@pxref{Option Retrieval}). If everything goes well, you
+are now wondering whether you really want to use a command-line at all.
 
-@node Flags, Valued Options, Environment, Option Syntax
-@subsection Flags
+@menu
+* Flags::                       Options with no argument
+* Valued Options::              Options with arguments
+* Switches::
+@end menu
 
-Flags are the only options that never take an argument. They just stand
-for themselves: either they are present on the command-line, or they are
-not (as a matter of fact, that is a lie). A typical example of a flag
-would be displayed like this in a standard help string (but
-@pxref{Output}).
+@node Flags, Valued Options, Option Arguments, Option Arguments
+@subsubsection Flags
+First of all, some options don't take an argument at all. In the @Clon{}
+jargon, these options are called ``flags''. Flags just stand for
+themselves: either they are present on the command-line, or they are not
+(as a matter of fact, this is a lie). A typical example of a flag would
+be displayed like this in a standard help string (but @pxref{Output}).
 @example
   -h, --help        Print this help and exit.
 @end example
 
-Flags can still be associated with an environment variable however. For
-such options, the presence of the environment variable in the
-application's environment (regardless of its value, since flags don't
-take any argument) will account for the presence of the flag on the
-command-line (now, you should see where the lied was). Suppose for
-instance that an application provides a @option{--ndebug} flag,
-associated with the environment variable @env{NDEBUG}. Setting this
-variable in the environment will make the application behave as if the
-option was given explicitely on the command-line all the time.
+@node Valued Options, Switches, Flags, Option Arguments
+@subsubsection Valued Options
+Options taking an argument are said to be ``valued''. In @Clon{}, a
+valued option's argument can be either mandatory or optional. We know
+that valued options, just like flags, may exist in short or long form. 
+When using the long form, the proper way of providing an argument is to
+append it after an equal sign, like this: @samp{--phone=01020304}. When
+using the short form, the proper way of providing an argument is to
+stick it right behind the option's name, like this: @samp{-p01020304}. 
+That should look familiar.
+
+When the option's argument is mandatory, you also have the ability to
+provide it in the next command-line item instead of sticking it to the
+option's name. Back to the previous example, this means that you can
+also say @samp{--phone 01020304} or @samp{-p 01020304}. Keep in mind
+that this is not possible when the argument is optional (in the general
+case, it is not possible to decide whether the next command-line item is
+an option's argument, a new option or something else).
+
+The phone example above would look like this in a standard help string
+(but @pxref{Output}).
+@example
+  -p, --phone=NUM    Set phone number to NUM.
+@end example
+
+And here is an example illustrating a typical output when the argument
+is optional:
+@example
+  -f, --fax[=NUM]    Set fax number to NUM, or same as phone.
+@end example
+
+@node Switches,  , Valued Options, Option Arguments
+@subsubsection Switches
+Because life is not just black or white, @Clon{} provides a specific
+option type for boolean values, along with an additional call syntax
+known around the world as the ``plus call''.
+
+Just like any other kind of valued option, a switch can have a short
+and/or a long name, and its argment may be mandatory or optional. 
+However, the possible values for a switch are restricted to true or
+false. In fact, you can freely use @samp{yes}, @samp{on}, @samp{true},
+@samp{yup}, @samp{yeah} and @samp{no}, @samp{off}, @samp{false},
+@samp{nope}, @samp{nah} respectively@footnote{If you want more, a very
+modest additional fee will be charged.}.
+
+In addition to the standard short and long form, a switch can be
+provided with a ``plus call'', that is, by appending its short name
+behind a ``+'' character. This form doesn't take an argument and always
+means false (turn the switch off, if you prefer).
 
 
-@node Valued Options,  , Flags, Option Syntax
-@subsection Valued Options
-
-Apart from flags, clonified applications may provide ``valued options'',
-that is, options taking an argument. These options are more complicated
-to use than flags because a number of properties come into play: in
-addition to short and/or long names and environment variable
-association, a valued option's argument may be optional or mandatory, a
-valued option may provide a default value and/or a fallback value (don't
-worry, we'll get to that soon) and finally, there is also an additional
-call syntax for some of them. If everything goes well, you're now
-wondering whether you really want to use a command-line at all.
-
-Because of this additional call syntax we just mentioned, valued options
-can be classified in two main categories: ``standard'' ones, with short
-and long call syntax, and ``switch based'' ones, with some more magic
-involved@dots{}
-
-@menu
-* Standard Valued Options::     With short and long call syntax
-* Switch Based Options::        With an additional call syntax
-@end menu
-
-@node Standard Valued Options, Switch Based Options, Valued Options, Valued Options
-@subsubsection Standard Valued Options
-
-As we said before, standard valued options may exist in short or long
-form. When using the long form, the proper way of giving an argument to
-an option is to append it after an equal sign, like this:
-@samp{--color=black}. When using the short form, the proper way of
-giving an argument to an option is to stick it right behind the option's
-name, like this: @samp{-cblack}. That should sound familiar.
-
-Now, the situation gets a bit more convoluted
-
-
-@node Switch Based Options,  , Standard Valued Options, Valued Options
-@subsubsection Switch Based Options
 
 @c ----------------------
 @c Command Line Structure
 @c ----------------------
-@node Command Line Structure, Abbreviation, Option Syntax, Command Line Options
+@node Command Line Structure, Option Retrieval, Option Syntax, Command Line Options
 @section Command Line Structure
 
+@menu
+* Abbreviation::                Abbreviating option names
+@end menu
 
-@c ------------
-@c Abbreviation
-@c ------------
-@node Abbreviation,  , Command Line Structure, Command Line Options
-@section Abbreviation
+
+@node Abbreviation,  , Command Line Structure, Command Line Structure
+@subsection Abbreviation
+
+
+@c ----------------
+@c Option Retrieval
+@c ----------------
+@node Option Retrieval,  , Command Line Structure, Command Line Options
+@section Option Retrieval
 
 
 @c ====================================================================
