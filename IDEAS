@@ -80,3 +80,7 @@ then trying a pack instead of immediately reporting the error.
 * Extend the [items-]separator face property
 Item separation would ideally depend on what's before or after the item being
 displayed. 
+
+* Special --no-<name> option for switches
+(and probably switch-based options).
+For instance, you would have -d / --debug and +d / --no-debug. 
