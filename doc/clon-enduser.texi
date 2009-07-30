@@ -328,7 +328,7 @@ are now wondering whether you really want to use a command-line at all.
 @menu
 * Flags::                       Options with no argument
 * Valued Options::              Options with arguments
-* Switches::
+* Switches::                    Options with boolean arguments
 @end menu
 
 @node Flags, Valued Options, Option Arguments, Option Arguments
@@ -404,6 +404,13 @@ Given such an option, you can turn debugging on by saying just @samp{-d}
 or @samp{--debug} (but you can also provide an explicit argument like
 this: @samp{-dyes} or that: @samp{--debug=yes}). Similarly, to turn
 debugging off, use @samp{+d} or @samp{--debug=no}.
+
+One last word about switches: @Clon{} lets application developers create
+new options based on (but not limited to) switches. These options
+typically accept boolean arguments as well as some other value(s). As
+soon as an option is switch-based (and has a short name), the plus
+syntax become automatically available, and this should be advertised in
+the application's help string.
 
 
 @c ----------------------
