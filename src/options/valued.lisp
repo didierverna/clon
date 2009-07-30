@@ -358,12 +358,12 @@ This class is a mixin used to authorize the +-syntax for the switch hierarchy.")
   ((yes-values :documentation "The possible 'yes' values."
 	       :allocation :class
 	       :type list
-	       :initform '("yes" "on" "true" "yup")
+	       :initform '("yes" "on" "true" "yup" "yeah")
 	       :accessor yes-values)
    (no-values :documentation "The possible 'no' values."
 	      :allocation :class
 	      :type list
-	      :initform '("no" "off" "false" "nope")
+	      :initform '("no" "off" "false" "nope" "nah")
 	      :accessor no-values))
   (:documentation "The SWITCH-BASE abstract class.
 This class provides support for options including boolean values."))
