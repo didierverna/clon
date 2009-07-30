@@ -337,7 +337,7 @@ First of all, some options don't take an argument at all. In the @Clon{}
 jargon, these options are called ``flags''. Flags just stand for
 themselves: either they are present on the command-line, or they are not
 (as a matter of fact, this is a lie). A typical example of a flag would
-be displayed like this in a standard help string (but @pxref{Output}).
+be displayed like this in a standard help string (but @pxref{Output}):
 @example
   -h, --help        Print this help and exit.
 @end example
@@ -362,7 +362,7 @@ case, it is not possible to decide whether the next command-line item is
 an option's argument, a new option or something else).
 
 The phone example above would look like this in a standard help string
-(but @pxref{Output}).
+(but @pxref{Output}):
 @example
   -p, --phone=NUM    Set phone number to NUM.
 @end example
@@ -389,9 +389,21 @@ modest additional fee will be charged.}.
 
 In addition to the standard short and long form, a switch can be
 provided with a ``plus call'', that is, by appending its short name
-behind a ``+'' character. This form doesn't take an argument and always
+behind a ``+'' character. This form never takes any argument and always
 means false (turn the switch off, if you prefer).
 
+Although an application might do something different, the intended usage
+for switches is to take an optional argument that defaults to true. A
+typical example would look like this in a standard help string (but
+@pxref{Output}):
+@example
+  -(+)d, --debug[=yes/no]    Whether to enable debugging.
+@end example
+
+Given such an option, you can turn debugging on by saying just @samp{-d}
+or @samp{--debug} (but you can also provide an explicit argument like
+this: @samp{-dyes} or that: @samp{--debug=yes}). Similarly, to turn
+debugging off, use @samp{+d} or @samp{--debug=no}.
 
 
 @c ----------------------
