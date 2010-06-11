@@ -1,4 +1,4 @@
-;;; clon.asd --- ASDF system definition for Clon
+;;; com.dvlsoft.clon.asd --- ASDF system definition
 
 ;; Copyright (C) 2008 Didier Verna
 
@@ -33,9 +33,12 @@
 
 (in-package :cl-user)
 
-(defpackage :clon-asdf
+;; #### PORTME.
+(require :sb-grovel)
+
+(defpackage :com.dvlsoft.clon.asdf
     ;; #### PORTME.
-   (:use :cl :asdf :sb-grovel :sb-alien)
+    (:use :cl :asdf :sb-grovel :sb-alien)
   (:export :+release-major-level+
 	   :+release-minor-level+
 	   :+release-status+ :+release-status-level+
@@ -43,7 +46,7 @@
 	   :version))
 
 
-(in-package :clon-asdf)
+(in-package :com.dvlsoft.clon.asdf)
 
 (defmacro define-constant (name value &optional doc)
   `(defconstant ,name (if (boundp ',name) (symbol-value ',name) ,value)
@@ -129,7 +132,7 @@ version, a patchlevel of 0 is ignored in the output."
 	    +release-status+ +release-status-level+
 	    +release-name+))
 
-(defsystem :clon
+(defsystem :com.dvlsoft.clon
   :description "The Common Lisp / Command Line Option Nuker."
   :long-description "Clon is a library for command-line option management.
 It is intended to ease the creation of standalone Common Lisp applications by
@@ -151,37 +154,49 @@ The most important features of Clon are:
   ;; #### PORTME.
   :depends-on (:sb-posix :sb-grovel)
   :components ((:file "package")
-	       #+sbcl
+	       ;; #### PORTME.
 	       (:module "sbcl"
 		 :depends-on ("package")
 		 :components ((grovel-constants-file "constants"
-				:package :clon)))
-	       (:file "util" :depends-on (#+sbcl "sbcl" "package"))
-	       (:file "traversable" :depends-on ("util"))
-	       (:file "text" :depends-on ("traversable"))
-	       (:module "options"
-		 :depends-on ("text")
-		 :components ((:file "option")
-			      (:file "flag" :depends-on ("option"))
-			      (:file "valued" :depends-on ("option"))
-			      (:file "switch" :depends-on ("valued"))
-			      (:file "stropt" :depends-on ("valued"))
-			      (:file "lispobj" :depends-on ("valued"))
-			      (:file "path" :depends-on ("valued"))
-			      (:file "enum" :depends-on ("valued"))
-			      (:file "xswitch" :depends-on ("valued"))))
-	       (:file "container" :depends-on ("options"))
-	       (:file "group" :depends-on ("container"))
-	       (:module "retrieval"
-		 :depends-on ("options")
-		 :components ((:file "cmdline")
-			      (:file "environ")))
-	       (:file "synopsis" :depends-on ("group"))
-	       (:module "output"
-		 :depends-on ("synopsis" "retrieval")
-		 :components ((:file "face")
-			      (:file "sheet" :depends-on ("face"))))
-	       (:file "context" :depends-on ("output"))))
+				 :package :com.dvlsoft.clon)))
+	       (module "src"
+		 ;; #### PORTME.
+		 :depends-on ("sbcl" "package")
+		 :components ((:file "util")
+			      (:file "traversable" :depends-on ("util"))
+			      (:file "text" :depends-on ("traversable"))
+			      (:module "options"
+				:depends-on ("text")
+				:components ((:file "option")
+					     (:file "flag"
+						    :depends-on ("option"))
+					     (:file "valued"
+						    :depends-on ("option"))
+					     (:file "switch"
+						    :depends-on ("valued"))
+					     (:file "stropt"
+						    :depends-on ("valued"))
+					     (:file "lispobj"
+						    :depends-on ("valued"))
+					     (:file "path"
+						    :depends-on ("valued"))
+					     (:file "enum"
+						    :depends-on ("valued"))
+					     (:file "xswitch"
+						    :depends-on ("valued"))))
+			      (:file "container" :depends-on ("options"))
+			      (:file "group" :depends-on ("container"))
+			      (:module "retrieval"
+				:depends-on ("options")
+				:components ((:file "cmdline")
+					     (:file "environ")))
+			      (:file "synopsis" :depends-on ("group"))
+			      (:module "output"
+				:depends-on ("synopsis" "retrieval")
+				:components ((:file "face")
+					     (:file "sheet"
+						    :depends-on ("face"))))
+			      (:file "context" :depends-on ("output"))))))
 
 
-;;; clon.asd ends here
+;;; com.dvlsoft.clon.asd ends here

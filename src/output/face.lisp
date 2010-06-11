@@ -31,8 +31,8 @@
 
 ;;; Code:
 
-(in-package :clon)
-(in-readtable :clon)
+(in-package :com.dvlsoft.clon)
+(in-readtable :com.dvlsoft.clon)
 
 
 ;; =========================================================================

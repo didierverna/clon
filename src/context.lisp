@@ -31,8 +31,8 @@
 
 ;;; Code:
 
-(in-package :clon)
-(in-readtable :clon)
+(in-package :com.dvlsoft.clon)
+(in-readtable :com.dvlsoft.clon)
 
 
 (defvar *current-context* nil "The current context.")
@@ -441,7 +441,7 @@ If PLUS, read a plus call or pack. Otherwise, read a short call or minus pack."
 						     "RETRIEVE-FROM-"
 						     (symbol-name func)
 						     "-CALL")
-						   'clon)))
+						   :com.dvlsoft.clon)))
 			  new-cmdline)
 		     (unless name-form
 		       (setq name-form

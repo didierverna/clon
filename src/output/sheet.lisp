@@ -31,8 +31,8 @@
 
 ;;; Code:
 
-(in-package :clon)
-(in-readtable :clon)
+(in-package :com.dvlsoft.clon)
+(in-readtable :com.dvlsoft.clon)
 
 
 ;; ==========================================================================
@@ -694,7 +694,7 @@ than the currently available right margin."
   (make-face-tree
    (list* 'toplevel
 	  (with-open-file (stream pathname)
-	    (let ((*package* (find-package :clon)))
+	    (let ((*package* (find-package :com.dvlsoft.clon)))
 	      (loop :for item := (read stream nil stream)
 		    :if (eql item stream)
 		    :return items

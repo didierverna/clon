@@ -31,8 +31,8 @@
 
 ;;; Code:
 
-(in-package :clon)
-(in-readtable :clon)
+(in-package :com.dvlsoft.clon)
+(in-readtable :com.dvlsoft.clon)
 
 
 ;; ==========================================================================
@@ -86,7 +86,7 @@ implementing hierarchical program command-line."))
 					 (t
 					  (format nil "MAKE-~:[~;INTERNAL-~]~A"
 					    internalp operation)))
-				   :clon)
+				   :com.dvlsoft.clon)
 				  (if (string= operation "GROUP")
 				      (list* internalp (cdr form))
 				      (cdr form))))))))

@@ -31,8 +31,8 @@
 
 ;;; Code:
 
-(in-package :clon)
-(in-readtable :clon)
+(in-package :com.dvlsoft.clon)
+(in-readtable :com.dvlsoft.clon)
 
 
 ;; ==========================================================================
@@ -251,7 +251,7 @@ remainder."
 					  "DEFGROUP")
 					 (t
 					  (format nil "MAKE-~A" operation)))
-				   :clon)
+				   :com.dvlsoft.clon)
 				  (cdr form)))))))
 
 

@@ -1,4 +1,4 @@
-;;; package.lisp --- Package definition for Clon
+;;; package.lisp --- Package definition
 
 ;; Copyright (C) 2008 Didier Verna
 
@@ -33,44 +33,44 @@
 
 (in-package :cl-user)
 
-(defpackage :clon
-  (:use :cl)
+(defpackage :com.dvlsoft.clon
+    (:use :cl)
   (:shadow :*readtable*)
-  (:import-from :clon-asdf
+  (:import-from :com.dvlsoft.clon.asdf
     :+release-major-level+
     :+release-minor-level+
     :+release-status+ :+release-status-level+
     :+release-name+
     :version)
   (:export
-   ;; From clon.asd:
+   ;; From com.dvlsoft.clon.asd:
    :+release-major-level+
    :+release-minor-level+
    :+release-status+
    :+release-status-level+
    :+release-name+
    :version
-   ;; From text.lisp:
+   ;; From src/text.lisp:
    :make-text
-   ;; From options/flag.lisp:
+   ;; From src/options/flag.lisp:
    :make-flag
-   ;; From options/switch.lisp:
+   ;; From src/options/switch.lisp:
    :make-switch
-   ;; From options/stropt.lisp:
+   ;; From src/options/stropt.lisp:
    :make-stropt
-   ;; From options/lispobj.lisp:
+   ;; From src/options/lispobj.lisp:
    :make-lispobj
-   ;; From options/path.lisp:
+   ;; From src/options/path.lisp:
    :make-path
-   ;; From options/enum.lisp:
+   ;; From src/options/enum.lisp:
    :make-enum
-   ;; From options/xswitch.lisp:
+   ;; From src/options/xswitch.lisp:
    :make-xswitch
-   ;; From group.lisp:
+   ;; From src/group.lisp:
    :make-group :defgroup
-   ;; From synopsis.lisp:
+   ;; From src/synopsis.lisp:
    :make-synopsis :defsynopsis
-   ;; From context.lisp:
+   ;; From src/context.lisp:
    :make-context
    :getopt
    :getopt-cmdline
@@ -79,7 +79,7 @@
    :help))
 
 
-(in-package :clon)
+(in-package :com.dvlsoft.clon)
 
 (defvar *readtable* (copy-readtable nil)
   "The Clon readtable.")
