@@ -31,8 +31,22 @@
 
 ;;; Code:
 
+(in-package :cl-user)
+
 (require :asdf)
-(asdf:operate 'asdf:load-op :clon)
+(setf asdf:*central-registry*
+      (list* #p"../"
+	     #p"/usr/local/share/common-lisp/systems/"
+	     #p"/usr/share/common-lisp/systems/"
+	     asdf:*central-registry*))
+(ignore-errors (asdf:operate 'asdf:load-op :asdf-binary-locations))
+
+(asdf:operate 'asdf:load-op :com.dvlsoft.clon)
+(rename-package :com.dvlsoft.clon
+		(package-name :com.dvlsoft.clon)
+		(adjoin :clon (package-nicknames :com.dvlsoft.clon)
+			:test #'string-equal))
+
 
 
 ;; Create and fill the program synopsis:
