@@ -5,26 +5,31 @@
 The Clon distribution has the following shape:
 
 ./src/		;; source directory
+./sbcl/	        ;; SBCL grovel module
 ./share/	;; data files
 ./doc/		;; documentation
+./demo/         ;; demo program
 
 
-* Building and Installation
+* Building
 
-** Edit Makefile.cnf
-to modify some installation parameters (if needed).
+** Edit Makefile.cnf if needed
+All make targets from the toplevel propagate to the subdirectories.
 
-** Type "make" and then "make install" from the toplevel directory
-These targets (all targets actually) propagate to the subdiretories.
-
-*** Additional notes:
-The build phase generates the documentation (that's actually all it does). By
-default, documentation is built (and installed) in info and PDF formats. If
-you want other formats, type "make all-formats" in the doc directory. You can
-also type individually make "dvi", "ps" and/or "html" in order to get the
-corresponding format.
+** Type "make" from the toplevel directory
+The build phase generates the demo program and the documentation. By default,
+documentation is built in info and PDF formats. If you want other formats,
+type "make all-formats" in the doc directory. You can also type individually
+make "dvi", "ps" and/or "html" in order to get the corresponding format.
 
 
-* Uninstallation
+* Installing
+
+** Type "make install" from the toplevel directory
+This installs the ASDF system file, the data and the documentation. The demo
+program is not installed anywhere.
+
+
+* Uninstalling
 
 Type "make uninstall".
