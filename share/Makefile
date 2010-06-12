@@ -32,8 +32,8 @@
 ### Code:
 
 include ../Makefile.cnf
+include ../Makefile.inc
 
-SHARE      := $(PREFIX)/share
 CLON_SHARE := $(SHARE)/clon
 THEMES_DIR := $(CLON_SHARE)/themes
 
@@ -48,10 +48,10 @@ uninstall:
 	-rm -fr $(CLON_SHARE)
 
 clean:
+	-rm *~ **/*~
 
-distclean: clean
 
-.PHONY: all install uninstall
+.PHONY: all install uninstall clean
 
 
 ### Makefile ends here

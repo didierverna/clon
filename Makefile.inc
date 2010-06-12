@@ -1,4 +1,4 @@
-### Makefile.inc --- Makefile commonalities
+### Makefile.inc --- Make commonalities
 
 ## Copyright (C) 2009 Didier Verna
 

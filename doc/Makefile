@@ -58,12 +58,14 @@ install: $(INFO_FILES) $(PDF_FILES)
 	  install-info --info-dir=$(INFO_DIR) $$i;	\
 	done
 	install -d $(CLON_DOC_DIR)
-	install -m 644 $(PDF_FILES) $(CLON_DOC_DIR)/
+	for i in $(PDF_FILES); do					   \
+	  install -m 644 $$i $(CLON_DOC_DIR)/`echo $$i | sed 's/clon-//'`; \
+       done
 
 uninstall:
 	-rm -fr $(CLON_DOC_DIR)
 	for i in $(INFO_FILES); do				\
-	  install-info --delete --info-dir=$(INFO_DIR) $$i;	\
+	  install-info --remove --info-dir=$(INFO_DIR) $$i;	\
 	done
 	cd $(INFO_DIR) && rm -f $(ALL_INFO_FILES)
 

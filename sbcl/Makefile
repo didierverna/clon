@@ -37,10 +37,11 @@ include ../Makefile.inc
 all:
 
 clean:
-	-rm *~
+	-rm *~ a.out foo.c
 
 distclean: clean
-	-rm -fr sbcl-* **/sbcl-*
+	-rm -fr constants.lisp-temp sbcl-*
+
 
 .PHONY: all clean distclean
 

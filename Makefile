@@ -30,13 +30,31 @@
 
 ### Code:
 
-SUBDIRS := src share doc
+SUBDIRS := src sbcl  \
+	   share doc \
+	   demo
 
 include Makefile.cnf
 include Makefile.inc
 
+SYSTEMS_DIR := $(SHARE)/common-lisp/systems
+ASDF_FILE   := com.dvlsoft.clon.asd
+
+
 all:
 	$(MAKE) gen TARGET=all
+
+install:
+	ln -fs $(ASDF_FILE) $(SYSTEMS_DIR)/
+	$(MAKE) gen TARGET=install
+
+uninstall:
+	-rm -f $(SYSTEMS_DIR)/$(ASDF_FILE)
+	$(MAKE) gen TARGET=uninstall
+
+clean:
+	-rm *~
+	$(MAKE) gen TARGET=clean
 
 gen:
 	@for i in $(SUBDIRS) ; do                 \
@@ -47,7 +65,7 @@ gen:
 .DEFAULT:
 	$(MAKE) gen TARGET=$@
 
-.PHONY: all gen local.mak
+.PHONY: all install uninstall clean gen local.mak
 
 
 ### Makefile ends here

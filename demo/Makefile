@@ -1,4 +1,4 @@
-### Makefile --- Makefile for Clon's src directory
+### Makefile --- Demo directory
 
 ## Copyright (C) 2009 Didier Verna
 
@@ -35,12 +35,13 @@ include ../Makefile.cnf
 include ../Makefile.inc
 
 all:
+	CC=$(CC) sbcl --script demo.lisp
 
 clean:
 	-rm *~
 
 distclean: clean
-	-rm -fr sbcl-* **/sbcl-*
+	-rm -fr demo
 
 .PHONY: all clean distclean
 

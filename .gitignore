@@ -1,6 +1,8 @@
-*.fasl
+sbcl-*/
 
 demo/demo
 
 sbcl/foo.c
 sbcl/constants.lisp-temp
+
+doc/clon-enduser.pdf
