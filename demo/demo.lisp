@@ -1,18 +1,17 @@
-;;; demo.lisp --- Clon demonstration program
+;;; demo.lisp --- Demonstration program
 
-;; Copyright (C) 2008 Didier Verna
+;; Copyright (C) 2010 Didier Verna
 
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Fri Aug  1 14:45:48 2008
-;; Last Revision: Fri Aug  1 14:45:48 2008
+;; Last Revision: Sat Jun 12 17:59:07 2010
 
 ;; This file is part of Clon.
 
 ;; Clon is free software; you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation; either version 2 of the License, or
-;; (at your option) any later version.
+;; it under the terms of the GNU General Public License version 3,
+;; as published by the Free Software Foundation.
 
 ;; Clon is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -120,7 +119,6 @@
   (quit))
 
 ;; #### PORTME.
-;(sb-ext:disable-debugger)
 (save-lisp-and-die "demo"
 		   :toplevel #'main :executable t :save-runtime-options t)
 

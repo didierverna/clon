@@ -1,20 +1,19 @@
 \input texinfo
 
-@c clon-enduser.texi --- The Clon end-user manual
+@c clon-enduser.texi --- End-user manual
 
-@c Copyright (C) 2009 Didier Verna
+@c Copyright (C) 2010 Didier Verna
 
 @c Author:        Didier Verna <didier@lrde.epita.fr>
 @c Maintainer:    Didier Verna <didier@lrde.epita.fr>
 @c Created:       Tue Jun  2 18:29:49 2009
-@c Last Revision: Thu Jul  9 18:32:14 2009
+@c Last Revision: Sat Jun 12 18:04:25 2010
 
 @c This file is part of Clon.
 
 @c Clon is free software; you can redistribute it and/or modify
-@c it under the terms of the GNU General Public License as published by
-@c the Free Software Foundation; either version 2 of the License, or
-@c (at your option) any later version.
+@c it under the terms of the GNU General Public License version 3,
+@c as published by the Free Software Foundation.
 
 @c Clon is distributed in the hope that it will be useful,
 @c but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -44,7 +43,7 @@
 @c Settings
 @c ====================================================================
 @set VERSION 1.0
-@set COPYRIGHT_DATE 2009
+@set COPYRIGHT_DATE 2010
 @setchapternewpage odd
 @setcontentsaftertitlepage
 @documentdescription
@@ -162,8 +161,8 @@ This is the @Clon{} end-user manual for @Clon{} version
 
 @quotation
 @Clon{} is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License version 2, as published by
-the Software Foundation.
+the terms of the GNU General Public License version 3,
+as published by the Software Foundation.
 
 @Clon{} is distributed in the hope that it will be useful, but WITHOUT
 ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -203,7 +202,7 @@ This manual is for the @Clon{} end-user, that is, the user of an
 application powered by @Clon{}. It describes how to use the command-line
 of clonified@footnote{An application using @Clon{} for its command-line
 option management is said to be ``clonified''. It is also possible to
-say ``clonfiscated''. However, we advise against using ``clonistified''. 
+say ``clonfiscated''. However, we advise against using ``clonistified''.
 The term ``clonificated'' is also considered bad style, and the use of
 ``clonificationated'' is strictly prohibited.} applications and how to
 customize @Clon{}'s output. Everybody should read this manual first. If
@@ -247,7 +246,7 @@ information, and if you try @kbd{--clon-version=number}, you will end up
 with a purely numerical version number. For more information on @Clon{}
 version numbering, @xref{Version Numbering, , , clon-user, The Clon user
 manual, The Clon user manual}.
-@end itemize 
+@end itemize
 
 
 
@@ -281,7 +280,7 @@ organized, and also how you can call options by abbreviated names.
 @section Option Syntax
 
 @Clon{} offers a set of precise syntactic rules that every clonified
-application follows implicitely, making them work in a homogeneous way. 
+application follows implicitely, making them work in a homogeneous way.
 Although application programmers have the ability to extend @Clon{} by
 defining their own option @emph{types}, even those new options obey the
 same syntactic rules as the built-in ones.
@@ -319,7 +318,7 @@ sometimes@dots{}
 
 In @Clon{}, there are different kinds of options: in addition to having
 a short and/or long name, an option may or may not take an argument. For
-those taking one, the argument may be either mandatory or optional. 
+those taking one, the argument may be either mandatory or optional.
 Then, there is also an additional, extended call syntax for some of
 them. But then again, that is not the whole story about getting an
 option's value (@pxref{Option Retrieval}). If everything goes well, you
@@ -346,11 +345,11 @@ be displayed like this in a standard help string (but @pxref{Output}):
 @subsubsection Valued Options
 Options taking an argument are said to be ``valued''. In @Clon{}, a
 valued option's argument can be either mandatory or optional. We know
-that valued options, just like flags, may exist in short or long form. 
+that valued options, just like flags, may exist in short or long form.
 When using the long form, the proper way of providing an argument is to
 append it after an equal sign, like this: @samp{--phone=01020304}. When
 using the short form, the proper way of providing an argument is to
-stick it right behind the option's name, like this: @samp{-p01020304}. 
+stick it right behind the option's name, like this: @samp{-p01020304}.
 That should look familiar.
 
 When the option's argument is mandatory, you also have the ability to
@@ -380,7 +379,7 @@ option type for boolean values, along with an additional call syntax
 known around the world as the ``plus call''.
 
 Just like any other kind of valued option, a switch can have a short
-and/or a long name, and its argment may be mandatory or optional. 
+and/or a long name, and its argment may be mandatory or optional.
 However, the possible values for a switch are restricted to true or
 false. In fact, you can freely use @samp{yes}, @samp{on}, @samp{true},
 @samp{yup}, @samp{yeah} and @samp{no}, @samp{off}, @samp{false},

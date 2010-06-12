@@ -1,18 +1,17 @@
-;;; traversable.lisp --- Traversable objects for Clon
+;;; traversable.lisp --- Traversable objects
 
-;; Copyright (C) 2008 Didier Verna
+;; Copyright (C) 2010 Didier Verna
 
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Sun Nov  2 22:10:17 2008
-;; Last Revision: Wed Nov  5 09:26:18 2008
+;; Last Revision: Sat Jun 12 18:21:17 2010
 
 ;; This file is part of Clon.
 
 ;; Clon is free software; you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation; either version 2 of the License, or
-;; (at your option) any later version.
+;; it under the terms of the GNU General Public License version 3,
+;; as published by the Free Software Foundation.
 
 ;; Clon is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of

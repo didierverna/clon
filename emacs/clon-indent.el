@@ -1,20 +1,19 @@
-;;; clon-indent.el --- cl-indent additions for Clon
+;;; clon-indent.el --- cl-indent additions
 
-;; Copyright (C) 2008 Didier Verna
+;; Copyright (C) 2010 Didier Verna
 
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Wed Jul  2 14:09:17 2008
-;; Last Revision: Wed Jul  2 14:09:17 2008
+;; Last Revision: Sat Jun 12 18:06:53 2010
 ;; Keywords:      extensions, lisp, data
 
 
 ;; This file is part of Clon.
 
 ;; Clon is free software; you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation; either version 2 of the License, or
-;; (at your option) any later version.
+;; it under the terms of the GNU General Public License version 3,
+;; as published by the Free Software Foundation.
 
 ;; Clon is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -56,5 +55,6 @@
   (put symbol 'common-lisp-indent-function 3))
 
 (put 'do-options 'common-lisp-indent-function '((&whole 4 2 1) &body))
+
 
 ;;; clon-indent.el ends here

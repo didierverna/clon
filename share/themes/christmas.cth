@@ -1,9 +1,9 @@
-;;; christmas.cth --- The Clon theme that you'll never use       -*- lisp -*-
+;;; christmas.cth --- Christmas theme                            -*- lisp -*-
 
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Sun Jan  4 13:32:27 2009
-;; Last Revision: Sun Jan  4 13:38:20 2009
+;; Last Revision: Sat Jun 12 18:15:37 2010
 
 
 ;;; Commentary:
@@ -12,6 +12,7 @@
 
 ;; This theme is not meant to be used, but rather to illustrate most of the
 ;; highlighting features of Clon.
+
 
 ;;; Code:
 

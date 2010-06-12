@@ -1,18 +1,17 @@
-;;; face.lisp --- Face management for Clon
+;;; face.lisp --- Face management
 
-;; Copyright (C) 2008 Didier Verna
+;; Copyright (C) 2010 Didier Verna
 
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Wed Dec 24 17:37:38 2008
-;; Last Revision: Wed Dec 24 17:37:38 2008
+;; Last Revision: Sat Jun 12 18:26:29 2010
 
 ;; This file is part of Clon.
 
 ;; Clon is free software; you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation; either version 2 of the License, or
-;; (at your option) any later version.
+;; it under the terms of the GNU General Public License version 3,
+;; as published by the Free Software Foundation.
 
 ;; Clon is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of

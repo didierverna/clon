@@ -1,18 +1,17 @@
-;;; package.lisp --- Package definition
+;;; package.lisp --- Common Lisp Package definition
 
-;; Copyright (C) 2008 Didier Verna
+;; Copyright (C) 2010 Didier Verna
 
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Wed Jun 18 08:49:39 2008
-;; Last Revision: Wed Dec 17 16:45:07 2008
+;; Last Revision: Sat Jun 12 17:55:37 2010
 
 ;; This file is part of Clon.
 
 ;; Clon is free software; you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation; either version 2 of the License, or
-;; (at your option) any later version.
+;; it under the terms of the GNU General Public License version 3,
+;; as published by the Free Software Foundation.
 
 ;; Clon is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of

@@ -1,9 +1,9 @@
-;;; refcard.cth --- Reference card theme for Clon                 -*- lisp -*-
+;;; refcard.cth --- Reference card theme                         -*- lisp -*-
 
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Sun Jan  4 13:32:27 2009
-;; Last Revision: Sun Jan  4 15:12:47 2009
+;; Last Revision: Sat Jun 12 18:16:49 2010
 
 
 ;;; Commentary:
