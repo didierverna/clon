@@ -659,11 +659,13 @@ CONTEXT is where to look for the options."
       (setf (slot-value context 'remainder) remainder)))
   ;; Step two: handle internal options ======================================
   (when (getopt :context context :long-name "clon-banner")
-    (format t "~A is powered by the Clon library, version ~A,
+    (format t "~A's command-line is powered by Clon,
+the Command-Line Option Nuker library, version ~A,
 written by Didier Verna <didier@lrde.epita.fr>.
 
-Copyright (C) 2008 Didier Verna.
-Clon is free software; see the source for copying conditions.  There is NO
+Copyright (C) 2010 Didier Verna.
+Clon is released under the terms of the GNU General Public License, version 3.
+This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.~%"
       (pathname-name (progname context))
       (version :long))
