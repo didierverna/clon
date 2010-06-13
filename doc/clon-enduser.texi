@@ -55,12 +55,20 @@ describes the use of applications powered by Clon.
 @c ====================================================================
 @c New Commands
 @c ====================================================================
-@macro Clon
+@macro clon
 @t{Clon}
 @end macro
 
 @macro tty
 @t{tty}
+@end macro
+
+@macro etc
+@i{etc.}
+@end macro
+
+@macro cl
+Common Lisp
 @end macro
 
 
@@ -135,17 +143,16 @@ approved by the Free Software Foundation.
 @node Top, Copying, (dir), (dir)
 @top The Clon end-user manual
 
-This is the @Clon{} end-user manual for @Clon{} version
-@value{VERSION}: it describes the use of applications powered by
-@Clon{}.
+This is the @clon{} end-user manual for @clon{} version @value{VERSION}:
+it describes the use of applications powered by @clon{}.
 
 @menu
-* Copying::                     The GNU General Public License
-* Introduction::                What Clon is all about
-* Clonification::               Determining whether a program is powered by Clon
-* Command Line Options::        Making use of @Clon{}'s command-line features
-* Output::                      Understanding and customizing @Clon{}'s output
-* Concept Index::               Concept Index
+* Copying::             The GNU General Public License
+* Introduction::        What Clon is all about
+* Clonification::       Determining whether a program is powered by Clon
+* The Command Line::    Making use of @clon{}'s command-line features
+* Output::              Understanding and customizing @clon{}'s output
+* Concept Index::       Concept Index
 @end menu
 
 @insertcopying
@@ -160,11 +167,11 @@ This is the @Clon{} end-user manual for @Clon{} version
 @unnumbered Copying
 
 @quotation
-@Clon{} is free software; you can redistribute it and/or modify it under
+@clon{} is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License version 3,
 as published by the Software Foundation.
 
-@Clon{} is distributed in the hope that it will be useful, but WITHOUT
+@clon{} is distributed in the hope that it will be useful, but WITHOUT
 ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
 FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
 more details.
@@ -182,83 +189,92 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 @node Introduction, Clonification, Copying, Top
 @chapter Introduction
 
-@Clon{} is a library for managing command-line options in standalone
-Common Lisp applications. It provides a unified option syntax with both
-short and long names, automatic completion of partial names and
-automatic retrieval/conversion of option values from the command-line,
-associated environment variables or default values. @Clon{} comes with a
-set of extensible option types (numbers, paths, strings etc). @Clon{}
-also provides automatic generation and formatting of help strings, with
+@clon{} is a library for managing command-line options in standalone
+@cl{} applications. It provides a unified option syntax with both short
+and long names, automatic completion of partial names and automatic
+retrieval/conversion of option values from the command-line, associated
+environment variables or default values. @clon{} comes with a set of
+extensible option types (numbers, paths, strings @etc{}). @clon{} also
+provides automatic generation and formatting of help strings, with
 support for highlighting on @tty{}'s through ISO/IEC 6429 SGR. This
-formatting is customizable through ``themes''.
+formatting is customizable through @emph{themes}.
 
-Depending on the target audience, @Clon{} stands for either ``The
-Command Line Option Nuker'' or ``The Common Lisp Option Nuker''. @Clon{}
-also has a recursive acronym: ``@Clon{} Likes Options Nuking'', and a
-reverse one: ``Never Omit to Link with @Clon{}''. I think that should be
-enough for now.
+Depending on the target audience, @clon{} stands for either ``The
+Command Line Option Nuker'' or ``The @cl{} Option Nuker''. @clon{} also
+has a recursive acronym: ``@clon{} Likes Options Nuking'', and a reverse
+one: ``Never Omit to Link with @clon{}''. Other possible expansions of
+the acronym are still being investigated.
 
-This manual is for the @Clon{} end-user, that is, the user of an
-application powered by @Clon{}. It describes how to use the command-line
-of clonified@footnote{An application using @Clon{} for its command-line
-option management is said to be ``clonified''. It is also possible to
-say ``clonfiscated''. However, we advise against using ``clonistified''.
-The term ``clonificated'' is also considered bad style, and the use of
-``clonificationated'' is strictly prohibited.} applications and how to
-customize @Clon{}'s output. Everybody should read this manual first. If
-you want to use @Clon{} in one of your applications, then you are
-considered a @Clon{} @emph{user}, as opposed to a @Clon{}
-@emph{end-user}, and you should then read the corresponding manual
-(@pxref{Top, , , clon-user, The Clon user manual, The Clon user manual}).
+This manual is for the @clon{} @emph{end-user}, that is, the user of an
+application powered by @clon{}. It describes how to use the command-line
+of clonified@footnote{An application using @clon{} for its command-line
+option management is said to be @emph{clonified}. It is also possible to
+say @emph{clonfiscated}. However, we advise against using
+@emph{clonistified}. The term @emph{clonificated} is also considered bad
+style, and the use of @emph{clonificationated} is strictly prohibited.}
+applications and how to customize @clon{}'s output. Everybody should
+read this manual first. If you want to use @clon{} in one of your
+applications, then you are considered a @clon{} @emph{user}, as opposed
+to a @clon{} @emph{end-user}, and you should then read the corresponding
+manual (@pxref{Top, , , clon-user, The Clon user manual, The Clon user
+manual}).
+
+@ref{Clonification} shows how to verify that an application is powered
+by @clon{}. @ref{The Command Line} explains how to use the command line
+of a clonified application, and @ref{Output} describes how to customize
+the output of @clon{}.
 
 
 
 @c ====================================================================
 @c Clonification
 @c ====================================================================
-@node Clonification, Command Line Options, Introduction, Top
+@node Clonification, The Command Line, Introduction, Top
 @chapter Clonification
 
-Before knowing how to handle clonified programs, you must ensure that
-they are indeed @Clon{}-enabled. Perhaps the simplest way to do that is
-to type @kbd{theprogram --clon-help} and see what happens. If you get an
-error, then you are out of luck. Otherwise, you will get a list of
-@Clon{}-specific options. Every clonified application has these options
-built-in. We will describe most of them when appropriate in this manual,
-but here's already the description for a couple of them (in addition to
-@option{--clon-help} that we've just mentioned).
+Given this wonderful standalone @cl{} application, how do I know if it
+uses @clon{} for handing the command line? Perhaps the simplest way to
+know is to type
+@example
+program --clon-help
+@end example
+and see what happens. If you get an error, then you are out of luck.
+Otherwise, you will get a list of @clon{}-specific options. Every
+clonified application has these options built-in, and they are all
+called @t{--clon-}@i{something}. We will describe most of them when
+appropriate in this manual, but here's already the description for a
+couple of them (in addition to @option{--clon-help} that we've just
+mentioned).
 
-@itemize @bullet
-@item @option{--clon-banner}
-
+@table @option
+@item --clon-banner
 When given this option, the application outputs a whole bunch of
-information, including the version of @Clon{} it is using, and
-@Clon{}-specific copyright information.
+information, including the version of @clon{} it is using, and
+@clon{}-specific copyright information.
 
-@item @option{--clon-version}
-
-This option makes the application output the version of @Clon{} it is
-using. By default (or by using it like this: @kbd{--clon-version=long}),
-this information is provided in ``long'' form (release number, status
-and name; just try it to see what gives). If you ask for
-@kbd{--clon-version=short}, you'll get a more compact version
-information, and if you try @kbd{--clon-version=number}, you will end up
-with a purely numerical version number. For more information on @Clon{}
-version numbering, @xref{Version Numbering, , , clon-user, The Clon user
-manual, The Clon user manual}.
-@end itemize
+@item --clon-version
+This option makes the application output the version of @clon{} it is
+using. By default (or by using it like this:
+@option{--clon-version=long}), this information is provided in
+@emph{long} form (release number, status and name; just try it). If you
+ask for @option{--clon-version=short}, you'll get a more compact version
+information, and if you try @option{--clon-version=number}, you will end
+up with a purely numerical version number. For more information on
+@clon{} version numbering, @xref{Version Numbering, , , clon-user, The
+Clon user manual, The Clon user manual}.
+@end table
 
 
 
 @c ====================================================================
-@c Command Line Options
+@c The Command Line
 @c ====================================================================
-@node Command Line Options, Output, Clonification, Top
-@chapter Command Line Options
+@node The Command Line, Output, Clonification, Top
+@chapter The Command Line
 
 When using a clonified application, you will probably encounter a couple
 of familiar concepts, such as option names coming in short form
-(@samp{-h}) or long form (@samp{--help}). @Clon{}, however, also comes
+(@samp{-h}) or long form (@samp{--help}). @clon{}, however, also comes
 with a set a specific features such as packs or abbreviated calls that
 you might want to become familiar with in order to use an application's
 command-line to its full extent.
@@ -276,12 +292,12 @@ organized, and also how you can call options by abbreviated names.
 @c -------------
 @c Option Syntax
 @c -------------
-@node Option Syntax, Command Line Structure, Command Line Options, Command Line Options
+@node Option Syntax, Command Line Structure, The Command Line, The Command Line
 @section Option Syntax
 
-@Clon{} offers a set of precise syntactic rules that every clonified
+@clon{} offers a set of precise syntactic rules that every clonified
 application follows implicitely, making them work in a homogeneous way.
-Although application programmers have the ability to extend @Clon{} by
+Although application programmers have the ability to extend @clon{} by
 defining their own option @emph{types}, even those new options obey the
 same syntactic rules as the built-in ones.
 
@@ -316,7 +332,7 @@ sometimes@dots{}
 @node Option Arguments,  , Option Names, Option Syntax
 @subsection Option Arguments
 
-In @Clon{}, there are different kinds of options: in addition to having
+In @clon{}, there are different kinds of options: in addition to having
 a short and/or long name, an option may or may not take an argument. For
 those taking one, the argument may be either mandatory or optional.
 Then, there is also an additional, extended call syntax for some of
@@ -332,7 +348,7 @@ are now wondering whether you really want to use a command-line at all.
 
 @node Flags, Valued Options, Option Arguments, Option Arguments
 @subsubsection Flags
-First of all, some options don't take an argument at all. In the @Clon{}
+First of all, some options don't take an argument at all. In the @clon{}
 jargon, these options are called ``flags''. Flags just stand for
 themselves: either they are present on the command-line, or they are not
 (as a matter of fact, this is a lie). A typical example of a flag would
@@ -343,7 +359,7 @@ be displayed like this in a standard help string (but @pxref{Output}):
 
 @node Valued Options, Switches, Flags, Option Arguments
 @subsubsection Valued Options
-Options taking an argument are said to be ``valued''. In @Clon{}, a
+Options taking an argument are said to be ``valued''. In @clon{}, a
 valued option's argument can be either mandatory or optional. We know
 that valued options, just like flags, may exist in short or long form.
 When using the long form, the proper way of providing an argument is to
@@ -374,7 +390,7 @@ is optional:
 
 @node Switches,  , Valued Options, Option Arguments
 @subsubsection Switches
-Because life is not just black or white, @Clon{} provides a specific
+Because life is not just black or white, @clon{} provides a specific
 option type for boolean values, along with an additional call syntax
 known around the world as the ``plus call''.
 
@@ -404,7 +420,7 @@ or @samp{--debug} (but you can also provide an explicit argument like
 this: @samp{-dyes} or that: @samp{--debug=yes}). Similarly, to turn
 debugging off, use @samp{+d} or @samp{--debug=no}.
 
-One last word about switches: @Clon{} lets application developers create
+One last word about switches: @clon{} lets application developers create
 new options based on (but not limited to) switches. These options
 typically accept boolean arguments as well as some other value(s). As
 soon as an option is switch-based (and has a short name), the plus
@@ -415,7 +431,7 @@ the application's help string.
 @c ----------------------
 @c Command Line Structure
 @c ----------------------
-@node Command Line Structure, Option Retrieval, Option Syntax, Command Line Options
+@node Command Line Structure, Option Retrieval, Option Syntax, The Command Line
 @section Command Line Structure
 
 @menu
@@ -430,14 +446,14 @@ the application's help string.
 @c ----------------
 @c Option Retrieval
 @c ----------------
-@node Option Retrieval,  , Command Line Structure, Command Line Options
+@node Option Retrieval,  , Command Line Structure, The Command Line
 @section Option Retrieval
 
 
 @c ====================================================================
 @c Output
 @c ====================================================================
-@node Output, Concept Index, Command Line Options, Top
+@node Output, Concept Index, The Command Line, Top
 @chapter Output
 
 
