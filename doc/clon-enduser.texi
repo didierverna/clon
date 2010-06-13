@@ -284,11 +284,12 @@ Clon user manual, The Clon user manual}.
 @node The Command Line, Output, Clonification, Top
 @chapter The Command Line
 
-@clon{} provides applications with usual @cmdline{} features such as option
-names coming in short (@eg{} @samp{-h}) or long (@eg{} @samp{--help})
-form. @clon{} also comes with a set of more specific features, such as
-@emph{packs} or abbreviated calls, that you might want to become
-familiar with in order to use an application's @cmdline{} to its full extent.
+@clon{} provides applications with usual @cmdline{} features such as
+option names coming in short (@eg{} @samp{-h}) or long (@eg{}
+@samp{--help}) form. @clon{} also comes with a set of more specific
+features, such as @emph{packs} or abbreviated forms, that you might want
+to become familiar with in order to use an application's @cmdline{} to
+its full extent.
 
 @menu
 * Option Syntax::               Different kinds of options
@@ -318,10 +319,10 @@ same syntactic rules as the built-in ones.
 @subsection Option Names
 
 An option can come with either a short name, a long name, or both. To
-provide an option by short name, use a ``short call'' (or ``minus
-call''): a single dash followed by the option's short name (@eg{}
-@samp{-h}). To provide an option by long name, use a ``long call'': two
-dashes followed by the option's long name (@eg{} @samp{--help}).
+provide an option by short name, use a @emph{short form}: a single dash
+followed by the option's short name (@eg{} @samp{-h}). To provide an
+option by long name, use a @emph{long form}: two dashes followed by the
+option's long name (@eg{} @samp{--help}).
 
 Short names typically consist of a single character. They are concise
 but more difficult to remember. Long names can be whole words, or even
@@ -356,24 +357,24 @@ are now wondering whether you really want to use a @cmdline{} at all.
 @node Flags, Valued Options, Option Arguments, Option Arguments
 @subsubsection Flags
 First of all, some options don't take an argument at all. In the @clon{}
-jargon, these options are called ``flags''. Flags just stand for
-themselves: either they are present on the @cmdline{}, or they are not (as a
-matter of fact, this is a lie). A typical example of a flag would be
-displayed like this in a standard help string (but @pxref{Output}):
+jargon, these options are called @emph{flags}. Flags just stand for
+themselves: either they are present on the @cmdline{}, or they are not
+(as a matter of fact, this is a lie). A typical example of a flag would
+be displayed like this in a standard help string (but @pxref{Output}):
 @example
   -h, --help        Print this help and exit.
 @end example
 
 @node Valued Options, Switches, Flags, Option Arguments
 @subsubsection Valued Options
-Options taking an argument are said to be ``valued''. In @clon{}, a
+Options taking an argument are said to be @emph{valued}. In @clon{}, a
 valued option's argument can be either mandatory or optional. We know
-that valued options, just like flags, may exist in short or long form.
-When using the long form, the proper way of providing an argument is to
-append it after an equal sign, like this: @samp{--phone=01020304}. When
-using the short form, the proper way of providing an argument is to
-stick it right behind the option's name, like this: @samp{-p01020304}.
-All this should look familiar.
+that valued options, just like flags, may be provided in short or long
+form. When using the long form, the proper way of providing an argument
+is to append it after an @samp{=} sign, like this:
+@samp{--phone=01020304}. When using the short form, the proper way of
+providing an argument is to stick it right behind the option's name,
+like this: @samp{-p01020304}. All this should look familiar.
 
 When the option's argument is mandatory, you also have the ability to
 provide it in the next @cmdline{} item instead of sticking it to the
@@ -397,9 +398,9 @@ is optional:
 
 @node Switches,  , Valued Options, Option Arguments
 @subsubsection Switches
-Because life is not just black or white, @clon{} provides a specific
-option type for boolean values, along with an additional call syntax
-known around the world as the ``plus call''.
+For those of you who are not satisfied with short and long forms,
+@clon{} provides a specific option type for boolean values, along with
+an additional call syntax. These options are called @emph{switches}.
 
 Just like any other kind of valued option, a switch can have a short
 and/or a long name, and its argment may be mandatory or optional.
@@ -409,10 +410,10 @@ false. In fact, you can freely use @samp{yes}, @samp{on}, @samp{true},
 @samp{nope}, @samp{nah} respectively@footnote{If you want more, a very
 modest additional fee will be charged.}.
 
-In addition to the standard short and long form, a switch can be
-provided with a ``plus call'', that is, by appending its short name
-behind a ``+'' character. This form never takes any argument and always
-means false (turn the switch off, if you prefer).
+In addition to the standard short and long forms, a switch can be
+provided in @emph{negated form}, that is, by appending its short name
+behind a @samp{+} character. This form never takes any argument and
+always means false (turn the switch off, if you prefer).
 
 Although an application might do something different, the intended usage
 for switches is to take an optional argument that defaults to true. A
@@ -430,8 +431,8 @@ debugging off, use @samp{+d} or @samp{--debug=no}.
 One last word about switches: @clon{} lets application developers create
 new options based on (but not limited to) switches. These options
 typically accept boolean arguments as well as some other value(s). As
-soon as an option is switch-based (and has a short name), the plus
-syntax become automatically available, and this should be advertised in
+soon as an option is switch-based (and has a short name), the negated
+form becomes automatically available, and this should be advertised in
 the application's help string.
 
 
