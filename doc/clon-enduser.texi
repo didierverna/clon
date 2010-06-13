@@ -212,10 +212,10 @@ support for highlighting on @tty{}'s through ISO/IEC 6429 SGR. This
 formatting is customizable through @emph{themes}.
 
 Depending on the target audience, @clon{} stands for either ``The
-@CmdLine{} Option Nuker'' or ``The @cl{} Option Nuker''. @clon{} also
-has a recursive acronym: ``@clon{} Likes Options Nuking'', and a reverse
-one: ``Never Omit to Link with @clon{}''. Other possible expansions of
-the acronym are still being investigated.
+@CmdLine{} Option Nuker'' or ``The @cmdline{} Option Nuker''. @clon{}
+also has a recursive acronym: ``@clon{} Likes Options Nuking'', and a
+reverse one: ``Never Omit to Link with @clon{}''. Other possible
+expansions of the acronym are still being investigated.
 
 This manual is for the @clon{} @emph{end-user}, that is, the user of an
 application powered by @clon{}. It describes how to use the @cmdline{}
@@ -337,7 +337,7 @@ real difference is whether you use one or two dashes. Some other
 differences also come into play when an option expects an argument
 (@pxref{Option Arguments}) though (it would be no fun otherwise).
 
-@node Option Arguments,  , Option Names, Option Syntax
+@node Option Arguments, , Option Names, Option Syntax
 @subsection Option Arguments
 
 In @clon{}, there are different kinds of options: in addition to having
@@ -384,6 +384,11 @@ that this is not possible when the argument is optional (in the general
 case, it is not possible to decide whether the next @cmdline{} item is
 an option's argument, a new option or something else).
 
+There is also another case where you can't use this alternate syntax,
+even when the argument is mandatory: that is when the argument itself
+looks like an option. @clon{} will think it is, and consequently will
+also think that the previous one lacks its mandatory argument.
+
 The phone example above would look like this in a standard help string
 (but @pxref{Output}):
 @example
@@ -396,7 +401,7 @@ is optional:
   -f, --fax[=NUM]    Set fax number to NUM, or same as phone.
 @end example
 
-@node Switches,  , Valued Options, Option Arguments
+@node Switches, , Valued Options, Option Arguments
 @subsubsection Switches
 For those of you who are not satisfied with short and long forms,
 @clon{} provides a specific option type for boolean values, along with
@@ -407,8 +412,8 @@ and/or a long name, and its argment may be mandatory or optional.
 However, the possible values for a switch are restricted to true or
 false. In fact, you can freely use @samp{yes}, @samp{on}, @samp{true},
 @samp{yup}, @samp{yeah} and @samp{no}, @samp{off}, @samp{false},
-@samp{nope}, @samp{nah} respectively@footnote{If you want more, a very
-modest additional fee will be charged.}.
+@samp{nope}, @samp{nah} respectively.@footnote{If you want more, a very
+modest additional fee will be charged.}
 
 In addition to the standard short and long forms, a switch can be
 provided in @emph{negated form}, that is, by appending its short name
@@ -442,19 +447,54 @@ the application's help string.
 @node Command Line Structure, Option Retrieval, Option Syntax, The Command Line
 @section Command Line Structure
 
+The @cmdline{} of all clonified applications follows a particular
+structure and may contain different kinds of items, in addition to the
+usual option calls. This section describes this in detail.
+
 @menu
-* Abbreviation::                Abbreviating option names
+* Separator::           Telling @clon{} to mind it's own business
+* Option Calls::        Using possibly abbreviated option names
+* Option Packs::        Grouping option calls
 @end menu
 
 
-@node Abbreviation,  , Command Line Structure, Command Line Structure
-@subsection Abbreviation
+@node Separator, Option Calls, Command Line Structure, Command Line Structure
+@subsection Separator
+
+@clon{} separates the @cmdline{} in two parts. The left part contains
+options, and the right part contains the rest (it is also called the
+@emph{postfix}).
+
+You can force this distinction by using the special construct @samp{--}
+on the @cmdline{}. Everything that follows it will be completely ignored
+by @clon{} (not necessarily by the application itself though).
+
+In the case you don't split your @cmdline{} explicitely, @clon{} does
+this for you automatically by noticing where the last option (or its
+potential argument) stands. The behavior is different from that of
+explicit splitting in one regard however: if the application is not
+expecting any postfix and there's an implicit one, then @clon{} will
+throw an error at your face. It hurts.
+
+One final note on @cmdline{} separation: in the case an application's
+postfix is supposed to contain something looking like an option (perhaps
+real options to pass on to another program), you @strong{need} an
+explicit separator. Otherwise, @clon{} will be confused: it could for
+instance wrongly detect unknown options, junk on the @cmdline{} @etc{}
+You don't want to confuse @clon{}. @clon{} is nasty when it is scared.
+
+
+@node Option Calls, Option Packs, Separator, Command Line Structure
+@subsection Option Calls
+
+@node Option Packs,  , Option Calls, Command Line Structure
+@subsection Option Packs
 
 
 @c ----------------
 @c Option Retrieval
 @c ----------------
-@node Option Retrieval,  , Command Line Structure, The Command Line
+@node Option Retrieval, , Command Line Structure, The Command Line
 @section Option Retrieval
 
 
