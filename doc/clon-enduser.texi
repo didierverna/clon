@@ -59,6 +59,10 @@ describes the use of applications powered by Clon.
 @t{Clon}
 @end macro
 
+@macro cl
+Common Lisp
+@end macro
+
 @macro tty
 @t{tty}
 @end macro
@@ -67,8 +71,16 @@ describes the use of applications powered by Clon.
 @i{etc.}
 @end macro
 
-@macro cl
-Common Lisp
+@macro eg
+@i{e.g.}
+@end macro
+
+@macro cmdline
+command-line
+@end macro
+
+@macro CmdLine
+Command-Line
 @end macro
 
 
@@ -150,7 +162,7 @@ it describes the use of applications powered by @clon{}.
 * Copying::             The GNU General Public License
 * Introduction::        What Clon is all about
 * Clonification::       Determining whether a program is powered by Clon
-* The Command Line::    Making use of @clon{}'s command-line features
+* The Command Line::    Making use of @clon{}'s @cmdline{} features
 * Output::              Understanding and customizing @clon{}'s output
 * Concept Index::       Concept Index
 @end menu
@@ -189,10 +201,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 @node Introduction, Clonification, Copying, Top
 @chapter Introduction
 
-@clon{} is a library for managing command-line options in standalone
-@cl{} applications. It provides a unified option syntax with both short
-and long names, automatic completion of partial names and automatic
-retrieval/conversion of option values from the command-line, associated
+@clon{} is a library for managing @cmdline{} options in standalone @cl{}
+applications. It provides a unified option syntax with both short and
+long names, automatic completion of partial names and automatic
+retrieval/conversion of option values from the @cmdline{}, associated
 environment variables or default values. @clon{} comes with a set of
 extensible option types (numbers, paths, strings @etc{}). @clon{} also
 provides automatic generation and formatting of help strings, with
@@ -200,14 +212,14 @@ support for highlighting on @tty{}'s through ISO/IEC 6429 SGR. This
 formatting is customizable through @emph{themes}.
 
 Depending on the target audience, @clon{} stands for either ``The
-Command Line Option Nuker'' or ``The @cl{} Option Nuker''. @clon{} also
+@CmdLine{} Option Nuker'' or ``The @cl{} Option Nuker''. @clon{} also
 has a recursive acronym: ``@clon{} Likes Options Nuking'', and a reverse
 one: ``Never Omit to Link with @clon{}''. Other possible expansions of
 the acronym are still being investigated.
 
 This manual is for the @clon{} @emph{end-user}, that is, the user of an
-application powered by @clon{}. It describes how to use the command-line
-of clonified@footnote{An application using @clon{} for its command-line
+application powered by @clon{}. It describes how to use the @cmdline{}
+of clonified@footnote{An application using @clon{} for its @cmdline{}
 option management is said to be @emph{clonified}. It is also possible to
 say @emph{clonfiscated}. However, we advise against using
 @emph{clonistified}. The term @emph{clonificated} is also considered bad
@@ -220,9 +232,9 @@ manual (@pxref{Top, , , clon-user, The Clon user manual, The Clon user
 manual}).
 
 @ref{Clonification} shows how to verify that an application is powered
-by @clon{}. @ref{The Command Line} explains how to use the command line
-of a clonified application, and @ref{Output} describes how to customize
-the output of @clon{}.
+by @clon{}. @ref{The Command Line} explains how to use the @cmdline{} of
+a clonified application, and @ref{Output} describes how to customize the
+output of @clon{}.
 
 
 
@@ -233,7 +245,7 @@ the output of @clon{}.
 @chapter Clonification
 
 Given this wonderful standalone @cl{} application, how do I know if it
-uses @clon{} for handing the command line? Perhaps the simplest way to
+uses @clon{} for handing the @cmdline{}? Perhaps the simplest way to
 know is to type
 @example
 program --clon-help
@@ -272,19 +284,15 @@ Clon user manual, The Clon user manual}.
 @node The Command Line, Output, Clonification, Top
 @chapter The Command Line
 
-When using a clonified application, you will probably encounter a couple
-of familiar concepts, such as option names coming in short form
-(@samp{-h}) or long form (@samp{--help}). @clon{}, however, also comes
-with a set a specific features such as packs or abbreviated calls that
-you might want to become familiar with in order to use an application's
-command-line to its full extent.
-
-In this chapter, we will look at option syntax, how the command-line is
-organized, and also how you can call options by abbreviated names.
+@clon{} provides applications with usual @cmdline{} features such as option
+names coming in short (@eg{} @samp{-h}) or long (@eg{} @samp{--help})
+form. @clon{} also comes with a set of more specific features, such as
+@emph{packs} or abbreviated calls, that you might want to become
+familiar with in order to use an application's @cmdline{} to its full extent.
 
 @menu
 * Option Syntax::               Different kinds of options
-* Command Line Structure::      How the command-line is organized
+* Command Line Structure::      How the @cmdline{} is organized
 * Option Retrieval::            How an option's value is computed
 @end menu
 
@@ -311,14 +319,14 @@ same syntactic rules as the built-in ones.
 
 An option can come with either a short name, a long name, or both. To
 provide an option by short name, use a ``short call'' (or ``minus
-call''): a single dash followed by the option's short name (for example
+call''): a single dash followed by the option's short name (@eg{}
 @samp{-h}). To provide an option by long name, use a ``long call'': two
-dashes followed by the option's long name (for example @samp{--help}).
+dashes followed by the option's long name (@eg{} @samp{--help}).
 
 Short names typically consist of a single character. They are concise
 but more difficult to remember. Long names can be whole words, or even
 word sequences (usually separated by dashes). They are easier to
-remember but longer to type on the command-line.
+remember but longer to type on the @cmdline{}.
 
 You should be aware of the fact that in a clonified application, neither
 short names nore long ones are restricted in length. In fact, it would
@@ -326,8 +334,7 @@ be perfectly possible to have an option's short name longer than the
 corresponding long one, although that would make little sense. The only
 real difference is whether you use one or two dashes. Some other
 differences also come into play when an option expects an argument
-(@pxref{Option Arguments}) though. Yes, life can be complicated
-sometimes@dots{}
+(@pxref{Option Arguments}) though (it would be no fun otherwise).
 
 @node Option Arguments,  , Option Names, Option Syntax
 @subsection Option Arguments
@@ -338,7 +345,7 @@ those taking one, the argument may be either mandatory or optional.
 Then, there is also an additional, extended call syntax for some of
 them. But then again, that is not the whole story about getting an
 option's value (@pxref{Option Retrieval}). If everything goes well, you
-are now wondering whether you really want to use a command-line at all.
+are now wondering whether you really want to use a @cmdline{} at all.
 
 @menu
 * Flags::                       Options with no argument
@@ -350,9 +357,9 @@ are now wondering whether you really want to use a command-line at all.
 @subsubsection Flags
 First of all, some options don't take an argument at all. In the @clon{}
 jargon, these options are called ``flags''. Flags just stand for
-themselves: either they are present on the command-line, or they are not
-(as a matter of fact, this is a lie). A typical example of a flag would
-be displayed like this in a standard help string (but @pxref{Output}):
+themselves: either they are present on the @cmdline{}, or they are not (as a
+matter of fact, this is a lie). A typical example of a flag would be
+displayed like this in a standard help string (but @pxref{Output}):
 @example
   -h, --help        Print this help and exit.
 @end example
@@ -366,14 +373,14 @@ When using the long form, the proper way of providing an argument is to
 append it after an equal sign, like this: @samp{--phone=01020304}. When
 using the short form, the proper way of providing an argument is to
 stick it right behind the option's name, like this: @samp{-p01020304}.
-That should look familiar.
+All this should look familiar.
 
 When the option's argument is mandatory, you also have the ability to
-provide it in the next command-line item instead of sticking it to the
+provide it in the next @cmdline{} item instead of sticking it to the
 option's name. Back to the previous example, this means that you can
 also say @samp{--phone 01020304} or @samp{-p 01020304}. Keep in mind
 that this is not possible when the argument is optional (in the general
-case, it is not possible to decide whether the next command-line item is
+case, it is not possible to decide whether the next @cmdline{} item is
 an option's argument, a new option or something else).
 
 The phone example above would look like this in a standard help string
