@@ -350,8 +350,7 @@ This function returns two values:
 		      (:none)))))
     (let* ((env-var (env-var option))
 	   ;; #### PORTME.
-	   ;; #### Note: (sb-posix:getenv nil) -> nil, so using let* is ok.
-	   (env-val (sb-posix:getenv env-var)))
+	   (env-val (when env-var (sb-posix:getenv env-var))))
       (when env-val
 	(return-from getopt
 	  (values (retrieve-from-environment option env-val)
