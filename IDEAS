@@ -96,3 +96,18 @@ displayed.
 * Special --no-<name> option for switches
 (and probably switch-based options).
 For instance, you would have -d / --debug and +d / --no-debug. 
+
+* Support help string formatting for more than ttys
+For instance, it would be good to be able to generate texinfo, man (groff)
+etc. Currently, it is not very clear to me where exactly the limit between
+themes and format "drivers" stands. I think that what's in a theme depends on
+the driver you use (e.g. colors make sense for a tty driver, but not for a
+groff one).
+
+* Support for GUI-based options browsing
+I'm quite proud of this idea ;-) Joe uses program for the first time, so he
+types "program --gui-help" and gets a GUI with all available options, their
+help strings as bubbles, the possibility to select them, provide values etc. 
+He plays around and then clicks "Go", and the program continues with with the
+appropriate command-line (you can already have different contexts in CLon). 
+Cool hey ?
