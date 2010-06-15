@@ -6,7 +6,9 @@ An option could have several names instead of just one.
 
 * Support for multiple environment variables
 An option could be associated with a list of environment variables instead of
-just one.
+just one. Possible uses would be handling both DEBUG and NDEBUG (see below),
+but also program-specific versions of otherwise general variables, like trying
+MYPROG_NDEBUG first, and NDEBUG next.
 
 * Support for value post-processing
 I'm especially thinking about multiple environment variable support, but maybe
@@ -20,6 +22,10 @@ canonicalization (especially useful when in the debugger, you're invited to
 provide another value). For instance, in path options, the converter handles
 ~/ abbreviations. However, this is not valid when typing a value directly,
 which is a shame.
+
+* Support for resource files ala X11
+This could be used to provide values for options depending on the
+application's class/name.
 
 * Treat empty env vars as options called without their (optional argument)
 With the restriction that there's no notion of an env var set without
