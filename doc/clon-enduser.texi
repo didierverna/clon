@@ -246,6 +246,17 @@ output of @clon{}.
 @c ====================================================================
 @node Clonification, The Command Line, Introduction, Top
 @chapter Clonification
+@cindex @t{--clon-help}
+@cindex @t{--clon-banner}
+@cindex @t{--clon-version}
+@cindex Built-in Options
+@cindex Built-in Options, @t{--clon-help}
+@cindex Built-in Options, @t{--clon-banner}
+@cindex Built-in Options, @t{--clon-version}
+@cindex Options, built-in
+@cindex Options, built-in, @t{--clon-help}
+@cindex Options, built-in, @t{--clon-banner}
+@cindex Options, built-in, @t{--clon-version}
 
 Given this wonderful standalone @cl{} application, how do I know if it
 uses @clon{} for handing the @cmdline{}? Perhaps the simplest way to
@@ -286,6 +297,7 @@ Clon user manual, The Clon user manual}.
 @c ====================================================================
 @node The Command Line, Output, Clonification, Top
 @chapter The Command Line
+@cindex Command-Line
 
 @clon{} provides applications with usual @cmdline{} features such as
 option names coming in short (@eg{} @samp{-h}) or long (@eg{}
@@ -307,6 +319,8 @@ its full extent.
 @c -------------
 @node Option Calls, Option Packs, The Command Line, The Command Line
 @section Option Calls
+@cindex Command-Line, options
+@cindex Options, command-line
 
 @clon{} offers a set of precise syntactic rules that every clonified
 application follows implicitely, making them work in a homogeneous way. 
@@ -321,7 +335,8 @@ same syntactic rules as the built-in ones.
 
 @node Option Names, Option Arguments, Option Calls, Option Calls
 @subsection Option Names
-
+@cindex Option Names
+@cindex Options, names
 An option can come with either a short name, a long name, or both. It is
 also possible to abbreviate long names.
 
@@ -332,6 +347,15 @@ also possible to abbreviate long names.
 
 @node Full Names, Abbreviations, Option Names, Option Names
 @subsubsection Full Names
+@cindex Full names
+@cindex Long names
+@cindex Short names
+@cindex Option Names, full
+@cindex Option Names, long
+@cindex Option Names, short
+@cindex Options, names, full
+@cindex Options, names, long
+@cindex Options, names, short
 To provide an option by short name, use a @emph{short form}: a single
 dash followed by the option's short name (@eg{} @samp{-h}). To provide
 an option by long name, use a @emph{long form}: two dashes followed by
@@ -352,6 +376,9 @@ differences also come into play when an option expects an argument
 
 @node Abbreviations, , Full Names, Option Names
 @subsubsection Abbreviations
+@cindex Abbreviated names
+@cindex Option Names, abbreviated
+@cindex Options, names, abbreviated
 When calling an option by long form, it is possible to abbreviate its
 name, at the risk of being ambiguous. An abbreviation is simply the
 beginning of the option's name (for instance, @samp{--he} can stand for
@@ -362,7 +389,8 @@ characters).
 
 @node Option Arguments, , Option Names, Option Calls
 @subsection Option Arguments
-
+@cindex Options, arguments
+@cindex Option Arguments
 In @clon{}, there are different kinds of options: in addition to having
 a short and/or long name, an option may or may not take an argument. For
 those taking one, the argument may be either mandatory or optional.
@@ -379,6 +407,11 @@ are now wondering whether you really want to use a @cmdline{} at all.
 
 @node Flags, Valued Options, Option Arguments, Option Arguments
 @subsubsection Flags
+@cindex Flags
+@cindex Option Types, flags
+@cindex Options, types, flags
+@cindex Options, arguments, none
+@cindex Option Arguments, none
 First of all, some options don't take an argument at all. In the @clon{}
 jargon, these options are called @emph{flags}. Flags just stand for
 themselves: either they are present on the @cmdline{}, or they are not
