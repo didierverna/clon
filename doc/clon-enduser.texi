@@ -36,6 +36,7 @@
 @c %**start of header
 @setfilename clon-enduser.info
 @settitle The Clon end-user manual
+@afourpaper
 @c %**end of header
 
 
@@ -132,7 +133,9 @@ approved by the Free Software Foundation.
 @c ====================================================================
 @titlepage
 @title The Clon end-user manual
-@subtitle Version @value{VERSION}
+@subtitle The @CmdLine{} Option Nuker, Version @value{VERSION}
+@vskip 2cm
+@image{clon,16cm}
 @author Didier Verna <@email{didier@@lrde.epita.fr}>
 @page
 @vskip 0pt plus 1filll
@@ -212,10 +215,10 @@ support for highlighting on @tty{}'s through ISO/IEC 6429 SGR. This
 formatting is customizable through @emph{themes}.
 
 Depending on the target audience, @clon{} stands for either ``The
-@CmdLine{} Option Nuker'' or ``The @cmdline{} Option Nuker''. @clon{}
-also has a recursive acronym: ``@clon{} Likes Options Nuking'', and a
-reverse one: ``Never Omit to Link with @clon{}''. Other possible
-expansions of the acronym are still being investigated.
+@CmdLine{} Option Nuker'' or ``The @cl{} Option Nuker''. @clon{} also
+has a recursive acronym: ``@clon{} Likes Options Nuking'', and a reverse
+one: ``Never Omit to Link with @clon{}''. Other possible expansions of
+the acronym are still being investigated.
 
 This manual is for the @clon{} @emph{end-user}, that is, the user of an
 application powered by @clon{}. It describes how to use the @cmdline{}
