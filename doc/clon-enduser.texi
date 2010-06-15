@@ -569,6 +569,28 @@ You don't want to confuse @clon{}. @clon{} is nasty when it is scared.
 @node Option Retrieval, , Option Separator, The Command Line
 @section Option Retrieval
 
+When an application requests the value for a specific option, @clon{}
+first looks at the @cmdline{}, from left to right, and stops at the
+first match. Please note that the match in question may be a regular
+option call or a pack, depending on what appears first in the
+@cmdline{}. There is no concept of priority amongst option forms.
+
+It is possible to provide several calls to the same option on a single
+@cmdline{}. Some applications may take advantage of this: every
+consecutive request for an option's value will use the next match on the
+@cmdline{} until there is none left.
+
+The @cmdline{}, however is not the only place where @clon{} looks for
+option values. Some options may be associated with an environment
+variable and may also provide a default value. All of this should
+normally be advertised in the application's help string
+(@pxref{Output}).
+
+When @clon{} attempts to retrieve a value for a particular option, it
+always does so in a specific order: first, the @cmdline{} is searched. 
+Next, an environment variable is tried (if appropriate), and finally,
+the option's default value is used (if any).
+
 
 
 @c ====================================================================
