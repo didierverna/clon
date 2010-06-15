@@ -204,7 +204,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 @clon{} is a library for managing @cmdline{} options in standalone @cl{}
 applications. It provides a unified option syntax with both short and
 long names, automatic completion of partial names and automatic
-retrieval/conversion of option values from the @cmdline{}, associated
+retrieval/conversion of option arguments from the @cmdline{}, associated
 environment variables or default values. @clon{} comes with a set of
 extensible option types (numbers, paths, strings @etc{}). @clon{} also
 provides automatic generation and formatting of help strings, with
@@ -292,37 +292,47 @@ to become familiar with in order to use an application's @cmdline{} to
 its full extent.
 
 @menu
-* Option Syntax::               Different kinds of options
-* Command Line Structure::      How the @cmdline{} is organized
-* Option Retrieval::            How an option's value is computed
+* Option Calls::        Different ways to specify options
+* Option Packs::        Grouping option calls together
+* Option Separator::    Telling @clon{} to mind it's own business
+* Option Retrieval::    How @clon{} computes the value of an option
 @end menu
 
 
 @c -------------
-@c Option Syntax
+@c Option Calls
 @c -------------
-@node Option Syntax, Command Line Structure, The Command Line, The Command Line
-@section Option Syntax
+@node Option Calls, Option Packs, The Command Line, The Command Line
+@section Option Calls
 
 @clon{} offers a set of precise syntactic rules that every clonified
-application follows implicitely, making them work in a homogeneous way.
+application follows implicitely, making them work in a homogeneous way. 
 Although application programmers have the ability to extend @clon{} by
 defining their own option @emph{types}, even those new options obey the
 same syntactic rules as the built-in ones.
 
 @menu
-* Option Names::                Short or long
-* Option Arguments::            None, mandatory or optional
+* Option Names::        Long, short or abbreviated
+* Option Arguments::    None, mandatory or optional
 @end menu
 
-@node Option Names, Option Arguments, Option Syntax, Option Syntax
+@node Option Names, Option Arguments, Option Calls, Option Calls
 @subsection Option Names
 
-An option can come with either a short name, a long name, or both. To
-provide an option by short name, use a @emph{short form}: a single dash
-followed by the option's short name (@eg{} @samp{-h}). To provide an
-option by long name, use a @emph{long form}: two dashes followed by the
-option's long name (@eg{} @samp{--help}).
+An option can come with either a short name, a long name, or both. It is
+also possible to abbreviate long names.
+
+@menu
+* Full Names::          Long or short
+* Abbreviations::       Shorter long names
+@end menu
+
+@node Full Names, Abbreviations, Option Names, Option Names
+@subsubsection Full Names
+To provide an option by short name, use a @emph{short form}: a single
+dash followed by the option's short name (@eg{} @samp{-h}). To provide
+an option by long name, use a @emph{long form}: two dashes followed by
+the option's long name (@eg{} @samp{--help}).
 
 Short names typically consist of a single character. They are concise
 but more difficult to remember. Long names can be whole words, or even
@@ -337,7 +347,17 @@ real difference is whether you use one or two dashes. Some other
 differences also come into play when an option expects an argument
 (@pxref{Option Arguments}) though (it would be no fun otherwise).
 
-@node Option Arguments, , Option Names, Option Syntax
+@node Abbreviations, , Full Names, Option Names
+@subsubsection Abbreviations
+When calling an option by long form, it is possible to abbreviate its
+name, at the risk of being ambiguous. An abbreviation is simply the
+beginning of the option's name (for instance, @samp{--he} can stand for
+@samp{--help}). In case of ambiguity, @clon{} always chooses the option
+which is ``closest'' to the abbreviation (here, the ``distance'' between
+an abbreviation and an option's name is the number of missing
+characters).
+
+@node Option Arguments, , Option Names, Option Calls
 @subsection Option Arguments
 
 In @clon{}, there are different kinds of options: in addition to having
@@ -408,8 +428,8 @@ For those of you who are not satisfied with short and long forms,
 an additional call syntax. These options are called @emph{switches}.
 
 Just like any other kind of valued option, a switch can have a short
-and/or a long name, and its argment may be mandatory or optional.
-However, the possible values for a switch are restricted to true or
+and/or a long name, and its argment may be mandatory or optional. 
+However, the possible arguments for a switch are restricted to true or
 false. In fact, you can freely use @samp{yes}, @samp{on}, @samp{true},
 @samp{yup}, @samp{yeah} and @samp{no}, @samp{off}, @samp{false},
 @samp{nope}, @samp{nah} respectively.@footnote{If you want more, a very
@@ -441,29 +461,86 @@ form becomes automatically available, and this should be advertised in
 the application's help string.
 
 
-@c ----------------------
-@c Command Line Structure
-@c ----------------------
-@node Command Line Structure, Option Retrieval, Option Syntax, The Command Line
-@section Command Line Structure
+@c ------------
+@c Option Packs
+@c ------------
+@node Option Packs,  Option Separator, Option Calls, The Command Line
+@section Option Packs
 
-The @cmdline{} of all clonified applications follows a particular
-structure and may contain different kinds of items, in addition to the
-usual option calls. This section describes this in detail.
+In addition to using options individually (@pxref{Option Calls}),
+@clon{} offers the possibility to group option calls together under some
+circumstances. This feature is know as option @emph{packs}. @clon{}
+offers two kinds of packs.
 
 @menu
-* Separator::           Telling @clon{} to mind it's own business
-* Option Calls::        Using possibly abbreviated option names
-* Option Packs::        Grouping option calls
+* Short Packs::         Grouping short forms together
+* Negated Packs::       Grouping negated forms together
 @end menu
 
+@node Short Packs, Negated Packs, Option Packs, Option Packs
+@subsection Short Packs
+A short pack allows you to group multiple short forms in a single
+@cmdline{} item. For instance, instead of calling your program like
+this: @samp{program -c -u -p}, you can directly use: @samp{program
+-cup}.
 
-@node Separator, Option Calls, Command Line Structure, Command Line Structure
-@subsection Separator
+A short pack can only contain options the short names of which are
+exactly one character long. Also, it should be obvious that you cannot
+provide an argument to an option in a pack. There is one exception
+however: it @emph{is} possible to provide an argument to the @emph{last}
+option in the pack. If provided, this argument must be located in the
+next @cmdline{} item. It cannot be sticked to the option, so this means
+in particular that this option's argument is mandatory (@pxref{Valued
+Options}).
+
+Beware that using short packs comes at the risk of ambiguity. When
+@clon{} parses a @cmdline{} item beginning with only one dash, it tries
+to detect options first, options with a sticky argument next, and then
+short packs. For that reason, you cannot possibly start a pack with a
+valued option. Indeed, suppose that the option @samp{-c} takes an
+argument. What you @emph{think} is a short pack (@samp{-cup}) will in
+fact be interpreted as the option @samp{-c} with a sticky (and maybe
+invalid) argument @samp{up}. On the other hand, if the option @samp{-u}
+is only a flag (@pxref{Flags}), then you can safely pack your options in
+a different order, like this: @samp{-ucp}.
+
+A single @cmdline{} may contain as many short packs as you like, and
+they can also be intermixed with regular option calls.
+
+@node Negated Packs, , Short Packs, Option Packs
+@subsection Negated Packs
+In a very similar way, a negated pack allows you to group multiple
+negated forms in a single @cmdline{} item. As such, this feature only
+applies to switches or switch-based options (@pxref{Switches}). For
+instance, instead of calling your program like this: @samp{program +c +u
++p}, you can directly use: @samp{program +cup}.
+
+A negated pack can only contain options the short names of which are
+exactly one character long. Also, remember that negated forms never take
+any argument.
+
+Beware that using negated packs comes at the risk of ambiguity (although
+much less than with short packs). When @clon{} parses a @cmdline{} item
+beginning with a @samp{+}, it tries to detect options first, and then
+negated packs. For that reason, the order in which you specify the
+options in the pack is important. Indeed, suppose that your application
+has a @samp{+cup} switch (this would be a very bad idea, but
+still@dots{}). If you want to provide the same pack as above, then you
+need to modify the options order, like this: @samp{+ucp}.
+
+A single @cmdline{} may contain as many negated packs as you like, and
+they can also be intermixed with regular option calls or short packs.
+
+
+@c ----------------
+@c Option Separator
+@c ----------------
+@node Option Separator, Option Retrieval, Option Packs, The Command Line
+@section Option Separator
 
 @clon{} separates the @cmdline{} in two parts. The left part contains
-options, and the right part contains the rest (it is also called the
-@emph{postfix}).
+option calls and packs while the right part contains the rest. The right
+part is also called the @emph{postfix}).
 
 You can force this distinction by using the special construct @samp{--}
 on the @cmdline{}. Everything that follows it will be completely ignored
@@ -474,28 +551,24 @@ this for you automatically by noticing where the last option (or its
 potential argument) stands. The behavior is different from that of
 explicit splitting in one regard however: if the application is not
 expecting any postfix and there's an implicit one, then @clon{} will
-throw an error at your face. It hurts.
+throw an error at your face.
 
 One final note on @cmdline{} separation: in the case an application's
 postfix is supposed to contain something looking like an option (perhaps
 real options to pass on to another program), you @strong{need} an
 explicit separator. Otherwise, @clon{} will be confused: it could for
 instance wrongly detect unknown options, junk on the @cmdline{} @etc{}
+
 You don't want to confuse @clon{}. @clon{} is nasty when it is scared.
 
-
-@node Option Calls, Option Packs, Separator, Command Line Structure
-@subsection Option Calls
-
-@node Option Packs,  , Option Calls, Command Line Structure
-@subsection Option Packs
 
 
 @c ----------------
 @c Option Retrieval
 @c ----------------
-@node Option Retrieval, , Command Line Structure, The Command Line
+@node Option Retrieval, , Option Separator, The Command Line
 @section Option Retrieval
+
 
 
 @c ====================================================================
