@@ -77,6 +77,12 @@ whereas the user probably meant -v -d (or -vd which works). We could improve
 the detection of this situation by catching the invalid argument error, and
 then trying a pack instead of immediately reporting the error.
 
+* Better advertisement of minus-packs
+[ See also above ] When Clon computes the pack string for the synopsis, we
+should put flags first in the pack, because it does not make nay sense to
+start a pack with a valued option (the pack would be seen as an option with a
+sticky argument first).
+
 * Extend the [items-]separator face property
 Item separation would ideally depend on what's before or after the item being
 displayed. 
