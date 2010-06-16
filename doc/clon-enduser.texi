@@ -785,6 +785,66 @@ Selection} explains how to switch between predefined layouts and
 @c ---------------
 @node Output Elements, Theme Selection, Output, Output
 @section Output Elements
+Let's look at the output of @command{program --help} in a default
+setting first:
+
+@cartouche
+@verbatim
+Usage: program [-hdF] [+d] [OPTIONS] FILES...
+
+A clonified program.
+
+  -h, --help                  Print this help and exit.
+Runtime options:
+  -(+)d, --debug[=yes/no]     Turn debugging on or off.
+                              Fallback: yes
+                              Environment: DEBUG
+                              Default: no
+  --simulate=yes/no           Simulate only. Nothing will happen for real, 
+                              except for log messages.
+User identification:
+  -f, --first-name=STR        Set the user's first name to STR.
+  -F, --family-name[=NAME]    Set the user's family name to NAME.
+                              Fallback: unknown
+@end verbatim
+@end cartouche
+
+@cindex Synopsis
+@cindex Output, synopsis
+@cindex Postfix
+@cindex Short packs
+@cindex Packs, short
+@cindex Negated packs
+@cindex Negated Short Packs
+@cindex Negated packs, short
+@cindex Packs, negated
+@cindex Packs, short, negated
+The first line of output is what's called the @emph{synopsis}. This
+synopsis indicates that the program accepts a number of options and also
+a postfix consisting of file names. The set of available options is not
+detailed in the synopsis but for convenience, @clon{} shows the
+available short and negated packs explicitly.
+
+@cindex Text
+@cindex Arbitrary Text
+@cindex Text, arbitrary
+The next non-empty line is just text. A clonified application is free to
+put arbitrary text anywhere in its help string. This can be used to
+describe what the application is about for instance.
+
+@cindex Groups
+@cindex Arbitrary Text, in groups
+@cindex Text, in groups
+@cindex Options, in groups
+@cindex Groups, in groups
+@cindex Groups, titles
+Two other lines in the help string look like arbitrary text, but in fact
+are not: ``Runtime options:'' and ``User identification:''. These are
+not arbitrary text, but @emph{group titles}. A group is a way of putting
+help string items together, for instance because they are related to the
+same topic. A group has an optional title, and may contain options,
+arbitrary text or even sub-groups.
+
 
 @c ---------------
 @c Theme Selection
