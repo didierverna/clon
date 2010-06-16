@@ -323,7 +323,7 @@ its full extent.
 @cindex Options, command-line
 
 @clon{} offers a set of precise syntactic rules that every clonified
-application follows implicitely, making them work in a homogeneous way. 
+application follows implicitely, making them work in a homogeneous way.
 Although application programmers have the ability to extend @clon{} by
 defining their own option @emph{types}, even those new options obey the
 same syntactic rules as the built-in ones.
@@ -335,7 +335,6 @@ same syntactic rules as the built-in ones.
 
 @node Option Names, Option Arguments, Option Calls, Option Calls
 @subsection Option Names
-@cindex Option Names
 @cindex Options, names
 An option can come with either a short name, a long name, or both. It is
 also possible to abbreviate long names.
@@ -347,15 +346,15 @@ also possible to abbreviate long names.
 
 @node Full Names, Abbreviations, Option Names, Option Names
 @subsubsection Full Names
-@cindex Full names
-@cindex Long names
-@cindex Short names
-@cindex Option Names, full
-@cindex Option Names, long
-@cindex Option Names, short
+@cindex Long Form
+@cindex Short Form
+@cindex Command-Line, options, long form
+@cindex Command-Line, options, short form
 @cindex Options, names, full
 @cindex Options, names, long
 @cindex Options, names, short
+@cindex Options, command-line, long form
+@cindex Options, command-line, short form
 To provide an option by short name, use a @emph{short form}: a single
 dash followed by the option's short name (@eg{} @samp{-h}). To provide
 an option by long name, use a @emph{long form}: two dashes followed by
@@ -376,9 +375,17 @@ differences also come into play when an option expects an argument
 
 @node Abbreviations, , Full Names, Option Names
 @subsubsection Abbreviations
-@cindex Abbreviated names
-@cindex Option Names, abbreviated
+@cindex Abbreviated Form
+@cindex Abbreviated Long Form
+@cindex Long Form, abbreviated
 @cindex Options, names, abbreviated
+@cindex Options, names, long, abbreviated
+@cindex Command-Line, options, abbreviated form
+@cindex Command-Line, options, abbreviated long form
+@cindex Command-Line, options, long form, abbreviated
+@cindex Options, command-line, abbreviated form
+@cindex Options, command-line, abbreviated long form
+@cindex Options, command-line, long form, abbreviated
 When calling an option by long form, it is possible to abbreviate its
 name, at the risk of being ambiguous. An abbreviation is simply the
 beginning of the option's name (for instance, @samp{--he} can stand for
@@ -389,8 +396,8 @@ characters).
 
 @node Option Arguments, , Option Names, Option Calls
 @subsection Option Arguments
+@cindex Arguments
 @cindex Options, arguments
-@cindex Option Arguments
 In @clon{}, there are different kinds of options: in addition to having
 a short and/or long name, an option may or may not take an argument. For
 those taking one, the argument may be either mandatory or optional.
@@ -408,10 +415,7 @@ are now wondering whether you really want to use a @cmdline{} at all.
 @node Flags, Valued Options, Option Arguments, Option Arguments
 @subsubsection Flags
 @cindex Flags
-@cindex Option Types, flags
 @cindex Options, types, flags
-@cindex Options, arguments, none
-@cindex Option Arguments, none
 First of all, some options don't take an argument at all. In the @clon{}
 jargon, these options are called @emph{flags}. Flags just stand for
 themselves: either they are present on the @cmdline{}, or they are not
@@ -423,6 +427,17 @@ be displayed like this in a standard help string (but @pxref{Output}):
 
 @node Valued Options, Switches, Flags, Option Arguments
 @subsubsection Valued Options
+@cindex Valued Options
+@cindex Options, types, valued
+@cindex Sticky Arguments
+@cindex Arguments, sticky
+@cindex Options, arguments, sticky
+@cindex Mandatory Arguments
+@cindex Arguments, mandatory
+@cindex Options, arguments, mandatory
+@cindex Optional Arguments
+@cindex Arguments, optional
+@cindex Options, arguments, optional
 Options taking an argument are said to be @emph{valued}. In @clon{}, a
 valued option's argument can be either mandatory or optional. We know
 that valued options, just like flags, may be provided in short or long
@@ -430,16 +445,24 @@ form. When using the long form, the proper way of providing an argument
 is to append it after an @samp{=} sign, like this:
 @samp{--phone=01020304}. When using the short form, the proper way of
 providing an argument is to stick it right behind the option's name,
-like this: @samp{-p01020304}. All this should look familiar.
+like this: @samp{-p01020304}. In both long and short form, we call these
+arguments ``sticky''. All this should look familiar.
 
+@cindex Separated Arguments
+@cindex Arguments, separated
+@cindex Options, arguments, separated
 When the option's argument is mandatory, you also have the ability to
 provide it in the next @cmdline{} item instead of sticking it to the
-option's name. Back to the previous example, this means that you can
-also say @samp{--phone 01020304} or @samp{-p 01020304}. Keep in mind
-that this is not possible when the argument is optional (in the general
-case, it is not possible to decide whether the next @cmdline{} item is
-an option's argument, a new option or something else).
+option's name. These arguments are said to be ``separated''. Back to the
+previous example, this means that you can also say @samp{--phone
+01020304} or @samp{-p 01020304}. Keep in mind that this is not possible
+when the argument is optional (in the general case, it is not possible
+to decide whether the next @cmdline{} item is an option's argument, a
+new option or something else).
 
+@cindex Arguments, looking like options
+@cindex Options, as argument to other options
+@cindex Options, arguments, looking like options
 There is also another case where you can't use this alternate syntax,
 even when the argument is mandatory: that is when the argument itself
 looks like an option. @clon{} will think it is, and consequently will
@@ -459,18 +482,29 @@ is optional:
 
 @node Switches, , Valued Options, Option Arguments
 @subsubsection Switches
+@cindex Switches
+@cindex Options, types, switches
 For those of you who are not satisfied with short and long forms,
 @clon{} provides a specific option type for boolean values, along with
 an additional call syntax. These options are called @emph{switches}.
 
 Just like any other kind of valued option, a switch can have a short
-and/or a long name, and its argment may be mandatory or optional. 
+and/or a long name, and its argment may be mandatory or optional.
 However, the possible arguments for a switch are restricted to true or
 false. In fact, you can freely use @samp{yes}, @samp{on}, @samp{true},
 @samp{yup}, @samp{yeah} and @samp{no}, @samp{off}, @samp{false},
 @samp{nope}, @samp{nah} respectively.@footnote{If you want more, a very
 modest additional fee will be charged.}
 
+@cindex Negated Form
+@cindex Negated Short Form
+@cindex Short Form, negated
+@cindex Options, command-line, negated form
+@cindex Options, command-line, negated short form
+@cindex Options, command-line, short form, negated
+@cindex Command-Line, options, negated form
+@cindex Command-Line, options, negated short form
+@cindex Command-Line, options, short form, negated
 In addition to the standard short and long forms, a switch can be
 provided in @emph{negated form}, that is, by appending its short name
 behind a @samp{+} character. This form never takes any argument and
@@ -623,7 +657,7 @@ normally be advertised in the application's help string
 (@pxref{Output}).
 
 When @clon{} attempts to retrieve a value for a particular option, it
-always does so in a specific order: first, the @cmdline{} is searched. 
+always does so in a specific order: first, the @cmdline{} is searched.
 Next, an environment variable is tried (if appropriate), and finally,
 the option's default value is used (if any).
 
