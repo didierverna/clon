@@ -536,6 +536,9 @@ the application's help string.
 @c ------------
 @node Option Packs,  Option Separator, Option Calls, The Command Line
 @section Option Packs
+@cindex Packs
+@cindex Command-Line, packs
+@cindex Options, command-line, packed
 
 In addition to using options individually (@pxref{Option Calls}),
 @clon{} offers the possibility to group option calls together under some
@@ -549,11 +552,16 @@ offers two kinds of packs.
 
 @node Short Packs, Negated Packs, Option Packs, Option Packs
 @subsection Short Packs
+@cindex Short packs
+@cindex Packs, short
+@cindex Command-Line, short packs
+@cindex Command-Line, packs, short
 A short pack allows you to group multiple short forms in a single
 @cmdline{} item. For instance, instead of calling your program like
 this: @samp{program -c -u -p}, you can directly use: @samp{program
 -cup}.
 
+@cindex Options, names, short, one character
 A short pack can only contain options the short names of which are
 exactly one character long. Also, it should be obvious that you cannot
 provide an argument to an option in a pack. There is one exception
@@ -579,12 +587,23 @@ they can also be intermixed with regular option calls.
 
 @node Negated Packs, , Short Packs, Option Packs
 @subsection Negated Packs
+@cindex Negated packs
+@cindex Negated Short Packs
+@cindex Negated packs, short
+@cindex Packs, negated
+@cindex Packs, short, negated
+@cindex Command-Line, negated packs
+@cindex Command-Line, negated short packs
+@cindex Command-Line, short packs, negated
+@cindex Command-Line, packs, negated
+@cindex Command-Line, packs, short, negated
 In a very similar way, a negated pack allows you to group multiple
 negated forms in a single @cmdline{} item. As such, this feature only
 applies to switches or switch-based options (@pxref{Switches}). For
 instance, instead of calling your program like this: @samp{program +c +u
 +p}, you can directly use: @samp{program +cup}.
 
+@cindex Options, names, short, one character
 A negated pack can only contain options the short names of which are
 exactly one character long. Also, remember that negated forms never take
 any argument.
