@@ -419,8 +419,9 @@ are now wondering whether you really want to use a @cmdline{} at all.
 First of all, some options don't take an argument at all. In the @clon{}
 jargon, these options are called @emph{flags}. Flags just stand for
 themselves: either they are present on the @cmdline{}, or they are not
-(as a matter of fact, this is a lie). A typical example of a flag would
-be displayed like this in a standard help string (but @pxref{Output}):
+(as a matter of fact, this is a lie, @pxref{Option Retrieval}). A
+typical example of a flag would be displayed like this in a standard
+help string (but @pxref{Output}):
 @example
   -h, --help        Print this help and exit.
 @end example
@@ -429,6 +430,15 @@ be displayed like this in a standard help string (but @pxref{Output}):
 @subsubsection Valued Options
 @cindex Valued Options
 @cindex Options, types, valued
+@cindex Values
+@cindex Options, values
+Options taking an argument are said to be @emph{valued}. We need a bit
+of terminology here: and option's @emph{argument} is typically what you
+provide on the @cmdline{} (or elsewhere, @pxref{Option Retrieval}). 
+Typically a string. An option's @emph{value} is what results from the
+conversion of the option's argument to the proper type (the same string,
+a number, whatever).
+
 @cindex Sticky Arguments
 @cindex Arguments, sticky
 @cindex Options, arguments, sticky
@@ -438,11 +448,10 @@ be displayed like this in a standard help string (but @pxref{Output}):
 @cindex Optional Arguments
 @cindex Arguments, optional
 @cindex Options, arguments, optional
-Options taking an argument are said to be @emph{valued}. In @clon{}, a
-valued option's argument can be either mandatory or optional. We know
-that valued options, just like flags, may be provided in short or long
-form. When using the long form, the proper way of providing an argument
-is to append it after an @samp{=} sign, like this:
+In @clon{}, a valued option's argument can be either mandatory or
+optional. We know that valued options, just like flags, may be provided
+in short or long form. When using the long form, the proper way of
+providing an argument is to append it after an @samp{=} sign, like this:
 @samp{--phone=01020304}. When using the short form, the proper way of
 providing an argument is to stick it right behind the option's name,
 like this: @samp{-p01020304}. In both long and short form, we call these
@@ -679,31 +688,68 @@ You don't want to confuse @clon{}. @clon{} is nasty when it is scared.
 @cindex Retrieval, from command-line
 @cindex Command-Line, retrieval
 @cindex Options, retrieval, from command-line
-When an application requests the value for a specific option, @clon{}
-first looks at the @cmdline{}, from left to right, and stops at the
-first match. Please note that the match in question may be a regular
-option call or a pack, depending on what appears first in the
-@cmdline{}. There is no concept of priority amongst option forms.
+When an application wants to retrieve a specific option, @clon{} looks
+at the @cmdline{}, from left to right, and stops at the first match. 
+Please note that the match in question may be a regular option call or a
+pack, depending on what appears first on the @cmdline{}. There is no
+concept of priority amongst option forms.
 
-It is possible to provide several calls to the same option on a single
-@cmdline{}. Some applications may take advantage of this: every
-consecutive request for an option's value will use the next match on the
+@cindex Options, multiple calls
+Note that it is possible to provide several calls to the same option on
+a single @cmdline{}. Some applications may take advantage of this: every
+consecutive request for an option will use the next match on the
 @cmdline{} until there is none left.
 
-@cindex Retrieval, from environment
-@cindex Retrieval, from default value
-@cindex Options, retrieval, from environment
-@cindex Options, retrieval, from default value
-The @cmdline{}, however is not the only place where @clon{} looks for
-option values. Some options may be associated with an environment
-variable and may also provide a default value. All of this should
-normally be advertised in the application's help string
+The @cmdline{} is not the only place where @clon{} looks for option
+@emph{values} however. Other sources for option values are:
+@emph{fallback} values, @emph{environment} variables and @emph{default}
+values. The existence of a fallback value, environment variable or
+default value should be advertised in the application's help string
 (@pxref{Output}).
 
+
+@itemize @bullet
+@item
+@cindex Fallback values
+@cindex Values, fallback
+@cindex Retrieval, from fallback value
+@cindex Options, retrieval, from fallback value
+Fallback values are used when an option exists on the @cmdline{} without
+a corresponding argument (so this applies only to options taking
+optional arguments).
+@item
+@cindex Environment variables
+@cindex Retrieval, from environment
+@cindex Options, retrieval, from environment
+Applications may also associate an option with a specific environment
+variable which contains a value for it.
+@item
+@cindex Default values
+@cindex Values, default
+@cindex Retrieval, from default value
+@cindex Options, retrieval, from default value
+Finally, default values are used for options not provided on the
+@cmdline{}.
+@end itemize
+
 When @clon{} attempts to retrieve a value for a particular option, it
-always does so in a specific order: first, the @cmdline{} is searched.
-Next, an environment variable is tried (if appropriate), and finally,
-the option's default value is used (if any).
+always does so in a specific order: first, the @cmdline{} is searched. 
+If an argument is present, it is used. Otherwise, a fallback value is
+used (if any). Next, an environment variable is tried (when
+appropriate), and finally, the option's default value is used (if any).
+
+@cindex Flags
+@cindex Options, types, flags
+@cindex Environment variables
+@cindex Retrieval, from environment
+@cindex Options, retrieval, from environment
+One last note: fallback or default values don't make any sense for
+flags, but flags can still be associated with environment variables. In
+such a case, the very @emph{existence} of the variable in the
+environment, regardless of its value, stands for the presence of the
+corresponding option on the @cmdline{}.
+
+Now you need to get some rest.
 
 
 
