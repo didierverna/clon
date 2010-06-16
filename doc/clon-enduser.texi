@@ -323,7 +323,7 @@ its full extent.
 @cindex Options, command-line
 
 @clon{} offers a set of precise syntactic rules that every clonified
-application follows implicitely, making them work in a homogeneous way.
+application follows implicitly, making them work in a homogeneous way.
 Although application programmers have the ability to extend @clon{} by
 defining their own option @emph{types}, even those new options obey the
 same syntactic rules as the built-in ones.
@@ -366,7 +366,7 @@ word sequences (usually separated by dashes). They are easier to
 remember but longer to type on the @cmdline{}.
 
 You should be aware of the fact that in a clonified application, neither
-short names nore long ones are restricted in length. In fact, it would
+short names nor long ones are restricted in length. In fact, it would
 be perfectly possible to have an option's short name longer than the
 corresponding long one, although that would make little sense. The only
 real difference is whether you use one or two dashes. Some other
@@ -409,7 +409,7 @@ are now wondering whether you really want to use a @cmdline{} at all.
 @menu
 * Flags::                       Options with no argument
 * Valued Options::              Options with arguments
-* Switches::                    Options with boolean arguments
+* Switches::                    Options with Boolean arguments
 @end menu
 
 @node Flags, Valued Options, Option Arguments, Option Arguments
@@ -494,11 +494,11 @@ is optional:
 @cindex Switches
 @cindex Options, types, switches
 For those of you who are not satisfied with short and long forms,
-@clon{} provides a specific option type for boolean values, along with
+@clon{} provides a specific option type for Boolean values, along with
 an additional call syntax. These options are called @emph{switches}.
 
 Just like any other kind of valued option, a switch can have a short
-and/or a long name, and its argment may be mandatory or optional.
+and/or a long name, and its argument may be mandatory or optional.
 However, the possible arguments for a switch are restricted to true or
 false. In fact, you can freely use @samp{yes}, @samp{on}, @samp{true},
 @samp{yup}, @samp{yeah} and @samp{no}, @samp{off}, @samp{false},
@@ -534,7 +534,7 @@ debugging off, use @samp{+d} or @samp{--debug=no}.
 
 One last word about switches: @clon{} lets application developers create
 new options based on (but not limited to) switches. These options
-typically accept boolean arguments as well as some other value(s). As
+typically accept Boolean arguments as well as some other value(s). As
 soon as an option is switch-based (and has a short name), the negated
 form becomes automatically available, and this should be advertised in
 the application's help string.
@@ -656,7 +656,7 @@ by @clon{} (not necessarily by the application itself though).
 @cindex Separator, implicit
 @cindex Command-Line, implicit separator
 @cindex Command-Line, separator, implicit
-In the case you don't split your @cmdline{} explicitely, @clon{} does
+In the case you don't split your @cmdline{} explicitly, @clon{} does
 this for you automatically by noticing where the last option (or its
 potential argument) stands. The behavior is different from that of
 explicit splitting in one regard however: if the application is not
@@ -811,3 +811,7 @@ Selection} explains how to switch between predefined layouts and
 @bye
 
 @c clon-enduser.texi ends here
+
+@c  LocalWords:  Clon clon cmdline Clonification tty emph CmdLine clonified
+@c  LocalWords:  clonfiscated clonistified clonificated clonificationated samp
+@c  LocalWords:  cindex subsubsection pxref
