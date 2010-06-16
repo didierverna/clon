@@ -626,15 +626,27 @@ they can also be intermixed with regular option calls or short packs.
 @c ----------------
 @node Option Separator, Option Retrieval, Option Packs, The Command Line
 @section Option Separator
+@cindex Separator
+@cindex Command-Line, separator
+@cindex Postfix
+@cindex Command-Line, postfix
 
 @clon{} separates the @cmdline{} in two parts. The left part contains
 option calls and packs while the right part contains the rest. The right
 part is also called the @emph{postfix}).
 
+@cindex Explicit separator
+@cindex Separator, explicit
+@cindex Command-Line, explicit separator
+@cindex Command-Line, separator, explicit
 You can force this distinction by using the special construct @samp{--}
 on the @cmdline{}. Everything that follows it will be completely ignored
 by @clon{} (not necessarily by the application itself though).
 
+@cindex Implicit separator
+@cindex Separator, implicit
+@cindex Command-Line, implicit separator
+@cindex Command-Line, separator, implicit
 In the case you don't split your @cmdline{} explicitely, @clon{} does
 this for you automatically by noticing where the last option (or its
 potential argument) stands. The behavior is different from that of
@@ -642,6 +654,10 @@ explicit splitting in one regard however: if the application is not
 expecting any postfix and there's an implicit one, then @clon{} will
 throw an error at your face.
 
+@cindex Postfix, options in
+@cindex Options, in postfix
+@cindex Command-Line, postfix, options in
+@cindex Command-Line, options, in postfix
 One final note on @cmdline{} separation: in the case an application's
 postfix is supposed to contain something looking like an option (perhaps
 real options to pass on to another program), you @strong{need} an
