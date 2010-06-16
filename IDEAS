@@ -111,3 +111,6 @@ help strings as bubbles, the possibility to select them, provide values etc.
 He plays around and then clicks "Go", and the program continues with with the
 appropriate command-line (you can already have different contexts in CLon). 
 Cool hey ?
+
+* Provide a negated long form as well ?
+++debug
