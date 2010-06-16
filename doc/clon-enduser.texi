@@ -713,6 +713,46 @@ the option's default value is used (if any).
 @node Output, Concept Index, The Command Line, Top
 @chapter Output
 
+In the previous chapter, we have seen how to make the best usage of a
+clonified application's command-line. The second aspect we need to look
+at is @clon{}'s output, typically what you get when you type
+@command{program --help}. From an end-user perspective, one key feature
+of @clon{} is that control on the formatting of the help strings is
+given to @emph{you} instead of being the programmer's responsibility. 
+What this means is that @emph{you} get to choose the way you want help
+strings to be formatted, and all of a sudden, every clonified
+application you use will conform to your specifications.
+
+@ref{Output Elements} surveys the different items composing a @clon{}
+help string by looking at examples in a default setting. @ref{Theme
+Selection} explains how to switch between predefined layouts and
+@ref{Theme Creation} describes how to build your own layouts.
+
+@menu
+* Output Elements::     What appears in help strings
+* Theme Selection::     Switching between available layouts
+* Theme Creation::      Building your own layouts
+@end menu
+
+@c ---------------
+@c Output Elements
+@c ---------------
+@node Output Elements, Theme Selection, Output, Output
+@section Output Elements
+
+@c ---------------
+@c Theme Selection
+@c ---------------
+@node Theme Selection, Theme Creation, Output Elements, Output
+@section Theme Selection
+
+@c ---------------
+@c Theme Creation
+@c ---------------
+@node Theme Creation, , Theme Selection, Output
+@section Theme Creation
+
+
 
 @c ====================================================================
 @c Concept Index
