@@ -673,7 +673,12 @@ You don't want to confuse @clon{}. @clon{} is nasty when it is scared.
 @c ----------------
 @node Option Retrieval, , Option Separator, The Command Line
 @section Option Retrieval
+@cindex Retrieval
+@cindex Options, retrieval
 
+@cindex Retrieval, from command-line
+@cindex Command-Line, retrieval
+@cindex Options, retrieval, from command-line
 When an application requests the value for a specific option, @clon{}
 first looks at the @cmdline{}, from left to right, and stops at the
 first match. Please note that the match in question may be a regular
@@ -685,6 +690,10 @@ It is possible to provide several calls to the same option on a single
 consecutive request for an option's value will use the next match on the
 @cmdline{} until there is none left.
 
+@cindex Retrieval, from environment
+@cindex Retrieval, from default value
+@cindex Options, retrieval, from environment
+@cindex Options, retrieval, from default value
 The @cmdline{}, however is not the only place where @clon{} looks for
 option values. Some options may be associated with an environment
 variable and may also provide a default value. All of this should
