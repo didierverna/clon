@@ -845,6 +845,76 @@ help string items together, for instance because they are related to the
 same topic. A group has an optional title, and may contain options,
 arbitrary text or even sub-groups.
 
+@cindex Groups
+@cindex Groups, built-in
+@cindex @t{--clon-help}
+@cindex Built-in Options
+@cindex Built-in Options, @t{--clon-help}
+@cindex Options, built-in
+@cindex Options, built-in, @t{--clon-help}
+In addition to displaying the full help string, a clonified application
+may display a group's help string only (in such a case, you don't get to
+see the synopsis). This is what happens when you type @command{program
+--clon-help} for instance. @clon{}'s built-in options belong to a
+reserved built-in group.
+
+@cindex Flags
+@cindex Options, types, flags
+@cindex Valued Options
+@cindex Options, types, valued
+@cindex Switches
+@cindex Options, types, switches
+@cindex Long Form
+@cindex Short Form
+@cindex Command-Line, options, long form
+@cindex Command-Line, options, short form
+@cindex Negated Form
+@cindex Negated Short Form
+@cindex Short Form, negated
+@cindex Options, command-line, negated form
+@cindex Options, command-line, negated short form
+@cindex Options, command-line, short form, negated
+@cindex Command-Line, options, negated form
+@cindex Command-Line, options, negated short form
+@cindex Command-Line, options, short form, negated
+Let's have a look at the options now. In the first column, you can see
+that depending on the option, the long, short and negated forms are
+advertised. Valued options also advertise their argument, enclosed in
+square brackets when it is optional. In this example, @samp{-h} is a
+flag, @samp{-d} and @samp{--simulate} are switches with different
+settings, while @samp{-f} and @samp{-F} are standard valued options.
+
+@cindex Options, description
+@cindex @t{--clon-line-width}
+@cindex Built-in Options
+@cindex Built-in Options, @t{--clon-line-width}
+@cindex Options, built-in
+@cindex Options, built-in, @t{--clon-line-width}
+@cindex CLON_LINE_WIDTH
+@cindex Environment Variables, CLON_LINE_WIDTH
+The second column of the help string provides each option's
+@emph{description}. Descriptions can span across several lines, as in
+the case of @samp{--simulate}. @clon{} takes care of properly aligning
+all the material that needs to be displayed. The global width of the
+output can be controlled by a built-in option, the description of which
+speaks for itself:
+@verbatim
+  --clon-line-width=WIDTH     Set Clon's output line width.
+                              If not given, the terminal size will be used when
+                              possible. Otherwise, 80 columns will be assumed.
+                              Environment: CLON_LINE_WIDTH
+@end verbatim
+
+@cindex Fallback values
+@cindex Values, fallback
+@cindex Environment Variables
+@cindex Default values
+@cindex Values, default
+Finally, you can see that potential fallback values, environment
+variables and default values are also advertised in that order, when
+appropriate.
+
+
 
 @c ---------------
 @c Theme Selection
