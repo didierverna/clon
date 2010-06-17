@@ -771,19 +771,19 @@ application you use will conform to your specifications.
 
 @ref{Output Elements} surveys the different items composing a @clon{}
 help string by looking at examples in a default setting. @ref{Theme
-Selection} explains how to switch between predefined layouts and
+Mechanism} explains how to switch between predefined layouts and
 @ref{Theme Creation} describes how to build your own layouts.
 
 @menu
 * Output Elements::     What appears in help strings
-* Theme Selection::     Switching between available layouts
+* Theme Mechanism::     Switching between available layouts
 * Theme Creation::      Building your own layouts
 @end menu
 
 @c ---------------
 @c Output Elements
 @c ---------------
-@node Output Elements, Theme Selection, Output, Output
+@node Output Elements, Theme Mechanism, Output, Output
 @section Output Elements
 Let's look at the output of @command{program --help} in a default
 setting first:
@@ -917,15 +917,120 @@ appropriate.
 
 
 @c ---------------
-@c Theme Selection
+@c Theme Mechanism
 @c ---------------
-@node Theme Selection, Theme Creation, Output Elements, Output
-@section Theme Selection
+@node Theme Mechanism, Theme Creation, Output Elements, Output
+@section Theme Mechanism
+@cindex Theme Mechanism
+
+@cindex Themes
+@cindex Themes, built-in, @t{raw}
+@cindex Built-in themes
+@cindex Built-in themes, @t{raw}
+The output of @command{program --help} that we have seen in the previous
+section corresponds to a default setting, but is really just one
+possibility. As the user of a clonified application, you have the
+ability to customize the appearance of @clon{}'s output. The way things
+look is specified by so-called @emph{themes}. By default, @clon{} uses a
+theme named @t{raw} which every clonified application has built-in.
+
+Other themes are stored in files the standard extension of which is
+@samp{cth} (as in @b{C}lon @b{TH}eme). In fact, theme files can be named
+as you like; this is just a convention.
+
+@menu
+* Standard Themes::     Some example themes are provided
+* Theme Search Path::   Where to find theme files
+* Theme Selection::     How to select a theme
+@end menu
+
+@node Standard Themes, Theme Search Path, Theme Mechanism, Theme Mechanism
+@subsection Standard Themes
+@cindex Themes, files
+@cindex Themes, files, standard
+@cindex Standard Themes
+@cindex Standard Themes, files
+@clon{} comes with several standard themes that can be used as-is or
+serve as the basis for creating new ones (@pxref{Theme Creation}). The
+list is given below.
+@table @t
+@item raw
+@cindex Themes, files, standard, @t{raw}
+Exactly the same as the built-in one, only copied into a theme file.
+@item optlist
+@cindex Themes, files, standard, @t{optlist}
+Displays only a list of available options, one per line, without any
+description, group indication or arbitrary text. This can be used to
+quickly remember the name or the syntax of an option.
+@item refcard
+@cindex Themes, files, standard, @t{refcard}
+Displays a very compact help string. The synopsis is there, so are the
+group titles and arbitrary texts, but the options are displayed without
+any description, and the lines are filled as much as possible. The
+intent of this theme is to produce some sort of ``reference card'' that
+could be printed.
+@item roomy
+@cindex Themes, files, standard, @t{roomy}
+Displays a full help string occupying more space than the @t{raw} theme.
+Option descriptions don't start @emph{after} the option's name, but
+@emph{under} it. As a result, they occupy more horizontal space. Also,
+sub-groups are indented to the right.
+@item christmas
+@cindex Themes, files, standard, @t{christmas}
+This one is full of bells and whistles, which makes it essentially
+unusable. It exists only to provide a concrete example of all the
+available formatting and highlighting features of @clon{}. The
+@t{christmas} theme is only available once a year, at exactly 23:59:59
+on December the 24th.
+@end table
+
+@node Theme Search Path, Theme Selection, Standard Themes, Theme Mechanism
+@subsection Theme Search Path
+@cindex Search Path
+@cindex Search Path, themes
+@cindex Themes, search path
+@clon{} maintains a search path for looking up files. Theme files are
+supposed to be located in a @file{themes} subdirectory of every
+directory in the search path. By default, the search path is as follows:
+@itemize @w{}
+@item
+@t{~/.clon/}
+@item
+@t{~/Library/Application Support/Clon/} (Mac OSX only)
+@item
+@t{~/share/clon/}
+@item
+@t{/Library/Application Support/Clon/} (Mac OSX only)
+@item
+@t{/usr/local/share/clon/}
+@item
+@t{/usr/share/clon/}
+@end itemize
+
+@cindex @t{--clon-search-path}
+@cindex Built-in Options
+@cindex Built-in Options, @t{--clon-search-path}
+@cindex Options, built-in
+@cindex Options, built-in, @t{--clon-search-path}
+@cindex CLON_SEARCH_PATH
+@cindex Environment Variables, CLON_SEARCH_PATH
+The search path can be modified with the @option{--clon-search-path}
+built-in option or its accompanying @env{CLON_SEARCH_PATH} environment
+variable. It takes a list of colon-separated directories as argument.
+This argument is in fact optional. Not providing an argument is
+equivalent to providing an empty one, which basically reduces the search
+path to the application's current directory.
+
+
+@node Theme Selection, , Theme Search Path, Theme Mechanism
+@subsection Theme Selection
+
+
 
 @c ---------------
 @c Theme Creation
 @c ---------------
-@node Theme Creation, , Theme Selection, Output
+@node Theme Creation, , Theme Mechanism, Output
 @section Theme Creation
 
 
