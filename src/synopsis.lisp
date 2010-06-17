@@ -168,7 +168,7 @@ If you don't want any search path at all, use this option with no argument."
 		       ;; specific values that I know of. Not sure about
 		       ;; Windows or anything else.
 		       :default-value
-		       (let ((local-path '(".clon/" "share/clon/"))
+		       (let ((local-path '("share/clon/"))
 			     (global-path '(#p"/usr/local/share/clon/"
 					    #p"/usr/share/clon/")))
 			 (when (mac-os-x-p)
@@ -176,6 +176,7 @@ If you don't want any search path at all, use this option with no argument."
 				 local-path)
 			   (push #p"/Library/Application Support/Clon/"
 				 global-path))
+			 (push ".clon/" local-path)
 			 (append
 			  (mapcar
 			   (lambda (subdir)
