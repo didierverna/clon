@@ -35,7 +35,7 @@
 @c ====================================================================
 @c %**start of header
 @setfilename clon-enduser.info
-@settitle The Clon end-user manual
+@settitle The Clon End-User Manual
 @afourpaper
 @c %**end of header
 
@@ -90,7 +90,7 @@ Command-Line
 @c ====================================================================
 @dircategory Common Lisp
 @direntry
-* Clon: (clon-enduser). The End User Manual.
+* Clon: (clon-enduser). The End-User Manual.
 @end direntry
 
 
@@ -132,7 +132,7 @@ approved by the Free Software Foundation.
 @c Title Page
 @c ====================================================================
 @titlepage
-@title The Clon end-user manual
+@title The Clon End-User Manual
 @subtitle The @CmdLine{} Option Nuker, Version @value{VERSION}
 @vskip 2cm
 @image{clon,16cm}
