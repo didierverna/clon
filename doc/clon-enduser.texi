@@ -434,7 +434,7 @@ help string (but @pxref{Output}):
 @cindex Options, values
 Options taking an argument are said to be @emph{valued}. We need a bit
 of terminology here: and option's @emph{argument} is typically what you
-provide on the @cmdline{} (or elsewhere, @pxref{Option Retrieval}). 
+provide on the @cmdline{} (or elsewhere, @pxref{Option Retrieval}).
 Typically a string. An option's @emph{value} is what results from the
 conversion of the option's argument to the proper type (the same string,
 a number, whatever).
@@ -689,7 +689,7 @@ You don't want to confuse @clon{}. @clon{} is nasty when it is scared.
 @cindex Command-Line, retrieval
 @cindex Options, retrieval, from command-line
 When an application wants to retrieve a specific option, @clon{} looks
-at the @cmdline{}, from left to right, and stops at the first match. 
+at the @cmdline{}, from left to right, and stops at the first match.
 Please note that the match in question may be a regular option call or a
 pack, depending on what appears first on the @cmdline{}. There is no
 concept of priority amongst option forms.
@@ -733,7 +733,7 @@ Finally, default values are used for options not provided on the
 @end itemize
 
 When @clon{} attempts to retrieve a value for a particular option, it
-always does so in a specific order: first, the @cmdline{} is searched. 
+always does so in a specific order: first, the @cmdline{} is searched.
 If an argument is present, it is used. Otherwise, a fallback value is
 used (if any). Next, an environment variable is tried (when
 appropriate), and finally, the option's default value is used (if any).
@@ -764,7 +764,7 @@ clonified application's command-line. The second aspect we need to look
 at is @clon{}'s output, typically what you get when you type
 @command{program --help}. From an end-user perspective, one key feature
 of @clon{} is that control on the formatting of the help strings is
-given to @emph{you} instead of being the programmer's responsibility. 
+given to @emph{you} instead of being the programmer's responsibility.
 What this means is that @emph{you} get to choose the way you want help
 strings to be formatted, and all of a sudden, every clonified
 application you use will conform to your specifications.
@@ -800,7 +800,7 @@ Runtime options:
                               Fallback: yes
                               Environment: DEBUG
                               Default: no
-  --simulate=yes/no           Simulate only. Nothing will happen for real, 
+  --simulate=yes/no           Simulate only. Nothing will happen for real,
                               except for log messages.
 User identification:
   -f, --first-name=STR        Set the user's first name to STR.
