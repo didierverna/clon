@@ -1095,12 +1095,48 @@ This theme is originally identical to the one provided in the file
 cannot change it.
 
 
-
 @c ---------------
 @c Theme Creation
 @c ---------------
 @node Theme Creation, , Theme Mechanism, Output
 @section Theme Creation
+Perhaps the most exciting thing in Computer Science is to spend more
+time hacking a tool than actually using it. After reading this section,
+you will find yourselves spending days customizing theme files instead
+of using clonified applications.
+
+@menu
+* Theme Elements::              Faces, properties, comments
+* Faces::                       You look just like your mother
+* Layout Properties::           Text geometry
+* Highlight Properties::        ISO/IEC 6429 SGR
+@end menu
+
+@node Theme Elements, Faces, Theme Creation, Theme Creation
+@subsection Theme Elements
+@cindex Faces
+@cindex Face Properties
+@cindex Themes, faces
+@cindex Themes, faces, properties
+@cindex Comments
+@cindex Themes, comments
+
+@node Faces, Layout Properties, Theme Elements, Theme Creation
+@subsection Faces
+@cindex Faces
+@cindex Themes, faces
+
+@node Layout Properties, Highlight Properties, Faces, Theme Creation
+@subsection Layout Properties
+@cindex Layout Properties
+@cindex Faces, properties, layout
+@cindex Themes, faces, properties, layout
+
+@node Highlight Properties, , Layout Properties, Theme Creation
+@subsection Highlight Properties
+@cindex Highlight Properties
+@cindex Faces, properties, highlight
+@cindex Themes, faces, properties, highlight
 
 
 
