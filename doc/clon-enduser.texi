@@ -931,52 +931,61 @@ The output of @command{program --help} that we have seen in the previous
 section corresponds to a default setting, but is really just one
 possibility. As the user of a clonified application, you have the
 ability to customize the appearance of @clon{}'s output. The way things
-look is specified by so-called @emph{themes}. By default, @clon{} uses a
-theme named @t{raw} which every clonified application has built-in.
+look is specified by so-called @emph{themes}. @clon{} has a theme named
+@t{raw} which every clonified application has built-in.
 
+@cindex Themes, files
+@cindex Themes, files, @t{cth} extension
+@cindex @t{cth} extension
+@cindex File Extension
+@cindex File Extension, @t{cth}
 Other themes are stored in files the standard extension of which is
 @samp{cth} (as in @b{C}lon @b{TH}eme). In fact, theme files can be named
 as you like; this is just a convention.
 
 @menu
 * Standard Themes::     Some example themes are provided
-* Theme Search Path::   Where to find theme files
+* Search Path::         Where to find theme files
 * Theme Selection::     How to select a theme
 @end menu
 
-@node Standard Themes, Theme Search Path, Theme Mechanism, Theme Mechanism
+@node Standard Themes, Search Path, Theme Mechanism, Theme Mechanism
 @subsection Standard Themes
-@cindex Themes, files
 @cindex Themes, files, standard
 @cindex Standard Themes
 @cindex Standard Themes, files
-@clon{} comes with several standard themes that can be used as-is or
-serve as the basis for creating new ones (@pxref{Theme Creation}). The
-list is given below.
+@clon{} comes with several standard themes in files that can be used
+as-is or serve as the basis for creating new ones (@pxref{Theme
+Creation}). The list is given below.
 @table @t
 @item raw
-@cindex Themes, files, standard, @t{raw}
+@cindex Standard Themes, files, @file{raw.cth}
+@cindex Themes, files, standard, @file{raw.cth}
 Exactly the same as the built-in one, only copied into a theme file.
 @item optlist
-@cindex Themes, files, standard, @t{optlist}
+@cindex Standard Themes, files, @file{optlist.cth}
+@cindex Themes, files, standard, @file{optlist.cth}
 Displays only a list of available options, one per line, without any
 description, group indication or arbitrary text. This can be used to
 quickly remember the name or the syntax of an option.
 @item refcard
-@cindex Themes, files, standard, @t{refcard}
+@cindex Standard Themes, files, @file{refcard.cth}
+@cindex Themes, files, standard, @file{refcard.cth}
 Displays a very compact help string. The synopsis is there, so are the
 group titles and arbitrary texts, but the options are displayed without
 any description, and the lines are filled as much as possible. The
 intent of this theme is to produce some sort of ``reference card'' that
 could be printed.
 @item roomy
-@cindex Themes, files, standard, @t{roomy}
+@cindex Standard Themes, files, @file{roomy.cth}
+@cindex Themes, files, standard, @file{roomy.cth}
 Displays a full help string occupying more space than the @t{raw} theme.
 Option descriptions don't start @emph{after} the option's name, but
 @emph{under} it. As a result, they occupy more horizontal space. Also,
 sub-groups are indented to the right.
 @item christmas
-@cindex Themes, files, standard, @t{christmas}
+@cindex Standard Themes, files, @file{christmas.cth}
+@cindex Themes, files, standard, @file{christmas.cth}
 This one is full of bells and whistles, which makes it essentially
 unusable. It exists only to provide a concrete example of all the
 available formatting and highlighting features of @clon{}. The
@@ -984,8 +993,8 @@ available formatting and highlighting features of @clon{}. The
 on December the 24th.
 @end table
 
-@node Theme Search Path, Theme Selection, Standard Themes, Theme Mechanism
-@subsection Theme Search Path
+@node Search Path, Theme Selection, Standard Themes, Theme Mechanism
+@subsection Search Path
 @cindex Search Path
 @cindex Search Path, themes
 @cindex Themes, search path
@@ -1008,9 +1017,7 @@ directory in the search path. By default, the search path is as follows:
 @end itemize
 
 @cindex @t{--clon-search-path}
-@cindex Built-in Options
 @cindex Built-in Options, @t{--clon-search-path}
-@cindex Options, built-in
 @cindex Options, built-in, @t{--clon-search-path}
 @cindex CLON_SEARCH_PATH
 @cindex Environment Variables, CLON_SEARCH_PATH
