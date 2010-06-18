@@ -76,6 +76,10 @@ Common Lisp
 @i{e.g.}
 @end macro
 
+@macro ie
+@i{i.e.}
+@end macro
+
 @macro cmdline
 command-line
 @end macro
@@ -1029,8 +1033,66 @@ equivalent to providing an empty one, which basically reduces the search
 path to the application's current directory.
 
 
-@node Theme Selection, , Theme Search Path, Theme Mechanism
+@node Theme Selection, , Search Path, Theme Mechanism
 @subsection Theme Selection
+@cindex @t{--clon-theme}
+@cindex Built-in Options, @t{--clon-theme}
+@cindex Options, built-in, @t{--clon-theme}
+@cindex CLON_THEME
+@cindex Environment Variables, CLON_THEME
+In order to select a theme, you can use the built-in option
+@option{--clon-theme} or its accompanying environment variable
+@env{CLON_THEME}. Just provide it with the theme name, and the
+corresponding theme file will be looked up in the search path
+(@pxref{Search Path}), stopping at the first match.
+
+@cindex File Extension, @t{cth}
+@cindex @t{cth} extension
+@cindex Themes, files, @t{cth} extension
+You can omit the @samp{cth} extension: @clon{} looks for a file named
+exactly as you said first and attempts to add the theme extension next.
+Note that searching with or without extension has priority over the
+search path. For instance, suppose that the following files exist:
+@itemize @w{}
+@item
+@t{/usr/local/share/clon/themes/foobar}
+@item
+@t{/usr/share/clon/themes/foobar.cth}
+@end itemize
+Using @samp{--clon-theme=foobar} will match the first one while
+@samp{--clon-theme=foobar.cth} will match the second.
+
+Now suppose that the following files exist:
+@itemize @w{}
+@item
+@t{/usr/local/share/clon/themes/foobar.cth}
+@item
+@t{/usr/share/clon/themes/foobar}
+@end itemize
+Using either @samp{--clon-theme=foobar} or
+@samp{--clon-theme=foobar.cth} will always match the first file. Which
+brings us to the next point (how clever).
+
+It is possible to bypass the search path when looking for a theme: just
+provide @option{--clon-theme} with a theme name starting with a path
+component (@ie{} @samp{/}, @samp{./} or @samp{../}). Even in that case,
+you can still omit the @samp{cth} extension.
+
+@cindex Built-in themes, @t{raw}
+@cindex Themes, built-in, @t{raw}
+@cindex Standard Themes, files, @file{raw.cth}
+@cindex Themes, files, standard, @file{raw.cth}
+Finally, here is an important precision about @option{--clon-theme}.
+This option has a fallback of @t{nil} and a default of @t{raw}. This
+means that if you don't use the option at all, a theme named @t{raw}
+will be looked up in the search path. This theme exists in the standard
+distribution and you are free to modify it. On the other hand, since
+this option has a fallback, it means that its argument is optional. If
+you don't provide any argument (that is, if you just use
+@samp{--clon-theme}), then the @emph{built-in} raw theme will be used.
+This theme is originally identical to the one provided in the file
+@file{raw.cth} but since it is built in every clonified application, you
+cannot change it.
 
 
 
