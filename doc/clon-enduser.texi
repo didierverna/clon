@@ -1107,7 +1107,7 @@ of using clonified applications.
 
 @menu
 * Theme Elements::              Faces, properties, comments
-* Faces::                       You look just like your mother
+* Faces::                       Boy, you look just like your mother
 * Layout Properties::           Text geometry
 * Highlight Properties::        ISO/IEC 6429 SGR
 @end menu
@@ -1120,6 +1120,30 @@ of using clonified applications.
 @cindex Themes, faces, properties
 @cindex Comments
 @cindex Themes, comments
+Hear hear! If you understand what @command{M-x all-hail-[x]emacs} means,
+you're going to get quite comfy here. @clon{} themes are articulated
+around two basic concepts: @emph{faces} and (face) @emph{properties}. A
+property describes some visual attribute for some piece of text, for
+instance bold, red, indented by 2 columns to the right. A face is more or
+less a set of properties (but there's more to it than that; please hold
+your post). Every piece of text in @clon{}'s output is associated with
+one or more faces, which in turn define specific values for specific
+properties.
+
+@cindex Layout Properties
+@cindex Faces, properties, layout
+@cindex Themes, faces, properties, layout
+@cindex Highlight Properties
+@cindex Faces, properties, highlight
+@cindex Themes, faces, properties, highlight
+There are two property types in @clon{}: @emph{layout properties}
+describe the text geometry (line width, indentation @etc{}) and
+@emph{highlight properties} describe the visual appearance of characters
+(color, font @etc{}). Please see @ref{Layout Properties} and
+@ref{Highlight Properties} for an exhaustive list of them.
+
+
+
 
 @node Faces, Layout Properties, Theme Elements, Theme Creation
 @subsection Faces
