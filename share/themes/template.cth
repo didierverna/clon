@@ -1,0 +1,42 @@
+;;; template.cth --- Template theme                              -*- lisp -*-
+
+;; Author:        Didier Verna <didier@lrde.epita.fr>
+;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
+;; Created:       Fri Jun 18 17:08:04 2010
+;; Last Revision: Sat Jun 19 09:14:03 2010
+
+
+;;; Commentary:
+
+;; Contents management by FCM version 0.1.
+
+;; This theme is a template for creating new ones. It contains a full tree of
+;; empty face definitions.
+
+
+
+;;; Code:
+
+
+:face (synopsis :face header
+		:face program
+		:face minus-pack
+		:face plus-pack
+		:face options
+		:face postfix)
+
+:face text
+
+:face (option :face (syntax :face (short :face name :face argument)
+			    :face (long  :face name :face argument))
+	      :face (usage :face description
+			   :face (fallback    :face header :face value)
+			   :face (default     :face header :face value)
+			   :face (environment :face header :face variable)))
+
+:face (group :face header
+	     :face (items :face text
+			  :face (option #| ... |#)
+			  :face (group  #| ... |#)))
+
+;;; template.cth ends here
