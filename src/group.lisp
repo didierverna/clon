@@ -39,10 +39,10 @@
 ;; ==========================================================================
 
 (defclass group (container)
-  ((title :documentation "The group's title."
-	  :initform nil
-	  :initarg :title
-	  :reader title))
+  ((header :documentation "The group's header."
+	   :initform nil
+	   :initarg :header
+	   :reader header))
   (:documentation "The GROUP class.
 This class groups other groups, options or strings together, effectively
 implementing hierarchical program command-line."))
@@ -56,11 +56,11 @@ implementing hierarchical program command-line."))
   "Return GROUP's help specification."
   ;; this brings us the container's help-spec.
   (accumulate (group)
-    (accumulate (title)
-      (title group))
-    (let ((group-items (call-next-method)))
-      (when group-items
-	(push 'contents group-items)))))
+    (accumulate (header)
+      (header group))
+    (let ((items (call-next-method)))
+      (when items
+	(push 'items items)))))
 
 
 
@@ -68,9 +68,9 @@ implementing hierarchical program command-line."))
 ;; Group Instance Creation
 ;; ==========================================================================
 
-(defun make-group (&rest keys &key title item)
+(defun make-group (&rest keys &key header item)
   "Make a new group."
-  (declare (ignore title item))
+  (declare (ignore header item))
   (apply #'make-instance 'group keys))
 
 (defmacro %defgroup (internalp (&rest keys) &body forms)
@@ -92,7 +92,7 @@ implementing hierarchical program command-line."))
 
 (defmacro defgroup ((&rest keys) &body forms)
   "Define a new group.
-KEYS are initargs to MAKE-GROUP (currently, only :title).
+KEYS are initargs to MAKE-GROUP (currently, only :header).
 Each form in FORMS will be treated as a new :item.
 The CAR of each form is the name of the operation to perform: TEXT, GROUP, or
 an option class name. The rest are the arguments to the MAKE-<OP> function or

@@ -106,49 +106,46 @@ If OPTION matches, return its short name's length; otherwise 0."
   "Return OPTION's help specification."
   (accumulate (option)
     (accumulate (syntax)
-      (accumulate (short-name)
-	(when (short-name option)
-	  (format nil "~A~A"
-	    (short-syntax-help-spec-prefix option)
-	    (short-name option)))
+      (accumulate (short)
+	(accumulate (name)
+	  (when (short-name option)
+	    (format nil "~A~A"
+	      (short-syntax-help-spec-prefix option)
+	      (short-name option))))
 	(accumulate (argument)
 	  (when (and (short-name option) (not (long-name option)))
 	    (format nil "~:[[~A]~:;~A~]"
 	      (argument-required-p option)
 	      (argument-name option)))))
-      (accumulate (long-name)
-	(when (long-name option)
-	  (format nil "--~A" (long-name option)))
+      (accumulate (long)
+	(accumulate (name)
+	  (when (long-name option)
+	    (format nil "--~A" (long-name option))))
 	(accumulate (argument)
 	  (when (long-name option)
 	    (format nil "~:[[=~A]~:;=~A~]"
 	      (argument-required-p option)
 	      (argument-name option))))))
-    (accumulate (description)
-      (description option)
+    (accumulate (usage)
+      (accumulate (description)
+	(description option))
       ;; #### FIXME: for the 2 cases below, we should have specialized methods
       ;; for outputting the printed representation of values. The default one
       ;; is not cool; we should probably print not the /values/, but their
       ;; /argument/ form, before conversion (hence we would required the
       ;; inverse of the conversion function !!).
       (when (slot-boundp option 'fallback-value)
-	(accumulate (fallback)
-	  (accumulate (title)
-	    "Fallback:")
-	  (accumulate (value)
-	    (format nil "~A" (fallback-value option)))))
+	`(fallback
+	  (header "Fallback:")
+	  (value ,(format nil "~A" (fallback-value option)))))
       (when (slot-boundp option 'default-value)
-	(accumulate (default)
-	  (accumulate (title)
-	    "Default:")
-	  (accumulate (value)
-	    (format nil "~A" (default-value option)))))
+	`(default
+	  (header "Default:")
+	  (value ,(format nil "~A" (default-value option)))))
       (when (env-var option)
-	(accumulate (environment)
-	  (accumulate (title)
-	    "Environment:")
-	  (accumulate (variable)
-	    (env-var option)))))))
+	`(environment
+	  (header "Environment:")
+	  (variable ,(env-var option)))))))
 
 
 

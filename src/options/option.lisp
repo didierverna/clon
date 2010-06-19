@@ -82,14 +82,21 @@ This is the base class for all options."))
   "Return OPTION's help specification."
   (accumulate (option)
     (accumulate (syntax)
-      (when (short-name option)
-	`(short-name ,(format nil "-~A" (short-name option))))
-      (when (long-name option)
-	`(long-name ,(format nil "--~A" (long-name option)))))
-    (accumulate (description)
-      (description option)
+      (accumulate (short)
+	(accumulate (name)
+	  (when (short-name option)
+	    (format nil "-~A" (short-name option)))))
+      (accumulate (long)
+	(accumulate (name)
+	  (when (long-name option)
+	    (format nil "--~A" (long-name option))))))
+    (accumulate (usage)
+      (accumulate (description)
+	(description option))
       (when (env-var option)
-	`(environment ,(format nil "Environment: ~A" (env-var option)))))))
+	`(environment
+	  (header "Environment:")
+	  (variable ,(env-var option)))))))
 
 
 

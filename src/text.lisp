@@ -64,7 +64,8 @@ This class implements plain text objects appearing in a synopsis."))
 (defgeneric help-spec (item &key &allow-other-keys)
   (:documentation "Return a help specification for ITEM.")
   (:method ((text text) &key)
-    `(text ,(contents text))))
+    (accumulate (text)
+      (contents text))))
 
 
 

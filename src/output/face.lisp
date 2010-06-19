@@ -310,6 +310,7 @@ This involves:
   (make-face-tree '(toplevel
 		    :face (synopsis
 			   :padding-bottom 1
+			   :face header
 			   :face program
 			   :face minus-pack
 			   :face plus-pack
@@ -324,33 +325,36 @@ This involves:
 			   :padding-bottom 0
 			   :face (syntax
 				  :item-separator ", "
-				  :face (short-name
+				  :face (short
 					 :item-separator nil
+					 :face name
 					 :face argument)
-				  :face (long-name
+				  :face (long
 					 :item-separator nil
+					 :face name
 					 :face argument))
-			   :face (description
+			   :face (usage
 				  :padding-left (30 absolute)
+				  :face description
 				  :face (fallback
 					 :padding-top 0
-					 :face title
+					 :face header
 					 :face value)
 				  :face (default
-					    :padding-top 0
-					  :face title
+					  :padding-top 0
+					  :face header
 					  :face value)
 				  :face (environment
 					 :padding-top 0
-					 :face title
+					 :face header
 					 :face variable)))
 		    :face (group
 			   :padding-top 0
 			   :padding-bottom 0
-			   :face (title
+			   :face (header
 				  :padding-top 0
 				  :padding-bottom 0)
-			   :face (contents
+			   :face (items
 				  :padding-top 0
 				  :padding-bottom 0)))
 		  face-class))

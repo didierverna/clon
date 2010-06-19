@@ -29,30 +29,30 @@
 	      :face (syntax :item-separator ", "
 			    :padding-right (29 absolute)
 			    :background magenta
-			    :face (short-name :item-separator nil)
-			    :face (long-name  :item-separator nil))
-	      :face (description :padding-left (30 absolute) :padding-right 0
-				 :background green
-				 :face (fallback :bold t
-						 :foreground yellow
-						 :padding-top 0
-						 :face (title :underline t)
-						 :face (value :blink t))
-				 :face (default :padding-top 0
-					 :bold t
-					 :foreground yellow
-					 :face (title :underline t)
-					 :face (value :blink t))
-				 :face (environment :bold t
-						    :foreground yellow
-						    :padding-top 0
-						    :face (title :underline t)
-						    :face (variable :blink t))))
+			    :face (short :item-separator nil)
+			    :face (long  :item-separator nil))
+	      :face (usage :padding-left (30 absolute) :padding-right 0
+			   :background green
+			   :face (fallback :bold t
+					   :foreground yellow
+					   :padding-top 0
+					   :face (header :underline t)
+					   :face (value :blink t))
+			   :face (default :padding-top 0
+				   :bold t
+				   :foreground yellow
+				   :face (header :underline t)
+				   :face (value :blink t))
+			   :face (environment :bold t
+					      :foreground yellow
+					      :padding-top 0
+					      :face (header :underline t)
+					      :face (variable :blink t))))
 
 :face (group :padding-right 0 :padding-top 0 :padding-bottom 0
-	     :face (title :padding-top 0 :padding-bottom 0
+	     :face (header :padding-top 0 :padding-bottom 0
 			  :underline t :bold t)
-	     :face (contents :padding-right 0 :padding-top 0 :padding-bottom 0)
+	     :face (items :padding-right 0 :padding-top 0 :padding-bottom 0)
 	     :face (group :padding-left 2 :padding-right 0))
 
 

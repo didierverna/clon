@@ -565,12 +565,13 @@ than the currently available right margin."
 ;; "it depends". However, I spotted one case in which it gives an unexpected
 ;; result.
 
-;; Suppose we have two nested groups with title but no contents. The help spec
-;; is like this: (group (title "Foo") (contents (group (title "Bar")))). With
-;; the refcard theme, the two titles will appear on the same line despite any
-;; padding specification. That is because the separation between the first
-;; title and the sub-group is a #\space. Since the second group is the first
-;; item in the enclosing contents face, its top-padding value is not used.
+;; Suppose we have two nested groups with header but no contents. The help
+;; spec is like this: (group (header "Foo") (contents (group (header
+;; "Bar")))). With the refcard theme, the two headers will appear on the same
+;; line despite any padding specification. That is because the separation
+;; between the first header and the sub-group is a #\space. Since the second
+;; group is the first item in the enclosing contents face, its top-padding
+;; value is not used.
 
 ;; This is bad. I'm not sure what I should do about it. Use the leaf ? Use a
 ;; max of *all* enclosing faces padding[1] ? Provide padding options specific

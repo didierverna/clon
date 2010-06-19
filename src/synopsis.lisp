@@ -106,14 +106,14 @@ This class handles the description of the program's command-line options."))
 (defmethod help-spec ((synopsis synopsis) &key program)
   "Return SYNOPSIS's help specification."
   (list* (accumulate (synopsis)
-	   "Usage:"
+	   '(header "Usage:")
 	   `(program ,program)
 	   (accumulate (minus-pack)
-	     (and (minus-pack synopsis)
-		  (format nil "[-~A]" (minus-pack synopsis))))
+	     (when (minus-pack synopsis)
+	       (format nil "[-~A]" (minus-pack synopsis))))
 	   (accumulate (plus-pack)
-	     (and (plus-pack synopsis)
-		  (format nil "[+~A]" (plus-pack synopsis))))
+	     (when (plus-pack synopsis)
+	       (format nil "[+~A]" (plus-pack synopsis))))
 	   '(options "[OPTIONS]")
 	   (accumulate (postfix)
 	     (postfix synopsis)))
@@ -145,7 +145,7 @@ This class handles the description of the program's command-line options."))
 
 (defmethod initialize-instance :around ((synopsis synopsis) &rest keys)
   "Prepare Clon specific options."
-  (let ((grp (%defgroup t (:title "Clon specific options:")
+  (let ((grp (%defgroup t (:header "Clon specific options:")
 	       (flag "banner" "Display the full Clon banner.")
 	       (enum "version"
 		     "Display Clon's version number.
@@ -156,7 +156,7 @@ FMT can be `number', `short' or `long'."
 		     :fallback-value :long
 		     #|:env-var "VERSION_FORMAT"|#)
 	       (flag "help" "Display Clon-specific help.")
-	       (group (:title "Clon output:")
+	       (group (:header "Clon output:")
 		 (path "search-path"
 		       "Set Clon's search path.
 If you don't want any search path at all, use this option with no argument."

@@ -52,11 +52,11 @@
 (defvar *synopsis*
   (clon:defsynopsis (:postfix "FILES...")
     (text :contents "Demonstration of Clon.")
-    (group (:title "Flags:")
+    (group (:header "Flags:")
       (flag :short-name "h" :long-name "help" :description "both names.")
       (flag :short-name "v" :description "short name.")
       (flag :long-name "version" :description "long name."))
-    (group (:title "Switches:")
+    (group (:header "Switches:")
       (switch :short-name "d" :long-name "debug"
 	      :description "both names, optional argument yes/no (the default)"
 	      :env-var "DEBUG")
@@ -73,7 +73,7 @@
       (switch  :long-name "simulate"
 	       :description "long name, required argument"
 	       :argument-type :required))
-    (group (:title "String Options:")
+    (group (:header "String Options:")
       (stropt :short-name "f" :long-name "first-name"
 	      :description "both names, required argument (default)")
       (stropt :short-name "F" :long-name "family-name"
@@ -91,8 +91,8 @@
 	      :description "long name, optional argument"
 	      :argument-type :optional
 	      :default-value "/same as phone/"))
-    (group (:title "Group imbrication demonstration:")
-      (group (:title "This group is the child of his father.")
+    (group (:header "Group imbrication demonstration:")
+      (group (:header "This group is the child of his father.")
 	(text :contents "This is a demo of the group imbrication feature."))))
   "This program's synopsis .")
 
