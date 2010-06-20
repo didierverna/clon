@@ -80,6 +80,10 @@ Common Lisp
 @i{i.e.}
 @end macro
 
+@macro perse
+@i{per-se}
+@end macro
+
 @macro cmdline
 command-line
 @end macro
@@ -1118,8 +1122,6 @@ of using clonified applications.
 @cindex Face Properties
 @cindex Themes, faces
 @cindex Themes, faces, properties
-@cindex Comments
-@cindex Themes, comments
 Hear hear! If you understand what @command{M-x all-hail-[x]emacs} means,
 you're going to get quite comfy here. @clon{} themes are articulated
 around two basic concepts: @emph{faces} and (face) @emph{properties}. A
@@ -1142,7 +1144,61 @@ describe the text geometry (line width, indentation @etc{}) and
 (color, font @etc{}). Please see @ref{Layout Properties} and
 @ref{Highlight Properties} for an exhaustive list of them.
 
+Let's have a look at a very simple theme file now.
+@cartouche
+@verbatim
+;; A very simple theme file.
 
+:background black
+;; ...
+
+:face (synopsis :foreground red
+                ;; ...
+                :face (header :bold t #| ...|#)
+                #| ... |#)
+;; ...
+@end verbatim
+@end cartouche
+
+@cindex Themes, files, comments
+The first line is a comment. Comments begin with a semi-colon and extend
+to the end of the line. There is another syntax for comments, as show
+later in the file: a comment can be opened with @samp{#|} and closed
+with @samp{|#}. This form allows you to create comments that span across
+several lines, or just part of a single line.
+
+@cindex Face Properties
+@cindex Themes, faces, properties
+@cindex Themes, files, keywords
+@cindex Themes, files, keywords, @t{:background}
+@cindex Faces, @t{toplevel}
+@cindex Themes, faces, @t{toplevel}
+The next line sets the @samp{background} property to @samp{black}. It
+means that @clon{}'s output will be displayed over a black background
+(no kidding). Every property in @clon{} has a name, which you specify by
+using a @emph{keyword} (@ie{} the name prepended with a colon). But
+wait, properties are supposed to belong to faces, right? So what is that
+property doing, floating around like that in the file? That's right,
+clever. In fact, the whole output of @clon{} is wrapped in a global face
+called @samp{toplevel}. You will never need to mention this face
+explicitly, though, because the contents of theme files is always
+enclosed in that face.
+
+@cindex Themes, files, keywords
+@cindex Themes, files, keywords, @t{:face}
+@cindex Themes, files, keywords, @t{:foreground}
+@cindex Themes, files, keywords, @t{:bold}
+@cindex Faces, @t{synopsis}
+@cindex Themes, faces, @t{synopsis}
+@cindex Faces, @t{header}
+@cindex Themes, faces, @t{header}
+Later in the file, you find yourself contemplating a face specification.
+Faces are specified by using the keyword @samp{:face}. What follows is a
+list beginning with the face name, and continuing with properties or
+sub-faces specifications. In this particular example, we're specifying
+that the synopsis line (the one that says ``Usage: blah blah'') should
+appear in red, and in addition to that, the header part (the ``Usage:''
+portion) should also be displayed in bold face.
 
 
 @node Faces, Layout Properties, Theme Elements, Theme Creation
