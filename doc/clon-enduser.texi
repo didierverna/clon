@@ -1165,7 +1165,9 @@ The first line is a comment. Comments begin with a semi-colon and extend
 to the end of the line. There is another syntax for comments, as show
 later in the file: a comment can be opened with @samp{#|} and closed
 with @samp{|#}. This form allows you to create comments that span across
-several lines, or just part of a single line.
+several lines, or just part of a single line.@footnote{By now, you have
+realized that a theme file is just a piece of @cl{} code@dots{} No,
+wait! Don't go!}
 
 @cindex Face Properties
 @cindex Themes, faces, properties
@@ -1199,6 +1201,25 @@ sub-faces specifications. In this particular example, we're specifying
 that the synopsis line (the one that says ``Usage: blah blah'') should
 appear in red, and in addition to that, the header part (the ``Usage:''
 portion) should also be displayed in bold face.
+
+@cindex Faces, nesting
+@cindex Themes, faces, nesting
+@cindex Face properties, inheritance
+We have already mentioned this, but it is worth noting again that faces
+can be nested (in fact, @emph{all} the faces you specify are sub-faces
+of the @samp{toplevel} face). In this example, the @samp{header} face is
+a sub-face of the @samp{synopsis} one. This is important for two
+reasons:
+@enumerate
+@item
+face nesting leads to the notion of property inheritance (more on this
+later),
+@item
+@clon{} makes use of faces with the same name in different (nesting)
+contexts. For instance, there are many places where the @samp{header}
+face is used (@pxref{Faces}), but this face can have very different
+specifications according to where it appears in a face tree.
+@end enumerate
 
 
 @node Faces, Layout Properties, Theme Elements, Theme Creation
