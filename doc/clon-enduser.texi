@@ -1124,10 +1124,10 @@ Hear hear! If you understand what @command{M-x all-hail-[x]emacs} means,
 you're going to get quite comfy here. @clon{} themes are articulated
 around two basic concepts: @emph{faces} and (face) @emph{properties}. A
 property describes some visual attribute for some piece of text, for
-instance bold, red, indented by 2 columns to the right. A face is more or
-less a set of properties (but there's more to it than that; please hold
-your post). Every piece of text in @clon{}'s output is associated with
-one or more faces, which in turn define specific values for specific
+instance bold, red, indented by 2 columns to the right. A face is more
+or less a set of properties (but there's more to it than that; please
+hold your post). Every piece of text in @clon{}'s output is associated
+with a face, which in turn defines specific values for specific
 properties.
 
 @cindex Layout Properties
@@ -1193,19 +1193,21 @@ enclosed in that face.
 @cindex Themes, faces, @t{header}
 Later in the file, you find yourself contemplating a face specification.
 Faces are specified by using the keyword @samp{:face}. What follows is a
-list beginning with the face name, and continuing with properties or
-sub-faces specifications. In this particular example, we're specifying
-that the synopsis line (the one that says ``Usage: blah blah'') should
-appear in red, and in addition to that, the header part (the ``Usage:''
-portion) should also be displayed in bold face.
+list beginning with the face name, and continuing with property
+specifications. In this particular example, we're specifying that the
+synopsis line (the one that says ``Usage: blah blah'') should appear in
+red, although as you can see, the story does not stop there.
 
 @cindex Faces, nesting
 @cindex Themes, faces, nesting
 @cindex Face properties, inheritance
-We have already mentioned this, but it is worth noting again that faces
-can be nested (in fact, @emph{all} the faces you specify are sub-faces
-of the @samp{toplevel} face). In this example, the @samp{header} face is
-a sub-face of the @samp{synopsis} one. This is important for two
+Indeed, there is also a @samp{header} face specification @emph{within}
+the @samp{synopsis} one. What it says it that the header part (the
+``Usage:'' portion of the synopsis line) should additionally be
+displayed in bold font. So it turns out that face specifications can be
+nested. In fact, @emph{all} the faces you specify are sub-faces of the
+@samp{toplevel} face at some level. In this example, the @samp{header}
+face is a sub-face of the @samp{synopsis} one. This is important for two
 reasons:
 @enumerate
 @item
@@ -1217,7 +1219,6 @@ contexts. For instance, there are many places where the @samp{header}
 face is used (@pxref{Faces}), but this face can have very different
 specifications according to where it appears in a face tree.
 @end enumerate
-
 
 @node Faces, Layout Properties, Theme Elements, Theme Creation
 @subsection Faces
