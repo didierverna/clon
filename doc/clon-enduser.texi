@@ -1138,10 +1138,10 @@ properties.
 @cindex Highlight Properties
 @cindex Faces, properties, highlight
 @cindex Themes, faces, properties, highlight
-There are two property types in @clon{}: @emph{layout properties}
+There are two property types in @clon{}: @emph{layout properties}, which
 describe the text geometry (line width, indentation @etc{}) and
-@emph{highlight properties} describe the visual appearance of characters
-(color, font @etc{}). Please see @ref{Layout Properties} and
+@emph{highlight properties}, which describe the visual appearance of
+characters (color, font @etc{}). Please see @ref{Layout Properties} and
 @ref{Highlight Properties} for an exhaustive list of them.
 
 Let's have a look at a very simple theme file now.
