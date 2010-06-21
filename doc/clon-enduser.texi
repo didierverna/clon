@@ -795,7 +795,6 @@ Mechanism} explains how to switch between predefined layouts and
 @section Output Elements
 Let's look at the output of @command{program --help} in a default
 setting first:
-
 @cartouche
 @verbatim
 Usage: program [-hdF] [+d] [OPTIONS] FILES...
@@ -816,7 +815,6 @@ User identification:
                               Fallback: unknown
 @end verbatim
 @end cartouche
-
 @cindex Synopsis
 @cindex Output, synopsis
 @cindex Postfix
@@ -912,7 +910,6 @@ speaks for itself:
                               possible. Otherwise, 80 columns will be assumed.
                               Environment: CLON_LINE_WIDTH
 @end verbatim
-
 @cindex Fallback values
 @cindex Values, fallback
 @cindex Environment Variables
@@ -932,6 +929,7 @@ appropriate.
 @cindex Theme Mechanism
 
 @cindex Themes
+@cindex Themes, built-in
 @cindex Themes, built-in, @t{raw}
 @cindex Built-in themes
 @cindex Built-in themes, @t{raw}
@@ -1159,7 +1157,6 @@ Let's have a look at a very simple theme file now.
 ;; ...
 @end verbatim
 @end cartouche
-
 @cindex Themes, files, comments
 The first line is a comment. Comments begin with a semi-colon and extend
 to the end of the line. There is another syntax for comments, as show
@@ -1226,6 +1223,105 @@ specifications according to where it appears in a face tree.
 @subsection Faces
 @cindex Faces
 @cindex Themes, faces
+
+@cindex Built-in themes, @t{raw}
+@cindex Themes, built-in, @t{raw}
+@cindex Standard Themes, files, @file{raw.cth}
+@cindex Themes, files, standard, @file{raw.cth}
+@cindex Faces, @t{synopsis}
+@cindex Faces, @t{header}
+@cindex Faces, @t{program}
+@cindex Faces, @t{minus-pack}
+@cindex Faces, @t{plus-pack}
+@cindex Faces, @t{options}
+@cindex Faces, @t{postfix}
+@cindex Faces, @t{text}
+@cindex Faces, @t{option}
+@cindex Faces, @t{syntax}
+@cindex Faces, @t{short}
+@cindex Faces, @t{name}
+@cindex Faces, @t{argument}
+@cindex Faces, @t{long}
+@cindex Faces, @t{usage}
+@cindex Faces, @t{description}
+@cindex Faces, @t{fallback}
+@cindex Faces, @t{value}
+@cindex Faces, @t{default}
+@cindex Faces, @t{environment}
+@cindex Faces, @t{variable}
+@cindex Themes, faces, @t{synopsis}
+@cindex Themes, faces, @t{header}
+@cindex Themes, faces, @t{program}
+@cindex Themes, faces, @t{minus-pack}
+@cindex Themes, faces, @t{plus-pack}
+@cindex Themes, faces, @t{options}
+@cindex Themes, faces, @t{postfix}
+@cindex Themes, faces, @t{text}
+@cindex Themes, faces, @t{option}
+@cindex Themes, faces, @t{syntax}
+@cindex Themes, faces, @t{short}
+@cindex Themes, faces, @t{name}
+@cindex Themes, faces, @t{argument}
+@cindex Themes, faces, @t{long}
+@cindex Themes, faces, @t{usage}
+@cindex Themes, faces, @t{description}
+@cindex Themes, faces, @t{fallback}
+@cindex Themes, faces, @t{value}
+@cindex Themes, faces, @t{default}
+@cindex Themes, faces, @t{environment}
+@cindex Themes, faces, @t{variable}
+The following figure shows the full face tree defined by @clon{}. In
+fact, it is extracted from the theme file @file{raw.cth} (property
+specifications have been removed). By the way, that is why it is a good
+idea to start from this one when you want to create a new theme: all the
+faces are in there. It should be pretty easy to figure out what portion
+of text each face applies to.
+@cartouche
+@verbatim
+;; Remember that everything in here belongs to the toplevel face.
+
+:face (synopsis :face header
+		:face program
+		:face minus-pack
+		:face plus-pack
+		:face options
+		:face postfix)
+
+:face text
+
+:face (option :face (syntax :face (short :face name
+					 :face argument)
+			    :face (long  :face name
+					 :face argument))
+	      :face (usage :face description
+			   :face (fallback :face header
+					   :face value)
+			   :face (default :face header
+					  :face value)
+			   :face (environment :face header
+					      :face variable)))
+
+:face (group :face header
+             :face (items #| :face text :face option :face group |#))
+@end verbatim
+@end cartouche
+As mentioned earlier, you can see that faces of the same name may appear
+at different places in the tree (@eg{} the @samp{header} one) and hence
+may have different specifications, depending on the context (their
+branch in the tree).
+
+Pushing this idea one step further, note the peculiarity of the
+@samp{group} face: since group items may be arbitrary text, options or
+even groups, you can specify as many levels of sub-groups as you want.
+In fact, you can spend your whole life specifying sub-groups, although
+it is very unlikely that a clonified application provides more than two
+or three levels of group imbrication.
+
+One last point to note: you might be surprised to find @emph{empty} face
+specifications like this one: @samp{:face description}. This @emph{is} a
+valid specification, and this @emph{is} different from not mentioning
+the face at all, or specifying some properties explicitely. More on this
+later.
 
 @node Layout Properties, Highlight Properties, Faces, Theme Creation
 @subsection Layout Properties
