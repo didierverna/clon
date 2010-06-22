@@ -164,7 +164,7 @@ approved by the Free Software Foundation.
 @c ====================================================================
 @ifnottex
 @node Top, Copying, (dir), (dir)
-@top The Clon end-user manual
+@top The Clon End-User Manual
 
 This is the @clon{} end-user manual for @clon{} version @value{VERSION}:
 it describes the use of applications powered by @clon{}.
@@ -1108,10 +1108,10 @@ you will find yourselves spending days customizing theme files instead
 of using clonified applications.
 
 @menu
-* Theme Elements::              Faces, properties, comments
-* Faces::                       Boy, you look just like your mother
-* Layout Properties::           Text geometry
-* Highlight Properties::        ISO/IEC 6429 SGR
+* Theme Elements::      Faces, properties, comments
+* Faces::               Boy, you look just like your mother
+* Highlight::           Text Appearance
+* Layout::              Text geometry
 @end menu
 
 @node Theme Elements, Faces, Theme Creation, Theme Creation
@@ -1136,11 +1136,11 @@ properties.
 @cindex Highlight Properties
 @cindex Faces, properties, highlight
 @cindex Themes, faces, properties, highlight
-There are two property types in @clon{}: @emph{layout properties}, which
-describe the text geometry (line width, indentation @etc{}) and
-@emph{highlight properties}, which describe the visual appearance of
-characters (color, font @etc{}). Please see @ref{Layout Properties} and
-@ref{Highlight Properties} for an exhaustive list of them.
+There are two property types in @clon{}: @emph{highlight properties},
+which describe the visual appearance of characters (color, font @etc{}),
+and @emph{layout properties}, which describe the text geometry (line
+width, indentation @etc{}). Please see @ref{Highlight Properties} and
+@ref{Layout Properties} for an exhaustive list of them.
 
 Let's have a look at a very simple theme file now.
 @cartouche
@@ -1211,8 +1211,8 @@ face is a sub-face of the @samp{synopsis} one. This is important for two
 reasons:
 @enumerate
 @item
-face nesting leads to the notion of property inheritance (more on this
-later),
+face nesting leads to the notion of property inheritance
+(@pxref{Highlight Inheritance}),
 @item
 @clon{} makes use of faces with the same name in different (nesting)
 contexts. For instance, there are many places where the @samp{header}
@@ -1220,7 +1220,7 @@ face is used (@pxref{Faces}), but this face can have very different
 specifications according to where it appears in a face tree.
 @end enumerate
 
-@node Faces, Layout Properties, Theme Elements, Theme Creation
+@node Faces, Highlight, Theme Elements, Theme Creation
 @subsection Faces
 @cindex Faces
 @cindex Themes, faces
@@ -1313,10 +1313,10 @@ branch in the tree).
 
 Pushing this idea one step further, note the peculiarity of the
 @samp{group} face: since group items may be arbitrary text, options or
-even groups, you can specify as many levels of sub-groups as you want.
-In fact, you can spend your whole life specifying sub-groups, although
-it is very unlikely that a clonified application provides more than two
-or three levels of group imbrication.
+even sub-groups, you can specify as many levels of group nesting as you
+want. In fact, you can spend your whole life specifying sub-groups,
+although it is very unlikely that a clonified application provides more
+than two or three levels of group imbrication.
 
 One last point to note: you might be surprised to find @emph{empty} face
 specifications like this one: @samp{:face description}. This @emph{is} a
@@ -1324,12 +1324,155 @@ valid specification, and this @emph{is} different from not mentioning
 the face at all, or specifying some properties explicitely. More on this
 later.
 
-@node Layout Properties, Highlight Properties, Faces, Theme Creation
-@subsection Layout Properties
+@node Highlight, Layout, Faces, Theme Creation
+@subsection Highlight
+The first category of properties that we are going to describe deals
+with @emph{highlighting}, that is, modifying the visual aspect of
+characters in the output.
+
+@menu
+* Highlight Properties::        What is available
+* Highlight Inheritance::       What happens in a face tree
+@end menu
+
+@node Highlight Properties, Highlight Inheritance, Highlight, Highlight
+@subsubsection Highlight Properties
+@cindex Highlight Properties
+@cindex Faces, properties, highlight
+@cindex Themes, faces, properties, highlight
+@clon{} supports 10 highlight properties defined by the ISO/IEC 6429 SGR
+standard (under the assumption that your favorite terminal program
+supports them). Their description is given below.
+
+@table @t
+@item :foreground
+@cindex Face Properties, highlight, @t{foreground}
+@cindex Themes, faces, properties, highlight, @t{foreground}
+@cindex Themes, files, keywords, @t{:foreground}
+@item :background
+@cindex Face Properties, highlight, @t{background}
+@cindex Themes, faces, properties, highlight, @t{background}
+@cindex Themes, files, keywords, @t{:background}
+The face's foreground and background colors. Possible values are
+@t{black}, @t{red}, @t{green}, @t{yellow}, @t{blue}, @t{magenta},
+@t{cyan} and @t{white}. It is also possible to use the special values
+@t{nil} or @t{reset} to reset the color to the terminal's default value.
+@item :intensity
+@cindex Face Properties, highlight, @t{intensity}
+@cindex Themes, faces, properties, highlight, @t{intensity}
+@cindex Themes, files, keywords, @t{:intensity}
+The face's intensity. Possible values are @t{bold}, @t{normal} (or
+@t{nil}) and @t{faint}. Please note that @t{faint} is usually not very
+well supported.
+@cindex Face Properties, highlight, @t{bold}
+@cindex Themes, faces, properties, highlight, @t{bold}
+@cindex Themes, files, keywords, @t{:bold}
+For convenience, a @t{:bold} Boolean property is also provided which
+will set the face's intensity to @t{bold} if true (@t{t}) and @t{normal}
+if false (@t{nil}).
+@item :italic
+@cindex Face Properties, highlight, @t{italic}
+@cindex Themes, faces, properties, highlight, @t{italic}
+@cindex Themes, files, keywords, @t{:italic}
+Whether to display the face's contents in italics. This is a Boolean
+property. Possible values are @t{t} or @t{nil}. The effect of this
+property depends a lot on the font you use in your terminal application.
+@item :underline
+@cindex Face Properties, highlight, @t{underline}
+@cindex Themes, faces, properties, highlight, @t{underline}
+@cindex Themes, files, keywords, @t{:underline}
+Whether to underline the face's contents. Possible values are @t{single}
+(or @t{on} or @t{t}), @t{double} and @t{none} (or @t{off} or @t{nil}).
+Please note that @t{double} is usually not very well supported.
+@item :blink
+@cindex Face Properties, highlight, @t{blink}
+@cindex Themes, faces, properties, highlight, @t{blink}
+@cindex Themes, files, keywords, @t{:blink}
+The face's blink speed. Possible values are @t{slow} (or @t{on} or
+@t{t}), @t{rapid} and @t{off} (or @t{nil}). Please note that @t{rapid}
+is usually not very well supported.
+@item :inverse
+@cindex Face Properties, highlight, @t{inverse}
+@cindex Themes, faces, properties, highlight, @t{inverse}
+@cindex Themes, files, keywords, @t{:inverse}
+Whether to display the face's contents in inverse video. This is a
+Boolean property. Possible values are @t{t} or @t{nil}.
+@item :crossed-out
+@cindex Face Properties, highlight, @t{crossed-out}
+@cindex Themes, faces, properties, highlight, @t{crossed-out}
+@cindex Themes, files, keywords, @t{:crossed-out}
+Whether to display the face's contents crossed out. This is a Boolean
+property. Possible values are @t{t} or @t{nil}.
+@item :framed
+@cindex Face Properties, highlight, @t{framed}
+@cindex Themes, faces, properties, highlight, @t{framed}
+@cindex Themes, files, keywords, @t{:framed}
+Whether to display the face's contents framed or encircled. This is a
+Boolean property. Possible values are @t{t} or @t{nil}.
+@item :concealed
+@cindex Face Properties, highlight, @t{concealed}
+@cindex Themes, faces, properties, highlight, @t{concealed}
+@cindex Themes, files, keywords, @t{:concealed}
+Whether to conceal the face's contents. This is a Boolean property.
+Possible values are @t{t} or @t{nil}. In case it is not obvious,
+concealing means that the face's contents is not displayed, but still
+occupies its normal space, so this is different from hiding it
+(@pxref{Layout Properties}).
+@cindex Face Properties, highlight, @t{revealed}
+@cindex Themes, faces, properties, highlight, @t{revealed}
+@cindex Themes, files, keywords, @t{:revealed}
+Alternately, you can also use the opposite Boolean property named
+@t{:revealed}.
+@end table
+
+@node Highlight Inheritance, , Highlight Properties, Highlight
+@subsubsection Highlight Inheritance
+@cindex Face Properties, inheritance
+@cindex Face Properties, highlight, inheritance
+@cindex Themes, faces, properties, inheritance
+@cindex Themes, faces, properties, highlight, inheritance
+@cindex Themes, built-in, @t{raw}
+@cindex Built-in themes, @t{raw}
+By default (this is also the case in the @samp{raw} theme), all
+highlight properties are turned off: text is output in whatever way is
+standard on the current terminal.
+
+When you set a face's highlight property however, it is inherited by all
+the sub-faces. This is in fact the most natural behavior. For instance,
+if you set the foreground of the @samp{synopsis} face to red, you
+probably expect the whole synopsis line to be output in red, including
+the header, program @etc{} parts. If not, you need to explicitly
+neutralize the unwanted effect, for instance by saying something like
+this:
+@verbatim
+:face (synopsis :foreground red
+                :face (program :foreground reset)
+                :face (postfix :foreground cyan))
+@end verbatim
+In other words, you can consider that the way some piece of text is
+output is not specified exactly by its associated face, but rather by
+the merging of all active properties from the whole corresponding face
+tree. This is exactly how Emacs faces work by the way.
+
+
+@node Layout, , Highlight, Theme Creation
+@subsection Layout
+The second category of properties that we are going to describe deals
+with @emph{layout}, that is, modifying the placement of text in the
+output.
+
+@menu
+* Layout Properties::   What is available
+* Layout Inheritance::  What happens in a face tree
+@end menu
+
+@node Layout Properties, Layout Inheritance, Layout, Layout
+@subsubsection Layout Properties
 @cindex Layout Properties
 @cindex Faces, properties, layout
 @cindex Themes, faces, properties, layout
-@clon{} currently defines 6 layout properties. Here are the first 4 of
+In addition to the 10 highlight properties described in the previous
+section, @clon{} defines 6 layout properties. Here are the first 4 of
 them, along with their description and default value.
 @table @t
 @item :visible
@@ -1511,13 +1654,17 @@ settings:
                         :padding-right (2 :relative-to option))))
 @end verbatim
 
+@cindex Face Properties, highlight, @t{display}
+@cindex Themes, faces, properties, highlight, @t{display}
+@cindex Themes, files, keywords, @t{:display}
+Since the notions of hiding, concealing or making text visible are
+somewhat intermixed, @clon{} provides a ``bastard'' property which,
+depending on its value, would be considered either a layout, or a
+highlight one. This property is named @t{:display}.
 
-@node Highlight Properties, , Layout Properties, Theme Creation
-@subsection Highlight Properties
-@cindex Highlight Properties
-@cindex Faces, properties, highlight
-@cindex Themes, faces, properties, highlight
 
+@node Layout Inheritance, , Layout Properties, Layout
+@subsubsection Layout Inheritance
 
 
 @c ====================================================================
