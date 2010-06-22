@@ -1329,6 +1329,188 @@ later.
 @cindex Layout Properties
 @cindex Faces, properties, layout
 @cindex Themes, faces, properties, layout
+@clon{} currently defines 6 layout properties. Here are the first 4 of
+them, along with their description and default value.
+@table @t
+@item :visible
+@cindex Face Properties, layout, @t{visible}
+@cindex Themes, faces, properties, layout, @t{visible}
+@cindex Themes, files, keywords, @t{:visible}
+@cindex Face Properties, layout, @t{hidden}
+@cindex Themes, faces, properties, layout, @t{hidden}
+@cindex Themes, files, keywords, @t{:hidden}
+@cindex Standard Themes, files, @file{optlist.cth}
+@cindex Themes, files, standard, @file{optlist.cth}
+@cindex Standard Themes, files, @file{refcard.cth}
+@cindex Themes, files, standard, @file{refcard.cth}
+Whether the face's contents is visible. Possible values are @t{t} (the
+default), or @t{nil}. You can also use the opposite property named
+@t{:hidden}. The @samp{optlist} and @samp{refcard} themes make use of
+this to avoid printing the options descriptions.
+@item :padding-top
+@cindex Face Properties, layout, @t{padding-top}
+@cindex Themes, faces, properties, layout, @t{padding-top}
+@cindex Themes, files, keywords, @t{:padding-top}
+The face's top padding, that is, the number of lines to skip before
+opening it and displaying its contents. This property can take the
+following forms.
+@table @t
+@item nil
+This face may be opened right away (anywhere). This is the default.
+@item 0
+This face should be opened on the next line.
+@item <num> @r{(positive)}
+This face should be opened after skipping @t{<num>} empty lines. Note
+that the empty lines are displayed in the enclosing face, @emph{not} the
+face which specifies the top padding.
+@end table
+@item :padding-bottom
+@cindex Face Properties, layout, @t{padding-bottom}
+@cindex Themes, faces, properties, layout, @t{padding-bottom}
+@cindex Themes, files, keywords, @t{:padding-bottom}
+This face's bottom padding, that is, the number of lines to skip before
+opening the next face and displaying its contents. This property can
+take the following forms.
+@table @t
+@item nil
+The next face may be opened right at the end of this one. This is the
+default.
+@item 0
+The next face should be opened on the next line.
+@item <num> @r{(positive)}
+The next face should be opened after skipping @t{<num>} lines. Note that
+the empty lines are displayed in the enclosing face, @emph{not} the face
+which specifies the bottom padding.
+@end table
+@item :item-separator
+@cindex Face Properties, layout, @t{item-separator}
+@cindex Themes, faces, properties, layout, @t{item-separator}
+@cindex Themes, files, keywords, @t{:item-separator}
+The face's item separator, that is, a piece of text to insert between
+every sub-face's contents. The default value is @t{#\space} (a space
+character).
+@end table
+@cindex Themes, built-in, @t{raw}
+@cindex Built-in Themes, @t{raw}
+The default values above have been chosen because they are convenient
+for the majority of the faces, but not necessarily all the time. Let us
+now review some examples of non-default settings in the @samp{raw}
+theme.
+@itemize @bullet
+@item
+The @samp{synopsis} face has its bottom padding set to 1, which means to
+leave an empty line below it. Note that this line does not belong to the
+synopsis. It is output in the @samp{toplevel} face.
+@item
+The @samp{text}, @samp{option} and @samp{group} faces have both their
+top and bottom paddings set to 0. This means that all these items should
+start and end on lines of their own.
+@item
+Finally, the @samp{syntax} face has its item separator set to
+@w{@t{", "}}, which in this context is used to separate the short and
+long name syntax, as in @w{@samp{-h, --help}}.
+@end itemize
+
+@cindex Frames
+@cindex Layout, frames
+In order to describe the last two properties, we need to introduce the
+notion of @emph{frame} first. A frame is a rectangle in which @clon{}
+prints something. When @clon{} opens a face for printing its contents,
+it associates a frame with it. Usually, @clon{} doesn't know the frame's
+height because it doesn't know in advance how many lines of output will
+be necessary to display the face's contents. However, @clon{} usually
+knows the frame's width: a frame starts at a certain column (the left
+one) and stops at another (the right one).
+
+There is an isomorphic relation between frames and faces: when a face is
+a sub-face of a super-face, the corresponding frame is a sub-frame of
+the corresponding super-frame. Sub-frames are geometrically enclosed
+within their super-frames: a sub-frame can only draw in an equally large
+or narrower band than its super-frame. That's how @clon{} handles
+vertical alignment of text.
+
+In order to give you control on the starting and ending columns of every
+frame (in fact, every face), the following two layout properties are
+defined.
+@table @t
+@item :padding-left
+@cindex Face Properties, layout, @t{padding-left}
+@cindex Themes, faces, properties, layout, @t{padding-left}
+@cindex Themes, files, keywords, @t{:padding-left}
+A face's left padding determines its starting column. This property can
+take the following forms.
+@table @t
+@item <num>
+Skip @t{<num>} columns relatively to the enclosing face. The default
+value is 0, meaning to open this face at the same column number as the
+enclosing one.
+@item (<num> :relative-to <face>)
+As above, but relatively to a @emph{parent} face named @t{<face>}
+instead of just the enclosing one. This lets you go more than one level
+up in the face tree.
+@item (<num> absolute)
+Open this face exactly at column @t{<num>}.
+@item self
+This face may be opened anywhere, and when it is, its left column is set
+to the current column number.
+@end table
+@item :padding-right
+@cindex Face Properties, layout, @t{padding-right}
+@cindex Themes, faces, properties, layout, @t{padding-right}
+@cindex Themes, files, keywords, @t{:padding-right}
+A face's right padding, determines its ending column. This property can
+take the following forms.
+@table @t
+@item <num>
+Close this face @t{<num>} columns before the enclosing one.
+@item (<num> :relative-to <face>)
+As above, but relatively to a @emph{parent} face named @t{<face>}
+instead of just the enclosing one. This lets you go more than one level
+up in the face tree.
+@item (<num> absolute)
+Close this face exactly at column @t{<num>}.
+@item self
+This face may be closed anywhere. This is the default.
+@end table
+@end table
+@cindex Themes, built-in, @t{raw}
+@cindex Built-in Themes, @t{raw}
+The default values above have been chosen because they are convenient
+for the majority of the faces, but not necessarily all the time. Let us
+now review some examples of non-default settings in the @samp{raw}
+theme.
+@itemize @bullet
+@item
+The @samp{option} face has its left padding set to 2. Since all
+super-faces default to 0, this essentially mean an indentation of 2
+columns.
+@item
+The @samp{usage} face has its left padding set to @t{(30 absolute)}
+which means that the descriptive texts for all options start aligned at
+column 30.
+@end itemize
+
+@cindex Faces, self-ending
+There is one important point to understand about self-ending faces
+(which, again, is the default setting). A self-ending face typically
+doesn't know at which column it stops until it stops. In fact, this is
+not completely true: if the face's contents needs to span across several
+lines, then the ending column will be known at the end of the first
+line, when the ending column of the enclosing face is reached. However,
+for a piece of contents that fits on a single line, the point holds.
+
+Because of that, it is impossible for a face's right padding to be
+relative to a self-ending face. This would be like saying ``stop 2
+columns before I don't know where''. Here are two examples of invalid
+settings:
+@verbatim
+:face (option :face (syntax :padding-right 2))
+:face (option
+        :face (syntax
+                :face (short
+                        :padding-right (2 :relative-to option))))
+@end verbatim
+
 
 @node Highlight Properties, , Layout Properties, Theme Creation
 @subsection Highlight Properties
