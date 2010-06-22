@@ -1112,6 +1112,7 @@ of using clonified applications.
 * Faces::               Boy, you look just like your mother
 * Highlight::           Text Appearance
 * Layout::              Text geometry
+* Implicit Faces::      Missing definitions and siblings
 @end menu
 
 @node Theme Elements, Faces, Theme Creation, Theme Creation
@@ -1321,8 +1322,9 @@ than two or three levels of group imbrication.
 One last point to note: you might be surprised to find @emph{empty} face
 specifications like this one: @samp{:face description}. This @emph{is} a
 valid specification, and this @emph{is} different from not mentioning
-the face at all, or specifying some properties explicitely. More on this
-later.
+the face at all, or specifying some properties explicitely. See
+@ref{Implicit Faces} for an explanation.
+
 
 @node Highlight, Layout, Faces, Theme Creation
 @subsection Highlight
@@ -1455,7 +1457,7 @@ the merging of all active properties from the whole corresponding face
 tree. This is exactly how Emacs faces work by the way.
 
 
-@node Layout, , Highlight, Theme Creation
+@node Layout, Implicit Faces, Highlight, Theme Creation
 @subsection Layout
 The second category of properties that we are going to describe deals
 with @emph{layout}, that is, modifying the placement of text in the
@@ -1490,6 +1492,15 @@ Whether the face's contents is visible. Possible values are @t{t} (the
 default), or @t{nil}. You can also use the opposite property named
 @t{:hidden}. The @samp{optlist} and @samp{refcard} themes make use of
 this to avoid printing the options descriptions.
+@cindex Face Properties, highlight, @t{display}
+@cindex Themes, faces, properties, highlight, @t{display}
+@cindex Themes, files, keywords, @t{:display}
+Since the notions of hiding, concealing or making text visible are
+somewhat intermixed, @clon{} also provides a ``bastard'' property which,
+depending on its value, would be considered either a layout, or a
+highlight one. This property is named @t{:display}. Possible values are:
+@t{visible} (or @t{revealed} or @t{t}), @t{concealed} and @t{hidden} (or
+@t{nil}).
 @item :padding-top
 @cindex Face Properties, layout, @t{padding-top}
 @cindex Themes, faces, properties, layout, @t{padding-top}
@@ -1499,7 +1510,8 @@ opening it and displaying its contents. This property can take the
 following forms.
 @table @t
 @item nil
-This face may be opened right away (anywhere). This is the default.
+This face may be opened anywhere, including on the current line. This is
+the default.
 @item 0
 This face should be opened on the next line.
 @item <num> @r{(positive)}
@@ -1516,8 +1528,8 @@ opening the next face and displaying its contents. This property can
 take the following forms.
 @table @t
 @item nil
-The next face may be opened right at the end of this one. This is the
-default.
+The next face may be opened anywhere, including on the current line.
+This is the default.
 @item 0
 The next face should be opened on the next line.
 @item <num> @r{(positive)}
@@ -1556,14 +1568,14 @@ long name syntax, as in @w{@samp{-h, --help}}.
 
 @cindex Frames
 @cindex Layout, frames
-In order to describe the last two properties, we need to introduce the
-notion of @emph{frame} first. A frame is a rectangle in which @clon{}
-prints something. When @clon{} opens a face for printing its contents,
-it associates a frame with it. Usually, @clon{} doesn't know the frame's
-height because it doesn't know in advance how many lines of output will
-be necessary to display the face's contents. However, @clon{} usually
-knows the frame's width: a frame starts at a certain column (the left
-one) and stops at another (the right one).
+In order to describe the last two layout properties, we need to
+introduce the notion of @emph{frame} first. A frame is a rectangle in
+which @clon{} prints something. When @clon{} opens a face for printing
+its contents, it associates a frame with it. Usually, @clon{} doesn't
+know the frame's height because it doesn't know in advance how many
+lines of output will be necessary to display the face's contents.
+However, @clon{} usually knows the frame's width: a frame starts at a
+certain column (the left one) and stops at another (the right one).
 
 There is an isomorphic relation between frames and faces: when a face is
 a sub-face of a super-face, the corresponding frame is a sub-frame of
@@ -1644,8 +1656,8 @@ for a piece of contents that fits on a single line, the point holds.
 
 Because of that, it is impossible for a face's right padding to be
 relative to a self-ending face. This would be like saying ``stop 2
-columns before I don't know where''. Here are two examples of invalid
-settings:
+columns before I don't know where''. Here are two examples of such
+invalid settings (an error will be thrown if you try that in a theme):
 @verbatim
 :face (option :face (syntax :padding-right 2))
 :face (option
@@ -1654,17 +1666,29 @@ settings:
                         :padding-right (2 :relative-to option))))
 @end verbatim
 
-@cindex Face Properties, highlight, @t{display}
-@cindex Themes, faces, properties, highlight, @t{display}
-@cindex Themes, files, keywords, @t{:display}
-Since the notions of hiding, concealing or making text visible are
-somewhat intermixed, @clon{} provides a ``bastard'' property which,
-depending on its value, would be considered either a layout, or a
-highlight one. This property is named @t{:display}.
-
-
 @node Layout Inheritance, , Layout Properties, Layout
 @subsubsection Layout Inheritance
+@cindex Face Properties, inheritance
+@cindex Face Properties, layout, inheritance
+@cindex Themes, faces, properties, inheritance
+@cindex Themes, faces, properties, layout, inheritance
+This section is a misnomer. Contrary to highlight properties, there is
+@emph{no} inheritance for layout properties across a face tree. In other
+words, every missing layout property in a face specification has the
+property in question set to its default value.
+
+Again, this design decision has been adopted because it is the most
+natural thing to do. If you're not convinced, consider this: when you
+specify that the @samp{option} face has a top padding of 0, you mean
+that every option should be described on a line of its own. However, you
+probably do @emph{not} mean that every individual sub-part of the
+option's description (syntax part, usage part @etc{}) should also start
+on its own line.
+
+
+@node Implicit Faces, , Layout, Theme Creation
+@subsection Implicit Faces
+
 
 
 @c ====================================================================
