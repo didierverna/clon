@@ -48,7 +48,7 @@
 @setchapternewpage odd
 @setcontentsaftertitlepage
 @documentdescription
-This is the Clon end-user manual for Clon version @value{VERSION}: it
+This is the Clon End-User Manual for Clon version @value{VERSION}: it
 describes the use of applications powered by Clon.
 @end documentdescription
 
@@ -166,7 +166,7 @@ approved by the Free Software Foundation.
 @node Top, Copying, (dir), (dir)
 @top The Clon End-User Manual
 
-This is the @clon{} end-user manual for @clon{} version @value{VERSION}:
+This is the @clon{} End-User Manual for @clon{} version @value{VERSION}:
 it describes the use of applications powered by @clon{}.
 
 @menu
@@ -239,8 +239,8 @@ applications and how to customize @clon{}'s output. Everybody should
 read this manual first. If you want to use @clon{} in one of your
 applications, then you are considered a @clon{} @emph{user}, as opposed
 to a @clon{} @emph{end-user}, and you should then read the corresponding
-manual (@pxref{Top, , , clon-user, The Clon user manual, The Clon user
-manual}).
+manual (@pxref{Top, , , clon-user, The Clon User Manual, The Clon User
+Manual}).
 
 @ref{Clonification} shows how to verify that an application is powered
 by @clon{}. @ref{The Command Line} explains how to use the @cmdline{} of
@@ -295,7 +295,7 @@ ask for @option{--clon-version=short}, you'll get a more compact version
 information, and if you try @option{--clon-version=number}, you will end
 up with a purely numerical version number. For more information on
 @clon{} version numbering, @xref{Version Numbering, , , clon-user, The
-Clon user manual, The Clon user manual}.
+Clon User Manual, The Clon User Manual}.
 @end table
 
 
@@ -764,7 +764,7 @@ Now you need to get some rest.
 @c ====================================================================
 @c Output
 @c ====================================================================
-@node Output, Concept Index, The Command Line, Top
+@node Output, Conclusion, The Command Line, Top
 @chapter Output
 
 In the previous chapter, we have seen how to make the best usage of a
