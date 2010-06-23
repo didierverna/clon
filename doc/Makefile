@@ -95,7 +95,7 @@ $(HTML_DIRS): %_html: %.texi
 	touch $@
 
 clean:
-	-rm *.tmp *.fn* *.vr* *.ky* *.tp *.cp *.pg *.toc *.aux *.log *~
+	-rm *.tmp *.fn* *.vr* *.ky* *.tp *.cp* *.pg *.toc *.aux *.log *~
 
 distclean: clean
 	-rm -fr *.info* *.pdf *.dvi *.ps *_html
