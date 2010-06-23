@@ -993,7 +993,7 @@ on December the 24th.
 @cindex Search Path, themes
 @cindex Themes, search path
 @clon{} maintains a search path for looking up files. Theme files are
-supposed to be located in a @file{themes} subdirectory of every
+supposed to be located in a @file{themes} directory of every
 directory in the search path. By default, the search path is as follows:
 @itemize @w{}
 @item
@@ -1097,7 +1097,7 @@ options are orthogonal to themes: all themes implicitly honor them.
 Since their description is pretty self-explanatory, they are given
 below.
 
-The first one aloows you to control the output's line width. Normally,
+The first one allows you to control the output's line width. Normally,
 @clon{} detects it for you, but it may not be possible in some
 situations.
 @cindex @t{--clon-line-width}
@@ -1357,7 +1357,7 @@ than two or three levels of group imbrication.
 One last point to note: you might be surprised to find @emph{empty} face
 specifications like this one: @samp{:face description}. This @emph{is} a
 valid specification, and this @emph{is} different from not mentioning
-the face at all, or specifying some properties explicitely. See
+the face at all, or specifying some properties explicitly. See
 @ref{Layout Inheritance} for an explanation.
 
 
@@ -1868,8 +1868,9 @@ Hmmm. What kind of conclusion was that@dots{}
 
 @bye
 
-@c clon-enduser.texi ends here
-
-@c  LocalWords:  Clon clon cmdline Clonification tty emph CmdLine clonified
+@c  LocalWords:  Clon clon cmdline Clonification tty emph CmdLine clonified SGR
 @c  LocalWords:  clonfiscated clonistified clonificated clonificationated samp
-@c  LocalWords:  cindex subsubsection pxref
+@c  LocalWords:  cindex subsubsection pxref Didier Nuker postfix Runtime cth
+@c  LocalWords:  cartouche toplevel prepended IEC
+
+@c clon-enduser.texi ends here
