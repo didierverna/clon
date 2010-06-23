@@ -779,12 +779,15 @@ application you use will conform to your specifications.
 
 @ref{Output Elements} surveys the different items composing a @clon{}
 help string by looking at examples in a default setting. @ref{Theme
-Mechanism} explains how to switch between predefined layouts and
-@ref{Theme Creation} describes how to build your own layouts.
+Mechanism} explains how to switch between predefined layouts.
+@ref{Global Control} describe two built-in options that give you some
+control over the layout on a global scale. Finally, @ref{Theme Creation}
+describes how to build your own layouts.
 
 @menu
 * Output Elements::     What appears in help strings
 * Theme Mechanism::     Switching between available layouts
+* Global Control::      Line width and highlighting
 * Theme Creation::      Building your own layouts
 @end menu
 
@@ -854,9 +857,7 @@ arbitrary text or even sub-groups.
 @cindex Groups
 @cindex Groups, built-in
 @cindex @t{--clon-help}
-@cindex Built-in Options
 @cindex Built-in Options, @t{--clon-help}
-@cindex Options, built-in
 @cindex Options, built-in, @t{--clon-help}
 In addition to displaying the full help string, a clonified application
 may display a group's help string only (in such a case, you don't get to
@@ -891,25 +892,11 @@ flag, @samp{-d} and @samp{--simulate} are switches with different
 settings, while @samp{-f} and @samp{-F} are standard valued options.
 
 @cindex Options, description
-@cindex @t{--clon-line-width}
-@cindex Built-in Options
-@cindex Built-in Options, @t{--clon-line-width}
-@cindex Options, built-in
-@cindex Options, built-in, @t{--clon-line-width}
-@cindex CLON_LINE_WIDTH
-@cindex Environment Variables, CLON_LINE_WIDTH
 The second column of the help string provides each option's
 @emph{description}. Descriptions can span across several lines, as in
 the case of @samp{--simulate}. @clon{} takes care of properly aligning
-all the material that needs to be displayed. The global width of the
-output can be controlled by a built-in option, the description of which
-speaks for itself:
-@verbatim
-  --clon-line-width=WIDTH     Set Clon's output line width.
-                              If not given, the terminal size will be used when
-                              possible. Otherwise, 80 columns will be assumed.
-                              Environment: CLON_LINE_WIDTH
-@end verbatim
+all the material that needs to be displayed.
+
 @cindex Fallback values
 @cindex Values, fallback
 @cindex Environment Variables
@@ -924,7 +911,7 @@ appropriate.
 @c ---------------
 @c Theme Mechanism
 @c ---------------
-@node Theme Mechanism, Theme Creation, Output Elements, Output
+@node Theme Mechanism, Global Control, Output Elements, Output
 @section Theme Mechanism
 @cindex Theme Mechanism
 
@@ -1097,10 +1084,57 @@ This theme is originally identical to the one provided in the file
 cannot change it.
 
 
+@c --------------
+@c Global Control
+@c --------------
+@node Global Control, Theme Creation, Theme Mechanism, Output
+@section Global Control
+
+In addition to selecting the appropriate theme, @clon{} provides two
+built-in options that give you additional control on the output. These
+options are orthogonal to themes: all themes implicitly honor them.
+Since their description is pretty self-explanatory, they are given
+below.
+
+The first one aloows you to control the output's line width. Normally,
+@clon{} detects it for you, but it may not be possible in some
+situations.
+@cindex @t{--clon-line-width}
+@cindex Built-in Options, @t{--clon-line-width}
+@cindex Options, built-in, @t{--clon-line-width}
+@cindex CLON_LINE_WIDTH
+@cindex Environment Variables, CLON_LINE_WIDTH
+@verbatim
+  --clon-line-width=WIDTH     Set Clon's output line width.
+                              If not given, the terminal size will be used when
+                              possible. Otherwise, 80 columns will be assumed.
+                              Environment: CLON_LINE_WIDTH
+@end verbatim
+
+The second one deals with @emph{highlighting} (@pxref{Highlight}).
+@clon{} has the ability to highlight the output through ISO/IEC 6429 SGR
+escape sequences. The built-in raw theme doesn't do highlighting but
+other do. Normally, @clon{} detects when highlighting is appropriate
+automatically, but you might want more control on that.
+@cindex @t{--clon-highlight}
+@cindex Built-in Options, @t{--clon-highlight}
+@cindex Options, built-in, @t{--clon-highlight}
+@cindex CLON_HIGHLIGHT
+@cindex Environment Variables, CLON_HIGHLIGHT
+@verbatim
+  --clon-highlight[=ARG]      Set Clon's output highlighting to on/off/auto.
+                              Auto (the default) means on for tty output and
+                              off otherwise.
+                              Fallback: T
+                              Default: AUTO
+                              Environment: CLON_HIGHLIGHT
+@end verbatim
+
+
 @c ---------------
 @c Theme Creation
 @c ---------------
-@node Theme Creation, , Theme Mechanism, Output
+@node Theme Creation, , Global Control, Output
 @section Theme Creation
 Perhaps the most exciting thing in Computer Science is to spend more
 time hacking a tool than actually using it. After reading this section,
