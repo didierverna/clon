@@ -1,6 +1,6 @@
 \input texinfo
 
-@c clon-enduser.texi --- End-user manual
+@c enduser.texi --- End-user manual
 
 @c Copyright (C) 2010 Didier Verna
 
@@ -1873,4 +1873,4 @@ Hmmm. What kind of conclusion was that@dots{}
 @c  LocalWords:  cindex subsubsection pxref Didier Nuker postfix Runtime cth
 @c  LocalWords:  cartouche toplevel prepended IEC
 
-@c clon-enduser.texi ends here
+@c enduser.texi ends here

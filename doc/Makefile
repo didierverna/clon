@@ -38,7 +38,7 @@ DOC_DIR	     := $(SHARE)/doc
 CLON_DOC_DIR := $(DOC_DIR)/clon
 TEXI_FILES   := $(wildcard *.texi)
 
-INFO_FILES     := $(TEXI_FILES:%.texi=%.info)
+INFO_FILES     := $(TEXI_FILES:%.texi=clon-%.info)
 PDF_FILES      := $(TEXI_FILES:%.texi=%.pdf)
 ALL_INFO_FILES := $(INFO_FILES:%.info=%.info*)
 DVI_FILES      := $(TEXI_FILES:%.texi=%.dvi)
@@ -57,8 +57,7 @@ install: $(INFO_FILES) $(PDF_FILES)
 	  install-info --info-dir=$(INFO_DIR) $$i;	\
 	done
 	install -d $(CLON_DOC_DIR)
-	for i in $(PDF_FILES); do					   \
-	  install -m 644 $$i $(CLON_DOC_DIR)/`echo $$i | sed 's/clon-//'`; \
+	install -m 644 $(PDF_FILES) $(CLON_DOC_DIR)/; \
        done
 
 uninstall:
