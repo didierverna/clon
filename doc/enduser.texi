@@ -799,6 +799,7 @@ describes how to build your own layouts.
 @section Output Elements
 Let's look at the output of @command{program --help} in a default
 setting first:
+
 @cartouche
 @verbatim
 Usage: program [-hdF] [+d] [OPTIONS] FILES...
@@ -819,6 +820,7 @@ User identification:
                               Fallback: unknown
 @end verbatim
 @end cartouche
+
 @cindex Synopsis
 @cindex Output, synopsis
 @cindex Postfix
@@ -1100,6 +1102,7 @@ below.
 The first one allows you to control the output's line width. Normally,
 @clon{} detects it for you, but it may not be possible in some
 situations.
+
 @cindex @t{--clon-line-width}
 @cindex Built-in Options, @t{--clon-line-width}
 @cindex Options, built-in, @t{--clon-line-width}
@@ -1122,6 +1125,7 @@ automatically, but you might want more control on that.
 @cindex Options, built-in, @t{--clon-highlight}
 @cindex CLON_HIGHLIGHT
 @cindex Environment Variables, CLON_HIGHLIGHT
+
 @verbatim
   --clon-highlight[=ARG]      Set Clon's output highlighting to on/off/auto.
                               Auto (the default) means on for tty output and
@@ -1179,6 +1183,7 @@ width, indentation @etc{}). Please see @ref{Highlight Properties} and
 @ref{Layout Properties} for an exhaustive list of them.
 
 Let's have a look at a very simple theme file now.
+
 @cartouche
 @verbatim
 ;; A very simple theme file.
@@ -1193,6 +1198,7 @@ Let's have a look at a very simple theme file now.
 ;; ...
 @end verbatim
 @end cartouche
+
 @cindex Themes, files, comments
 The first line is a comment. Comments begin with a semi-colon and extend
 to the end of the line. There is another syntax for comments, as show
@@ -1313,6 +1319,7 @@ specifications have been removed). By the way, that is why it is a good
 idea to start from this one when you want to create a new theme: all the
 faces are in there. It should be pretty easy to figure out what portion
 of text each face applies to.
+
 @cartouche
 @verbatim
 ;; Remember that everything in here belongs to the toplevel face.
@@ -1342,6 +1349,7 @@ of text each face applies to.
              :face (items #| :face text :face option :face group |#))
 @end verbatim
 @end cartouche
+
 As mentioned earlier, you can see that faces of the same name may appear
 at different places in the tree (@eg{} the @samp{header} one) and hence
 may have different specifications, depending on the context (their
@@ -1481,16 +1489,17 @@ probably expect the whole synopsis line to be output in red, including
 the header, program @etc{} parts. If not, you need to explicitly
 neutralize the unwanted effect, for instance by saying something like
 this:
+
 @verbatim
 :face (synopsis :foreground red
                 :face (program :foreground reset)
                 :face (postfix :foreground cyan))
 @end verbatim
+
 In other words, you can consider that the way some piece of text is
 output is not specified exactly by its associated face, but rather by
 the merging of all active properties from the whole corresponding face
 tree. This is exactly how Emacs faces work by the way.
-
 
 @node Layout, Implicit Faces, Highlight, Theme Creation
 @subsection Layout
@@ -1693,6 +1702,7 @@ Because of that, it is impossible for a face's right padding to be
 relative to a self-ending face. This would be like saying ``stop 2
 columns before I don't know where''. Here are two examples of such
 invalid settings (an error will be thrown if you try that in a theme):
+
 @verbatim
 :face (option :face (syntax :padding-right 2))
 :face (option
@@ -1724,16 +1734,20 @@ Now that we know all about highlight and layout inheritance, we are able
 to explain the face specification shortcut mentioned earlier, when a
 face is specified directly by name, without any explicit property
 specification:
+
 @verbatim
 :face description
 @end verbatim
+
 This syntactic shortcut actually lets you specify a face which gets all
 default values for layout properties, and inherits all current values
 from its super-faces for highlight properties. This is in fact a
 shortcut for this:
+
 @verbatim
 :face (description)
 @end verbatim
+
 This, however, does not explain why you would want to issue such a
 specification instead of just not mentioning the face at all. See
 @ref{Implicit Faces} for an explanation.
@@ -1770,17 +1784,21 @@ this section is all about.
 Suppose that @clon{} needs to display an option's description, and that
 option belongs to a group. The corresponding face in a theme file would
 be the following one:
+
 @verbatim
 :face (group :face (items :face (option  #| ... |#)))
 @end verbatim
+
 This face describes how options belonging to a level 1 group are to be
 displayed. As such, it is not applicable to toplevel options. When this
 face is missing from the theme file, @clon{} tries to find a @emph{more
 general} one. In that particular case, the theme file might define a
 ``toplevel'' @samp{option} face like this:
+
 @verbatim
 :face (option #| ... |#)
 @end verbatim
+
 This face is more general because it lies at the toplevel. As such, it
 is considered applicable to toplevel options, but also to options
 belonging to groups at any level. In the same vein, specifying an
@@ -1805,17 +1823,21 @@ things a little.
 Suppose @clon{} needs to display the syntax part of an option that
 belongs to a level 1 group. The corresponding face in a theme file would
 be the following:
+
 @verbatim
 :face (group :face (items :face (option :face (syntax #| ... |#))))
 @end verbatim
+
 If that face is missing, then @clon{} will in fact attempt to find a
 more general one @emph{while preserving as much context as possible}. In
 other words, the following specifications will be tried, in that order:
+
 @verbatim
 :face (items :face (option :face (syntax #| ... |#)))
 :face (option :face (syntax #| ... |#))
 :face (syntax #| ... |#)
 @end verbatim
+
 I hope this makes sense to you because again, it is the most natural
 thing to do. What this roughly means is that when you are looking for a
 way to display an option's syntax part, you should reuse a more general
