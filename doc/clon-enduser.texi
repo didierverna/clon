@@ -1722,6 +1722,90 @@ on its own line.
 
 @node Implicit Faces, , Layout, Theme Creation
 @subsection Implicit Faces
+@cindex Implicit Faces
+@cindex Faces, implicit
+@cindex Themes, faces, implicit
+@cindex Built-in themes, @t{raw}
+@cindex Themes, built-in, @t{raw}
+In order to fully understand how themes work, we need to tackle one last
+aspect of their conception: the case of @emph{implicit faces}. Although
+@clon{} itself needs a completely defined face tree to perform output
+correctly, a theme file is not required to define all of them (that is
+impossible by the way: because of group nesting, a complete theme file
+would be infinitely big). In fact, a theme file can be totally empty, in
+which case the output will effectively conform to the built-in
+@samp{raw} theme. When a face is ``missing'' from a theme, @clon{}
+arranges to define it in a sensible way. Such a face is said to be
+@emph{implicit}. The exact rules for defining implicit faces is what
+this section is all about.
+
+@menu
+* Face Tree Reuse::     Substituting previously specified faces
+* Sibling Faces::       Substituting built-in faces
+@end menu
+
+@node Face Tree Reuse, Sibling Faces, Implicit Faces, Implicit Faces
+@subsubsection Face Tree Reuse
+@cindex Faces, reuse
+@cindex Themes, faces, reuse
+Suppose that @clon{} needs to display an option's description, and that
+option belongs to a group. The corresponding face in a theme file would
+be the following one:
+@verbatim
+:face (group :face (items :face (option  #| ... |#)))
+@end verbatim
+This face describes how options belonging to a level 1 group are to be
+displayed. As such, it is not applicable to toplevel options. When this
+face is missing from the theme file, @clon{} tries to find a @emph{more
+general} one. In that particular case, the theme file might define a
+``toplevel'' @samp{option} face like this:
+@verbatim
+:face (option #| ... |#)
+@end verbatim
+This face is more general because it lies at the toplevel. As such, it
+is considered applicable to toplevel options, but also to options
+belonging to groups at any level. In the same vein, specifying an
+@samp{option} face within a @samp{group} face implicitly makes it
+applicable at any higher group level.
+
+This face reuse mechanism applies to @emph{any} face in a theme; not
+only to the ones used in the examples above. For instance, if you decide
+that all headers in @clon{}'s output should be displayed in the same
+way, you can very well specify a @samp{header} face at the toplevel of a
+theme file (although @clon{} never has anything to display in a
+@samp{header} face at the toplevel), and this face will be used in
+synopsis headers, group headers, fallback headers @etc{}.
+
+@cindex Faces, tree, reuse
+@cindex Themes, faces, tree, reuse
+Now, we have to admit that the face reuse mechanism described above was
+over-simplified. What really happens is not exactly face reuse, but
+@emph{face tree} reuse. Here is a more complicated example to clarify
+things a little.
+
+Suppose @clon{} needs to display the syntax part of an option that
+belongs to a level 1 group. The corresponding face in a theme file would
+be the following:
+@verbatim
+:face (group :face (items :face (option :face (syntax #| ... |#))))
+@end verbatim
+If that face is missing, then @clon{} will in fact attempt to find a
+more general one @emph{while preserving as much context as possible}. In
+other words, the following specifications will be tried, in that order.
+@verbatim
+:face (items :face (option :face (syntax #| ... |#)))
+:face (option :face (syntax #| ... |#))
+:face (syntax #| ... |#)
+@end verbatim
+I hope this makes sense to you because again, it is the most natural
+thing to do. What this roughly means is that when you are looking for a
+way to display an option's syntax part, you should reuse a more general
+option's syntax face first, and only as a very last resort fall back to
+a @samp{syntax} face specification that would be floating around on its
+own.
+
+@node Sibling Faces, , Face Tree Reuse, Implicit Faces
+@subsubsection Sibling Faces
 
 
 
