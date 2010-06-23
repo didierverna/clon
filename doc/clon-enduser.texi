@@ -175,6 +175,7 @@ it describes the use of applications powered by @clon{}.
 * Clonification::       Determining whether a program is powered by Clon
 * The Command Line::    Making use of @clon{}'s @cmdline{} features
 * Output::              Understanding and customizing @clon{}'s output
+* Conclusion::          That's all folks
 * Concept Index::       Concept Index
 @end menu
 
@@ -1778,7 +1779,7 @@ synopsis headers, group headers, fallback headers @etc{}.
 
 @cindex Faces, tree, reuse
 @cindex Themes, faces, tree, reuse
-Now, we have to admit that the face reuse mechanism described above was
+Now, I must confess that the face reuse mechanism described above was
 over-simplified. What really happens is not exactly face reuse, but
 @emph{face tree} reuse. Here is a more complicated example to clarify
 things a little.
@@ -1791,7 +1792,7 @@ be the following:
 @end verbatim
 If that face is missing, then @clon{} will in fact attempt to find a
 more general one @emph{while preserving as much context as possible}. In
-other words, the following specifications will be tried, in that order.
+other words, the following specifications will be tried, in that order:
 @verbatim
 :face (items :face (option :face (syntax #| ... |#)))
 :face (option :face (syntax #| ... |#))
@@ -1806,13 +1807,43 @@ own.
 
 @node Sibling Faces, , Face Tree Reuse, Implicit Faces
 @subsubsection Sibling Faces
+@cindex Sibling Faces
+@cindex Faces, siblings
+@cindex Themes, faces, siblings
+@cindex Built-in themes, @t{raw}
+@cindex Themes, built-in, @t{raw}
+Now, what happens when the face you're looking for is not specified
+@emph{at all}, not even at a more general level? In such a situation,
+@clon{} uses a @emph{sibling}. A sibling face is a face that plays the
+same role as the one you're looking for, only it is extracted from the
+built-in @samp{raw} theme. The built-in @samp{raw} theme ensures that
+every face is defined at least once, so all faces will eventually be
+found. When a sibling face is not found in the exact context in which it
+is needed (for instance, the @samp{group} face is empty in the
+@samp{raw} theme), then the same process of face tree reuse as described
+in the previous section occurs on the sibling face tree.
+
+
+
+@c ====================================================================
+@c Conclusion
+@c ====================================================================
+@node Conclusion,  Concept Index, Output, Top
+@unnumbered Conclusion
+So that's it I guess. Enjoy using clonified applications, don't spend
+too much time hacking themes, and please contribute to the @cl{} world
+by developing standalone programs with @clon{}. Read @ref{Top, , ,
+clon-user, The Clon User Manual, The Clon User Manual} to learn how to
+do that.
+
+Hmmm. What kind of conclusion was that@dots{}
 
 
 
 @c ====================================================================
 @c Concept Index
 @c ====================================================================
-@node Concept Index,  , Output, Top
+@node Concept Index, , Conclusion, Top
 @unnumbered Concept Index
 
 @printindex cp
