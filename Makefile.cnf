@@ -45,5 +45,6 @@ CC = gcc
 MAKEINFO = makeinfo
 TEXI2DVI = texi2dvi
 DVIPS    = dvips
+CONVERT  = convert
 
 ### Makefile.cnf ends here

@@ -69,15 +69,15 @@ uninstall:
 
 info: $(INFO_FILES)
 
-pdf: $(PDF_FILES)
+pdf: clon.jpg $(PDF_FILES)
 
-dvi: $(DVI_FILES)
+dvi: clon.eps $(DVI_FILES)
 
-ps: $(PS_FILES)
+ps: clon.eps $(PS_FILES)
 
 html: $(HTML_DIRS)
 
-%.info: %.texi
+clon-%.info: %.texi
 	$(MAKEINFO) $<
 
 %.pdf: %.texi
@@ -93,11 +93,14 @@ $(HTML_DIRS): %_html: %.texi
 	$(MAKEINFO) --html -o $@ $<
 	touch $@
 
+%.eps: %.jpg
+	$(CONVERT) $< $@
+
 clean:
 	-rm *.tmp *.fn* *.vr* *.ky* *.tp *.cp* *.pg *.toc *.aux *.log *~
 
 distclean: clean
-	-rm -fr *.info* *.pdf *.dvi *.ps *_html
+	-rm -fr *.info* *.pdf *.dvi *.ps *_html clon.eps
 
 .PHONY: all all-formats			\
 	install uninstall		\
