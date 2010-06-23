@@ -58,6 +58,11 @@ clean:
 	-rm *~
 	$(MAKE) gen TARGET=clean
 
+distclean:
+	$(MAKE) clean
+	-rm -fr sbcl-* **/sbcl-*
+	$(MAKE) gen TARGET=clean
+
 gen:
 	@for i in $(SUBDIRS) ; do                 \
 	   echo "making $(TARGET) in $${i} ..." ; \
