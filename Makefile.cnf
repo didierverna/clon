@@ -38,8 +38,12 @@
 # do the installation by hand.
 PREFIX := /usr/local
 
-# CC variable for sb-grovel.
-CC=gcc
+# CC variable for sb-grovel:
+CC = gcc
 
+# Programs for generating the documentation:
+MAKEINFO = makeinfo
+TEXI2DVI = texi2dvi
+DVIPS    = dvips
 
 ### Makefile.cnf ends here
