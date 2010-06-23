@@ -1358,7 +1358,7 @@ One last point to note: you might be surprised to find @emph{empty} face
 specifications like this one: @samp{:face description}. This @emph{is} a
 valid specification, and this @emph{is} different from not mentioning
 the face at all, or specifying some properties explicitely. See
-@ref{Implicit Faces} for an explanation.
+@ref{Layout Inheritance} for an explanation.
 
 
 @node Highlight, Layout, Faces, Theme Creation
@@ -1719,6 +1719,24 @@ that every option should be described on a line of its own. However, you
 probably do @emph{not} mean that every individual sub-part of the
 option's description (syntax part, usage part @etc{}) should also start
 on its own line.
+
+Now that we know all about highlight and layout inheritance, we are able
+to explain the face specification shortcut mentioned earlier, when a
+face is specified directly by name, without any explicit property
+specification:
+@verbatim
+:face description
+@end verbatim
+This syntactic shortcut actually lets you specify a face which gets all
+default values for layout properties, and inherits all current values
+from its super-faces for highlight properties. This is in fact a
+shortcut for this:
+@verbatim
+:face (description)
+@end verbatim
+This, however, does not explain why you would want to issue such a
+specification instead of just not mentioning the face at all. See
+@ref{Implicit Faces} for an explanation.
 
 
 @node Implicit Faces, , Layout, Theme Creation
