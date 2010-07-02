@@ -1869,7 +1869,7 @@ in the previous section occurs on the sibling face tree.
 @c Conclusion
 @c ====================================================================
 @node Conclusion,  Concept Index, Output, Top
-@unnumbered Conclusion
+@chapter Conclusion
 So that's it I guess. Enjoy using clonified applications, don't spend
 too much time hacking themes, and please contribute to the @cl{} world
 by developing standalone programs with @clon{}. Read @ref{Top, , ,
