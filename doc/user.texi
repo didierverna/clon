@@ -92,6 +92,11 @@ command-line
 Command-Line
 @end macro
 
+@macro function{NAME}
+@t{\NAME\}
+@end macro
+
+
 
 @c ====================================================================
 @c Info Category and Directory
@@ -172,8 +177,13 @@ it explains how to use @clon{} in your application.
 @menu
 * Copying::             The GNU General Public License
 * Introduction::        What Clon is all about
+* Quick Start::         For the brave and the impatient
+* Synopsis Definition:: Creating your command-line
+* Option Retrieval::    Getting options values
+* Extension::           Creating your own option types
 * Conclusion::          That's all folks
-* Concept Index::       Concept Index
+* Quick Start Program:: The complete listing
+* Indexes::             Concept, Function and Variable
 @end menu
 
 @insertcopying
@@ -207,7 +217,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 @c ====================================================================
 @c Introduction
 @c ====================================================================
-@node Introduction, Conclusion, Copying, Top
+@node Introduction, Quick Start, Copying, Top
 @chapter Introduction
 
 @clon{} is a library for managing @cmdline{} options in standalone @cl{}
@@ -242,10 +252,153 @@ End-User Manual}). Everybody should read the end-user manual first.
 
 
 @c ====================================================================
+@c Quick Start
+@c ====================================================================
+@node Quick Start, Synopsis Definition, Introduction, Top
+@chapter Quick Start
+In this chapter, we quickly build a very short program to get you
+started. We assume that you have properly installed @clon{} for ASDF.
+Since several bits are compiler-specific, we also assume that SBCL is
+used in this example. If you want to try this program for real, the full
+listing is available for cut'n paste in @ref{Quick Start Program}. For a
+slightly longer example, have a look at the @t{demo} program provided in
+the distribution.
+
+Let's put us in the @cl{} user package, and load @clon{} first. @clon{}
+lives in a package named @samp{com.dvlsoft.clon}. The @t{demo} program
+from the distribution shows how to create a nickname if you find this
+too long, or if you don't want to @t{use-package} it.
+
+@cartouche
+@verbatim
+(in-package :cl-user)
+
+(require :asdf)
+(asdf:operate 'asdf:load-op :com.dvlsoft.clon)
+(use-package :com.dvlsoft.clon)
+@end verbatim
+@end cartouche
+
+@cindex Synopsis, @t{defsynopsis}
+@findex defsynopsis
+The next thing you want to do is to create a set of options, groups or
+texts that your application will recognize and/or display in its help
+string. The structure of your @cmdline{} is known to @clon{} as the
+@dfn{synopsis}. In order to create it, use the macro
+@function{defsynopsis}.
+@cartouche
+@verbatim
+(defvar *synopsis*
+  (defsynopsis ()
+    (text :contents "A very short program.")
+    (group (:header "Immediate exit options:")
+      (flag :short-name "h" :long-name "help"
+            :description "Print this help and exit.")
+      (flag :short-name "v" :long-name "version"
+            :description "Print version number and exit."))))
+@end verbatim
+@end cartouche
+Note that the synopsis has a double role: it not only serves to define
+the options recognized by your application, but also the order in which
+every element appears in the help string. In that particular example, we
+define a line of text and a group with a header and two flags.
+
+@cindex Context, @t{make-context}
+@findex make-context
+Now, we are going to define a function @function{main} for our
+standalone application. The first thing that we need to do is create a
+@dfn{context}. A context is an object that @clon{} uses to store various
+things, including some state related to the parsing of the @cmdline{}.
+You create a context with the function @function{make-context}. Our
+context needs to be associated with the synopsis we created earlier.
+@cartouche
+@verbatim
+(defun main ()
+  "Entry point for our standalone application."
+  (make-context :synopsis *synopsis*)
+@end verbatim
+@end cartouche
+
+@cindex Retrieval, by name, @t{getopt}
+@findex getopt
+@cindex Help, @t{help}
+@findex help
+At that point, @clon{} is ready to retrieve the options you want from
+the @cmdline{}. Let's first see if the user has used the option
+@option{-h}, and give him the help string. Option retrieval is done with
+the function @function{getopt}, and automatic help string output with
+the function @function{help}. Note that what we do here is @emph{not}
+process the @cmdline{} in sequence, but look directly for a specific
+option by name.
+@cartouche
+@verbatim
+  (when (getopt :short-name "h")
+    (help)
+    (quit))
+@end verbatim
+@end cartouche
+
+@cindex Retrieval, by @cmdline{} order, @t{do-cmdline-options}
+@findex do-cmdline-options
+And now, we are going to retrieve the other options and simply print
+them. This time however, we process the @cmdline{} sequentially. This is
+done with the @function{do-cmdline-options} macro. We also close the
+@function{main} function.
+@cartouche
+@verbatim
+  (do-cmdline-options (option name value)
+    (print (list option name value)))
+  (terpri)
+  (quit))
+@end verbatim
+@end cartouche
+
+Finally, time to save the Lisp image.
+@cartouche
+@verbatim
+(save-lisp-and-die "test"
+  :toplevel #'main :executable t :save-runtime-options t)
+@end verbatim
+@end cartouche
+
+We're now ready to compile this industrial-scale application and deliver
+it to the world:
+@verbatim
+CC=gcc sbcl --script test.lisp
+@end verbatim
+and voila!
+
+
+
+@c ====================================================================
+@c Synopsis Definition
+@c ====================================================================
+@node Synopsis Definition, Option Retrieval, Quick Start, Top
+@chapter Synopsis Definition
+
+
+
+@c ====================================================================
+@c Option Retrieval
+@c ====================================================================
+@node Option Retrieval, Extension, Synopsis Definition, Top
+@chapter Option Retrieval
+
+
+
+@c ====================================================================
+@c Extension
+@c ====================================================================
+@node Extension, Conclusion, Option Retrieval, Top
+@chapter Extension
+
+
+
+@c ====================================================================
 @c Conclusion
 @c ====================================================================
-@node Conclusion,  Concept Index, Introduction, Top
-@unnumbered Conclusion
+@node Conclusion, Quick Start Program, Extension, Top
+@chapter Conclusion
 So that's it I guess. Enjoy using @clon{}.
 
 Hmmm. What kind of conclusion was that@dots{}
@@ -253,12 +406,81 @@ Hmmm. What kind of conclusion was that@dots{}
 
 
 @c ====================================================================
-@c Concept Index
+@c Quick Start Program
 @c ====================================================================
-@node Concept Index, , Conclusion, Top
-@unnumbered Concept Index
+@node Quick Start Program, Indexes, Conclusion, Top
+@appendix Quick Start Program
 
+@cartouche
+@verbatim
+(in-package :cl-user)
+
+(require :asdf)
+(asdf:operate 'asdf:load-op :com.dvlsoft.clon)
+(use-package :com.dvlsoft.clon)
+
+(defvar *synopsis*
+  (defsynopsis ()
+    (text :contents "A very short program.")
+    (group (:header "Immediate exit options:")
+	   (flag :short-name "h" :long-name "help"
+		 :description "Print this help and exit.")
+	   (flag :short-name "v" :long-name "version"
+		 :description "Print version number and exit."))))
+
+(defun main ()
+  "Entry point for our standalone application."
+  (make-context :synopsis *synopsis*)
+  (when (getopt :short-name "h")
+    (help)
+    (quit))
+  (do-cmdline-options (option name value)
+    (print (list option name value)))
+  (terpri)
+  (quit))
+
+(save-lisp-and-die "test"
+  :toplevel #'main :executable t :save-runtime-options t)
+@end verbatim
+@end cartouche
+
+
+
+@c ====================================================================
+@c Indexes
+@c ====================================================================
+@node Indexes, , Quick Start Program, Top
+@appendix Indexes
+
+@menu
+* Concept Index::       Well, the concept index
+* Function Index::      Well, the function index
+* Variable Index::      Well, the variable index
+@end menu
+
+@c --------------
+@c Concept Index
+@c --------------
+@node Concept Index, Function Index, Indexes, Indexes
+@section Concepts
 @printindex cp
+
+
+@c --------------
+@c Function Index
+@c --------------
+@node Function Index, Variable Index, Concept Index, Indexes
+@section Functions
+@printindex fn
+
+
+@c --------------
+@c Variable Index
+@c --------------
+@node Variable Index, , Function Index, Indexes
+@section Variables
+@printindex vr
+
 
 @bye
 
