@@ -240,8 +240,7 @@ applications and how to customize @clon{}'s output. Everybody should
 read this manual first. If you want to use @clon{} in one of your
 applications, then you are considered a @clon{} @emph{user}, as opposed
 to a @clon{} @emph{end-user}, and you should then read the corresponding
-manual (@pxref{Top, , , clon-user, The Clon User Manual, The Clon User
-Manual}).
+manual (@pxref{Top, , , clon-user, The Clon User Manual}).
 
 @ref{Clonification} shows how to verify that an application is powered
 by @clon{}. @ref{The Command Line} explains how to use the @cmdline{} of
@@ -296,7 +295,7 @@ ask for @option{--clon-version=short}, you'll get a more compact version
 information, and if you try @option{--clon-version=number}, you will end
 up with a purely numerical version number. For more information on
 @clon{} version numbering, @xref{Version Numbering, , , clon-user, The
-Clon User Manual, The Clon User Manual}.
+Clon User Manual}.
 @end table
 
 
@@ -1873,8 +1872,7 @@ in the previous section occurs on the sibling face tree.
 So that's it I guess. Enjoy using clonified applications, don't spend
 too much time hacking themes, and please contribute to the @cl{} world
 by developing standalone programs with @clon{}. Read @ref{Top, , ,
-clon-user, The Clon User Manual, The Clon User Manual} to learn how to
-do that.
+clon-user, The Clon User Manual} to learn how to do that.
 
 Hmmm. What kind of conclusion was that@dots{}
 
