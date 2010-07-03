@@ -92,10 +92,6 @@ command-line
 Command-Line
 @end macro
 
-@macro function{NAME}
-@t{\NAME\}
-@end macro
-
 
 
 @c ====================================================================
@@ -289,7 +285,7 @@ The next thing you want to do is to create a set of options, groups or
 texts that your application will recognize and/or display in its help
 string. The structure of your @cmdline{} is known to @clon{} as the
 @dfn{synopsis}. In order to create it, use the macro
-@function{defsynopsis}.
+@code{defsynopsis}.
 @cartouche
 @verbatim
 (defvar *synopsis*
@@ -309,11 +305,11 @@ define a line of text and a group with a header and two flags.
 
 @cindex Context, @t{make-context}
 @findex make-context
-Now, we are going to define a function @function{main} for our
+Now, we are going to define a function @code{main} for our
 standalone application. The first thing that we need to do is create a
 @dfn{context}. A context is an object that @clon{} uses to store various
 things, including some state related to the parsing of the @cmdline{}.
-You create a context with the function @function{make-context}. Our
+You create a context with the function @code{make-context}. Our
 context needs to be associated with the synopsis we created earlier.
 @cartouche
 @verbatim
@@ -330,8 +326,8 @@ context needs to be associated with the synopsis we created earlier.
 At that point, @clon{} is ready to retrieve the options you want from
 the @cmdline{}. Let's first see if the user has used the option
 @option{-h}, and give him the help string. Option retrieval is done with
-the function @function{getopt}, and automatic help string output with
-the function @function{help}. Note that what we do here is @emph{not}
+the function @code{getopt}, and automatic help string output with
+the function @code{help}. Note that what we do here is @emph{not}
 process the @cmdline{} in sequence, but look directly for a specific
 option by name.
 @cartouche
@@ -346,8 +342,8 @@ option by name.
 @findex do-cmdline-options
 And now, we are going to retrieve the other options and simply print
 them. This time however, we process the @cmdline{} sequentially. This is
-done with the @function{do-cmdline-options} macro. We also close the
-@function{main} function.
+done with the @code{do-cmdline-options} macro. We also close the
+@code{main} function.
 @cartouche
 @verbatim
   (do-cmdline-options (option name value)
