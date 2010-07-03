@@ -298,6 +298,7 @@ string. The structure of your @cmdline{} is known to @clon{} as the
             :description "Print version number and exit."))))
 @end verbatim
 @end cartouche
+
 Note that the synopsis has a double role: it not only serves to define
 the options recognized by your application, but also the order in which
 every element appears in the help string. In that particular example, we
@@ -366,6 +367,7 @@ it to the world:
 @verbatim
 CC=gcc sbcl --script test.lisp
 @end verbatim
+
 and voila!
 
 
@@ -454,6 +456,7 @@ form:
 @verbatim
 (text :contents "Blah blah.")
 @end verbatim
+
 Try to make proper sentences when adding arbitrary text. You can use
 explicit newline characters in your text if you really want to go next
 line, but in general, you should not worry about the formatting because
@@ -465,12 +468,41 @@ a newline. This would break potential theme specifications.
 @cindex Options, in synopsis
 @cindex Synopsis, options
 @findex defsynopsis, @r{items}, @r{options}
+In order to add an option to your help string, you must provide a list
+beginning with the option type and followed by key / value pairs
+describing the option's properties. For instance, to add a flag with a
+short name and a description, you could do this:
+@verbatim
+(flag :short-name "h" :description "Print this help and exit.")
+@end verbatim
+
+Option properties vary depending on the option type. The exact list of
+available option types, and the corresponding properties are described
+in @ref{Built-In Option Types}.
 
 @node Groups, , Options, Synopsis Items
 @subsubsection Groups
 @cindex Groups, in synopsis
 @cindex Synopsis, groups
 @findex defsynopsis, @r{items}, group
+In order to add a group to your help string, you must use the following
+form:@*
+@t{(group (@var{OPTIONS}@dots{}) @var{ITEMS}@dots{})}
+
+@cindex Groups, options, header
+The group's options are key / value pairs. Currently, the only available
+option is @code{:header}. The corresponding value must be a string which
+will be displayed above the group's contents in the help string. The
+same formatting recommendations as for arbitrary text apply.
+
+@cindex Text, in groups
+@cindex Groups, items, text
+@cindex Options, in groups
+@cindex Groups, items, options
+@cindex Groups, in groups
+@cindex Groups, items, groups
+The group's items are simply arbitrary text, option or sub-group
+descriptions as we've just seen.
 
 
 @node Built-In Option Types, , Synopsis Items, Synopsis Definition
