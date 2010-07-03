@@ -325,7 +325,7 @@ context needs to be associated with the synopsis we created earlier.
 
 @cindex Retrieval, by name, @t{getopt}
 @findex getopt
-@cindex Help, @t{help}
+@cindex Help String, @t{help}
 @findex help
 At that point, @clon{} is ready to retrieve the options you want from
 the @cmdline{}. Let's first see if the user has used the option
@@ -380,9 +380,61 @@ and voila!
 @node Using Clon, Extending Clon, Quick Start, Top
 @chapter Using Clon
 
+Using @clon{} in your application involves three steps. In the first
+step, you create a @dfn{synopsis}, which is a description of your
+application's @cmdline{}. In the second step, you create a
+@dfn{context}, which associates the synopsis with this specific
+execution of the program. In the third step finally, you retrieve the
+options values. Steps one and two form the @dfn{initialization phase} of
+@clon{}, while step 3 is called the @dfn{runtime phase}.
+
+@menu
+* Synopsis Definition:: Describing your command-line
+* Context Creation::    Instantiating your command-line
+* Option Retrieval::    Getting the options values
+@end menu
+
+
+@c -------------------
+@c Synopsis Definition
+@c -------------------
+@node Synopsis Definition, Context Creation, Using Clon, Using Clon
+@section Synopsis Definition
+@cindex Initialization Phase
+@cindex Phase, initialization
 @cindex Synopsis
+@cindex Help String
+
+A @dfn{synopsis} is essentially a description of your application's
+@cmdline{}: it describes what are the available options, whether your
+application has a postfix @etc{} The synopsis, however, plays a second
+role: it also describes the contents of your application's help string.
+When you create a synopsis, you describe the @cmdline{} and the help
+string at the same time.
+
 @cindex Synopsis, @t{defsynopsis}
 @findex defsynopsis
+
+
+@c ----------------
+@c Context Creation
+@c ----------------
+@node Context Creation, Option Retrieval, Synopsis Definition, Using Clon
+@section Context Creation
+@cindex Initialization Phase
+@cindex Phase, initialization
+@cindex Context
+@cindex Context, @t{make-context}
+@findex make-context
+
+
+@c ----------------
+@c Option Retrieval
+@c ----------------
+@node Option Retrieval, , Context Creation, Using Clon
+@section Option Retrieval
+@cindex Runtime Phase
+@cindex Phase, runtime
 
 
 
