@@ -241,8 +241,8 @@ style, and the use of @emph{clonificationated} is strictly prohibited.}.
 As opposed to the user of the @emph{library}, the user of an
 @emph{application} powered by @clon{} is called an @emph{end-user}.
 @clon{} provides both a user manual (this one) and an end-user manual
-(@pxref{Top, , , clon-end-user, The Clon End-User Manual, The Clon
-End-User Manual}). Everybody should read the end-user manual first.
+(@pxref{Top, , , clon-end-user, The Clon End-User Manual}). Everybody
+should read the end-user manual first.
 
 @ref{Quick Start} provides a very short example in order to give an
 overview of what's coming next. @ref{Using Clon} explains in detail how
