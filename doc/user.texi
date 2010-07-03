@@ -279,7 +279,7 @@ too long, or if you don't want to @t{use-package} it.
 @end verbatim
 @end cartouche
 
-@cindex Synopsis, @t{defsynopsis}
+@cindex Synopsis, definition
 @findex defsynopsis
 The next thing you want to do is to create a set of options, groups or
 texts that your application will recognize and/or display in its help
@@ -303,7 +303,7 @@ the options recognized by your application, but also the order in which
 every element appears in the help string. In that particular example, we
 define a line of text and a group with a header and two flags.
 
-@cindex Context, @t{make-context}
+@cindex Context, creation
 @findex make-context
 Now, we are going to define a function @code{main} for our
 standalone application. The first thing that we need to do is create a
@@ -319,9 +319,9 @@ context needs to be associated with the synopsis we created earlier.
 @end verbatim
 @end cartouche
 
-@cindex Retrieval, by name, @t{getopt}
+@cindex Retrieval, by name
 @findex getopt
-@cindex Help String, @t{help}
+@cindex Help String, display
 @findex help
 At that point, @clon{} is ready to retrieve the options you want from
 the @cmdline{}. Let's first see if the user has used the option
@@ -338,7 +338,7 @@ option by name.
 @end verbatim
 @end cartouche
 
-@cindex Retrieval, by @cmdline{} order, @t{do-cmdline-options}
+@cindex Retrieval, by @cmdline{} order
 @findex do-cmdline-options
 And now, we are going to retrieve the other options and simply print
 them. This time however, we process the @cmdline{} sequentially. This is
@@ -420,7 +420,7 @@ string at the same time.
 @cindex Initialization Phase
 @cindex Phase, initialization
 @cindex Context
-@cindex Context, @t{make-context}
+@cindex Context, creation
 @findex make-context
 
 
