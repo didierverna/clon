@@ -408,8 +408,74 @@ role: it also describes the contents of your application's help string.
 When you create a synopsis, you describe the @cmdline{} and the help
 string at the same time.
 
-@cindex Synopsis, @t{defsynopsis}
-@findex defsynopsis
+@menu
+* Synopsis Items::              Defsynopsis and its contents
+* Built-In Option Types::       The exhaustive list
+@end menu
+
+@node Synopsis Items, Built-In Option Types, Synopsis Definition, Synopsis Definition
+@subsection Synopsis Items
+@cindex Synopsis, definition
+Look again at the synopsis definition provided in @ref{Quick Start}. You
+define a synopsis with the @code{defsynopsis} macro.
+@defmac defsynopsis (@var{OPTIONS}@dots{}) @var{ITEMS}@dots{}
+Define a new synopsis. @var{OPTIONS} are key / value pairs. @var{ITEMS}
+is a list of either text, group, or option descriptions.
+@end defmac
+
+@cindex Postfix
+@cindex Synopsis, postfix
+@findex defsynopsis, @r{options}, :postfix
+The first argument to @code{defsynopsis} is a list of key / value pairs.
+Currently, the only available key is @code{:postfix}. Its value is a
+string which will appear at the end of the synopsis line in the help
+string. When you provide a postfix, you also implicitely tell @clon{}
+that your application accepts non-option arguments at the end of the
+@cmdline{}. See @ref{Option Separator, , , clon-end-user, The Clon
+End-User Manual} for more information on the behavior of @clon{} with
+respect to postfixes.
+
+The remainder of the arguments to @code{defsynopsis} are text, group or
+options descriptions. We now examine the syntax for each one of them.
+
+@menu
+* Text::        Adding arbitrary text
+* Options::     Adding options
+* Groups::      Adding groups
+@end menu
+
+@node Text, Options, Synopsis Items, Synopsis Items
+@subsubsection Arbitrary Text
+@cindex Text, in synopsis
+@cindex Synopsis, text
+@findex defsynopsis, @r{items}, text
+In order to add arbitrary text to your help string, use the following
+form:
+@verbatim
+(text :contents "Blah blah.")
+@end verbatim
+Try to make proper sentences when adding arbitrary text. You can use
+explicit newline characters in your text if you really want to go next
+line, but in general, you should not worry about the formatting because
+the themes are here to do so. In particular, don't finish your text with
+a newline. This would break potential theme specifications.
+
+@node Options, Groups, Text, Synopsis Items
+@subsubsection Options
+@cindex Options, in synopsis
+@cindex Synopsis, options
+@findex defsynopsis, @r{items}, @r{options}
+
+@node Groups, , Options, Synopsis Items
+@subsubsection Groups
+@cindex Groups, in synopsis
+@cindex Synopsis, groups
+@findex defsynopsis, @r{items}, group
+
+
+@node Built-In Option Types, , Synopsis Items, Synopsis Definition
+@subsection Built-In Option Types
+
 
 
 @c ----------------
