@@ -178,9 +178,8 @@ it explains how to use @clon{} in your application.
 * Copying::             The GNU General Public License
 * Introduction::        What Clon is all about
 * Quick Start::         For the brave and the impatient
-* Synopsis Definition:: Creating your command-line
-* Option Retrieval::    Getting options values
-* Extension::           Creating your own option types
+* Using Clon::          Clonificating your application
+* Extending Clon::      Creating your own option types
 * Conclusion::          That's all folks
 * Quick Start Program:: The complete listing
 * Indexes::             Concept, Function and Variable
@@ -249,12 +248,17 @@ As opposed to the user of the @emph{library}, the user of an
 (@pxref{Top, , , clon-end-user, The Clon End-User Manual, The Clon
 End-User Manual}). Everybody should read the end-user manual first.
 
+@ref{Quick Start} provides a very short example in order to give an
+overview of what's coming next. @ref{Using Clon} explains in detail how
+to clonify your application, and @ref{Extending Clon} describe how to
+extend @clon{} with your own option types.
+
 
 
 @c ====================================================================
 @c Quick Start
 @c ====================================================================
-@node Quick Start, Synopsis Definition, Introduction, Top
+@node Quick Start, Using Clon, Introduction, Top
 @chapter Quick Start
 In this chapter, we quickly build a very short program to get you
 started. We assume that you have properly installed @clon{} for ASDF.
@@ -371,33 +375,29 @@ and voila!
 
 
 @c ====================================================================
-@c Synopsis Definition
+@c Using Clon
 @c ====================================================================
-@node Synopsis Definition, Option Retrieval, Quick Start, Top
-@chapter Synopsis Definition
+@node Using Clon, Extending Clon, Quick Start, Top
+@chapter Using Clon
 
-
-
-@c ====================================================================
-@c Option Retrieval
-@c ====================================================================
-@node Option Retrieval, Extension, Synopsis Definition, Top
-@chapter Option Retrieval
+@cindex Synopsis
+@cindex Synopsis, @t{defsynopsis}
+@findex defsynopsis
 
 
 
 @c ====================================================================
-@c Extension
+@c Extending Clon
 @c ====================================================================
-@node Extension, Conclusion, Option Retrieval, Top
-@chapter Extension
+@node Extending Clon, Conclusion, Using Clon, Top
+@chapter Extending Clon
 
 
 
 @c ====================================================================
 @c Conclusion
 @c ====================================================================
-@node Conclusion, Quick Start Program, Extension, Top
+@node Conclusion, Quick Start Program, Extending Clon, Top
 @chapter Conclusion
 So that's it I guess. Enjoy using @clon{}.
 
