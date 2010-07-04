@@ -59,7 +59,8 @@
    (argument-styles :documentation "The possible argument styles."
 		    :allocation :class
 		    :type list
-		    :initform '(:yes/no :on/off :true/false :yup/nope)
+		    :initform '(:yes/no :on/off :true/false :yup/nope
+				:yeah/nah)
 		    :accessor argument-styles))
   (:default-initargs
     :argument-type :optional
@@ -122,7 +123,7 @@ If ARGUMENT is not valid for a switch, raise a conversion error."
 - DESCRIPTION is the switch's description appearing in help strings.
   It defaults to nil.
 - ARGUMENT-STYLE is the switch's argument display style. It can be one of
-  :yes/no, :on/off, :true/false, :yup/nope.
+  :yes/no, :on/off, :true/false, :yup/nope or :yeah/nah.
   It defaults to :yes/no.
 - ARGUMENT-TYPE is one of :required, :mandatory or :optional (:required and
   :mandatory are synonyms).
@@ -143,7 +144,7 @@ If ARGUMENT is not valid for a switch, raise a conversion error."
   (Internal options don't have short names.)
 - DESCRIPTION is the switch's description.
 - ARGUMENT-STYLE is the switch's argument display style. It can be one of
-  :yes/no, :on/off, :true/false, :yup/nope.
+  :yes/no, :on/off, :true/false, :yup/nope or :yeah/nah.
   It defaults to :yes/no.
 - ARGUMENT-TYPE is one of :required, :mandatory or :optional (:required and
   :mandatory are synonyms).
