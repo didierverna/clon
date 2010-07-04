@@ -194,6 +194,8 @@ If you don't want any theme at all, use this option with no argument. "
 		       :argument-name "FILE"
 		       :argument-type :optional
 		       :type :file
+		       ;; #### FIXME: paths are nullable by default right ?
+		       ;; So why did I put this here ?
 		       :nullablep t
 		       :fallback-value nil
 		       :default-value (make-pathname :name "raw")
