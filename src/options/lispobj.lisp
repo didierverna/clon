@@ -39,7 +39,9 @@
 ;; ==========================================================================
 
 (defoption lispobj ()
-  ((typespec :documentation "A type specifier the option's value should satisfy."
+  ((argument-name ;; inherited from the VALUED-OPTION class
+    :initform "OBJ")
+   (typespec :documentation "A type specifier the option's value should satisfy."
 	     :initform t
 	     :initarg :typespec
 	     :reader typespec))
