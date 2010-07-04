@@ -574,8 +574,8 @@ defaults to @code{"ARG"}, so that for instance, a @samp{name} option
 would appear like this: @samp{--name=ARG}.
 @item :argument-type
 @cindex Options, properties, argument type
-The status of the argument. Possible values are @code{:required} and
-@code{:mandatory} which are synonyms, or @code{:optional}.
+The status of the argument. Possible values are @code{:required} (the
+default) and @code{:mandatory} which are synonyms, or @code{:optional}.
 @item :default-value
 @cindex Options, properties, default value
 @item :fallback-value
