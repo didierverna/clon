@@ -508,39 +508,45 @@ descriptions as we've just seen.
 
 @node Built-In Option Types, , Synopsis Items, Synopsis Definition
 @subsection Built-In Option Types
-@cindex Built-In Options
-@cindex Options, built-in
+@cindex Built-In Option Types
+@cindex Options, built-in types
+@cindex Options, types, built-in
 In this section, we will review all the built-in option types that
 @clon{} provides, along with their corresponding properties. You can use
 them directly in your synopsis description. For adding personal option
 types to @clon{}, see @ref{Extending Clon}.
 
 @menu
-* Common Properties::   All option types have them
-* Flags::               Options without arguments
-* Valued Options::      Options with arguments
+* Common Properties::                   For all options
+* Flags::                               Built-in options without arguments
+* Common Valued Option Properties::     For all valued options
+* Built-In Valued Options::             Built-in options with arguments
 @end menu
 
 @node Common Properties, Flags, Built-In Option Types, Built-In Option Types
 @subsubsection Common Properties
 @cindex Options, common properties
 @cindex Options, properties, common
-All option types in @clon{} have a set of basic, common properties,
-including those you define yourself (@pxref{Extending Clon}). Here is a
-list of them.
+All option types in @clon{}, including those you define yourself
+(@pxref{Extending Clon}), have a set of basic, common properties. Here
+is a list of them.
 @table @code
 @item :short-name
-@cindex Options, properties, short name
+@cindex Options, common properties, short name
+@cindex Options, properties, common, short name
 The option's short name. A string or @code{nil}.
 @item :long-name
-@cindex Options, properties, long name
+@cindex Options, common properties, long name
+@cindex Options, properties, common, long name
 The option's long name. A string or @code{nil}.
 @item :description
-@cindex Options, properties, description
+@cindex Options, common properties, description
+@cindex Options, properties, common, description
 The option's descriptive text. A string or @code{nil}. The same
 formatting recommendations as for arbitrary text apply (@pxref{Text}).
 @item :env-var
-@cindex Options, properties, environment variable
+@cindex Options, common properties, environment variable
+@cindex Options, properties, common, environment variable
 The option's associated environment variable. A string or @code{nil}.
 @end table
 
@@ -549,18 +555,18 @@ or long). Non-@code{nil} but empty names are also prohibited, and of
 course, a short name cannot begin with a dash (otherwise, it would be
 mistaken for a long name, but did I really need to mention this?).
 
-@node Flags, Valued Options, Common Properties, Built-In Option Types
+@node Flags, Common Valued Option Properties, Common Properties, Built-In Option Types
 @subsubsection Flags
-@cindex Built-In Options, @code{flag}
-@cindex Options, built-in, @code{flag}
-@cindex Options, types, @code{flag}
+@cindex Built-In Option Types, @code{flag}
+@cindex Options, built-in types, @code{flag}
+@cindex Options, types, built-in, @code{flag}
 In @clon{}, options that don't take any argument are of type
 @code{flag}. These options don't provide additional properties on top of
 the common set described in @ref{Common Properties}. All properties
 default to @code{nil}.
 
-@node Valued Options, , Flags, Built-In Option Types
-@subsubsection Valued Options
+@node Common Valued Option Properties, Built-In Valued Options, Flags, Built-In Option Types
+@subsubsection Common Valued Option Properties
 @cindex Valued Options
 @cindex Options, valued
 All non-flag options in @clon{} are said to be @dfn{valued}. All valued
@@ -568,24 +574,39 @@ options, including those you define yourself (@pxref{Extending Clon}),
 share a set of additional properties. Here is a list of them.
 @table @code
 @item :argument-name
-@cindex Options, properties, argument name
+@cindex Valued Options, common properties, argument name
+@cindex Valued Options, properties, common, argument name
+@cindex Options, valued, common properties, argument name
+@cindex Options, valued, properties, common, argument name
 The name of the option's argument, as it appears in the help string. It
 defaults to @code{"ARG"}, so that for instance, a @samp{name} option
 would appear like this: @samp{--name=ARG}.
 @item :argument-type
-@cindex Options, properties, argument type
+@cindex Valued Options, common properties, argument type
+@cindex Valued Options, properties, common, argument type
+@cindex Options, valued, common properties, argument type
+@cindex Options, valued, properties, common, argument type
 The status of the argument. Possible values are @code{:required} (the
 default) and @code{:mandatory} which are synonyms, or @code{:optional}.
 @item :default-value
-@cindex Options, properties, default value
+@cindex Valued Options, common properties, default value
+@cindex Valued Options, properties, common, default value
+@cindex Options, valued, common properties, default value
+@cindex Options, valued, properties, common, default value
 @item :fallback-value
-@cindex Options, properties, fallback value
+@cindex Valued Options, common properties, fallback value
+@cindex Valued Options, properties, common, fallback value
+@cindex Options, valued, common properties, fallback value
+@cindex Options, valued, properties, common, fallback value
 The option's default and fallback values. Remember that a fallback value
 only makes sense when the argument is optional. Besides, also when the
 argument is optional, you need to provide at least a fallback or a
 default value (or both of course).
 @item :nullablep
-@cindex Options, properties, nullable
+@cindex Valued Options, common properties, nullable
+@cindex Valued Options, properties, common, nullable
+@cindex Options, valued, common properties, nullable
+@cindex Options, valued, properties, common, nullable
 Whether the option accepts a null value. Default to @code{nil}. FIXME:
 need more explanation.
 @end table
