@@ -447,7 +447,7 @@ options descriptions. We now examine the syntax for each one of them.
 @end menu
 
 @node Text, Options, Synopsis Items, Synopsis Items
-@subsubsection Arbitrary Text
+@subsubsection Text
 @cindex Text, in synopsis
 @cindex Synopsis, text
 @findex defsynopsis, @r{items}, text
@@ -493,7 +493,8 @@ form:@*
 The group's options are key / value pairs. Currently, the only available
 option is @code{:header}. The corresponding value must be a string which
 will be displayed above the group's contents in the help string. The
-same formatting recommendations as for arbitrary text apply.
+same formatting recommendations as for arbitrary text apply
+(@pxref{Text}).
 
 @cindex Text, in groups
 @cindex Groups, items, text
