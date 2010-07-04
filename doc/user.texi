@@ -561,7 +561,34 @@ default to @code{nil}.
 
 @node Valued Options, , Flags, Built-In Option Types
 @subsubsection Valued Options
-
+@cindex Valued Options
+@cindex Options, valued
+All non-flag options in @clon{} are said to be @dfn{valued}. All valued
+options, including those you define yourself (@pxref{Extending Clon}),
+share a set of additional properties. Here is a list of them.
+@table @code
+@item :argument-name
+@cindex Options, properties, argument name
+The name of the option's argument, as it appears in the help string. It
+defaults to @code{"ARG"}, so that for instance, a @samp{name} option
+would appear like this: @samp{--name=ARG}.
+@item :argument-type
+@cindex Options, properties, argument type
+The status of the argument. Possible values are @code{:required} and
+@code{:mandatory} which are synonyms, or @code{:optional}.
+@item :default-value
+@cindex Options, properties, default value
+@item :fallback-value
+@cindex Options, properties, fallback value
+The option's default and fallback values. Remember that a fallback value
+only makes sense when the argument is optional. Besides, also when the
+argument is optional, you need to provide at least a fallback or a
+default value (or both of course).
+@item :nullablep
+@cindex Options, properties, nullable
+Whether the option accepts a null value. Default to @code{nil}. FIXME:
+need more explanation.
+@end table
 
 
 @c ----------------
