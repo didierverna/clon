@@ -611,6 +611,144 @@ Whether the option accepts a null value. Default to @code{nil}. FIXME:
 need more explanation.
 @end table
 
+@node Built-In Valued Options, , Common Valued Option Properties, Built-In Option Types
+@subsubsection Built-In Valued Options
+@cindex Options, types, valued
+@cindex Built-In Option Types, valued
+@cindex Options, built-in types, valued
+@cindex Options, types, built-in, valued
+@clon{} currently defines 6 built-in valued option types. These option
+types may change the default value for some common properties, and / or
+provide additional properties of their own. All of this is described
+below.
+
+@table @code
+@item stropt
+@cindex Built-In Option Types, @code{stropt}
+@cindex Options, built-in types, @code{stropt}
+@cindex Options, types, built-in, @code{stropt}
+@cindex Valued Options, common properties, argument name
+@cindex Valued Options, properties, common, argument name
+@cindex Options, valued, common properties, argument name
+@cindex Options, valued, properties, common, argument name
+This option type is for options taking strings as their argument. String
+options don't provide any additional properties, but their default
+argument name is changed from @code{"ARG"} to @code{"STR"}.
+@item lispobj
+@cindex Built-In Option Types, @code{lispobj}
+@cindex Options, built-in types, @code{lispobj}
+@cindex Options, types, built-in, @code{lispobj}
+@cindex Valued Options, common properties, argument name
+@cindex Valued Options, properties, common, argument name
+@cindex Options, valued, common properties, argument name
+@cindex Options, valued, properties, common, argument name
+@cindex Valued Options, @code{lispobj}
+@cindex Valued Options, @code{lispobj}, properties, type specifier
+@cindex Options, valued, @code{lispobj}, properties, type specifier
+This option type is for options taking any kind of Lisp object as their
+argument. @code{lispobj} options change their default argument name from
+@code{"ARG"} to @code{"OBJ"}. Also, they provide an additional property
+called @code{:typespec} which must be a @cl{} type specifier that the
+argument must satisfy. It defaults to @code{t}.
+@item enum
+@cindex Built-In Option Types, @code{enum}
+@cindex Options, built-in types, @code{enum}
+@cindex Options, types, built-in, @code{enum}
+@cindex Valued Options, common properties, argument name
+@cindex Valued Options, properties, common, argument name
+@cindex Options, valued, common properties, argument name
+@cindex Options, valued, properties, common, argument name
+@cindex Valued Options, @code{enum}
+@cindex Valued Options, @code{enum}, properties, enumeration
+@cindex Options, valued, @code{enum}, properties, enumeration
+@cindex Built-In Options, @code{--clon-version}
+@cindex Options, built-in, @code{--clon-version}
+This option type is for options taking values from an enumerated set.
+@code{enum} options change their default argument name from @code{"ARG"}
+to @code{"TYPE"}. Also, they provide an additional property called
+@code{:enum} which must be a list of @cl{} keywords enumerating the
+possible values. In fact, the values are not the keywords themselves,
+but rather their corresponding symbol name. This means that an end-user
+needs not be aware of the underlying implementation, and actually does
+not use a colon when providing an argument. The end-user also has the
+ability to abbreviate the possible values. Look at the
+@code{--clon-version} built-in option for an example.
+@item path
+@cindex Built-In Option Types, @code{path}
+@cindex Options, built-in types, @code{path}
+@cindex Options, types, built-in, @code{path}
+@cindex Valued Options, common properties, argument name
+@cindex Valued Options, properties, common, argument name
+@cindex Options, valued, common properties, argument name
+@cindex Options, valued, properties, common, argument name
+@cindex Valued Options, common properties, nullable
+@cindex Valued Options, properties, common, nullable
+@cindex Options, valued, common properties, nullable
+@cindex Options, valued, properties, common, nullable
+@cindex Valued Options, @code{path}
+@cindex Valued Options, @code{path}, properties, path type
+@cindex Options, valued, @code{path}, properties, path type
+This option type is for options taking a colon-separated list of
+pathnames as argument. @code{path} options change their default argument
+name from @code{"ARG"} to @code{"PATH"} and their default nullable
+property from @code{nil} to @code{t}. Also, they provide an additional
+property called @code{:type} which specifies the kind of path which is
+expected. Possible values are: @code{:file}, @code{:directory},
+@code{:file-list}, @code{:diretory-list} or @code{nil} (meaning that
+anything is allowed).
+@item switch
+@cindex Built-In Option Types, @code{switch}
+@cindex Options, built-in types, @code{switch}
+@cindex Options, types, built-in, @code{switch}
+@cindex Valued Options, common properties, argument type
+@cindex Valued Options, properties, common, argument type
+@cindex Options, valued, common properties, argument type
+@cindex Options, valued, properties, common, argument type
+@cindex Valued Options, common properties, nullable
+@cindex Valued Options, properties, common, nullable
+@cindex Options, valued, common properties, nullable
+@cindex Options, valued, properties, common, nullable
+@cindex Valued Options, @code{switch}
+@cindex Valued Options, @code{switch}, properties, argument style
+@cindex Options, valued, @code{switch}, properties, argument style
+This option type is for Boolean options. @code{switch} options change
+their default nullable property from @code{nil} to @code{t}, and their
+default argument type from required to optional. Also, instead of using
+the @code{:argument-name} property, @code{switch} options provide a
+property called @code{:argument-style}. Possible values are
+@code{:yes/no} (the default), @code{:on/off}, @code{:true/false},
+@code{:yup/nope}, @code{:yeah/nah}. Note that this property determines
+the argument name @emph{only}. All possible switch arguments
+(@pxref{Switches, , , clon-end-user, The Clon End-User Manual}) are
+always availble to all switches.
+@item xswitch
+@cindex Built-In Option Types, @code{xswitch}
+@cindex Options, built-in types, @code{xswitch}
+@cindex Options, types, built-in, @code{xswitch}
+@cindex Valued Options, common properties, argument type
+@cindex Valued Options, properties, common, argument type
+@cindex Options, valued, common properties, argument type
+@cindex Options, valued, properties, common, argument type
+@cindex Valued Options, common properties, nullable
+@cindex Valued Options, properties, common, nullable
+@cindex Options, valued, common properties, nullable
+@cindex Options, valued, properties, common, nullable
+@cindex Valued Options, @code{xswitch}
+@cindex Valued Options, @code{xswitch}, properties, enumeration
+@cindex Options, valued, @code{xswitch}, properties, enumeration
+@cindex Built-In Options, @code{--clon-highlight}
+@cindex Options, built-in, @code{--clon-highlight}
+This option type stands for @dfn{extended} switch. Extended switches
+result from the mating of a male switch and a female enumeration, or the
+other way around (elementary decency prevents me from describing this
+mating process in detail): their possible values are either Boolean or
+from an @code{:enum} property as in the case of @code{enum} options.
+@code{xswitch} options change their default nullable property from
+@code{nil} to @code{t}, and their default argument type from required to
+optional.
+@end table
+
+
 
 @c ----------------
 @c Context Creation
