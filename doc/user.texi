@@ -508,6 +508,59 @@ descriptions as we've just seen.
 
 @node Built-In Option Types, , Synopsis Items, Synopsis Definition
 @subsection Built-In Option Types
+@cindex Built-In Options
+@cindex Options, built-in
+In this section, we will review all the built-in option types that
+@clon{} provides, along with their corresponding properties. You can use
+them directly in your synopsis description. For adding personal option
+types to @clon{}, see @ref{Extending Clon}.
+
+@menu
+* Common Properties::   All option types have them
+* Flags::               Options without arguments
+* Valued Options::      Options with arguments
+@end menu
+
+@node Common Properties, Flags, Built-In Option Types, Built-In Option Types
+@subsubsection Common Properties
+@cindex Options, common properties
+@cindex Options, properties, common
+All option types in @clon{} have a set of basic, common properties,
+including those you define yourself (@pxref{Extending Clon}). Here is a
+list of them.
+@table @code
+@item :short-name
+@cindex Options, properties, short name
+The option's short name. A string or @code{nil}.
+@item :long-name
+@cindex Options, properties, long name
+The option's long name. A string or @code{nil}.
+@item :description
+@cindex Options, properties, description
+The option's descriptive text. A string or @code{nil}. The same
+formatting recommendations as for arbitrary text apply (@pxref{Text}).
+@item :env-var
+@cindex Options, properties, environment variable
+The option's associated environment variable. A string or @code{nil}.
+@end table
+
+Note that an option is required to have at least one name (either short
+or long). Non-@code{nil} but empty names are also prohibited, and of
+course, a short name cannot begin with a dash (otherwise, it would be
+mistaken for a long name, but did I really need to mention this?).
+
+@node Flags, Valued Options, Common Properties, Built-In Option Types
+@subsubsection Flags
+@cindex Built-In Options, @code{flag}
+@cindex Options, built-in, @code{flag}
+@cindex Options, types, @code{flag}
+In @clon{}, options that don't take any argument are of type
+@code{flag}. These options don't provide additional properties on top of
+the common set described in @ref{Common Properties}. All properties
+default to @code{nil}.
+
+@node Valued Options, , Flags, Built-In Option Types
+@subsubsection Valued Options
 
 
 
