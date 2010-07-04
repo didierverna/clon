@@ -351,6 +351,9 @@ This class is a mixin used to authorize the +-syntax for the switch hierarchy.")
 ;; The SWITCH-BASE Class
 ;; ==========================================================================
 
+;; #### FIXME: consider defaulting nullablep to t here instead of in SWITCH
+;; and XSWITCH. Same for ARGUMENT-TYPE -> OPTIONAL.
+
 (defabstract switch-base (plus-callable)
   ((yes-values :documentation "The possible 'yes' values."
 	       :allocation :class
