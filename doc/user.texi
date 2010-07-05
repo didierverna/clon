@@ -403,12 +403,13 @@ options values. Steps one and two form the @dfn{initialization phase} of
 @cindex Synopsis
 @cindex Help String
 
-A @dfn{synopsis} is essentially a description of your application's
-@cmdline{}: it describes what are the available options, whether your
-application has a postfix @etc{} The synopsis, however, plays a second
-role: it also describes the contents of your application's help string.
-When you create a synopsis, you describe the @cmdline{} and the help
-string at the same time.
+Step one of the @clon{} initialization phase consists in defining a
+@dfn{synopsis}. A synopsis is essentially a description of your
+application's @cmdline{}: it describes what are the available options,
+whether your application has a postfix @etc{} The synopsis, however,
+plays a second role: it also describes the contents of your
+application's help string. When you create a synopsis, you describe the
+@cmdline{} and the help string at the same time.
 
 @menu
 * Synopsis Items::              Defsynopsis and its contents
