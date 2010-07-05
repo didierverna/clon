@@ -759,8 +759,43 @@ optional.
 @cindex Initialization Phase
 @cindex Phase, initialization
 @cindex Context
+
+Step two of the @clon{} initialization phase consists in creating a
+@dfn{context}. A context is an object representing a particular instance
+of your program, for example (and most notably) with an actual
+@cmdline{} as the user typed it.
+
 @cindex Context, creation
 @findex make-context
+You create a context with the @code{make-context} function.
+@defun make-context @var{OPTIONS}@dots{}
+Create a new context. @var{OPTIONS} are key/value pairs.
+@end defun
+@code{make-context} accepts the following keys:
+@table @code
+@item :synopsis
+@findex make-context, @r{options}, :synopsis
+Use this key to associate the context with a synopsis previously defined
+by @code{defsynopsis} (@pxref{Synopsis Definition}).
+@item :error-handler
+@findex make-context, @r{options}, :error-handler
+The behavior to adopt in case an error happens during the initialization
+phase, when the @cmdline{} is parsed. This is where you get errors like
+``unknown option'', ``invalid argument'' @etc{}). Possible values are
+@code{:quit} and @code{:none}. When @code{:quit} and an error happens,
+print the error and terminate the application (this is the default).
+When @code{:none}, no error handler is installed, which means that the
+behavior will depend on the underlying @cl{} implementation. For
+instance, the debugger might be raised or a stack trace might be printed
+(this is the case in SBCL with the @option{--script} option).
+@item :getopt-error-handler
+@findex make-context, @r{options}, :getopt-error-handler
+The behavior to adopt in case an error happens when an option is
+retrieved in any way (@pxref{Option Retrieval}). Since @cmdline{} errors
+are throw at initialization time, the errors you can get here are
+related to retrieval from the environment. Possible values are the same
+as above, and the same comments apply as well.
+@end table
 
 
 @c ----------------
