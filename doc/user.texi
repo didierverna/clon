@@ -422,14 +422,14 @@ application's help string. When you create a synopsis, you describe the
 Look again at the synopsis definition provided in @ref{Quick Start}. You
 define a synopsis with the @code{defsynopsis} macro.
 @defmac defsynopsis (@var{OPTIONS}@dots{}) @var{ITEMS}@dots{}
-Define a new synopsis. @var{OPTIONS} are key / value pairs. @var{ITEMS}
+Define a new synopsis. @var{OPTIONS} are key/value pairs. @var{ITEMS}
 is a list of either text, group, or option descriptions.
 @end defmac
 
 @cindex Postfix
 @cindex Synopsis, postfix
 @findex defsynopsis, @r{options}, :postfix
-The first argument to @code{defsynopsis} is a list of key / value pairs.
+The first argument to @code{defsynopsis} is a list of key/value pairs.
 Currently, the only available key is @code{:postfix}. Its value is a
 string which will appear at the end of the synopsis line in the help
 string. When you provide a postfix, you also implicitely tell @clon{}
@@ -470,7 +470,7 @@ a newline. This would break potential theme specifications.
 @cindex Synopsis, options
 @findex defsynopsis, @r{items}, @r{options}
 In order to add an option to your help string, you must provide a list
-beginning with the option type and followed by key / value pairs
+beginning with the option type and followed by key/value pairs
 describing the option's properties. For instance, to add a flag with a
 short name and a description, you could do this:
 @verbatim
@@ -491,7 +491,7 @@ form:@*
 @t{(group (@var{OPTIONS}@dots{}) @var{ITEMS}@dots{})}
 
 @cindex Groups, options, header
-The group's options are key / value pairs. Currently, the only available
+The group's options are key/value pairs. Currently, the only available
 option is @code{:header}. The corresponding value must be a string which
 will be displayed above the group's contents in the help string. The
 same formatting recommendations as for arbitrary text apply
