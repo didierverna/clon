@@ -139,6 +139,8 @@
 	       :initform nil)
    (highlight :documentation "Clon's output highlight mode."
 	      :reader highlight)
+   ;; #### FIXME: these should be built-in options ! In fact, there shouldn't
+   ;; be two different handlers. One is enough.
    (error-handler :documentation ~"The behavior to adopt on errors "
 			       ~"at command-line parsing time."
 		  :type symbol
