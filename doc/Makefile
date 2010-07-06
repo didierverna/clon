@@ -99,7 +99,9 @@ clean:
 	-rm *.tmp *.fn* *.vr* *.ky* *.tp *.cp* *.pg *.toc *.aux *.log *~
 
 distclean: clean
-	-rm -fr *.info* *.pdf *.dvi *.ps *_html clon.eps
+	-rm -fr clon.eps						\
+		$(HTML_DIRS)						\
+		$(ALL_INFO_FILES) $(PDF_FILES) $(DVI_FILES) $(PS_FILES)
 
 .PHONY: all all-formats			\
 	install uninstall		\
