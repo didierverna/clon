@@ -600,6 +600,7 @@ mistaken for a long name, but did I really need to mention this?).
 
 @node Flags, Common Valued Option Properties, Common Properties, Built-In Option Types
 @subsubsection Flags
+@cindex Flags
 @cindex Built-In Option Types, @code{flag}
 @cindex Options, built-in types, @code{flag}
 @cindex Options, types, built-in, @code{flag}
@@ -848,6 +849,106 @@ as above, and the same comments apply as well.
 @section Option Retrieval
 @cindex Runtime Phase
 @cindex Phase, runtime
+@cindex Retrieval
+@cindex Options, retrieval
+
+During the runtime phase of @clon{}, your main activity will be to
+retrieve options and their values. @clon{} provides two techniques for
+retrieving options: you can request the value for a specific option
+directly, or you can process the @cmdline{} sequentially, which is the
+more traditional approach.
+
+Both of these techniques can be freely combined together at any time,
+because @clon{} keeps track of the current status of the @cmdline{}. In
+fact, @clon{} never works on the original @cmdline{}, but uses a mutable
+@emph{copy} of it after parsing.
+
+@menu
+* Explicit Retrieval::          Accessing options by name
+* Sequential Retrieval::        Accessing options in order
+@end menu
+
+@node Explicit Retrieval, Sequential Retrieval, Option Retrieval, Option Retrieval
+@subsection Explicit Retrieval
+@cindex Retrieval, explicit
+@cindex Options, retrieval, explicit
+Since @clon{} lets you retrieve options on demand (at any time), it
+makes sense to be able to request the value of a specific option
+explicitely. For instance, you might want to try the @samp{--help}
+option first, without looking at the rest of the @cmdline{} because the
+application will in fact quit immediately after having displayed the
+help string.
+
+@findex getopt
+@defun getopt @var{KEYS}@dots{}
+Retrieve the value of a specific option. @var{KEYS} are key/value pairs.
+The following keys are available.
+
+@table @code
+@item :short-name
+@item :long-name
+Use one of these 2 keys to specify the name of the option you wish to
+retrieve.
+@item :error-handler
+Lets you locally override the error handler established by the
+@code{:getopt-error-handler} to @code{make-context} (@pxref{Context
+Creation}). Note again that this handler will only affect retrieval from
+the environment.
+@end table
+
+This function return two values: the option's value and the value's
+source.
+@end defun
+
+The value's source may have the following forms:
+@table @code
+@item (:cmdline @var{NAME})
+@cindex Values, source, @cmdline{}
+This is for options found on the @cmdline{}. @var{NAME} is the name used
+on the @cmdline{}. It can be the option's long or short name, or a
+completed long name if the option's name was abbreviated. A completed
+name displays the omitted parts in parentheses (@code{"he(lp)"} for
+instance).
+@item (:environment @var{VAR})
+@cindex Options, common properties, environment variable
+@cindex Options, properties, common, environment variable
+@cindex Values, source, environment
+This is for options not found on the @cmdline{} but for which there is
+an associated environment variable set in the application's environment.
+@var{VAR} is the name of the corresponding environment variable.
+@item :default
+@cindex Valued Options, common properties, default value
+@cindex Valued Options, properties, common, default value
+@cindex Options, valued, common properties, default value
+@cindex Options, valued, properties, common, default value
+@cindex Values, source, default
+This is for options not found anywhere, but for which a default value
+was provided.
+@end table
+
+@cindex Flags
+@cindex Built-In Option Types, @code{flag}
+@cindex Options, built-in types, @code{flag}
+@cindex Options, types, built-in, @code{flag}
+Note that flags don't take any argument, so @code{getopt} returns a
+virtual value of @code{t} when they are found, or a corresponding
+environment variable exists in the environment.
+
+@cindex Valued Options, common properties, nullable
+@cindex Valued Options, properties, common, nullable
+@cindex Options, valued, common properties, nullable
+@cindex Options, valued, properties, common, nullable
+When an option is not found anywhere and there is no default value,
+@code{getopt} just returns nil (no second value). Also, note that when
+your option is nullable, you @emph{need} to handle the second retrun
+value to make the difference between an option not found, and an actual
+value of @code{nil}.
+
+
+@node Sequential Retrieval, , Explicit Retrieval, Option Retrieval
+@subsection Sequential Retrieval
+@cindex Retrieval, sequential
+@cindex Options, retrieval, sequential
 
 
 
