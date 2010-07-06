@@ -248,11 +248,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 applications. It provides a unified option syntax with both short and
 long names, automatic completion of partial names and automatic
 retrieval/conversion of option arguments from the @cmdline{}, associated
-environment variables or default values. @clon{} comes with a set of
-extensible option types (numbers, paths, strings @etc{}). @clon{} also
-provides automatic generation and formatting of help strings, with
-support for highlighting on @tty{}'s through ISO/IEC 6429 SGR. This
-formatting is customizable through @emph{themes}.
+environment variables, fallback or default values. @clon{} comes with a
+set of extensible option types (switches, paths, strings @etc{}). 
+@clon{} also provides automatic generation and formatting of help
+strings, with support for highlighting on @tty{}'s through ISO/IEC 6429
+SGR. This formatting is customizable through @emph{themes}.
 
 Depending on the target audience, @clon{} stands for either ``The
 @CmdLine{} Option Nuker'' or ``The @cl{} Option Nuker''. @clon{} also
