@@ -269,9 +269,11 @@ output of @clon{}.
 Given this wonderful standalone @cl{} application, how do I know if it
 uses @clon{} for handing the @cmdline{}? Perhaps the simplest way to
 know is to type
+
 @example
 program --clon-help
 @end example
+
 and see what happens. If you get an error, then you are out of luck.
 Otherwise, you will get a list of @clon{}-specific options. Every
 clonified application has these options built-in, and they are all
@@ -430,6 +432,7 @@ themselves: either they are present on the @cmdline{}, or they are not
 (as a matter of fact, this is a lie, @pxref{Option Retrieval}). A
 typical example of a flag would be displayed like this in a standard
 help string (but @pxref{Output}):
+
 @example
   -h, --help        Print this help and exit.
 @end example
@@ -487,12 +490,14 @@ also think that the previous one lacks its mandatory argument.
 
 The phone example above would look like this in a standard help string
 (but @pxref{Output}):
+
 @example
   -p, --phone=NUM    Set phone number to NUM.
 @end example
 
 And here is an example illustrating a typical output when the argument
 is optional:
+
 @example
   -f, --fax[=NUM]    Set fax number to NUM, or same as phone.
 @end example
@@ -531,6 +536,7 @@ Although an application might do something different, the intended usage
 for switches is to take an optional argument that defaults to true. A
 typical example would look like this in a standard help string (but
 @pxref{Output}):
+
 @example
   -(+)d, --debug[=yes/no]    Whether to enable debugging.
 @end example
