@@ -350,7 +350,8 @@ needs to be associated with the synopsis we created earlier.
 @end verbatim
 @end cartouche
 
-@cindex Retrieval, by name
+@cindex Retrieval, explicit
+@cindex Options, retrieval, explicit
 @findex getopt
 @cindex Help String, display
 @findex help
@@ -370,7 +371,8 @@ name.
 @end verbatim
 @end cartouche
 
-@cindex Retrieval, by @cmdline{} order
+@cindex Retrieval, sequential
+@cindex Options, retrieval, sequential
 @findex do-cmdline-options
 And now, we are going to retrieve the other options and simply print
 them. This time however, we process the @cmdline{} sequentially. This is
@@ -458,7 +460,6 @@ define a synopsis with the @code{defsynopsis} macro.
 @defmac defsynopsis (@var{OPTIONS}@dots{}) @var{ITEMS}@dots{}
 Define a new synopsis. @var{OPTIONS} are key/value pairs. @var{ITEMS}
 is a list of either text, group, or option descriptions.
-@end defmac
 
 @cindex Postfix
 @cindex Synopsis, postfix
@@ -472,8 +473,10 @@ that your application accepts non-option arguments at the end of the
 the behavior of @clon{} with respect to postfixes.
 
 The remainder of the arguments to @code{defsynopsis} are text, group or
-options descriptions. We now examine the syntax for each one of them.
+options descriptions.
+@end defmac
 
+We now examine the syntax for each one of them.
 @menu
 * Text::        Adding arbitrary text
 * Options::     Adding options
@@ -649,7 +652,7 @@ default value (or both of course).
 @cindex Options, valued, common properties, nullable
 @cindex Options, valued, properties, common, nullable
 Whether the option accepts a null value. Default to @code{nil}. FIXME:
-need more explanation.
+link explanation to the converter part in extending clon.
 @end table
 
 @node Built-In Valued Options, , Common Valued Option Properties, Built-In Option Types
@@ -803,14 +806,13 @@ Step two of the @clon{} initialization phase consists in creating a
 @dfn{context}. A context is an object representing a particular instance
 of your program, for example (and most notably) with an actual
 @cmdline{} as the user typed it.
-
 @cindex Context, creation
 @findex make-context
 You create a context with the @code{make-context} function.
+
 @defun make-context @var{OPTIONS}@dots{}
-Create a new context. @var{OPTIONS} are key/value pairs.
-@end defun
-@code{make-context} accepts the following keys:
+Create a new context. @var{OPTIONS} are key/value pairs. The following
+keys are available.
 
 @table @code
 @item :synopsis
@@ -836,6 +838,7 @@ are throw at initialization time, the errors you can get here are
 related to retrieval from the environment. Possible values are the same
 as above, and the same comments apply as well.
 @end table
+@end defun
 
 
 @c ----------------
