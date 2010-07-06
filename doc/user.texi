@@ -99,7 +99,7 @@ Command-Line
 @c ====================================================================
 @dircategory Common Lisp
 @direntry
-* Clon: (clon-user). The User Manual.
+* Clon User: (clon-user). The Clon User Manual.
 @end direntry
 
 
