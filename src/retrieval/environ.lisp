@@ -139,6 +139,10 @@ Available restarts are:
       (sb-posix:putenv (concatenate 'string (env-var valued-option) "=" env-val))
       (restartable-environment-convert valued-option env-val))))
 
+;; #### FIXME: we should split this into flag.lisp and valued.lisp but we
+;; can't because this fiel is loaded only after the options files.
+
+
 ;; #### WARNING: given the idea of supporting a list of env vars, I would need
 ;; to modify this function in order to pass the env-var itself. This protocol
 ;; would become even more similar to the command-line one. Yummy...

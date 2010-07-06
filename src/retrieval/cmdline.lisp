@@ -146,6 +146,9 @@ name."
 ;; The Command-Line Retrieval Protocol
 ;; ==========================================================================
 
+;; #### FIXME: we should split this into flag.lisp and valued.lisp but we
+;; can't because this fiel is loaded only after the options files.
+
 (defun cmdline-convert (valued-option cmdline-name cmdline-argument)
   "Convert CMDLINE-ARGUMENT to VALUED-OPTION's value.
 This function is used when the conversion comes from a command-line usage of
