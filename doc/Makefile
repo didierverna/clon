@@ -43,7 +43,7 @@ PDF_FILES      := $(TEXI_FILES:%.texi=%.pdf)
 ALL_INFO_FILES := $(INFO_FILES:%.info=%.info*)
 DVI_FILES      := $(TEXI_FILES:%.texi=%.dvi)
 PS_FILES       := $(TEXI_FILES:%.texi=%.ps)
-HTML_DIRS      := $(TEXI_FILES:%.texi=%_html)
+HTML_DIRS      := $(TEXI_FILES:%.texi=%)
 
 
 all: info pdf
@@ -88,7 +88,7 @@ clon-%.info: %.texi
 %.ps: %.dvi
 	$(DVIPS) -o $@ $<
 
-$(HTML_DIRS): %_html: %.texi
+$(HTML_DIRS): %: %.texi
 	$(MAKEINFO) --html -o $@ $<
 	touch $@
 
