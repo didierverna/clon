@@ -284,8 +284,8 @@ too long, or if you don't want to @t{use-package} it.
 The next thing you want to do is to create a set of options, groups or
 texts that your application will recognize and/or display in its help
 string. The structure of your @cmdline{} is known to @clon{} as the
-@dfn{synopsis}. In order to create it, use the macro
-@code{defsynopsis}.
+@dfn{synopsis}. In order to create it, use the macro @code{defsynopsis}.
+
 @cartouche
 @verbatim
 (defvar *synopsis*
@@ -306,12 +306,13 @@ define a line of text and a group with a header and two flags.
 
 @cindex Context, creation
 @findex make-context
-Now, we are going to define a function @code{main} for our
-standalone application. The first thing that we need to do is create a
+Now, we are going to define a function @code{main} for our standalone
+application. The first thing that we need to do is create a
 @dfn{context}. A context is an object that @clon{} uses to store various
-things, including some state related to the parsing of the @cmdline{}.
-You create a context with the function @code{make-context}. Our
-context needs to be associated with the synopsis we created earlier.
+things, including some state related to the parsing of the @cmdline{}. 
+You create a context with the function @code{make-context}. Our context
+needs to be associated with the synopsis we created earlier.
+
 @cartouche
 @verbatim
 (defun main ()
@@ -327,10 +328,11 @@ context needs to be associated with the synopsis we created earlier.
 At that point, @clon{} is ready to retrieve the options you want from
 the @cmdline{}. Let's first see if the user has used the option
 @option{-h}, and give him the help string. Option retrieval is done with
-the function @code{getopt}, and automatic help string output with
-the function @code{help}. Note that what we do here is @emph{not}
-process the @cmdline{} in sequence, but look directly for a specific
-option by name.
+the function @code{getopt}, and automatic help string output with the
+function @code{help}. Note that what we do here is @emph{not} process
+the @cmdline{} in sequence, but look directly for a specific option by
+name.
+
 @cartouche
 @verbatim
   (when (getopt :short-name "h")
@@ -345,6 +347,7 @@ And now, we are going to retrieve the other options and simply print
 them. This time however, we process the @cmdline{} sequentially. This is
 done with the @code{do-cmdline-options} macro. We also close the
 @code{main} function.
+
 @cartouche
 @verbatim
   (do-cmdline-options (option name value)
@@ -355,6 +358,7 @@ done with the @code{do-cmdline-options} macro. We also close the
 @end cartouche
 
 Finally, time to save the Lisp image.
+
 @cartouche
 @verbatim
 (save-lisp-and-die "test"
@@ -364,6 +368,7 @@ Finally, time to save the Lisp image.
 
 We're now ready to compile this industrial-scale application and deliver
 it to the world:
+
 @verbatim
 CC=gcc sbcl --script test.lisp
 @end verbatim
@@ -454,6 +459,7 @@ options descriptions. We now examine the syntax for each one of them.
 @findex defsynopsis, @r{items}, text
 In order to add arbitrary text to your help string, use the following
 form:
+
 @verbatim
 (text :contents "Blah blah.")
 @end verbatim
@@ -473,6 +479,7 @@ In order to add an option to your help string, you must provide a list
 beginning with the option type and followed by key/value pairs
 describing the option's properties. For instance, to add a flag with a
 short name and a description, you could do this:
+
 @verbatim
 (flag :short-name "h" :description "Print this help and exit.")
 @end verbatim
@@ -487,8 +494,11 @@ in @ref{Built-In Option Types}.
 @cindex Synopsis, groups
 @findex defsynopsis, @r{items}, group
 In order to add a group to your help string, you must use the following
-form:@*
-@t{(group (@var{OPTIONS}@dots{}) @var{ITEMS}@dots{})}
+form:
+
+@verbatim
+(group (@var{OPTIONS}@dots{}) @var{ITEMS}@dots{})
+@end verbatim
 
 @cindex Groups, options, header
 The group's options are key/value pairs. Currently, the only available
@@ -531,6 +541,7 @@ types to @clon{}, see @ref{Extending Clon}.
 All option types in @clon{}, including those you define yourself
 (@pxref{Extending Clon}), have a set of basic, common properties. Here
 is a list of them.
+
 @table @code
 @item :short-name
 @cindex Options, common properties, short name
@@ -573,6 +584,7 @@ default to @code{nil}.
 All non-flag options in @clon{} are said to be @dfn{valued}. All valued
 options, including those you define yourself (@pxref{Extending Clon}),
 share a set of additional properties. Here is a list of them.
+
 @table @code
 @item :argument-name
 @cindex Valued Options, common properties, argument name
@@ -772,6 +784,7 @@ You create a context with the @code{make-context} function.
 Create a new context. @var{OPTIONS} are key/value pairs.
 @end defun
 @code{make-context} accepts the following keys:
+
 @table @code
 @item :synopsis
 @findex make-context, @r{options}, :synopsis

@@ -958,6 +958,7 @@ as you like; this is just a convention.
 @clon{} comes with several standard themes in files that can be used
 as-is or serve as the basis for creating new ones (@pxref{Theme
 Creation}). The list is given below.
+
 @table @t
 @item raw
 @cindex Standard Themes, files, @file{raw.cth}
@@ -1525,6 +1526,7 @@ output.
 In addition to the 10 highlight properties described in the previous
 section, @clon{} defines 6 layout properties. Here are the first 4 of
 them, along with their description and default value.
+
 @table @t
 @item :visible
 @cindex Face Properties, layout, @t{visible}
@@ -1636,6 +1638,7 @@ vertical alignment of text.
 In order to give you control on the starting and ending columns of every
 frame (in fact, every face), the following two layout properties are
 defined.
+
 @table @t
 @item :padding-left
 @cindex Face Properties, layout, @t{padding-left}
