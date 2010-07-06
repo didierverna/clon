@@ -57,8 +57,7 @@ install: $(INFO_FILES) $(PDF_FILES)
 	  install-info --info-dir=$(INFO_DIR) $$i;	\
 	done
 	install -d $(CLON_DOC_DIR)
-	install -m 644 $(PDF_FILES) $(CLON_DOC_DIR)/; \
-       done
+	install -m 644 $(PDF_FILES) $(CLON_DOC_DIR)/
 
 uninstall:
 	-rm -fr $(CLON_DOC_DIR)

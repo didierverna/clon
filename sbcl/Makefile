@@ -35,6 +35,9 @@ include ../Makefile.inc
 
 all:
 
+install:
+uninstall:
+
 clean:
 	-rm *~ a.out foo.c
 
@@ -42,7 +45,7 @@ distclean: clean
 	-rm -fr constants.lisp-temp sbcl-*
 
 
-.PHONY: all clean distclean
+.PHONY: all install uninstall clean distclean
 
 
 ### Makefile ends here

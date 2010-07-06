@@ -35,13 +35,16 @@ include ../Makefile.inc
 
 all:
 
+install:
+uninstall:
+
 clean:
 	-rm *~
 
 distclean: clean
 	-rm -fr sbcl-* **/sbcl-*
 
-.PHONY: all clean distclean
+.PHONY: all install uninstall clean distclean
 
 
 ### Makefile ends here

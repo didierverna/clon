@@ -36,13 +36,16 @@ include ../Makefile.inc
 all:
 	CC=$(CC) sbcl --script demo.lisp
 
+install:
+uninstall:
+
 clean:
 	-rm *~
 
 distclean: clean
 	-rm -fr demo
 
-.PHONY: all clean distclean
+.PHONY: all install uninstall clean distclean
 
 
 ### Makefile ends here
