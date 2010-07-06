@@ -249,11 +249,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 applications. It provides a unified option syntax with both short and
 long names, automatic completion of partial names and automatic
 retrieval/conversion of option arguments from the @cmdline{}, associated
-environment variables or default values. @clon{} comes with a set of
-extensible option types (numbers, paths, strings @etc{}). @clon{} also
-provides automatic generation and formatting of help strings, with
-support for highlighting on @tty{}'s through ISO/IEC 6429 SGR. This
-formatting is customizable through @emph{themes}.
+environment variables, fallback or default values. @clon{} comes with a
+set of extensible option types (switches, paths, strings @etc{}).
+@clon{} also provides automatic generation and formatting of help
+strings, with support for highlighting on @tty{}'s through ISO/IEC 6429
+SGR. This formatting is customizable through @emph{themes}.
 
 Depending on the target audience, @clon{} stands for either ``The
 @CmdLine{} Option Nuker'' or ``The @cl{} Option Nuker''. @clon{} also
@@ -267,9 +267,9 @@ management@footnote{An application using @clon{} for its @cmdline{}
 option management is said to be @emph{clonified}. It is also possible to
 say @emph{clonfiscated}. However, we advise against using
 @emph{clonistified}. The term @emph{clonificated} is also considered bad
-style, and the use of @emph{clonificationated} is strictly prohibited.}. 
+style, and the use of @emph{clonificationated} is strictly prohibited.}.
 As opposed to the user of the @emph{library}, the user of an
-@emph{application} powered by @clon{} is called an @emph{end-user}. 
+@emph{application} powered by @clon{} is called an @emph{end-user}.
 @clon{} provides both a user manual (this one) and an end-user manual
 (@pxenduserref{Top}). Everybody should read the end-user manual first.
 
@@ -322,9 +322,9 @@ string. The structure of your @cmdline{} is known to @clon{} as the
     (text :contents "A very short program.")
     (group (:header "Immediate exit options:")
       (flag :short-name "h" :long-name "help"
-            :description "Print this help and exit.")
+	    :description "Print this help and exit.")
       (flag :short-name "v" :long-name "version"
-            :description "Print version number and exit."))))
+	    :description "Print version number and exit."))))
 @end verbatim
 @end cartouche
 
@@ -338,7 +338,7 @@ define a line of text and a group with a header and two flags.
 Now, we are going to define a function @code{main} for our standalone
 application. The first thing that we need to do is create a
 @dfn{context}. A context is an object that @clon{} uses to store various
-things, including some state related to the parsing of the @cmdline{}. 
+things, including some state related to the parsing of the @cmdline{}.
 You create a context with the function @code{make-context}. Our context
 needs to be associated with the synopsis we created earlier.
 
@@ -463,7 +463,7 @@ is a list of either text, group, or option descriptions.
 @cindex Postfix
 @cindex Synopsis, postfix
 @findex defsynopsis, @r{options}, :postfix
-The first argument to @code{defsynopsis} is a list of key/value pairs. 
+The first argument to @code{defsynopsis} is a list of key/value pairs.
 Currently, the only available key is @code{:postfix}. Its value is a
 string which will appear at the end of the synopsis line in the help
 string. When you provide a postfix, you also implicitely tell @clon{}
