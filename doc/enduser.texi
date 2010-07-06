@@ -93,6 +93,37 @@ Command-Line
 @end macro
 
 
+@c The following 3 macros are here to circumvent the info filenames
+@c changes, when referencing the user manual:
+
+@macro pxuserref{node}
+@ifinfo
+@pxref{\node\, , , clon-user, The Clon User Manual}
+@end ifinfo
+@ifnotinfo
+@pxref{\node\, , , user, The Clon User Manual}
+@end ifnotinfo
+@end macro
+
+@macro xuserref{node}
+@ifinfo
+@xref{\node\, , , clon-user, The Clon User Manual}
+@end ifinfo
+@ifnotinfo
+@xref{\node\, , , user, The Clon User Manual}
+@end ifnotinfo
+@end macro
+
+@macro userref{node}
+@ifinfo
+@ref{\node\, , , clon-user, The Clon User Manual}
+@end ifinfo
+@ifnotinfo
+@ref{\node\, , , user, The Clon User Manual}
+@end ifnotinfo
+@end macro
+
+
 @c ====================================================================
 @c Info Category and Directory
 @c ====================================================================
@@ -240,7 +271,7 @@ applications and how to customize @clon{}'s output. Everybody should
 read this manual first. If you want to use @clon{} in one of your
 applications, then you are considered a @clon{} @emph{user}, as opposed
 to a @clon{} @emph{end-user}, and you should then read the corresponding
-manual (@pxref{Top, , , clon-user, The Clon User Manual}).
+manual (@pxuserref{Top}).
 
 @ref{Clonification} shows how to verify that an application is powered
 by @clon{}. @ref{The Command Line} explains how to use the @cmdline{} of
@@ -296,8 +327,7 @@ using. By default (or by using it like this:
 ask for @option{--clon-version=short}, you'll get a more compact version
 information, and if you try @option{--clon-version=number}, you will end
 up with a purely numerical version number. For more information on
-@clon{} version numbering, @xref{Version Numbering, , , clon-user, The
-Clon User Manual}.
+@clon{} version numbering, see @userref{Version Numbering}.
 @end table
 
 
@@ -1880,8 +1910,8 @@ in the previous section occurs on the sibling face tree.
 @chapter Conclusion
 So that's it I guess. Enjoy using clonified applications, don't spend
 too much time hacking themes, and please contribute to the @cl{} world
-by developing standalone programs with @clon{}. Read @ref{Top, , ,
-clon-user, The Clon User Manual} to learn how to do that.
+by developing standalone programs with @clon{}. Read @userref{Top} to
+learn how to do that.
 
 Hmmm. What kind of conclusion was that@dots{}
 

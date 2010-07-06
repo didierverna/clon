@@ -8,7 +8,7 @@ sbcl/constants.lisp-temp
 doc/clon.eps
 doc/user.pdf
 doc/user.ps
-doc/user_html
+doc/user/
 doc/enduser.pdf
 doc/enduser.ps
-doc/enduser_html
+doc/enduser/

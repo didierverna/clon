@@ -93,6 +93,36 @@ Command-Line
 @end macro
 
 
+@c The following 3 macros are here to circumvent the info filenames
+@c changes, when referencing the end-user manual:
+
+@macro pxenduserref{node}
+@ifinfo
+@pxref{\node\, , , clon-enduser, The Clon End-User Manual}
+@end ifinfo
+@ifnotinfo
+@pxref{\node\, , , enduser, The Clon End-User Manual}
+@end ifnotinfo
+@end macro
+
+@macro xenduserref{node}
+@ifinfo
+@xref{\node\, , , clon-enduser, The Clon End-User Manual}
+@end ifinfo
+@ifnotinfo
+@xref{\node\, , , enduser, The Clon End-User Manual}
+@end ifnotinfo
+@end macro
+
+@macro enduserref{node}
+@ifinfo
+@ref{\node\, , , clon-enduser, The Clon End-User Manual}
+@end ifinfo
+@ifnotinfo
+@ref{\node\, , , enduser, The Clon End-User Manual}
+@end ifnotinfo
+@end macro
+
 
 @c ====================================================================
 @c Info Category and Directory
@@ -237,12 +267,11 @@ management@footnote{An application using @clon{} for its @cmdline{}
 option management is said to be @emph{clonified}. It is also possible to
 say @emph{clonfiscated}. However, we advise against using
 @emph{clonistified}. The term @emph{clonificated} is also considered bad
-style, and the use of @emph{clonificationated} is strictly prohibited.}.
+style, and the use of @emph{clonificationated} is strictly prohibited.}. 
 As opposed to the user of the @emph{library}, the user of an
-@emph{application} powered by @clon{} is called an @emph{end-user}.
+@emph{application} powered by @clon{} is called an @emph{end-user}. 
 @clon{} provides both a user manual (this one) and an end-user manual
-(@pxref{Top, , , clon-end-user, The Clon End-User Manual}). Everybody
-should read the end-user manual first.
+(@pxenduserref{Top}). Everybody should read the end-user manual first.
 
 @ref{Quick Start} provides a very short example in order to give an
 overview of what's coming next. @ref{Using Clon} explains in detail how
@@ -434,14 +463,13 @@ is a list of either text, group, or option descriptions.
 @cindex Postfix
 @cindex Synopsis, postfix
 @findex defsynopsis, @r{options}, :postfix
-The first argument to @code{defsynopsis} is a list of key/value pairs.
+The first argument to @code{defsynopsis} is a list of key/value pairs. 
 Currently, the only available key is @code{:postfix}. Its value is a
 string which will appear at the end of the synopsis line in the help
 string. When you provide a postfix, you also implicitely tell @clon{}
 that your application accepts non-option arguments at the end of the
-@cmdline{}. See @ref{Option Separator, , , clon-end-user, The Clon
-End-User Manual} for more information on the behavior of @clon{} with
-respect to postfixes.
+@cmdline{}. See @enduserref{Option Separator} for more information on
+the behavior of @clon{} with respect to postfixes.
 
 The remainder of the arguments to @code{defsynopsis} are text, group or
 options descriptions. We now examine the syntax for each one of them.
@@ -732,8 +760,7 @@ property called @code{:argument-style}. Possible values are
 @code{:yes/no} (the default), @code{:on/off}, @code{:true/false},
 @code{:yup/nope}, @code{:yeah/nah}. Note that this property determines
 the argument name @emph{only}. All possible switch arguments
-(@pxref{Switches, , , clon-end-user, The Clon End-User Manual}) are
-always availble to all switches.
+(@pxenduserref{Switches}) are always availble to all switches.
 @item xswitch
 @cindex Built-In Option Types, @code{xswitch}
 @cindex Options, built-in types, @code{xswitch}
