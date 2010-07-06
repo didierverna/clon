@@ -475,10 +475,10 @@ help string (but @pxref{Output}):
 @cindex Options, values
 Options taking an argument are said to be @emph{valued}. We need a bit
 of terminology here: and option's @emph{argument} is typically what you
-provide on the @cmdline{} (or elsewhere, @pxref{Option Retrieval}).
-Typically a string. An option's @emph{value} is what results from the
-conversion of the option's argument to the proper type (the same string,
-a number, whatever).
+provide on the @cmdline{} (or elsewhere, @pxref{Option Retrieval}). An
+option's argument is thus a string. An option's @emph{value} is what
+results from the conversion of the option's argument to the proper type
+(the same string, a number, whatever).
 
 @cindex Sticky Arguments
 @cindex Arguments, sticky
