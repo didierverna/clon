@@ -362,7 +362,7 @@ This function returns two values:
   ;; Try a default value:
   (when (and (typep option 'valued-option)
 	     (slot-boundp option 'default-value))
-    (values (default-value option) (list :default-value))))
+    (values (default-value option) :default)))
 
 (defun getopt-cmdline (&key (context *current-context*))
   "Get the next cmdline option in CONTEXT.
