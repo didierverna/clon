@@ -325,6 +325,8 @@ This function returns two values:
 	   (synopsis context)
 	   context))
   ;; Try the command-line:
+  ;; #### FIXME: in addition to :cmdline, I would like to have :fallback /
+  ;; :default for options not providing an optional argument.
   (let ((cmdline-options (list)))
     (do ((cmdline-option
 	  (pop (cmdline-options context))
