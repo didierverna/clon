@@ -426,6 +426,7 @@ options values. Steps one and two form the @dfn{initialization phase} of
 * Synopsis Definition:: Describing your command-line
 * Context Creation::    Instantiating your command-line
 * Option Retrieval::    Getting the options values
+* Help::                Generating the help string
 @end menu
 
 
@@ -845,7 +846,7 @@ as above, and the same comments apply as well.
 @c ----------------
 @c Option Retrieval
 @c ----------------
-@node Option Retrieval, , Context Creation, Using Clon
+@node Option Retrieval, Help, Context Creation, Using Clon
 @section Option Retrieval
 @cindex Runtime Phase
 @cindex Phase, runtime
@@ -978,6 +979,26 @@ to the values returned by the @code{getopt-cmdline} function above.
 (@var{OPTION} @var{NAME} @var{VALUE}) @var{BODY}
 As above, but loop over all @cmdline{} options.
 @end defmac
+
+
+@c ----
+@c Help
+@c ----
+@node Help, , Option Retrieval, Using Clon
+@section Help
+One of the first motivations in the design of @clon{} was to automate
+the generation of the help string, which is a very boring maintenance
+task to do by hand. The application's synopsis contains all the
+necessary information to do so.
+
+In order to print your application's help string, use the @code{help}
+function.
+@findex help
+@defun help
+Print the application's help string. Printing honors the search path,
+theme, line width and highlight settings provided by the built-in
+options.
+@end defun
 
 
 
