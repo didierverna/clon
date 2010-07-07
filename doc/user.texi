@@ -528,9 +528,8 @@ in @ref{Built-In Option Types}.
 In order to add a group to your help string, you must use the following
 form:
 
-@verbatim
-(group (@var{OPTIONS}@dots{}) @var{ITEMS}@dots{})
-@end verbatim
+@noindent
+@t{(group (@var{OPTIONS}@dots{}) @var{ITEMS}@dots{})}
 
 @cindex Groups, options, header
 The group's options are key/value pairs. Currently, the only available
