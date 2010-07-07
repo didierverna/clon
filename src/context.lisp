@@ -376,6 +376,7 @@ This function returns three values:
 	      (cmdline-option-name cmdline-option)
 	      (cmdline-option-value cmdline-option)))))
 
+;; #### FIXME: maybe conditionalize BODY on the presence of an actual option.
 (defmacro multiple-value-getopt-cmdline
     ((option name value &key context) &body body)
   "Evaluate BODY on the next command-line option in CONTEXT.
