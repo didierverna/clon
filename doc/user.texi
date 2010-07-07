@@ -989,15 +989,33 @@ As above, but loop over all @cmdline{} options.
 One of the first motivations in the design of @clon{} was to automate
 the generation of the help string, which is a very boring maintenance
 task to do by hand. The application's synopsis contains all the
-necessary information to do so.
-
-In order to print your application's help string, use the @code{help}
-function.
+necessary information to do so. In order to print your application's
+help string, use the @code{help} function.
 @findex help
 @defun help
+@cindex @t{--clon-search-path}
+@cindex Built-in Options, @t{--clon-search-path}
+@cindex Options, built-in, @t{--clon-search-path}
+@cindex CLON_SEARCH_PATH
+@cindex Environment Variables, CLON_SEARCH_PATH
+@cindex @t{--clon-highlight}
+@cindex Built-in Options, @t{--clon-highlight}
+@cindex Options, built-in, @t{--clon-highlight}
+@cindex CLON_HIGHLIGHT
+@cindex Environment Variables, CLON_HIGHLIGHT
+@cindex @t{--clon-theme}
+@cindex Built-in Options, @t{--clon-theme}
+@cindex Options, built-in, @t{--clon-theme}
+@cindex CLON_THEME
+@cindex Environment Variables, CLON_THEME
+@cindex @t{--clon-line-width}
+@cindex Built-in Options, @t{--clon-line-width}
+@cindex Options, built-in, @t{--clon-line-width}
+@cindex CLON_LINE_WIDTH
+@cindex Environment Variables, CLON_LINE_WIDTH
 Print the application's help string. Printing honors the search path,
-theme, line width and highlight settings provided by the built-in
-options.
+theme, line width and highlight settings provided by the corresponding
+built-in options (@pxenduserref{Theme Mechanism}).
 @end defun
 
 
