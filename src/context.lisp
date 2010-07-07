@@ -380,7 +380,7 @@ This function returns three values:
     ((option name value &key context) &body body)
   "Evaluate BODY on the next command-line option in CONTEXT.
 OPTION, NAME and VALUE are bound to the option's object, name used on the
-command-line) and retrieved value."
+command-line and retrieved value."
   `(multiple-value-bind (,option ,name ,value)
     (getopt-cmdline :context (or ,context *current-context*))
     ,@body))
@@ -389,7 +389,7 @@ command-line) and retrieved value."
     ((option name value &key context) &body body)
   "Evaluate BODY over all command-line options in CONTEXT.
 OPTION, NAME and VALUE are bound to each option's object, name used on the
-command-line) and retrieved value."
+command-line and retrieved value."
   (let ((ctx (gensym "context")))
     `(let ((,ctx (or ,context *current-context*)))
       (do () ((null (cmdline-options ,ctx)))
