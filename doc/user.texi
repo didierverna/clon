@@ -451,13 +451,27 @@ application's help string. When you create a synopsis, you describe the
 @menu
 * Synopsis Items::              Defsynopsis and its contents
 * Built-In Option Types::       The exhaustive list
+* Advanced Synopsis Creation::  The non-declarative way
 @end menu
 
 @node Synopsis Items, Built-In Option Types, Synopsis Definition, Synopsis Definition
 @subsection Synopsis Items
 @cindex Synopsis, definition
-Look again at the synopsis definition provided in @ref{Quick Start}. You
-define a synopsis with the @code{defsynopsis} macro.
+Look again at the synopsis definition provided in @ref{Quick Start}.
+
+@cartouche
+@verbatim
+(defsynopsis (:postfix "FILES...")
+  (text :contents "A very short program.")
+  (group (:header "Immediate exit options:")
+    (flag :short-name "h" :long-name "help"
+	  :description "Print this help and exit.")
+    (flag :short-name "v" :long-name "version"
+	  :description "Print version number and exit.")))
+@end verbatim
+@end cartouche
+
+You define a synopsis with the @code{defsynopsis} macro.
 @defmac defsynopsis (@var{OPTIONS}@dots{}) @var{ITEMS}@dots{}
 Define a new synopsis. @var{OPTIONS} are key/value pairs. @var{ITEMS}
 is a list of either text, group, or option descriptions.
