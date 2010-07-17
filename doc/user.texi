@@ -562,7 +562,7 @@ The group's items are simply arbitrary text, option or sub-group
 descriptions as we've just seen.
 
 
-@node Built-In Option Types, , Synopsis Items, Synopsis Definition
+@node Built-In Option Types, Advanced Synopsis Creation, Synopsis Items, Synopsis Definition
 @subsection Built-In Option Types
 @cindex Built-In Option Types
 @cindex Options, built-in types
@@ -805,6 +805,58 @@ from an @code{:enum} property as in the case of @code{enum} options.
 @code{nil} to @code{t}, and their default argument type from required to
 optional.
 @end table
+
+@node Advanced Synopsis Creation, , Built-In Option Types, Synopsis Definition
+@subsection Advanced Synopsis Creation
+@cindex Synopsis, definition
+@findex defsynopsis
+The fact that @code{defsynopsis} lets you define things in a
+@emph{declarative} way has not escaped you. Declarative is nice but
+sometimes it gets in the way, so it is time to see how things work under
+the hood. Every item in a synopsis is in fact implemented as an object
+(an instance of some class), so it turns out that @code{defsynopsis}
+simply is a convenience wrapper around the corresponding constructor
+functions for all such objects. Instead of using @code{defsynopsis}, you
+can then use those constructor functions explicitely.
+
+@menu
+* Constructors::        The expansion of defsynopsis
+@end menu
+
+@node Constructors, , Advanced Synopsis Creation, Advanced Synopsis Creation
+@subsubsection Constructors
+Let's have a look at the expansion of @code{defsynopsis} from the quick
+start example (@pxref{Quick Start}).
+
+The original code is like this:
+
+@cartouche
+@verbatim
+(defsynopsis (:postfix "FILES...")
+  (text :contents "A very short program.")
+  (group (:header "Immediate exit options:")
+    (flag :short-name "h" :long-name "help"
+	  :description "Print this help and exit.")
+    (flag :short-name "v" :long-name "version"
+	  :description "Print version number and exit.")))
+@end verbatim
+@end cartouche
+
+And once the macro is expanded, it will look like this:
+
+@cartouche
+@verbatim
+(make-synopsis :postfix "FILES..."
+  :item (make-text :contents "A very short program.")
+  :item (make-group :header "Immediate exit options:"
+          :item (make-flag :short-name "h"
+                           :long-name "help"
+                           :description "Print this help and exit.")
+          :item (make-flag :short-name "v"
+                           :long-name "version"
+                           :description "Print version number and exit.")))
+@end verbatim
+@end cartouche
 
 
 
