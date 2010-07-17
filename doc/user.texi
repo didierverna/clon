@@ -1070,10 +1070,10 @@ Hmmm. What kind of conclusion was that@dots{}
   (defsynopsis (:postfix "FILES...")
     (text :contents "A very short program.")
     (group (:header "Immediate exit options:")
-	   (flag :short-name "h" :long-name "help"
-		 :description "Print this help and exit.")
-	   (flag :short-name "v" :long-name "version"
-		 :description "Print version number and exit."))))
+      (flag :short-name "h" :long-name "help"
+	    :description "Print this help and exit.")
+      (flag :short-name "v" :long-name "version"
+	    :description "Print version number and exit."))))
 
 (defun main ()
   "Entry point for our standalone application."
