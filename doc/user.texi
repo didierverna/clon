@@ -821,9 +821,10 @@ can then use those constructor functions explicitely.
 
 @menu
 * Constructors::        The expansion of defsynopsis
+* Advantages::          Yes, but why?
 @end menu
 
-@node Constructors, , Advanced Synopsis Creation, Advanced Synopsis Creation
+@node Constructors, Advantages, Advanced Synopsis Creation, Advanced Synopsis Creation
 @subsubsection Constructors
 Let's have a look at the expansion of @code{defsynopsis} from the quick
 start example (@pxref{Quick Start}).
@@ -857,6 +858,64 @@ And once the macro is expanded, it will look like this:
                            :description "Print version number and exit.")))
 @end verbatim
 @end cartouche
+
+As you can see, every synopsis element has a corresponding
+@code{make-@var{something}} constructor, and the keywords used here and
+there in @code{defsyopsis} are in fact initialization arguments to those
+constructors. We now examine those constructors in greater detail.
+
+@defun make-text @code{:contents} @var{STRING}
+Create an arbitrary text object whose contents is @var{STRING}.
+@end defun
+
+@defun make-@var{option} @var{:INITARG} @var{INITVAL}@dots{}
+@findex make-flag
+@findex make-stropt
+@findex make-lispobj
+@findex make-enum
+@findex make-path
+@findex make-switch
+@findex make-xswitch
+Create a new @var{option} object, @var{option} being any built-in option
+type (@code{flag}, @code{stropt} @etc{}, see @ref{Built-In Valued
+Options}) or user-defined one (@pxref{Extending Clon}). For a list of
+available initialization arguments (depending on the option type),
+@xref{Built-In Option Types}.
+@end defun
+
+@defun make-group @code{:header} @var{STRING} @
+@code{:item} @var{ITEM1} @code{:item} @var{ITEM2}@dots{}
+Create a group object whose header is @var{STRING}. Every @var{ITEM} is
+an arbitrary text object, option object or group object. The order is
+important.
+@end defun
+
+@defun make-synopsis @code{:postfix} @var{STRING} @
+@code{:item} @var{ITEM1} @code{:item} @var{ITEM2}@dots{}
+Create a synopsis object whose postfix is @var{STRING}. Every @var{ITEM} is
+an arbitrary text object, option object or group object. The order is
+important.
+@end defun
+
+@node Advantages, , Constructors, Advanced Synopsis Creation
+@subsubsection Advantages
+@findex defsynopsis
+So, why would you want to use constructors directly, instead of using
+@code{defsynopsis} declaratively? There are several reasons for doing
+so.
+@enumerate
+@item
+Some people prefer to declare (or should I say, create) their arbitrary
+texts, options and groups locally, in files, modules or ASDF components
+where they belong. In such a case, you need to keep references to the
+corresponding objects in order to compute the synopsis in the end.
+@item
+Since using constructors explicitely allows you to keep references to
+the created objects, these objects can be @emph{reused}. For instance,
+you can use the same text at different places, you can also use a single
+option several times, or even a single group several times so that its
+items appear in different places @etc{}
+@end enumerate
 
 
 
@@ -1026,10 +1085,10 @@ Get the @dfn{next} @cmdline{} option, that is, the first option on the
 @cmdline{} that has not been previously retrieved, either explicitely or
 sequentially.
 
-This function returns three values: an option object (FIXME), the name
-used on the @cmdline{}, and the option's value. As in the case of
-explicit retrieval (@pxref{Explicit Retrieval}), the option's name may
-be completed in case of abbreviation.
+This function returns three values: an option object
+(@pxref{Constructors}), the name used on the @cmdline{}, and the
+option's value. As in the case of explicit retrieval (@pxref{Explicit
+Retrieval}), the option's name may be completed in case of abbreviation.
 @end defun
 
 @findex multiple-value-getopt-cmdline
