@@ -124,6 +124,7 @@ Command-Line
 @end macro
 
 
+
 @c ====================================================================
 @c Info Category and Directory
 @c ====================================================================
@@ -875,6 +876,7 @@ constructors. We now examine those constructors in greater detail.
 Create an arbitrary text object whose contents is @var{STRING}.
 @end defun
 
+@c FIXME: I would like an environment without indexing here.
 @defun make-@var{OPTION} @var{:INITARG} @var{INITVAL}@dots{}
 @findex make-flag
 @findex make-stropt
