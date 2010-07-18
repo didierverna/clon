@@ -845,6 +845,11 @@ The original code is like this:
 
 And once the macro is expanded, it will look like this:
 
+@findex make-synopsis
+@findex make-text
+@findex make-group
+@findex make-flag
+@cindex @code{defsynopsis}, expansion
 @cartouche
 @verbatim
 (make-synopsis :postfix "FILES..."
@@ -860,15 +865,17 @@ And once the macro is expanded, it will look like this:
 @end cartouche
 
 As you can see, every synopsis element has a corresponding
-@code{make-@var{something}} constructor, and the keywords used here and
+@code{make-@var{SOMETHING}} constructor, and the keywords used here and
 there in @code{defsyopsis} are in fact initialization arguments to those
 constructors. We now examine those constructors in greater detail.
 
+@cindex Options, creation
 @defun make-text @code{:contents} @var{STRING}
+@findex make-text@r{, initargs, }:contents
 Create an arbitrary text object whose contents is @var{STRING}.
 @end defun
 
-@defun make-@var{option} @var{:INITARG} @var{INITVAL}@dots{}
+@defun make-@var{OPTION} @var{:INITARG} @var{INITVAL}@dots{}
 @findex make-flag
 @findex make-stropt
 @findex make-lispobj
@@ -876,22 +883,28 @@ Create an arbitrary text object whose contents is @var{STRING}.
 @findex make-path
 @findex make-switch
 @findex make-xswitch
-Create a new @var{option} object, @var{option} being any built-in option
+Create a new @var{OPTION} object, @var{OPTION} being any built-in option
 type (@code{flag}, @code{stropt} @etc{}, see @ref{Built-In Valued
 Options}) or user-defined one (@pxref{Extending Clon}). For a list of
 available initialization arguments (depending on the option type),
 @xref{Built-In Option Types}.
 @end defun
 
+@cindex Groups, creation
 @defun make-group @code{:header} @var{STRING} @
 @code{:item} @var{ITEM1} @code{:item} @var{ITEM2}@dots{}
+@findex make-group@r{, initargs, }:header
+@findex make-group@r{, initargs, }:item
 Create a group object whose header is @var{STRING}. Every @var{ITEM} is
 an arbitrary text object, option object or group object. The order is
 important.
 @end defun
 
+@cindex Synopsis, creation
 @defun make-synopsis @code{:postfix} @var{STRING} @
 @code{:item} @var{ITEM1} @code{:item} @var{ITEM2}@dots{}
+@findex make-synopsis@r{, initargs, }:postfix
+@findex make-synopsis@r{, initargs, }:item
 Create a synopsis object whose postfix is @var{STRING}. Every @var{ITEM} is
 an arbitrary text object, option object or group object. The order is
 important.
@@ -914,7 +927,10 @@ Since using constructors explicitely allows you to keep references to
 the created objects, these objects can be @emph{reused}. For instance,
 you can use the same text at different places, you can also use a single
 option several times, or even a single group several times so that its
-items appear in different places @etc{}
+items appear in different places @etc{} Note that @clon{} knows its way
+around multiple occurrences of the same object: even if you use the same
+option object several times in a synopsis, @clon{} only maintains a
+single option definition.
 @end enumerate
 
 
