@@ -1160,7 +1160,7 @@ task to do by hand. The application's synopsis contains all the
 necessary information to do so. In order to print your application's
 help string, use the @code{help} function.
 @findex help
-@defun help
+@defun help :item @var{ITEM}
 @cindex @t{--clon-search-path}
 @cindex Built-in Options, @t{--clon-search-path}
 @cindex Options, built-in, @t{--clon-search-path}
@@ -1185,6 +1185,19 @@ Print the application's help string. Printing honors the search path,
 theme, line width and highlight settings provided by the corresponding
 built-in options (@pxenduserref{Theme Mechanism}).
 @end defun
+
+By default, @code{help} prints the whole application help string. 
+However, if you have kept a handle on any synopsis item (option, text,
+group), you can pass it as the value of the @code{:item} key, and
+@clon{} will only print the help string for that particular item.
+
+@cindex @t{--clon-help}
+@cindex Built-In Options, @code{--clon-help}
+@cindex Options, built-in, @code{--clon-help}
+For instance, this is how the @option{clon-help} option is implemented:
+it only prints the help string of the built-in @clon{} group.
+
+FIXME: mention the use in conjunction with hidden groups or options.
 
 
 
