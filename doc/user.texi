@@ -721,6 +721,7 @@ argument must satisfy. It defaults to @code{t}.
 @cindex Valued Options, @code{enum}
 @cindex Valued Options, @code{enum}, properties, enumeration
 @cindex Options, valued, @code{enum}, properties, enumeration
+@cindex @t{--clon-version}
 @cindex Built-In Options, @code{--clon-version}
 @cindex Options, built-in, @code{--clon-version}
 This option type is for options taking values from an enumerated set.
@@ -795,6 +796,7 @@ the argument name @emph{only}. All possible switch arguments
 @cindex Valued Options, @code{xswitch}
 @cindex Valued Options, @code{xswitch}, properties, enumeration
 @cindex Options, valued, @code{xswitch}, properties, enumeration
+@cindex @t{--clon-highlight}
 @cindex Built-In Options, @code{--clon-highlight}
 @cindex Options, built-in, @code{--clon-highlight}
 This option type stands for @dfn{extended} switch. Extended switches
