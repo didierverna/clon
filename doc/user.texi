@@ -823,6 +823,7 @@ can then use those constructor functions explicitely.
 @menu
 * Constructors::        The expansion of defsynopsis
 * Advantages::          Yes, but why?
+* Group Definition::    The declarative way
 @end menu
 
 @node Constructors, Advantages, Advanced Synopsis Creation, Advanced Synopsis Creation
@@ -912,7 +913,7 @@ an arbitrary text object, option object or group object. The order is
 important.
 @end defun
 
-@node Advantages, , Constructors, Advanced Synopsis Creation
+@node Advantages, Group Definition, Constructors, Advanced Synopsis Creation
 @subsubsection Advantages
 @findex defsynopsis
 So, why would you want to use constructors directly, instead of using
@@ -934,6 +935,27 @@ around multiple occurrences of the same object: even if you use the same
 option object several times in a synopsis, @clon{} only maintains a
 single option definition.
 @end enumerate
+
+@node Group Definition, , Advantages, Advanced Synopsis Creation
+@subsubsection Group Definition
+@findex defgroup
+There is one last point we need to address in order to complete this
+section. There might be times when you need to manipulate an explicit
+group object, but the object itself can still be created in a
+declarative way because you don't need to keep handles on its items. For
+this, @clon{} provides a macro called @code{defgroup}.
+
+@defmac defgroup (@var{OPTIONS}@dots{}) @var{ITEMS}@dots{}
+@cindex Groups, in synopsis
+@cindex Synopsis, groups
+@findex defsynopsis, @r{items}, group
+Define a new group and return it. This macro behaves exactly like the
+@code{group} form in a call to @code{defsynopsis} (@pxref{Groups}).
+@end defmac
+
+In fact, an intermediate step in the expansion of the @code{defsynopsis}
+macro is to transform @code{group} forms into @code{defgroup} macro
+calls.
 
 
 
