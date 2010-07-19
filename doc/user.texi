@@ -1103,10 +1103,12 @@ Get the @dfn{next} @cmdline{} option, that is, the first option on the
 @cmdline{} that has not been previously retrieved, either explicitely or
 sequentially.
 
-This function returns three values: an option object
-(@pxref{Constructors}), the name used on the @cmdline{}, and the
-option's value. As in the case of explicit retrieval (@pxref{Explicit
-Retrieval}), the option's name may be completed in case of abbreviation.
+When there are no more options on the @cmdline{}, this function returns
+@code{nil}. Otherwise, three values are returned: the corresponding
+option object from the synopsis definition (@pxref{Constructors}), the
+name used on the @cmdline{}, and the option's value. As in the case of
+explicit retrieval (@pxref{Explicit Retrieval}), the option's name may
+be completed in case of abbreviation.
 @end defun
 
 @findex multiple-value-getopt-cmdline
