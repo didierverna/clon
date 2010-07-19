@@ -474,8 +474,8 @@ Look again at the synopsis definition provided in @ref{Quick Start}.
 
 You define a synopsis with the @code{defsynopsis} macro.
 @defmac defsynopsis (@var{OPTIONS}@dots{}) @var{ITEMS}@dots{}
-Define a new synopsis. @var{OPTIONS} are key/value pairs. @var{ITEMS}
-is a list of either text, group, or option descriptions.
+Define a new synopsis and return it. @var{OPTIONS} are key/value pairs. 
+@var{ITEMS} is a list of either text, group, or option descriptions.
 
 @cindex Postfix
 @cindex Synopsis, postfix
