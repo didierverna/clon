@@ -114,3 +114,5 @@ Cool hey ?
 
 * Provide a negated long form as well ?
 ++debug
+
+* Extend defsynopsis and defgroup to support a mix of declarative and explicit forms

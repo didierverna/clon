@@ -242,6 +242,9 @@ remainder."
   (declare (ignore postfix item))
   (apply #'make-instance 'synopsis keys))
 
+;; #### FIXME: we could expand this macro to handle a mix of declarative forms
+;; and explicit objects: we just need to distinguish between atomic and list
+;; forms.
 (defmacro defsynopsis ((&rest keys) &body forms)
   "Define a new synopsis."
   `(make-synopsis ,@keys
