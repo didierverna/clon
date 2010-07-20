@@ -954,7 +954,7 @@ single option definition.
 
 @node Group Definition, , Advantages, Advanced Synopsis Creation
 @subsubsection Group Definition
-@findex defgroup
+@cindex Groups, definition
 There is one last point we need to address in order to complete this
 section. There might be times when you need to manipulate an explicit
 group object, but the object itself can still be created in a
