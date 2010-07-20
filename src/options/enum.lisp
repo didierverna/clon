@@ -65,6 +65,10 @@ This class implements options whose values belong to a set of keywords."))
 		      (symbols-to-string (enum enum)))))
   value)
 
+;; #### FIXME: this is probably wrong because nullable options are not
+;; handled. I need to check that, and all other option types as well. In fact,
+;; I think I need an :around method in CONVERT that takes the empty string and
+;; converts it to NIL is the option is nullable.
 (defmethod convert ((enum enum) argument)
   "Convert (possibly abbreviated) ARGUMENT to ENUM's value.
 If ARGUMENT doesn't name one of ENUM's symbols, raise a conversion error."
