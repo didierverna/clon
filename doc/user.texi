@@ -1207,6 +1207,100 @@ FIXME: mention the use in conjunction with hidden groups or options.
 @node Extending Clon, Conclusion, Using Clon, Top
 @chapter Extending Clon
 
+As you know, @clon{} already provides seven built-in option types: flags
+and six other types for valued options (@pxref{Built-In Valued
+Options}). After using @clon{} for a while, you may find that however
+brilliant and perfectly designed it is, none of the provided built-in
+types fullfill your requirements exactly. There are two ways around
+this: the right way or the wrong way (hint).
+
+@cindex String Options
+@cindex Built-In Option Types, @code{stropt}
+@cindex Options, built-in types, @code{stropt}
+@cindex Options, types, built-in, @code{stropt}
+The wrong, although perhaps quicker way would be to use the
+@code{stropt} option type to simply retrieve unprocessed string values,
+and then do whatever tweaking required on them. In doing so, you risk
+reinventing some of @clon{}'s wheels.
+
+The right way is to define a new option type. Properly defined option
+types are a good thing because they allow for reusability and also
+extensibility, since new option types can always be defined on top of
+others.
+@cindex Enums
+@cindex Built-In Option Types, @code{enum}
+@cindex Options, built-in types, @code{enum}
+@cindex Options, types, built-in, @code{enum}
+In this chapter we explain how to extend @clon{} by providing new option
+types. We illustrate the process with the example of the built-in
+@code{enum} one.
+
+@cindex Valued Options
+@cindex Options, valued
+@cindex Flags
+@cindex Built-In Option Types, @code{flag}
+@cindex Options, built-in types, @code{flag}
+@cindex Options, types, built-in, @code{flag}
+Oh, and I almost forgot. I hope it is obvious to everyone that new
+option types are always @emph{valued}. There's no point in extending
+@clon{} with options that don't take any arguments, since we already
+have flags.
+
+@menu
+* New Option Types::    In four steps
+* Extension Tips::      Some advice
+@end menu
+
+
+@c ----------------
+@c New Option Types
+@c ----------------
+@node New Option Types, Extension Tips, Extending Clon, Extending Clon
+@section New Option Types
+From a software engineering point of view, it is better to implement new
+option types in a file of their own, preferably named after the option
+type itself, and to put this file in the @clon{} package, like this:
+
+@cartouche
+@verbatim
+(in-package :com.dvlsoft.clon)
+@end verbatim
+@end cartouche
+
+Creating your own option type involves 4 steps: providing a class for
+them, implementing two protocols related to argument/value conversion,
+and providing a constructor function. We now review those 4 steps in
+order.
+
+@menu
+* New Option Class::            Step 1
+* Value Check Protocol::        Step 2
+* Conversion Protocol::         Step 3
+* Constructor Function::        Step 4
+@end menu
+
+@node New Option Class, Value Check Protocol, New Option Types, New Option Types
+@subsection New Option Class
+
+
+
+@node Value Check Protocol, Conversion Protocol, New Option Class, New Option Types
+@subsection Value Check Protocol
+
+@node Conversion Protocol, Constructor Function, Value Check Protocol, New Option Types
+@subsection Conversion Protocol
+
+@node Constructor Function, , Conversion Protocol, New Option Types
+@subsection Constructor Function
+
+
+@c --------------
+@c Extension Tips
+@c --------------
+@node Extension Tips, , New Option Types, Extending Clon
+@section Extension Tips
+
+
 
 
 @c ====================================================================
