@@ -62,7 +62,8 @@ This class implements read-from-string options."))
 	     :option lispobj
 	     :value value
 	     :comment (format nil "Value must satisfy ~A." (typespec lispobj)))))
-
+;; #### FIXME: I need to handle other errors than just end-of-file. Probably
+;; all reader errors, and why not simply all errors.
 (defmethod convert ((lispobj lispobj) argument)
   "Return the evaluation of ARGUMENT string."
   (multiple-value-bind (value position)
