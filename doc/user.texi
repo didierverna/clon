@@ -1668,7 +1668,62 @@ I grow older though).
 @c --------------
 @node Extension Tips, , New Option Types, Extending Clon
 @section Extension Tips
+So that's it. Now you know how to extend @clon{} with your own option
+types. Here is some piece of advice that you might find useful in the
+process.
 
+@menu
+* Incremental Option Types::    Doing without defoption
+* Lisp Option Abuse::           Thinking in end-user terms
+@end menu
+
+@node Incremental Option Types, Lisp Option Abuse, Extension Tips, Extension Tips
+@subsection Incremental Option Types
+@findex defoption
+@code{defoption} is a nice convenience macro for new (valued) option
+types that you define ``from scratch'' (we have even seen a more
+contrived example where an additional super-class is used). However, you
+might not want to use it all the time. For example, if one of the
+built-in options is almost what you need, you can perfectly subclass it
+instead of using @code{defoption}, and only change what's needed, as
+long as you follow the 3 other steps correctly. After all, it's Lisp.
+Lisp is a world of mess@t{^D^D^D^D}freedom.
+
+@node Lisp Option Abuse, , Incremental Option Types, Extension Tips
+@subsection Lisp Option Abuse
+@cindex Lisp Options
+@cindex Built-In Option Types, @t{lispobj}
+@cindex Options, built-in types, @t{lispobj}
+@cindex Options, types, built-in, @t{lispobj}
+@cindex Valued Options, @t{lispobj}
+@cindex Options, valued, @t{lispobj}
+@cindex Valued Options, @t{lispobj}, properties, type specifier
+@cindex Options, valued, @t{lispobj}, properties, type specifier
+Along with the same lines, you may find that the @code{lispobj} type is
+all you need in many situations. Let's take an example. Suppose you want
+to implement a @code{--stars} option to assign a rank to a movie, from 0
+to 5. The lazy approach is to simply create a @code{lispobj} option with
+a @code{:typespec} (type specifier) of @code{(integer 0 5)} and you're
+done.
+
+But now, remember that the end-user of your application is probably not
+a Lisper (in fact, I would hope that @clon{} contributes to increasing
+the number of standalone @cl{} applications out there@dots{}). What do
+you think would be her reaction, if, after providing a bogus value to
+the @code{--stars} option, she get the following error message:
+
+@verbatim
+ Option 'stars': invalid argument "6".
+Argument "6" must evaluate to (integer 0 5).
+@end verbatim
+
+or worse, a @code{"Cannot parse argument"} error message because of a
+typo?
+
+Not very friendly, right? In other words, you need to think in terms of
+what the end-user of your application will expect. In that particular
+situation, you might want to subclass @code{lispobj} only to provide
+friendlier error messages.
 
 
 
