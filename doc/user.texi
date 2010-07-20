@@ -1286,10 +1286,10 @@ and providing a constructor function. We now review those 4 steps in
 order.
 
 @menu
-* New Option Class::            Step 1
+* New Option Classes::          Step 1
 * Value Check Protocol::        Step 2
 * Conversion Protocol::         Step 3
-* Constructor Function::        Step 4
+* Constructor Functions::       Step 4
 @end menu
 
 @node New Option Class, Value Check Protocol, New Option Types, New Option Types
@@ -1300,11 +1300,11 @@ order.
 @node Value Check Protocol, Conversion Protocol, New Option Class, New Option Types
 @subsection Value Check Protocol
 
-@node Conversion Protocol, Constructor Function, Value Check Protocol, New Option Types
+@node Conversion Protocol, Constructor Functions, Value Check Protocol, New Option Types
 @subsection Conversion Protocol
 
-@node Constructor Function, , Conversion Protocol, New Option Types
-@subsection Constructor Function
+@node Constructor Functions, , Conversion Protocol, New Option Types
+@subsection Constructor Functions
 
 
 @c --------------
