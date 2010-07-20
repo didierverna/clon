@@ -157,6 +157,10 @@ If OPTION matches, return its short name's length; otherwise 0."
 ;; The value check subprotocol
 ;; ---------------------------
 
+;; #### FIXME: this protocol is currently used to check for the validity of
+;; fallback values, default values, and values provided from a debugger
+;; restart. We should also use it to check converted values.
+
 (define-condition invalid-value (option-error)
   ((value :documentation "The invalid value."
 	  :initarg :value
