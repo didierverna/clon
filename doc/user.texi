@@ -475,7 +475,7 @@ Look again at the synopsis definition provided in @ref{Quick Start}.
 
 You define a synopsis with the @code{defsynopsis} macro.
 @defmac defsynopsis (OPTIONS@dots{}) ITEMS@dots{}
-Define a new synopsis and return it. @var{OPTIONS} are key/value pairs. 
+Define a new synopsis and return it. @var{OPTIONS} are key/value pairs.
 @var{ITEMS} is a list of either text, group, or option descriptions.
 
 @cindex Postfix
@@ -1199,7 +1199,7 @@ theme, line width and highlight settings provided by the corresponding
 built-in options (@pxenduserref{Theme Mechanism}).
 @end defun
 
-By default, @code{help} prints the whole application help string. 
+By default, @code{help} prints the whole application help string.
 However, if you have kept a handle on any synopsis item (option, text,
 group), you can pass it as the value of the @code{:item} key, and
 @clon{} will only print the help string for that particular item.
@@ -1735,8 +1735,8 @@ friendlier error messages.
 @chapter Advanced Usage
 
 This chapter contains information about different features that are
-present in @clon{} because of design decisions, but I expect to be used
-only rarely, if at all.
+present in @clon{} because of design decisions, but that I expect to be
+used only rarely, if at all.
 
 @menu
 * Not Using the Command-Line::  Any kind of list of strings instead
@@ -1779,7 +1779,7 @@ applications using it and contaminate the world with standalone @cl{}
 programs, featuring unprecedented @cmdline{} power and thrill-a-minute
 option hacking.
 
-Now, go Luke. The Attack of the @clon{} may now begin.
+Now, go Luke. The Attack of the @clon{} is ready to begin.
 
 
 
