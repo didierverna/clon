@@ -1292,12 +1292,78 @@ order.
 * Constructor Functions::       Step 4
 @end menu
 
-@node New Option Class, Value Check Protocol, New Option Types, New Option Types
-@subsection New Option Class
+@node New Option Classes, Value Check Protocol, New Option Types, New Option Types
+@subsection New Option Classes
+@cindex Built-In Classes, @t{option}
+@cindex Classes, built-in, @t{option}
+@cindex Built-In Classes, @t{valued-option}
+@cindex Classes, built-in, @t{valued-option}
+@clon{} maintains a class hierarchy for all option types. The mother of
+all option types is the @code{option} abstract class. It provides slots
+for storing the options'short and long names, description and associated
+environment variable. Valued options inherit from an abstract subclass
+of @code{option} called @code{valued-option}. This class provides
+additional slots for storing the argument name and status (optional or
+mandatory), fallback and default values, and nullable status.
 
+@cindex User-Defined Option Classes
+@cindex Option Classes, user-defined
+In order to create a new option type, @clon{} provides a convenience
+macro named @code{defoption}.
+@defmac defoption CLASS SUPERCLASSES SLOTS &rest OPTIONS
+Wrapper around @code{defclass} for defining a new valued option type.
+Option types created like this implicitely inherit from
+@code{valued-option} and in turn @code{option}, so you don't need to put
+them explicitely in the @var{SUPERCLASSES} list.
+@end defmac
 
+Let's look at the enumeration example now.
 
-@node Value Check Protocol, Conversion Protocol, New Option Class, New Option Types
+@cartouche
+@verbatim
+(defoption enum (enum-base)
+  ((argument-name ;; inherited from the VALUED-OPTION class
+    :initform "TYPE"))
+  (:documentation "The ENUM class.
+This class implements options whose values belong to a set of keywords."))
+@end verbatim
+@end cartouche
+
+@cindex Enumerations
+@cindex Built-In Option Types, @t{enum}
+@cindex Options, built-in types, @t{enum}
+@cindex Options, types, built-in, @t{enum}
+@cindex Valued Options, @t{enum}
+@cindex Options, valued, @t{enum}
+@cindex Valued Options, @t{enum}, properties, enumeration
+@cindex Options, valued, @t{xswitch}, properties, enumeration
+@cindex Extended Switches
+@cindex Built-In Option Types, @t{xswitch}
+@cindex Options, built-in types, @t{xswitch}
+@cindex Options, types, built-in, @t{xswitch}
+@cindex Valued Options, @t{xswitch}
+@cindex Options, valued, @t{xswitch}
+@cindex Valued Options, @t{xswitch}, properties, enumeration
+@cindex Options, valued, @t{xswitch}, properties, enumeration
+@cindex Built-In Classes, @t{enum-base}
+@cindex Classes, built-in, @t{enum-base}
+As you can see, this class inherits from @code{enum-base}, which is the
+class providing the @code{enum} slot. The reason for this split is that
+there are currently two option types providing enumeration-like
+facility: @code{enum} and @code{xswitch}, so @code{xswitch} also
+inherits from @code{enum-base}.
+
+@cindex Built-In Classes, @t{valued-option}
+@cindex Classes, built-in, @t{valued-option}
+@cindex Valued Options, common properties, argument name
+@cindex Valued Options, properties, common, argument name
+@cindex Options, valued, common properties, argument name
+@cindex Options, valued, properties, common, argument name
+There are no new slots in this class, but the @code{argument-name} slot
+provided by the @code{valued-option} class has its initform changed from
+@code{"ARG"} to @code{"TYPE"}.
+
+@node Value Check Protocol, Conversion Protocol, New Option Classes, New Option Types
 @subsection Value Check Protocol
 
 @node Conversion Protocol, Constructor Functions, Value Check Protocol, New Option Types
