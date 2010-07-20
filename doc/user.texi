@@ -473,7 +473,7 @@ Look again at the synopsis definition provided in @ref{Quick Start}.
 @end cartouche
 
 You define a synopsis with the @code{defsynopsis} macro.
-@defmac defsynopsis (@var{OPTIONS}@dots{}) @var{ITEMS}@dots{}
+@defmac defsynopsis (OPTIONS@dots{}) ITEMS@dots{}
 Define a new synopsis and return it. @var{OPTIONS} are key/value pairs. 
 @var{ITEMS} is a list of either text, group, or option descriptions.
 
@@ -874,13 +874,13 @@ there in @code{defsyopsis} are in fact initialization arguments to those
 constructors. We now examine those constructors in greater detail.
 
 @cindex Options, creation
-@defun make-text @code{:contents} @var{STRING}
+@defun make-text @code{:contents} STRING
 @findex make-text@r{, initargs, }:contents
 Create an arbitrary text object whose contents is @var{STRING}.
 @end defun
 
 @c FIXME: I would like an environment without indexing here.
-@defun make-@var{OPTION} @var{:INITARG} @var{INITVAL}@dots{}
+@defun make-@var{OPTION} :INITARG INITVAL@dots{}
 @findex make-flag
 @findex make-stropt
 @findex make-lispobj
@@ -896,8 +896,8 @@ available initialization arguments (depending on the option type),
 @end defun
 
 @cindex Groups, creation
-@defun make-group @code{:header} @var{STRING} @
-@code{:item} @var{ITEM1} @code{:item} @var{ITEM2}@dots{}
+@defun make-group @code{:header} STRING @code{:item} ITEM1 @
+@code{:item} ITEM2@dots{}
 @findex make-group@r{, initargs, }:header
 @findex make-group@r{, initargs, }:item
 Create a group object whose header is @var{STRING}. Every @var{ITEM} is
@@ -906,8 +906,8 @@ important.
 @end defun
 
 @cindex Synopsis, creation
-@defun make-synopsis @code{:postfix} @var{STRING} @
-@code{:item} @var{ITEM1} @code{:item} @var{ITEM2}@dots{}
+@defun make-synopsis @code{:postfix} STRING @code{:item} ITEM1 @
+@code{:item} ITEM2@dots{}
 @findex make-synopsis@r{, initargs, }:postfix
 @findex make-synopsis@r{, initargs, }:item
 Create a synopsis object whose postfix is @var{STRING}. Every @var{ITEM} is
@@ -947,7 +947,7 @@ group object, but the object itself can still be created in a
 declarative way because you don't need to keep handles on its items. For
 this, @clon{} provides a macro called @code{defgroup}.
 
-@defmac defgroup (@var{OPTIONS}@dots{}) @var{ITEMS}@dots{}
+@defmac defgroup (OPTIONS@dots{}) ITEMS@dots{}
 @cindex Groups, in synopsis
 @cindex Synopsis, groups
 @findex defsynopsis, @r{items}, group
@@ -979,7 +979,7 @@ of your program, for example (and most notably) with an actual
 @findex make-context
 You create a context with the @code{make-context} function.
 
-@defun make-context @var{:INITARG} @var{INITVAL}@dots{}
+@defun make-context :INITARG INITVAL@dots{}
 Create a new context. The following initargs are available.
 
 @table @code
@@ -1047,9 +1047,9 @@ application will in fact quit immediately after having displayed the
 help string.
 
 @findex getopt
-@defun getopt @var{KEYS}@dots{}
-Retrieve the value of a specific option. @var{KEYS} are key/value pairs.
-The following keys are available.
+@defun getopt :KEY VALUE@dots{}
+Retrieve the value of a specific option. The following keys are
+available.
 
 @table @code
 @item :short-name
@@ -1136,15 +1136,13 @@ be completed in case of abbreviation.
 @end defun
 
 @findex multiple-value-getopt-cmdline
-@defmac multiple-value-getopt-cmdline @
-(@var{OPTION} @var{NAME} @var{VALUE}) @var{BODY}
+@defmac multiple-value-getopt-cmdline (OPTION NAME VALUE) BODY
 Evaluate @var{BODY} with @var{OPTION}, @var{NAME} and @var{VALUE} bound
 to the values returned by the @code{getopt-cmdline} function above.
 @end defmac
 
 @findex do-cmdline-options
-@defmac do-cmdline-options @
-(@var{OPTION} @var{NAME} @var{VALUE}) @var{BODY}
+@defmac do-cmdline-options (OPTION NAME VALUE) BODY
 As above, but loop over all @cmdline{} options.
 @end defmac
 
@@ -1160,7 +1158,7 @@ task to do by hand. The application's synopsis contains all the
 necessary information to do so. In order to print your application's
 help string, use the @code{help} function.
 @findex help
-@defun help :item @var{ITEM}
+@defun help @code{:item} ITEM
 @cindex @t{--clon-search-path}
 @cindex Built-in Options, @t{--clon-search-path}
 @cindex Options, built-in, @t{--clon-search-path}
