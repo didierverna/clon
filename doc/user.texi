@@ -207,6 +207,7 @@ it explains how to use @clon{} in your application.
 * Quick Start::         For the brave and the impatient
 * Using Clon::          Clonificating your application
 * Extending Clon::      Creating your own option types
+* Advanced Usage::      Things rarely needed
 * Conclusion::          That's all folks
 * Quick Start Program:: The complete listing
 * Indexes::             Concept, Function and Variable
@@ -1216,7 +1217,7 @@ FIXME: mention the use in conjunction with hidden groups or options.
 @c ====================================================================
 @c Extending Clon
 @c ====================================================================
-@node Extending Clon, Conclusion, Using Clon, Top
+@node Extending Clon, Advanced Usage, Using Clon, Top
 @chapter Extending Clon
 
 As you know, @clon{} already provides seven built-in option types: flags
@@ -1728,10 +1729,50 @@ friendlier error messages.
 
 
 @c ====================================================================
+@c Advanced Usage
+@c ====================================================================
+@node Advanced Usage, Conclusion, Extending Clon, Top
+@chapter Advanced Usage
+
+This chapter contains information about different features that are
+present in @clon{} because of design decisions, but I expect to be used
+only rarely, if at all.
+
+@menu
+* Not Using the Command-Line::  Any kind of list of strings instead
+* Using Multiple Contexts::     The current one, and the others
+* Version Numbering::           In case you need to conditionalize
+@end menu
+
+
+@c --------------------------
+@c Not Using the Command-Line
+@c --------------------------
+@node Not Using the Command-Line, Using Multiple Contexts, Advanced Usage, Advanced Usage
+@section Not Using the Command-Line
+
+
+@c -----------------------
+@c Using Multiple Contexts
+@c -----------------------
+@node Using Multiple Contexts, Version Numbering, Not Using the Command-Line, Advanced Usage
+@section Using Multiple Contexts
+
+
+@c -----------------
+@c Version Numbering
+@c -----------------
+@node Version Numbering, , Using Multiple Contexts, Advanced Usage
+@section Version Numbering
+
+
+
+@c ====================================================================
 @c Conclusion
 @c ====================================================================
-@node Conclusion, Quick Start Program, Extending Clon, Top
+@node Conclusion, Quick Start Program, Advanced Usage, Top
 @chapter Conclusion
+
 So that's it I guess. You know all about @clon{} now. The next step is
 to actually use it to clonify your favorite application, write new
 applications using it and contaminate the world with standalone @cl{}
