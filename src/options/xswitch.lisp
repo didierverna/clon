@@ -57,6 +57,8 @@ As such, the plus-syntax is available for extended xswitches."))
 ;; Value check subprotocol
 (defmethod check-value ((xswitch xswitch) value)
   "Check that VALUE is valid for XSWITCH."
+  ;; #### FIXME: it appears that the comment below is in contradiction with
+  ;; the code below. Check who's right!
   ;; All values are valid for xswitches: everything but nil means 'yes'."
   (unless (member value '(t nil))
     (unless (keywordp value)
