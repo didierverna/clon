@@ -1494,9 +1494,173 @@ the checks above will fail all the same.
 
 @node Conversion Protocol, Constructor Functions, Value Check Protocol, New Option Types
 @subsection Conversion Protocol
+@cindex Conversion Protocol
+@cindex Protocols, conversion
+The next protocol we need to implement is the so-called @dfn{conversion}
+protocol. This protocol is used to convert option arguments (that is,
+strings) to an actual value of the proper type. Arguments currently
+converted may come the @cmdline{}, the value of an environment variable,
+and arguments provided from a debugger restart FIXME: expand this.
+
+The conversion protocol is implemented through a @code{convert} generic
+function for which you must provide a method.
+
+@cindex @t{invalid-argument} error condition
+@cindex Error Conditions, @t{invalid-argument}
+@deffn {Generic Function} convert OPTION ARGUMENT
+Convert @var{ARGUMENT} to @var{OPTION's} value. If @var{ARGUMENT} is
+invalid, raise an @code{invalid-argument} error.
+@end deffn
+
+As you can see, you need to provide a method with the first argument
+specialized to your new option type. This method must return the
+conversion of @var{ARGUMENT} to the appropriate type if it is valid, and
+raise an @code{invalid-argument} error otherwise.
+
+@cindex @t{invalid-argument} error condition
+@cindex Error Conditions, @t{invalid-argument}
+The @code{invalid-argument} error condition is defined like this:
+
+@cartouche
+@verbatim
+(define-condition invalid-argument (option-error)
+  ((argument :documentation "The invalid argument."
+	     :type string
+	     :initarg :argument
+	     :reader argument)
+   (comment :documentation "An additional comment about the error."
+	    :type string
+	    :initarg :comment
+	    :reader comment))
+  (:report (lambda (error stream)
+	     (format stream "Option ~A: invalid argument ~S.~@[~%~A~]"
+	       (option error) (argument error) (comment error))))
+  (:documentation "An invalid argument error."))
+@end verbatim
+@end cartouche
+
+@cindex @t{invalid-argument} error condition
+@cindex Error Conditions, @t{invalid-argument}
+@cindex @t{invalid-argument} error condition, slots, @t{argument}
+@cindex @t{invalid-argument} error condition, slots, @t{comment}
+@cindex Error Conditions, @t{invalid-argument}, slots, @t{argument}
+@cindex Error Conditions, @t{invalid-argument}, slots, @t{comment}
+When the error is raised, you must fill in the @code{argument} and
+@code{comment} slots appropriately.
+@cindex @t{option-error} error condition
+@cindex Error Conditions, @t{option-error}
+@cindex @t{option-error} error condition, slots, @t{option}
+@cindex Error Conditions, @t{option-error}, slots, @t{option}
+As before, the super-condition @code{option-error} provides an
+additional @code{option} slot that you must also fill in when the error
+is raised.
+
+@findex convert, @r{methods, for enumerations}
+Let's look at the enumeration example now.
+
+@cartouche
+@verbatim
+(defmethod convert ((enum enum) argument)
+  "Convert (possibly abbreviated) ARGUMENT to ENUM's value.
+If ARGUMENT doesn't name one of ENUM's symbols, raise a conversion error."
+  (or (closest-match argument (enum enum) :ignore-case t :key #'symbol-name)
+      (error 'invalid-argument
+	     :option enum
+	     :argument argument
+	     :comment (format nil "Valid arguments are: ~A."
+			(symbols-to-string (enum enum))))))
+@end verbatim
+@end cartouche
+
+@cindex Enumerations
+@cindex Built-In Option Types, @t{enum}
+@cindex Options, built-in types, @t{enum}
+@cindex Options, types, built-in, @t{enum}
+@cindex Valued Options, @t{enum}
+@cindex Options, valued, @t{enum}
+@cindex Valued Options, @t{enum}, properties, enumeration
+@cindex Options, valued, @t{enum}, properties, enumeration
+Since enumerations allow their arguments to be abbreviated, a utility
+function is used to find the closest match between an argument and the
+possible values. Otherwise, the @code{invalid-argument} error is raised.
+
 
 @node Constructor Functions, , Conversion Protocol, New Option Types
 @subsection Constructor Functions
+@cindex Constructors
+The last required step to complete our new option type extension is to
+provide a @dfn{constructor} function that wraps around
+@code{make-instance} on the corresponding option class. I won't insult
+you by explaining how to write a constructor. Let me just give four good
+reasons why providing constructors is important.
+
+Providing a constructor for every new option type is important because:
+@enumerate
+@item
+it is important,
+@item
+it is a good software engineering practice,
+@item
+it is important,
+@item
+@findex defsynopsis
+@findex defgroup
+and above all, it makes your new option type automatically available in
+calls to @code{defsynopsis} and @code{defgroup} (@pxref{Synopsis Items}
+and @ref{Group Definition}).
+@end enumerate
+
+
+@cindex Enumerations
+@cindex Built-In Option Types, @t{enum}
+@cindex Options, built-in types, @t{enum}
+@cindex Options, types, built-in, @t{enum}
+@cindex Valued Options, @t{enum}
+@cindex Options, valued, @t{enum}
+@cindex Valued Options, @t{enum}, constructor
+@cindex Options, valued, @t{enum}, constructor
+@cindex Constructors, @t{make-enum}
+@findex make-enum
+Let's look at the enumeration example now.
+
+@cartouche
+@verbatim
+(defun make-enum (&rest keys
+		  &key short-name long-name description
+		       argument-name argument-type
+		       enum env-var fallback-value default-value
+		       nullablep)
+  "Make a new enum option.
+- SHORT-NAME is the option's short name (without the dash).
+  It defaults to nil.
+- LONG-NAME is the option's long name (without the double-dash).
+  It defaults to nil.
+- DESCRIPTION is the option's description appearing in help strings.
+  It defaults to nil.
+- ARGUMENT-NAME is the option's argument name appearing in help strings.
+- ARGUMENT-TYPE is one of :required, :mandatory or :optional (:required and
+  :mandatory are synonyms).
+  It defaults to :optional.
+- ENUM is the set of possible values.
+- ENV-VAR is the option's associated environment variable.
+  It defaults to nil.
+- FALLBACK-VALUE is the option's fallback value (for missing optional
+  arguments), if any.
+- DEFAULT-VALUE is the option's default value, if any.
+- NULLABLEP indicates whether this option accepts nil as a value."
+  (declare (ignore short-name long-name description
+		  argument-name argument-type
+		  enum env-var fallback-value default-value
+		  nullablep))
+  (apply #'make-instance 'enum keys))
+@end verbatim
+@end cartouche
+
+Woah, what a mouthful for a single line of code@dots{} Yeah, I'm a
+maniac and I like redundancy. I always restate all the available keys
+explicitely, and everything again in the docstring so that all the
+interesting information is directly available (I might change my mind as
+I grow older though).
 
 
 @c --------------
