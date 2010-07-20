@@ -1732,9 +1732,13 @@ friendlier error messages.
 @c ====================================================================
 @node Conclusion, Quick Start Program, Extending Clon, Top
 @chapter Conclusion
-So that's it I guess. Enjoy using @clon{}.
+So that's it I guess. You know all about @clon{} now. The next step is
+to actually use it to clonify your favorite application, write new
+applications using it and contaminate the world with standalone @cl{}
+programs, featuring unprecedented @cmdline{} power and thrill-a-minute
+option hacking.
 
-Hmmm. What kind of conclusion was that@dots{}
+Now, go Luke. The Attack of the @clon{} may now begin.
 
 
 
