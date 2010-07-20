@@ -667,8 +667,9 @@ default value (or both of course).
 @cindex Valued Options, properties, common, nullable
 @cindex Options, valued, common properties, nullable
 @cindex Options, valued, properties, common, nullable
-Whether the option accepts a null value. Default to @code{nil}. FIXME:
-link explanation to the converter part in extending clon.
+Whether the option accepts a null value. Default to @code{nil}. This
+property is useful when you define your own option types (@pxref{Value
+Check Protocol}).
 @end table
 
 @node Built-In Valued Options, , Common Valued Option Properties, Built-In Option Types
@@ -1365,6 +1366,127 @@ provided by the @code{valued-option} class has its initform changed from
 
 @node Value Check Protocol, Conversion Protocol, New Option Classes, New Option Types
 @subsection Value Check Protocol
+@cindex Value Check Protocol
+@cindex Protocols, value check
+Now that we have our new option class, we need to implement the
+so-called @dfn{value check} protocol. This protocol is used to make sure
+that values provided for options of your new type actually comply with
+the type in question.
+
+This protocol is currently used to check for the validity of fallback
+values, default values, and values provided from a debugger restart
+FIXME: expand this.
+
+@findex check-value
+The value check protocol is implemented through a @code{check-value}
+generic function for which you must provide a method. Here is how the
+protocol is declared:
+
+@cartouche
+@verbatim
+(defgeneric check-value (valued-option value)
+  (:documentation "Check that VALUE is valid for VALUED-OPTION.
+If VALUE is valid, return it. Otherwise, raise an invalid-value error.")
+  (:method :around ((option valued-option) value)
+    "Bypass the provided user method if VALUE is nil and OPTION is nullable."
+    ;; #### NOTE: check-value must return the value if it is valid. This is
+    ;; exactly what happens below when the unless clause fails (it returns
+    ;; nil).
+    (unless (and (nullablep option) (null value))
+      (call-next-method))))
+@end verbatim
+@end cartouche
+
+@cindex @t{invalid-value} error condition
+@cindex Error Conditions, @t{invalid-value}
+@cindex Valued Options, common properties, nullable
+@cindex Valued Options, properties, common, nullable
+@cindex Options, valued, common properties, nullable
+@cindex Options, valued, properties, common, nullable
+As you can see, you need to provide a method with the first argument
+specialized to your new option type. This method must return @var{VALUE}
+if it is okay, and raise an @code{invalid-value} error otherwise. Also,
+note that if your option is nullable (@pxref{Common Valued Option
+Properties}) and the provided value is @code{nil}, your method will
+actually be bypassed. Nullable options turn out to be very common, so
+this simplifies the writing of @code{check-value} methods.
+
+@cindex @t{invalid-value} error condition
+@cindex Error Conditions, @t{invalid-value}
+@clon{} maintains a hierarchy of error conditions. The
+@code{invalid-value} error condition is defined like this:
+
+@cartouche
+@verbatim
+(define-condition invalid-value (option-error)
+  ((value :documentation "The invalid value."
+	  :initarg :value
+	  :reader value)
+   (comment :documentation "An additional comment about the error."
+	    :type string
+	    :initarg :comment
+	    :reader comment))
+  (:report (lambda (error stream)
+	     (format stream "Option ~A: invalid value ~S.~@[~%~A~]"
+	       (option error) (value error) (comment error))))
+  (:documentation "An invalid value error."))
+@end verbatim
+@end cartouche
+
+@cindex @t{invalid-value} error condition
+@cindex Error Conditions, @t{invalid-value}
+@cindex @t{invalid-value} error condition, slots, @t{value}
+@cindex @t{invalid-value} error condition, slots, @t{comment}
+@cindex Error Conditions, @t{invalid-value}, slots, @t{value}
+@cindex Error Conditions, @t{invalid-value}, slots, @t{comment}
+When the error is raised, you must fill in the @code{value} and
+@code{comment} slots appropriately.
+@cindex @t{option-error} error condition
+@cindex Error Conditions, @t{option-error}
+@cindex @t{option-error} error condition, slots, @t{option}
+@cindex Error Conditions, @t{option-error}, slots, @t{option}
+The super-condition @code{option-error} provides an additional
+@code{option} slot that you must also fill in when the error is raised.
+
+Let's look at the enumeration example now.
+
+@cartouche
+@verbatim
+(defmethod check-value ((enum enum) value)
+  "Check that VALUE is a valid ENUM."
+  (unless (keywordp value)
+    (error 'invalid-value
+	   :option enum
+	   :value value
+	   :comment "Value must be a keyword."))
+  (unless (member value (enum enum))
+    (error 'invalid-value
+	   :option enum
+	   :value value
+	   :comment (format nil "Valid values are: ~A."
+		      (symbols-to-string (enum enum)))))
+  value)
+@end verbatim
+@end cartouche
+
+@cindex Enumerations
+@cindex Built-In Option Types, @t{enum}
+@cindex Options, built-in types, @t{enum}
+@cindex Options, types, built-in, @t{enum}
+@cindex Valued Options, @t{enum}
+@cindex Options, valued, @t{enum}
+@cindex Valued Options, common properties, nullable
+@cindex Valued Options, properties, common, nullable
+@cindex Options, valued, common properties, nullable
+@cindex Options, valued, properties, common, nullable
+This code should be self-explanatory. We first check that we got a
+keyword, and then that it belongs the the enumeration. Also, note that
+the nullable case is not treated explicitely. If the option was nullable
+and @code{nil} was provided, this method is not called at all. If
+@var{VALUE} is non-@var{nil}, then it goes through this method as any
+other value, and if @code{nil} was provided for a non-nullable option,
+the checks above will fail all the same.
+
 
 @node Conversion Protocol, Constructor Functions, Value Check Protocol, New Option Types
 @subsection Conversion Protocol
