@@ -174,6 +174,9 @@ If OPTION matches, return its short name's length; otherwise 0."
 	       (option error) (value error) (comment error))))
   (:documentation "An invalid value error."))
 
+
+;; #### FIXME: should we just call this check, as for convert ?
+
 (defgeneric check-value (valued-option value)
   (:documentation "Check that VALUE is valid for VALUED-OPTION.
 If VALUE is valid, return it. Otherwise, raise an invalid-value error.")
