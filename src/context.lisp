@@ -690,6 +690,8 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.~%"
     (help :context context :item (clon-options-group context))
     (quit 0)))
 
+;; #### FIXME: just as the :cmdline key defaults to the posix cmdline, the
+;; synopsis should default to *default-synopsis*.
 (defun make-context
     (&rest keys
      &key synopsis error-handler getopt-error-handler cmdline (make-current t))
