@@ -116,3 +116,7 @@ Cool hey ?
 ++debug
 
 * Extend defsynopsis and defgroup to support a mix of declarative and explicit forms
+
+
+* Provide a WITH-CONTEXT macro which changes temporarily the value of
+*current-context*. 
