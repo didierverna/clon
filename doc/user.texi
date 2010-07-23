@@ -1771,6 +1771,53 @@ course, the default is to use the actual program's one.
 @node Using Multiple Contexts, Version Numbering, Not Using the Command-Line, Advanced Usage
 @section Using Multiple Contexts
 
+Did you notice that after creating a context, there is actually never
+any explicit reference to it anymore? So where is the magick? In fact,
+there's no magick at all involved.
+
+@vindex *current-context*
+@findex make-context, @r{initargs}, :make-current
+@clon{} has a global variable named @code{*current-context*} which holds
+the@dots{} current context, yeah. When you create a context with
+@code{make-context}, it is automatically made current, unless you use
+the @code{:make-current} initarg with a value of @code{nil}.
+
+@cindex Runtime Phase
+@findex getopt
+@findex getopt-cmdline
+@findex multiple-value-getopt-cmdline
+@findex do-cmdline-options
+@findex help
+The whole runtime phase API of @clon{} uses a context implicitely. This
+involves @code{getopt}, @code{getopt-cmdline},
+@code{multiple-value-getopt-cmdline}, @code{do-cmdline-options} and
+@code{help}. As a consequence, it is possible to use @clon{} with
+multiple contexts at the same time. There are in fact two ways to
+achieve this.
+
+@enumerate
+@item
+@vindex *current-context*
+At any time in your program, you may change the value of
+@code{*current-context*}. All subsequent calls to the runtime phase API
+will hence use this other context.
+@item
+@c FIXME: index all function keys.
+If you prefer to use another context only temporarily, you can use the
+@code{context} key instead. The whole runtime phase API of @clon{}
+understands it. For the functions @code{getopt}, @code{getopt-cmdline}
+and @code{help}, it's just another key in addition to those we've
+already seen. For the macros @code{multiple-value-getopt-cmdline} and
+@code{do-cmdline-options}, the key belongs to the first (list) argument,
+like this:
+
+@verbatim
+(multiple-value-getopt-cmdline (option name value :context ctx) ...)
+(do-cmdline-options (option name value :context ctx) ...)
+@end verbatim
+
+@end enumerate
+
 
 @c -----------------
 @c Version Numbering
