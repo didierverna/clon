@@ -1739,7 +1739,7 @@ present in @clon{} because of design decisions, but that I expect to be
 used only rarely, if at all.
 
 @menu
-* Not Using the Command-Line::  Any kind of list of strings instead
+* Not Using the Command-Line::  But any list of strings instead
 * Using Multiple Contexts::     The current one, and the others
 * Version Numbering::           In case you need to conditionalize
 @end menu
@@ -1750,6 +1750,19 @@ used only rarely, if at all.
 @c --------------------------
 @node Not Using the Command-Line, Using Multiple Contexts, Advanced Usage, Advanced Usage
 @section Not Using the Command-Line
+
+In @ref{Context Creation}, we saw that when you create a context, you
+create an association between a specific execution of the program and
+the synopsis. In that particular instance of the application, the
+@cmdline{} must comply with the synopsis definition. It turns out,
+however that the @cmdline{} doesn't need to be the actual program's
+@cmdline{}, as the user typed it. Any list of strings can act as a
+@cmdline{}.
+
+@findex make-context, @r{initargs}, :cmdline
+The function @code{make-context} has a @code{:cmdline} key that allows
+you to provide any list of strings that will act as the @cmdline{}. Of
+course, the default is to use the actual program's one.
 
 
 @c -----------------------
