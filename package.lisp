@@ -38,7 +38,8 @@
   (:import-from :com.dvlsoft.clon.asdf
     :+release-major-level+
     :+release-minor-level+
-    :+release-status+ :+release-status-level+
+    :+release-status+
+    :+release-status-level+
     :+release-name+
     :version)
   (:export
