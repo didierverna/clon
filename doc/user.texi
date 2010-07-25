@@ -1815,7 +1815,6 @@ like this:
 (multiple-value-getopt-cmdline (option name value :context ctx) ...)
 (do-cmdline-options (option name value :context ctx) ...)
 @end verbatim
-
 @end enumerate
 
 
@@ -1824,6 +1823,76 @@ like this:
 @c -----------------
 @node Version Numbering, , Using Multiple Contexts, Advanced Usage
 @section Version Numbering
+
+@cindex @t{--clon-version}
+@cindex Built-in Options, @t{--clon-version}
+@cindex Options, built-in, @t{--clon-version}
+As @clon{} evolves over time, you might one day feel the need for
+conditionalizing your code on the version of the library. While the
+end-user of your application has limited means to access the current
+version number of @clon{} (see @enduserref{Clonification} and the
+built-in option @code{--clon-version}), you, the application programmer
+and @clon{} user, have a finer grained access to it.
+
+The first thing you can do to access the current version number of
+@clon{} is use the @code{version} function (this is in fact the function
+bound to the @code{--clon-version} option).
+@defun version &optional (TYPE :number)
+Return the current version number of @clon{}. @var{TYPE} can be one of
+@code{:number}, @code{:short} or @code{:long}. For @code{:number}, the
+returned value is a fixnum. Otherwise, it is a string.
+@end defun
+
+A @clon{} version is characterized by 4 elements as described below.
+@itemize
+@item
+@vindex +release-major-level+
+A major version number stored in the constant
+@code{+release-major-level+}.
+@item
+@vindex +release-minor-level+
+A minor version number, stored in the constant
+@code{+release-minor-level+}.
+@item
+@vindex +release-status+
+A release status stored in the constant @code{+release-status+}. The
+status of a release can be @code{:alpha}, @code{:beta}, @code{:pre} or
+@code{:patchlevel}. These are in effect 4 levels of expected stability,
+@code{:pre} meaning pre-release and @code{:patchlevel} corresponding to
+a stable version of the library.
+@item
+@vindex +release-status-level+
+A status-specific version number stored in the constant
+@code{+release-status-level+}. Status levels start at 1 for unstable
+versions (@eg{} beta 1, beta 2 @etc{}), but start at 0 for stable
+releases (@eg{} 2.4.0, 2.4.1 @etc{}).
+@end itemize
+
+In addition to that, each version of @clon{} (in the sense
+@emph{major.minor}, regardless of the status) has a name. The chosen
+theme for the 1.x series is ``Great Jazz Sax Players''.
+
+Here is how the @code{version} function computes its value.
+@itemize
+@item
+A version @code{:number} is computed as @emph{major . 10000 + minor .
+100 + patchlevel}, effectively leaving two digits for each level. Note
+that alpha, beta and pre status are ignored in version numbers (this is
+as if the corresponding status level was considered to be always 0).
+Only stable releases have their level taken into account.
+@item
+A @code{:short} version will appear like this for unstable releases:
+1.3a4, 2.5b8 or 4.2pre1. Remember that alpha, beta or pre levels start
+at 1. Patchlevels for stable releases start at 0 but 0 is ignored in the
+output. So for instance, version 4.3.2 will appear as-is, while version
+1.3.0 will appear as just 1.3.
+@item
+A @code{:long} version is expanded from the short one, and includes the
+release name. For instance, 1.3 alpha 4 "Michael Brecker", 2.5 beta 8
+"Michael Brecker", 4.2 pre 1 "Michael Brecker" or 4.3.2 "Michael
+Brecker". As for the short version, a patchlevel of 0 is ignored in the
+output: 1.3 "Michael Brecker".
+@end itemize
 
 
 
