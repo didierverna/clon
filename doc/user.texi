@@ -93,6 +93,9 @@ Command-Line
 @end macro
 
 
+@c --------------------------------
+@c Manuals cross-referencing macros
+@c --------------------------------
 @c The following 3 macros are here to circumvent the info filenames
 @c changes, when referencing the end-user manual:
 
@@ -123,6 +126,63 @@ Command-Line
 @end ifnotinfo
 @end macro
 
+
+@c ---------------
+@c Indexing macros
+@c ---------------
+
+@macro copindex{prop}
+@cindex Options, common properties, \prop\
+@cindex Options, properties, common, \prop\
+@end macro
+
+@macro cvopindex{prop}
+@cindex Valued Options, common properties, \prop\
+@cindex Valued Options, properties, common, \prop\
+@cindex Options, valued, common properties, \prop\
+@cindex Options, valued, properties, common, \prop\
+@end macro
+
+@macro biotindex{type}
+@cindex Built-In Option Types, @t{\type\}
+@cindex Options, built-in types, @t{\type\}
+@cindex Options, types, built-in, @t{\type\}
+@end macro
+
+@macro voindex{opt}
+@cindex Valued Options, @t{\opt\}
+@cindex Options, valued, @t{\opt\}
+@end macro
+
+@macro vopindex{opt, prop}
+@cindex Valued Options, @t{\opt\}, properties, \prop\
+@cindex Options, valued, @t{\opt\}, properties, \prop\
+@end macro
+
+@macro bioindex{opt}
+@cindex @t{--clon-\opt\}
+@cindex Built-In Options, @t{--clon-\opt\}
+@cindex Options, built-in, @t{--clon-\opt\}
+@end macro
+
+@macro bicindex{cls}
+@cindex Built-In Classes, @t{\cls\}
+@cindex Classes, built-in, @t{\cls\}
+@end macro
+
+@macro ecindex{cond}
+@cindex @t{\cond\} error condition
+@cindex Error Conditions, @t{\cond\}
+@end macro
+
+@macro ecsindex{cond, slot}
+@cindex @t{\cond\} error condition, slots, @t{\slot\}
+@cindex Error Conditions, @t{\cond\}, slots, @t{\slot\}
+@end macro
+
+@macro fiaindex{func, arg}
+@findex \func\@r{, initargs, }\arg\
+@end macro
 
 
 @c ====================================================================
@@ -474,13 +534,14 @@ Look again at the synopsis definition provided in @ref{Quick Start}.
 @end cartouche
 
 You define a synopsis with the @code{defsynopsis} macro.
+
 @defmac defsynopsis (OPTIONS@dots{}) ITEMS@dots{}
 Define a new synopsis and return it. @var{OPTIONS} are key/value pairs.
 @var{ITEMS} is a list of either text, group, or option descriptions.
 
 @cindex Postfix
 @cindex Synopsis, postfix
-@findex defsynopsis, @r{options}, :postfix
+@findex defsynopsis@r{, options, }:postfix
 The first argument to @code{defsynopsis} is a list of key/value pairs.
 Currently, the only available key is @code{:postfix}. Its value is a
 string which will appear at the end of the synopsis line in the help
@@ -504,7 +565,7 @@ We now examine the syntax for each one of them.
 @subsubsection Text
 @cindex Text, in synopsis
 @cindex Synopsis, text
-@findex defsynopsis, @r{items}, text
+@findex defsynopsis@r{, items, }text
 In order to add arbitrary text to your help string, use the following
 form:
 
@@ -522,7 +583,7 @@ a newline. This would break potential theme specifications.
 @subsubsection Options
 @cindex Options, in synopsis
 @cindex Synopsis, options
-@findex defsynopsis, @r{items}, @r{options}
+@findex defsynopsis@r{, items, options}
 In order to add an option to your help string, you must provide a list
 beginning with the option type and followed by key/value pairs
 describing the option's properties. For instance, to add a flag with a
@@ -540,7 +601,7 @@ in @ref{Built-In Option Types}.
 @subsubsection Groups
 @cindex Groups, in synopsis
 @cindex Synopsis, groups
-@findex defsynopsis, @r{items}, group
+@findex defsynopsis@r{, items, }group
 In order to add a group to your help string, you must use the following
 form:
 
@@ -591,21 +652,17 @@ is a list of them.
 
 @table @code
 @item :short-name
-@cindex Options, common properties, short name
-@cindex Options, properties, common, short name
+@copindex{short name}
 The option's short name. A string or @code{nil}.
 @item :long-name
-@cindex Options, common properties, long name
-@cindex Options, properties, common, long name
+@copindex{long name}
 The option's long name. A string or @code{nil}.
 @item :description
-@cindex Options, common properties, description
-@cindex Options, properties, common, description
+@copindex{description}
 The option's descriptive text. A string or @code{nil}. The same
 formatting recommendations as for arbitrary text apply (@pxref{Text}).
 @item :env-var
-@cindex Options, common properties, environment variable
-@cindex Options, properties, common, environment variable
+@copindex{environment variable}
 The option's associated environment variable. A string or @code{nil}.
 @end table
 
@@ -617,9 +674,7 @@ mistaken for a long name, but did I really need to mention this?).
 @node Flags, Common Valued Option Properties, Common Properties, Built-In Option Types
 @subsubsection Flags
 @cindex Flags
-@cindex Built-In Option Types, @t{flag}
-@cindex Options, built-in types, @t{flag}
-@cindex Options, types, built-in, @t{flag}
+@biotindex{flag}
 In @clon{}, options that don't take any argument are of type
 @code{flag}. These options don't provide additional properties on top of
 the common set described in @ref{Common Properties}. All properties
@@ -635,39 +690,24 @@ share a set of additional properties. Here is a list of them.
 
 @table @code
 @item :argument-name
-@cindex Valued Options, common properties, argument name
-@cindex Valued Options, properties, common, argument name
-@cindex Options, valued, common properties, argument name
-@cindex Options, valued, properties, common, argument name
+@cvopindex{argument name}
 The name of the option's argument, as it appears in the help string. It
 defaults to @code{"ARG"}, so that for instance, a @samp{name} option
 would appear like this: @samp{--name=ARG}.
 @item :argument-type
-@cindex Valued Options, common properties, argument type
-@cindex Valued Options, properties, common, argument type
-@cindex Options, valued, common properties, argument type
-@cindex Options, valued, properties, common, argument type
+@cvopindex{argument type}
 The status of the argument. Possible values are @code{:required} (the
 default) and @code{:mandatory} which are synonyms, or @code{:optional}.
 @item :default-value
-@cindex Valued Options, common properties, default value
-@cindex Valued Options, properties, common, default value
-@cindex Options, valued, common properties, default value
-@cindex Options, valued, properties, common, default value
+@cvopindex{default value}
 @item :fallback-value
-@cindex Valued Options, common properties, fallback value
-@cindex Valued Options, properties, common, fallback value
-@cindex Options, valued, common properties, fallback value
-@cindex Options, valued, properties, common, fallback value
+@cvopindex{fallback value}
 The option's default and fallback values. Remember that a fallback value
 only makes sense when the argument is optional. Besides, also when the
 argument is optional, you need to provide at least a fallback or a
 default value (or both of course).
 @item :nullablep
-@cindex Valued Options, common properties, nullable
-@cindex Valued Options, properties, common, nullable
-@cindex Options, valued, common properties, nullable
-@cindex Options, valued, properties, common, nullable
+@cvopindex{nullable}
 Whether the option accepts a null value. Default to @code{nil}. This
 property is useful when you define your own option types (@pxref{Value
 Check Protocol}).
@@ -687,31 +727,18 @@ below.
 @table @code
 @item stropt
 @cindex String Options
-@cindex Built-In Option Types, @t{stropt}
-@cindex Options, built-in types, @t{stropt}
-@cindex Options, types, built-in, @t{stropt}
-@cindex Valued Options, @t{stropt}
-@cindex Options, valued, @t{stropt}
-@cindex Valued Options, common properties, argument name
-@cindex Valued Options, properties, common, argument name
-@cindex Options, valued, common properties, argument name
-@cindex Options, valued, properties, common, argument name
+@biotindex{stropt}
+@voindex{stropt}
+@cvopindex{argument name}
 This option type is for options taking strings as their argument. String
 options don't provide any additional properties, but their default
 argument name is changed from @code{"ARG"} to @code{"STR"}.
 @item lispobj
 @cindex Lisp Options
-@cindex Built-In Option Types, @t{lispobj}
-@cindex Options, built-in types, @t{lispobj}
-@cindex Options, types, built-in, @t{lispobj}
-@cindex Valued Options, @t{lispobj}
-@cindex Options, valued, @t{lispobj}
-@cindex Valued Options, common properties, argument name
-@cindex Valued Options, properties, common, argument name
-@cindex Options, valued, common properties, argument name
-@cindex Options, valued, properties, common, argument name
-@cindex Valued Options, @t{lispobj}, properties, type specifier
-@cindex Options, valued, @t{lispobj}, properties, type specifier
+@biotindex{lispobj}
+@voindex{lispobj}
+@cvopindex{argument name}
+@vopindex{lispobj, type specifier}
 This option type is for options taking any kind of Lisp object as their
 argument. @code{lispobj} options change their default argument name from
 @code{"ARG"} to @code{"OBJ"}. Also, they provide an additional property
@@ -719,20 +746,11 @@ called @code{:typespec} which must be a @cl{} type specifier that the
 argument must satisfy. It defaults to @code{t}.
 @item enum
 @cindex Enumerations
-@cindex Built-In Option Types, @t{enum}
-@cindex Options, built-in types, @t{enum}
-@cindex Options, types, built-in, @t{enum}
-@cindex Valued Options, @t{enum}
-@cindex Options, valued, @t{enum}
-@cindex Valued Options, common properties, argument name
-@cindex Valued Options, properties, common, argument name
-@cindex Options, valued, common properties, argument name
-@cindex Options, valued, properties, common, argument name
-@cindex Valued Options, @t{enum}, properties, enumeration
-@cindex Options, valued, @t{enum}, properties, enumeration
-@cindex @t{--clon-version}
-@cindex Built-In Options, @t{--clon-version}
-@cindex Options, built-in, @t{--clon-version}
+@biotindex{enum}
+@voindex{enum}
+@cvopindex{argument name}
+@vopindex{enum, enumeration}
+@bioindex{version}
 This option type is for options taking values from an enumerated set.
 @code{enum} options change their default argument name from @code{"ARG"}
 to @code{"TYPE"}. Also, they provide an additional property called
@@ -745,21 +763,11 @@ ability to abbreviate the possible values. Look at the
 @code{--clon-version} built-in option for an example.
 @item path
 @cindex Path Options
-@cindex Built-In Option Types, @t{path}
-@cindex Options, built-in types, @t{path}
-@cindex Options, types, built-in, @t{path}
-@cindex Valued Options, @t{path}
-@cindex Options, valued, @t{path}
-@cindex Valued Options, common properties, argument name
-@cindex Valued Options, properties, common, argument name
-@cindex Options, valued, common properties, argument name
-@cindex Options, valued, properties, common, argument name
-@cindex Valued Options, common properties, nullable
-@cindex Valued Options, properties, common, nullable
-@cindex Options, valued, common properties, nullable
-@cindex Options, valued, properties, common, nullable
-@cindex Valued Options, @t{path}, properties, path type
-@cindex Options, valued, @t{path}, properties, path type
+@biotindex{path}
+@voindex{path}
+@cvopindex{argument name}
+@cvopindex{nullable}
+@vopindex{path, path type}
 This option type is for options taking a colon-separated list of
 pathnames as argument. @code{path} options change their default argument
 name from @code{"ARG"} to @code{"PATH"} and their default nullable
@@ -770,21 +778,11 @@ expected. Possible values are: @code{:file}, @code{:directory},
 anything is allowed).
 @item switch
 @cindex Switches
-@cindex Built-In Option Types, @t{switch}
-@cindex Options, built-in types, @t{switch}
-@cindex Options, types, built-in, @t{switch}
-@cindex Valued Options, @t{switch}
-@cindex Options, valued, @t{switch}
-@cindex Valued Options, common properties, argument type
-@cindex Valued Options, properties, common, argument type
-@cindex Options, valued, common properties, argument type
-@cindex Options, valued, properties, common, argument type
-@cindex Valued Options, common properties, nullable
-@cindex Valued Options, properties, common, nullable
-@cindex Options, valued, common properties, nullable
-@cindex Options, valued, properties, common, nullable
-@cindex Valued Options, @t{switch}, properties, argument style
-@cindex Options, valued, @t{switch}, properties, argument style
+@biotindex{switch}
+@voindex{switch}
+@cvopindex{argument type}
+@cvopindex{nullable}
+@vopindex{switch, argument style}
 This option type is for Boolean options. @code{switch} options change
 their default nullable property from @code{nil} to @code{t}, and their
 default argument type from required to optional. Also, instead of using
@@ -796,24 +794,12 @@ the argument name @emph{only}. All possible switch arguments
 (@pxenduserref{Switches}) are always availble to all switches.
 @item xswitch
 @cindex Extended Switches
-@cindex Built-In Option Types, @t{xswitch}
-@cindex Options, built-in types, @t{xswitch}
-@cindex Options, types, built-in, @t{xswitch}
-@cindex Valued Options, @t{xswitch}
-@cindex Options, valued, @t{xswitch}
-@cindex Valued Options, common properties, argument type
-@cindex Valued Options, properties, common, argument type
-@cindex Options, valued, common properties, argument type
-@cindex Options, valued, properties, common, argument type
-@cindex Valued Options, common properties, nullable
-@cindex Valued Options, properties, common, nullable
-@cindex Options, valued, common properties, nullable
-@cindex Options, valued, properties, common, nullable
-@cindex Valued Options, @t{xswitch}, properties, enumeration
-@cindex Options, valued, @t{xswitch}, properties, enumeration
-@cindex @t{--clon-highlight}
-@cindex Built-In Options, @t{--clon-highlight}
-@cindex Options, built-in, @t{--clon-highlight}
+@biotindex{xswitch}
+@voindex{xswitch}
+@cvopindex{argument type}
+@cvopindex{nullable}
+@vopindex{xswitch, enumeration}
+@bioindex{highlight}
 This option type stands for @dfn{extended} switch. Extended switches
 result from the mating of a male switch and a female enumeration, or the
 other way around (elementary decency prevents me from describing this
@@ -890,7 +876,7 @@ constructors. We now examine those constructors in greater detail.
 
 @cindex Options, creation
 @defun make-text @code{:contents} STRING
-@findex make-text@r{, initargs, }:contents
+@fiaindex{make-text, :contents}
 Create an arbitrary text object whose contents is @var{STRING}.
 @end defun
 
@@ -913,8 +899,8 @@ available initialization arguments (depending on the option type),
 @cindex Groups, creation
 @defun make-group @code{:header} STRING @code{:item} ITEM1 @
 @code{:item} ITEM2@dots{}
-@findex make-group@r{, initargs, }:header
-@findex make-group@r{, initargs, }:item
+@fiaindex{make-group, :header}
+@fiaindex{make-group, :item}
 Create a group object whose header is @var{STRING}. Every @var{ITEM} is
 an arbitrary text object, option object or group object. The order is
 important.
@@ -923,8 +909,8 @@ important.
 @cindex Synopsis, creation
 @defun make-synopsis @code{:postfix} STRING @code{:item} ITEM1 @
 @code{:item} ITEM2@dots{}
-@findex make-synopsis@r{, initargs, }:postfix
-@findex make-synopsis@r{, initargs, }:item
+@fiaindex{make-synopsis, :postfix}
+@fiaindex{make-synopsis, :item}
 Create a synopsis object whose postfix is @var{STRING}. Every @var{ITEM} is
 an arbitrary text object, option object or group object. The order is
 important.
@@ -965,8 +951,8 @@ this, @clon{} provides a macro called @code{defgroup}.
 @defmac defgroup (OPTIONS@dots{}) ITEMS@dots{}
 @cindex Groups, in synopsis
 @cindex Synopsis, groups
-@findex defsynopsis, @r{items}, group
-@findex defgroup, @r{options}, :header
+@findex defsynopsis@r{, items, }group
+@findex defgroup@r{, options, }:header
 Define a new group and return it. This macro behaves exactly like the
 @code{group} form in a call to @code{defsynopsis} (@pxref{Groups}).
 @end defmac
@@ -999,11 +985,11 @@ Create a new context. The following initargs are available.
 
 @table @code
 @item :synopsis
-@findex make-context, @r{initargs}, :synopsis
+@fiaindex{make-context, :synopsis}
 Use this key to associate the context with a synopsis previously defined
 by @code{defsynopsis} (@pxref{Synopsis Definition}).
 @item :error-handler
-@findex make-context, @r{initargs}, :error-handler
+@fiaindex{make-context, :error-handler}
 The behavior to adopt in case an error happens during the initialization
 phase, when the @cmdline{} is parsed. This is where you get errors like
 ``unknown option'', ``invalid argument'' @etc{}). Possible values are
@@ -1014,7 +1000,7 @@ behavior will depend on the underlying @cl{} implementation. For
 instance, the debugger might be raised or a stack trace might be printed
 (this is the case in SBCL with the @option{--script} option).
 @item :getopt-error-handler
-@findex make-context, @r{initargs}, :getopt-error-handler
+@fiaindex{make-context, :getopt-error-handler}
 The behavior to adopt in case an error happens when an option is
 retrieved in any way (@pxref{Option Retrieval}). Since @cmdline{} errors
 are throw at initialization time, the errors you can get here are
@@ -1061,7 +1047,6 @@ option first, without looking at the rest of the @cmdline{} because the
 application will in fact quit immediately after having displayed the
 help string.
 
-@findex getopt
 @defun getopt :KEY VALUE@dots{}
 Retrieve the value of a specific option. The following keys are
 available.
@@ -1092,34 +1077,25 @@ completed long name if the option's name was abbreviated. A completed
 name displays the omitted parts in parentheses (@code{"he(lp)"} for
 instance).
 @item (:environment @var{VAR})
-@cindex Options, common properties, environment variable
-@cindex Options, properties, common, environment variable
+@copindex{environment variable}
 @cindex Values, source, environment
 This is for options not found on the @cmdline{} but for which there is
 an associated environment variable set in the application's environment.
 @var{VAR} is the name of the corresponding environment variable.
 @item :default
-@cindex Valued Options, common properties, default value
-@cindex Valued Options, properties, common, default value
-@cindex Options, valued, common properties, default value
-@cindex Options, valued, properties, common, default value
+@cvopindex{default value}
 @cindex Values, source, default
 This is for options not found anywhere, but for which a default value
 was provided.
 @end table
 
 @cindex Flags
-@cindex Built-In Option Types, @t{flag}
-@cindex Options, built-in types, @t{flag}
-@cindex Options, types, built-in, @t{flag}
+@biotindex{flag}
 Note that flags don't take any argument, so @code{getopt} returns a
 virtual value of @code{t} when they are found, or a corresponding
 environment variable exists in the environment.
 
-@cindex Valued Options, common properties, nullable
-@cindex Valued Options, properties, common, nullable
-@cindex Options, valued, common properties, nullable
-@cindex Options, valued, properties, common, nullable
+@cvopindex{nullable}
 When an option is not found anywhere and there is no default value,
 @code{getopt} just returns nil (no second value). Also, note that when
 your option is nullable, you @emph{need} to handle the second retrun
@@ -1136,7 +1112,6 @@ The more traditional approach to option retrieval is to scan the
 this by providing you with one function and two macros, as explained
 below.
 
-@findex getopt-cmdline
 @defun getopt-cmdline
 Get the @dfn{next} @cmdline{} option, that is, the first option on the
 @cmdline{} that has not been previously retrieved, either explicitely or
@@ -1150,13 +1125,11 @@ explicit retrieval (@pxref{Explicit Retrieval}), the option's name may
 be completed in case of abbreviation.
 @end defun
 
-@findex multiple-value-getopt-cmdline
 @defmac multiple-value-getopt-cmdline (OPTION NAME VALUE) BODY
 Evaluate @var{BODY} with @var{OPTION}, @var{NAME} and @var{VALUE} bound
 to the values returned by the @code{getopt-cmdline} function above.
 @end defmac
 
-@findex do-cmdline-options
 @defmac do-cmdline-options (OPTION NAME VALUE) BODY
 As above, but loop over all @cmdline{} options.
 @end defmac
@@ -1172,26 +1145,18 @@ the generation of the help string, which is a very boring maintenance
 task to do by hand. The application's synopsis contains all the
 necessary information to do so. In order to print your application's
 help string, use the @code{help} function.
-@findex help
+
 @defun help @code{:item} ITEM
-@cindex @t{--clon-search-path}
-@cindex Built-In Options, @t{--clon-search-path}
-@cindex Options, built-in, @t{--clon-search-path}
+@bioindex{search-path}
 @cindex CLON_SEARCH_PATH
 @cindex Environment Variables, CLON_SEARCH_PATH
-@cindex @t{--clon-highlight}
-@cindex Built-In Options, @t{--clon-highlight}
-@cindex Options, built-in, @t{--clon-highlight}
+@bioindex{highlight}
 @cindex CLON_HIGHLIGHT
 @cindex Environment Variables, CLON_HIGHLIGHT
-@cindex @t{--clon-theme}
-@cindex Built-In Options, @t{--clon-theme}
-@cindex Options, built-in, @t{--clon-theme}
+@bioindex{theme}
 @cindex CLON_THEME
 @cindex Environment Variables, CLON_THEME
-@cindex @t{--clon-line-width}
-@cindex Built-In Options, @t{--clon-line-width}
-@cindex Options, built-in, @t{--clon-line-width}
+@bioindex{line-width}
 @cindex CLON_LINE_WIDTH
 @cindex Environment Variables, CLON_LINE_WIDTH
 Print the application's help string. Printing honors the search path,
@@ -1204,9 +1169,7 @@ However, if you have kept a handle on any synopsis item (option, text,
 group), you can pass it as the value of the @code{:item} key, and
 @clon{} will only print the help string for that particular item.
 
-@cindex @t{--clon-help}
-@cindex Built-In Options, @t{--clon-help}
-@cindex Options, built-in, @t{--clon-help}
+@bioindex{help}
 For instance, this is how the @option{clon-help} option is implemented:
 it only prints the help string of the built-in @clon{} group.
 
@@ -1228,9 +1191,7 @@ types fullfill your requirements exactly. There are two ways around
 this: the right way or the wrong way (hint).
 
 @cindex String Options
-@cindex Built-In Option Types, @t{stropt}
-@cindex Options, built-in types, @t{stropt}
-@cindex Options, types, built-in, @t{stropt}
+@biotindex{stropt}
 The wrong, although perhaps quicker way would be to use the
 @code{stropt} option type to simply retrieve unprocessed string values,
 and then do whatever tweaking required on them. In doing so, you risk
@@ -1241,9 +1202,7 @@ types are a good thing because they allow for reusability and also
 extensibility, since new option types can always be defined on top of
 others.
 @cindex Enumerations
-@cindex Built-In Option Types, @t{enum}
-@cindex Options, built-in types, @t{enum}
-@cindex Options, types, built-in, @t{enum}
+@biotindex{enum}
 In this chapter we explain how to extend @clon{} by providing new option
 types. We illustrate the process with the example of the built-in
 @code{enum} one.
@@ -1251,9 +1210,7 @@ types. We illustrate the process with the example of the built-in
 @cindex Valued Options
 @cindex Options, valued
 @cindex Flags
-@cindex Built-In Option Types, @t{flag}
-@cindex Options, built-in types, @t{flag}
-@cindex Options, types, built-in, @t{flag}
+@biotindex{flag}
 Oh, and I almost forgot. I hope it is obvious to everyone that new
 option types are always @emph{valued}. There's no point in extending
 @clon{} with options that don't take any arguments, since we already
@@ -1296,10 +1253,8 @@ order.
 
 @node New Option Classes, Value Check Protocol, New Option Types, New Option Types
 @subsection New Option Classes
-@cindex Built-In Classes, @t{option}
-@cindex Classes, built-in, @t{option}
-@cindex Built-In Classes, @t{valued-option}
-@cindex Classes, built-in, @t{valued-option}
+@bicindex{option}
+@bicindex{valued-option}
 @clon{} maintains a class hierarchy for all option types. The mother of
 all option types is the @code{option} abstract class. It provides slots
 for storing the options'short and long names, description and associated
@@ -1312,6 +1267,7 @@ mandatory), fallback and default values, and nullable status.
 @cindex Option Classes, user-defined
 In order to create a new option type, @clon{} provides a convenience
 macro named @code{defoption}.
+
 @defmac defoption CLASS SUPERCLASSES SLOTS &rest OPTIONS
 Wrapper around @code{defclass} for defining a new valued option type.
 Option types created like this implicitely inherit from
@@ -1332,35 +1288,22 @@ This class implements options whose values belong to a set of keywords."))
 @end cartouche
 
 @cindex Enumerations
-@cindex Built-In Option Types, @t{enum}
-@cindex Options, built-in types, @t{enum}
-@cindex Options, types, built-in, @t{enum}
-@cindex Valued Options, @t{enum}
-@cindex Options, valued, @t{enum}
-@cindex Valued Options, @t{enum}, properties, enumeration
-@cindex Options, valued, @t{xswitch}, properties, enumeration
+@biotindex{enum}
+@voindex{enum}
+@vopindex{enum, enumeration}
 @cindex Extended Switches
-@cindex Built-In Option Types, @t{xswitch}
-@cindex Options, built-in types, @t{xswitch}
-@cindex Options, types, built-in, @t{xswitch}
-@cindex Valued Options, @t{xswitch}
-@cindex Options, valued, @t{xswitch}
-@cindex Valued Options, @t{xswitch}, properties, enumeration
-@cindex Options, valued, @t{xswitch}, properties, enumeration
-@cindex Built-In Classes, @t{enum-base}
-@cindex Classes, built-in, @t{enum-base}
+@biotindex{xswitch}
+@voindex{xswitch}
+@vopindex{xswitch, enumeration}
+@bicindex{enum-base}
 As you can see, this class inherits from @code{enum-base}, which is the
 class providing the @code{enum} slot. The reason for this split is that
 there are currently two option types providing enumeration-like
 facility: @code{enum} and @code{xswitch}, so @code{xswitch} also
 inherits from @code{enum-base}.
 
-@cindex Built-In Classes, @t{valued-option}
-@cindex Classes, built-in, @t{valued-option}
-@cindex Valued Options, common properties, argument name
-@cindex Valued Options, properties, common, argument name
-@cindex Options, valued, common properties, argument name
-@cindex Options, valued, properties, common, argument name
+@bicindex{valued-option}
+@cvopindex{argument name}
 There are no new slots in this class, but the @code{argument-name} slot
 provided by the @code{valued-option} class has its initform changed from
 @code{"ARG"} to @code{"TYPE"}.
@@ -1379,8 +1322,7 @@ expand this.
 The value check protocol is implemented through a @code{check-value}
 generic function for which you must provide a method.
 
-@cindex @t{invalid-value} error condition
-@cindex Error Conditions, @t{invalid-value}
+@ecindex{invalid-value}
 @deffn {Generic Function} check-value OPTION VALUE
 Check that @var{VALUE} is valid for @var{OPTION}. If @var{VALUE} is
 valid, return it. Otherwise, raise an @code{invalid-value} error.
@@ -1390,7 +1332,7 @@ As you can see, you need to provide a method with the first argument
 specialized to your new option type. This method must return @var{VALUE}
 if it is okay, and raise an @code{invalid-value} error otherwise.
 
-@findex check-value, @r{methods}, :around
+@findex check-value@r{, methods, }:around
 This protocol additionally has the following @code{:around} method:
 
 @cartouche
@@ -1406,17 +1348,13 @@ This protocol additionally has the following @code{:around} method:
 @end verbatim
 @end cartouche
 
-@cindex Valued Options, common properties, nullable
-@cindex Valued Options, properties, common, nullable
-@cindex Options, valued, common properties, nullable
-@cindex Options, valued, properties, common, nullable
+@cvopindex{nullable}
 This means that if your option is nullable (@pxref{Common Valued Option
 Properties}) and the provided value is @code{nil}, your method will
 actually be bypassed. Nullable options turn out to be very common, so
 this simplifies the writing of @code{check-value} methods.
 
-@cindex @t{invalid-value} error condition
-@cindex Error Conditions, @t{invalid-value}
+@ecindex{invalid-value}
 @clon{} maintains a hierarchy of error conditions. The
 @code{invalid-value} error condition is defined like this:
 
@@ -1437,22 +1375,17 @@ this simplifies the writing of @code{check-value} methods.
 @end verbatim
 @end cartouche
 
-@cindex @t{invalid-value} error condition
-@cindex Error Conditions, @t{invalid-value}
-@cindex @t{invalid-value} error condition, slots, @t{value}
-@cindex @t{invalid-value} error condition, slots, @t{comment}
-@cindex Error Conditions, @t{invalid-value}, slots, @t{value}
-@cindex Error Conditions, @t{invalid-value}, slots, @t{comment}
+@ecindex{invalid-value}
+@ecsindex{invalid-value, value}
+@ecsindex{invalid-value, comment}
 When the error is raised, you must fill in the @code{value} and
 @code{comment} slots appropriately.
-@cindex @t{option-error} error condition
-@cindex Error Conditions, @t{option-error}
-@cindex @t{option-error} error condition, slots, @t{option}
-@cindex Error Conditions, @t{option-error}, slots, @t{option}
+@ecindex{option-error}
+@ecsindex{option-error, option}
 The super-condition @code{option-error} provides an additional
 @code{option} slot that you must also fill in when the error is raised.
 
-@findex check-value, @r{methods, for enumerations}
+@findex check-value@r{, methods, for enumerations}
 Let's look at the enumeration example now.
 
 @cartouche
@@ -1475,15 +1408,9 @@ Let's look at the enumeration example now.
 @end cartouche
 
 @cindex Enumerations
-@cindex Built-In Option Types, @t{enum}
-@cindex Options, built-in types, @t{enum}
-@cindex Options, types, built-in, @t{enum}
-@cindex Valued Options, @t{enum}
-@cindex Options, valued, @t{enum}
-@cindex Valued Options, common properties, nullable
-@cindex Valued Options, properties, common, nullable
-@cindex Options, valued, common properties, nullable
-@cindex Options, valued, properties, common, nullable
+@biotindex{enum}
+@voindex{enum}
+@cvopindex{nullable}
 This code should be self-explanatory. We first check that we got a
 keyword, and then that it belongs the the enumeration. Also, note that
 the nullable case is not treated explicitely. If the option was nullable
@@ -1506,8 +1433,7 @@ and arguments provided from a debugger restart FIXME: expand this.
 The conversion protocol is implemented through a @code{convert} generic
 function for which you must provide a method.
 
-@cindex @t{invalid-argument} error condition
-@cindex Error Conditions, @t{invalid-argument}
+@ecindex{invalid-argument}
 @deffn {Generic Function} convert OPTION ARGUMENT
 Convert @var{ARGUMENT} to @var{OPTION's} value. If @var{ARGUMENT} is
 invalid, raise an @code{invalid-argument} error.
@@ -1518,8 +1444,7 @@ specialized to your new option type. This method must return the
 conversion of @var{ARGUMENT} to the appropriate type if it is valid, and
 raise an @code{invalid-argument} error otherwise.
 
-@cindex @t{invalid-argument} error condition
-@cindex Error Conditions, @t{invalid-argument}
+@ecindex{invalid-argument}
 The @code{invalid-argument} error condition is defined like this:
 
 @cartouche
@@ -1540,23 +1465,18 @@ The @code{invalid-argument} error condition is defined like this:
 @end verbatim
 @end cartouche
 
-@cindex @t{invalid-argument} error condition
-@cindex Error Conditions, @t{invalid-argument}
-@cindex @t{invalid-argument} error condition, slots, @t{argument}
-@cindex @t{invalid-argument} error condition, slots, @t{comment}
-@cindex Error Conditions, @t{invalid-argument}, slots, @t{argument}
-@cindex Error Conditions, @t{invalid-argument}, slots, @t{comment}
+@ecindex{invalid-argument}
+@ecsindex{invalid-argument, argument}
+@ecsindex{invalid-argument, comment}
 When the error is raised, you must fill in the @code{argument} and
 @code{comment} slots appropriately.
-@cindex @t{option-error} error condition
-@cindex Error Conditions, @t{option-error}
-@cindex @t{option-error} error condition, slots, @t{option}
-@cindex Error Conditions, @t{option-error}, slots, @t{option}
+@ecindex{option-error}
+@ecsindex{option-error, option}
 As before, the super-condition @code{option-error} provides an
 additional @code{option} slot that you must also fill in when the error
 is raised.
 
-@findex convert, @r{methods, for enumerations}
+@findex convert@r{, methods, for enumerations}
 Let's look at the enumeration example now.
 
 @cartouche
@@ -1574,13 +1494,9 @@ If ARGUMENT doesn't name one of ENUM's symbols, raise a conversion error."
 @end cartouche
 
 @cindex Enumerations
-@cindex Built-In Option Types, @t{enum}
-@cindex Options, built-in types, @t{enum}
-@cindex Options, types, built-in, @t{enum}
-@cindex Valued Options, @t{enum}
-@cindex Options, valued, @t{enum}
-@cindex Valued Options, @t{enum}, properties, enumeration
-@cindex Options, valued, @t{enum}, properties, enumeration
+@biotindex{enum}
+@voindex{enum}
+@vopindex{enum, enumeration}
 Since enumerations allow their arguments to be abbreviated, a utility
 function is used to find the closest match between an argument and the
 possible values. Otherwise, the @code{invalid-argument} error is raised.
@@ -1613,11 +1529,8 @@ and @ref{Group Definition}).
 
 
 @cindex Enumerations
-@cindex Built-In Option Types, @t{enum}
-@cindex Options, built-in types, @t{enum}
-@cindex Options, types, built-in, @t{enum}
-@cindex Valued Options, @t{enum}
-@cindex Options, valued, @t{enum}
+@biotindex{enum}
+@voindex{enum}
 @cindex Valued Options, @t{enum}, constructor
 @cindex Options, valued, @t{enum}, constructor
 @cindex Constructors, @t{make-enum}
@@ -1693,13 +1606,9 @@ Lisp is a world of mess@t{^D^D^D^D}freedom.
 @node Lisp Option Abuse, , Incremental Option Types, Extension Tips
 @subsection Lisp Option Abuse
 @cindex Lisp Options
-@cindex Built-In Option Types, @t{lispobj}
-@cindex Options, built-in types, @t{lispobj}
-@cindex Options, types, built-in, @t{lispobj}
-@cindex Valued Options, @t{lispobj}
-@cindex Options, valued, @t{lispobj}
-@cindex Valued Options, @t{lispobj}, properties, type specifier
-@cindex Options, valued, @t{lispobj}, properties, type specifier
+@biotindex{lispobj}
+@voindex{lispobj}
+@vopindex{lispobj, type specifier}
 Along with the same lines, you may find that the @code{lispobj} type is
 all you need in many situations. Let's take an example. Suppose you want
 to implement a @code{--stars} option to assign a rank to a movie, from 0
@@ -1759,7 +1668,7 @@ however that the @cmdline{} doesn't need to be the actual program's
 @cmdline{}, as the user typed it. Any list of strings can act as a
 @cmdline{}.
 
-@findex make-context, @r{initargs}, :cmdline
+@fiaindex{make-context, :cmdline}
 The function @code{make-context} has a @code{:cmdline} key that allows
 you to provide any list of strings that will act as the @cmdline{}. Of
 course, the default is to use the actual program's one.
@@ -1776,7 +1685,7 @@ any explicit reference to it anymore? So where is the magick? In fact,
 there's no magick at all involved.
 
 @vindex *current-context*
-@findex make-context, @r{initargs}, :make-current
+@fiaindex{make-context, :make-current}
 @clon{} has a global variable named @code{*current-context*} which holds
 the@dots{} current context, yeah. When you create a context with
 @code{make-context}, it is automatically made current, unless you use
@@ -1824,9 +1733,7 @@ like this:
 @node Version Numbering, , Using Multiple Contexts, Advanced Usage
 @section Version Numbering
 
-@cindex @t{--clon-version}
-@cindex Built-in Options, @t{--clon-version}
-@cindex Options, built-in, @t{--clon-version}
+@bioindex{version}
 As @clon{} evolves over time, you might one day feel the need for
 conditionalizing your code on the version of the library. While the
 end-user of your application has limited means to access the current
@@ -1837,6 +1744,7 @@ and @clon{} user, have a finer grained access to it.
 The first thing you can do to access the current version number of
 @clon{} is use the @code{version} function (this is in fact the function
 bound to the @code{--clon-version} option).
+
 @defun version &optional (TYPE :number)
 Return the current version number of @clon{}. @var{TYPE} can be one of
 @code{:number}, @code{:short} or @code{:long}. For @code{:number}, the
