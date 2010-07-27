@@ -184,6 +184,14 @@ Command-Line
 @findex \func\@r{, initargs, }\arg\
 @end macro
 
+@macro fkindex{func, key}
+@findex \func\@r{, keys, }\key\
+@end macro
+
+@macro foindex{func, opt}
+@findex \func\@r{, options, }\opt\
+@end macro
+
 
 @c ====================================================================
 @c Info Category and Directory
@@ -425,6 +433,7 @@ function @code{help}. Note that what we do here is @emph{not} process
 the @cmdline{} in sequence, but look directly for a specific option by
 name.
 
+@fkindex{getopt, :short-name}
 @cartouche
 @verbatim
   (when (getopt :short-name "h")
@@ -1054,9 +1063,12 @@ available.
 @table @code
 @item :short-name
 @item :long-name
+@fkindex{getopt, :short-name}
+@fkindex{getopt, :long-name}
 Use one of these 2 keys to specify the name of the option you wish to
 retrieve.
 @item :error-handler
+@fkindex{getopt, :error-handler}
 Lets you locally override the error handler established by the
 @code{:getopt-error-handler} to @code{make-context} (@pxref{Context
 Creation}). Note again that this handler will only affect retrieval from
@@ -1091,11 +1103,13 @@ was provided.
 
 @cindex Flags
 @biotindex{flag}
+@findex getopt
 Note that flags don't take any argument, so @code{getopt} returns a
 virtual value of @code{t} when they are found, or a corresponding
 environment variable exists in the environment.
 
 @cvopindex{nullable}
+@findex getopt
 When an option is not found anywhere and there is no default value,
 @code{getopt} just returns nil (no second value). Also, note that when
 your option is nullable, you @emph{need} to handle the second retrun
@@ -1711,7 +1725,10 @@ At any time in your program, you may change the value of
 @code{*current-context*}. All subsequent calls to the runtime phase API
 will hence use this other context.
 @item
-@c FIXME: index all function keys.
+@fkindex{getopt, :context}
+@fkindex{getopt-cmdline, :context}
+@foindex{multiple-value-getopt-cmdline, :context}
+@foindex{do-cmdline-options, :context}
 If you prefer to use another context only temporarily, you can use the
 @code{context} key instead. The whole runtime phase API of @clon{}
 understands it. For the functions @code{getopt}, @code{getopt-cmdline}
