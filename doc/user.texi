@@ -170,10 +170,14 @@ Command-Line
 @cindex Classes, built-in, @t{\cls\}
 @end macro
 
-@alias ecindex = tpindex
+@macro ecindex{cond}
+@tpindex \cond\
+@tpindex @r{Error Conditions, }\cond\
+@end macro
 
 @macro ecsindex{cond, slot}
-@ecindex \cond\@r{, slots, }\slot\
+@tpindex \cond\@r{, slots, }\slot\
+@tpindex @r{Error Conditions, }\cond\@r{, slots, }\slot\
 @end macro
 
 @macro fiaindex{func, arg}
