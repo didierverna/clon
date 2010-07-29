@@ -1068,6 +1068,10 @@ available.
 @fkindex{getopt, :long-name}
 Use one of these 2 keys to specify the name of the option you wish to
 retrieve.
+@item :option
+@fkindex{getopt, :option}
+Alternatively, you can use a handle to an option object
+(@pxref{Constructors}).
 @item :error-handler
 @fkindex{getopt, :error-handler}
 Lets you locally override the error handler established by the
