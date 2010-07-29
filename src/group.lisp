@@ -90,6 +90,7 @@ implementing hierarchical program command-line."))
 				      (list* internalp (cdr form))
 				      (cdr form))))))))
 
+;; #### FIXME: KEYS should be explicit.
 (defmacro defgroup ((&rest keys) &body forms)
   "Define a new group.
 KEYS are initargs to MAKE-GROUP (currently, only :header).
