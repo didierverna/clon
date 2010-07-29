@@ -2025,11 +2025,13 @@ OPTION (ERROR-HANDLER (getopt-error-handler context))
 @fkindex{getopt, :long-name}
 @fkindex{getopt, :option}
 @fkindex{getopt, :error-handler}
+@vindex *current-context*
 See @ref{Explicit Retrieval} and @ref{Using Multiple Contexts}.
 @end defun
 
 @defun getopt-cmdline &key (CONTEXT *current-context*)
 @fkindex{getopt-cmdline, :context}
+@vindex *current-context*
 See @ref{Sequential Retrieval} and @ref{Using Multiple Contexts}.
 @end defun
 
@@ -2056,6 +2058,7 @@ See @ref{Sequential Retrieval} and @ref{Using Multiple Contexts}.
 @fkindex{help, :search-path}
 @fkindex{help, :line-width}
 @fkindex{help, :highlight}
+@vindex *current-context*
 @vindex *standard-output*
 @xref{Help}, @ref{Using Multiple Contexts} and @ref{Programmatic Help
 Strings}.
