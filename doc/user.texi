@@ -1954,10 +1954,12 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
 @appendix API Quick Reference
 
 @menu
-* Initialization Phase API::
-* Runtime Phase API::
-* Extension API::
+* Initialization Phase API::    Synopsis, items and context creation
+* Runtime Phase API::           Option retrieval and help formatting
+* Extension API::               New option types
+* Versioning API::              Release identification
 @end menu
+
 
 @c ------------------------
 @c Initialization Phase API
@@ -2070,8 +2072,41 @@ Strings}.
 @c -------------
 @c Extension API
 @c -------------
-@node Extension API, , Runtime Phase API, API Quick Reference
+@node Extension API, Versioning API, Runtime Phase API, API Quick Reference
 @section Extension API
+
+@defmac defoption CLASS SUPERCLASSES SLOTS &rest OPTIONS
+@pxref{New Option Classes}
+@end defmac
+
+@deffn {Generic Function} check-value OPTION VALUE
+@xref{Value Check Protocol}.
+@end deffn
+
+@deffn {Generic Function} convert OPTION ARGUMENT
+@xref{Conversion Protocol}.
+@end deffn
+
+@c FIXME: reference the error conditions
+
+
+@c --------------
+@c Versioning API
+@c --------------
+@node Versioning API, , Extension API, API Quick Reference
+@section Versioning API
+
+@defun version &optional (TYPE :number)
+@xref{Version Numbering}.
+@end defun
+
+@defvr Constant +release-major-level+
+@defvrx Constant +release-minor-level+
+@defvrx Constant +release-status+
+@defvrx Constant +release-status-level+
+@defvrx Constant +release-name+
+@xref{Version Numbering}.
+@end defvr
 
 
 
