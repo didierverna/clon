@@ -1178,6 +1178,7 @@ theme, line width and highlight settings provided by the corresponding
 built-in options (@pxenduserref{Theme Mechanism}).
 @end defun
 
+@fkindex{help, :item}
 By default, @code{help} prints the whole application help string.
 However, if you have kept a handle on any synopsis item (option, text,
 group), you can pass it as the value of the @code{:item} key, and
