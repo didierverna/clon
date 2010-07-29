@@ -165,9 +165,14 @@ Command-Line
 @cindex Options, built-in, @t{--clon-\opt\}
 @end macro
 
-@macro bicindex{cls}
-@cindex Built-In Classes, @t{\cls\}
-@cindex Classes, built-in, @t{\cls\}
+@macro clsindex{cls}
+@tpindex \cls\
+@tpindex @r{Classes, }\cls\
+@end macro
+
+@macro clssindex{cls, slot}
+@tpindex \cls\@r{, slots, }\slot\
+@tpindex @r{Classes, }\cls\@r{, slots, }\slot\
 @end macro
 
 @macro ecindex{cond}
@@ -1282,8 +1287,8 @@ order.
 
 @node New Option Classes, Value Check Protocol, New Option Types, New Option Types
 @subsection New Option Classes
-@bicindex{option}
-@bicindex{valued-option}
+@clsindex{option}
+@clsindex{valued-option}
 @clon{} maintains a class hierarchy for all option types. The mother of
 all option types is the @code{option} abstract class. It provides slots
 for storing the options'short and long names, description and associated
@@ -1324,14 +1329,14 @@ This class implements options whose values belong to a set of keywords."))
 @biotindex{xswitch}
 @voindex{xswitch}
 @vopindex{xswitch, enumeration}
-@bicindex{enum-base}
+@clsindex{enum-base}
 As you can see, this class inherits from @code{enum-base}, which is the
 class providing the @code{enum} slot. The reason for this split is that
 there are currently two option types providing enumeration-like
 facility: @code{enum} and @code{xswitch}, so @code{xswitch} also
 inherits from @code{enum-base}.
 
-@bicindex{valued-option}
+@clsindex{valued-option}
 @cvopindex{argument name}
 There are no new slots in this class, but the @code{argument-name} slot
 provided by the @code{valued-option} class has its initform changed from
