@@ -2006,9 +2006,9 @@ CMDLINE (MAKE-CURRENT t)
 Multiple Contexts}.
 @end defun
 
-@defvar *current-context*
+@defopt *current-context*
 @xref{Using Multiple Contexts}.
-@end defvar
+@end defopt
 
 
 
