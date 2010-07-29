@@ -1665,6 +1665,7 @@ used only rarely, if at all.
 @menu
 * Not Using the Command-Line::  But any list of strings instead
 * Using Multiple Contexts::     The current one, and the others
+* Programmatic Help Strings::   Beyond the --help option
 * Version Numbering::           In case you need to conditionalize
 @end menu
 
@@ -1692,7 +1693,7 @@ course, the default is to use the actual program's one.
 @c -----------------------
 @c Using Multiple Contexts
 @c -----------------------
-@node Using Multiple Contexts, Version Numbering, Not Using the Command-Line, Advanced Usage
+@node Using Multiple Contexts, Programmatic Help Strings, Not Using the Command-Line, Advanced Usage
 @section Using Multiple Contexts
 
 Did you notice that after creating a context, there is actually never
@@ -1746,10 +1747,69 @@ like this:
 @end enumerate
 
 
+@c -------------------------
+@c Programmatic Help Strings
+@c -------------------------
+@node Programmatic Help Strings, Version Numbering, Using Multiple Contexts, Advanced Usage
+@section Programmatic Help Strings
+
+@findex help
+@cindex Help String
+@cindex Themes
+@cindex Themes, standard, @t{refcard}
+@cindex Standard Themes, @t{refcard}
+So far, we've seen how to use the @code{help} function to implement a
+typical @code{--help} option. This is mostly intended for the end-user.
+There are also times when this function could be useful to @emph{you},
+the application developer. For instance, one could imagine that part of
+the compilation phase would involve generating the help string in order
+to include it in the manual. Another idea would be that @samp{make
+install} creates a @file{REFCARD} file in
+@file{/usr/local/share/doc/my-app/} which contains the help string
+formatted with the @code{refcard} theme, @etc{}.
+
+@bioindex{theme}
+@cindex CLON_THEME
+@cindex Environment Variables, CLON_THEME
+@bioindex{search-path}
+@cindex CLON_SEARCH_PATH
+@cindex Environment Variables, CLON_SEARCH_PATH
+@bioindex{line-width}
+@cindex CLON_LINE_WIDTH
+@cindex Environment Variables, CLON_LINE_WIDTH
+@bioindex{highlight}
+@cindex CLON_HIGHLIGHT
+@cindex Environment Variables, CLON_HIGHLIGHT
+In such situations, calling the @code{help} function might not be
+directly associated with an end-user level option, or at least not
+@code{--help}, and you might not want to honor the end-user level
+settings for theme, search path, line-width, or highlighting either
+(remember that these settings might come from the environment variables
+associated with @option{--clon-theme}, @option{--clon-search-path},
+@option{--clon-line-width} and @option{--clon-highlight}).
+
+@fkindex{help, :theme}
+@fkindex{help, :search-path}
+@fkindex{help, :line-width}
+@fkindex{help, :highlight}
+Because of this, the @code{help} function provides additional keys that
+allow you to override those settings (they are in fact stored in the
+context object). The keys in question are: @code{:theme},
+@code{:search-path}, @code{:line-width} and @code{:highlight}.
+
+@fkindex{help, :output-stream}
+@vindex *standard-output*
+In addition to that, there is an @code{:output-stream} key which
+defaults to @code{*standard-output*} which you could use for instance to
+write directly to a file. Note that there is no end-user level access to
+this parameter.
+
+
+
 @c -----------------
 @c Version Numbering
 @c -----------------
-@node Version Numbering, , Using Multiple Contexts, Advanced Usage
+@node Version Numbering, , Programmatic Help Strings, Advanced Usage
 @section Version Numbering
 
 @bioindex{version}
