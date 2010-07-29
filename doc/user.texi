@@ -170,14 +170,8 @@ Command-Line
 @cindex Classes, built-in, @t{\cls\}
 @end macro
 
-@macro ecindex{cond}
-@cindex @t{\cond\} error condition
-@cindex Error Conditions, @t{\cond\}
-@end macro
-
 @macro ecsindex{cond, slot}
-@cindex @t{\cond\} error condition, slots, @t{\slot\}
-@cindex Error Conditions, @t{\cond\}, slots, @t{\slot\}
+@tpindex \cond\@r{, slots, }\slot\
 @end macro
 
 @macro fiaindex{func, arg}
@@ -1351,7 +1345,7 @@ expand this.
 The value check protocol is implemented through a @code{check-value}
 generic function for which you must provide a method.
 
-@ecindex{invalid-value}
+@tpindex invalid-value
 @deffn {Generic Function} check-value OPTION VALUE
 Check that @var{VALUE} is valid for @var{OPTION}. If @var{VALUE} is
 valid, return it. Otherwise, raise an @code{invalid-value} error.
@@ -1383,7 +1377,7 @@ Properties}) and the provided value is @code{nil}, your method will
 actually be bypassed. Nullable options turn out to be very common, so
 this simplifies the writing of @code{check-value} methods.
 
-@ecindex{invalid-value}
+@tpindex invalid-value
 @clon{} maintains a hierarchy of error conditions. The
 @code{invalid-value} error condition is defined like this:
 
@@ -1404,12 +1398,12 @@ this simplifies the writing of @code{check-value} methods.
 @end verbatim
 @end cartouche
 
-@ecindex{invalid-value}
+@tpindex invalid-value
 @ecsindex{invalid-value, value}
 @ecsindex{invalid-value, comment}
 When the error is raised, you must fill in the @code{value} and
 @code{comment} slots appropriately.
-@ecindex{option-error}
+@tpindex option-error
 @ecsindex{option-error, option}
 The super-condition @code{option-error} provides an additional
 @code{option} slot that you must also fill in when the error is raised.
@@ -1462,7 +1456,7 @@ and arguments provided from a debugger restart FIXME: expand this.
 The conversion protocol is implemented through a @code{convert} generic
 function for which you must provide a method.
 
-@ecindex{invalid-argument}
+@tpindex invalid-argument
 @deffn {Generic Function} convert OPTION ARGUMENT
 Convert @var{ARGUMENT} to @var{OPTION's} value. If @var{ARGUMENT} is
 invalid, raise an @code{invalid-argument} error.
@@ -1473,7 +1467,7 @@ specialized to your new option type. This method must return the
 conversion of @var{ARGUMENT} to the appropriate type if it is valid, and
 raise an @code{invalid-argument} error otherwise.
 
-@ecindex{invalid-argument}
+@tpindex invalid-argument
 The @code{invalid-argument} error condition is defined like this:
 
 @cartouche
@@ -1494,12 +1488,12 @@ The @code{invalid-argument} error condition is defined like this:
 @end verbatim
 @end cartouche
 
-@ecindex{invalid-argument}
+@tpindex invalid-argument
 @ecsindex{invalid-argument, argument}
 @ecsindex{invalid-argument, comment}
 When the error is raised, you must fill in the @code{argument} and
 @code{comment} slots appropriately.
-@ecindex{option-error}
+@tpindex option-error
 @ecsindex{option-error, option}
 As before, the super-condition @code{option-error} provides an
 additional @code{option} slot that you must also fill in when the error
@@ -2092,11 +2086,18 @@ Strings}.
 @xref{Value Check Protocol}.
 @end deffn
 
+@deftp {Error Condition} option-error OPTION
+@deftpx {Error Condition} invalid-value VALUE COMMENT
+@xref{Value Check Protocol}.
+@end deftp
+
 @deffn {Generic Function} convert OPTION ARGUMENT
 @xref{Conversion Protocol}.
 @end deffn
 
-@c FIXME: reference the error conditions
+@deftp {Error Condition} invalid-argument ARGUMENT COMMENT
+@xref{Conversion Protocol}.
+@end deftp
 
 
 @c --------------
@@ -2129,7 +2130,9 @@ Strings}.
 * Concept Index::       Well, the concept index
 * Function Index::      Well, the function index
 * Variable Index::      Well, the variable index
+* Data Type Index::     Well, the data type index
 @end menu
+
 
 @c --------------
 @c Concept Index
@@ -2150,9 +2153,17 @@ Strings}.
 @c --------------
 @c Variable Index
 @c --------------
-@node Variable Index, , Function Index, Indexes
+@node Variable Index, Data Type Index, Function Index, Indexes
 @section Variables
 @printindex vr
+
+
+@c ---------------
+@c Data Type Index
+@c ---------------
+@node Data Type Index, , Variable Index, Indexes
+@section Data Types
+@printindex tp
 
 
 @bye
