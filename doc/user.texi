@@ -2018,6 +2018,49 @@ Multiple Contexts}.
 @node Runtime Phase API, Extension API, Initialization Phase API, API Quick Reference
 @section Runtime Phase API
 
+@defun getopt &key (CONTEXT *current-context*) SHORT-NAME LONG-NAME @
+OPTION (ERROR-HANDLER (getopt-error-handler context))
+@fkindex{getopt, :context}
+@fkindex{getopt, :short-name}
+@fkindex{getopt, :long-name}
+@fkindex{getopt, :option}
+@fkindex{getopt, :error-handler}
+See @ref{Explicit Retrieval} and @ref{Using Multiple Contexts}.
+@end defun
+
+@defun getopt-cmdline &key (CONTEXT *current-context*)
+@fkindex{getopt-cmdline, :context}
+See @ref{Sequential Retrieval} and @ref{Using Multiple Contexts}.
+@end defun
+
+@defmac multiple-value-getopt-cmdline (OPTION NAME VALUE &key CONTEXT) @
+&body BODY
+@defmacx do-cmdline-options (OPTION NAME VALUE &key CONTEXT) @
+&body BODY
+@foindex{multiple-value-getopt-cmdline, :context}
+@foindex{do-cmdline-options, :context}
+See @ref{Sequential Retrieval} and @ref{Using Multiple Contexts}.
+@end defmac
+
+@defun help &key (CONTEXT *current-context*) @
+(ITEM (synopsis context)) @
+(OUTPUT-STREAM *standard-output*) @
+(SEARCH-PATH (search-path context)) @
+(THEME (theme context)) @
+(LINE-WIDTH (line-width context)) @
+(HIGHLIGHT (highlight context)))
+@fkindex{help, :context}
+@fkindex{help, :item}
+@fkindex{help, :output-stream}
+@fkindex{help, :theme}
+@fkindex{help, :search-path}
+@fkindex{help, :line-width}
+@fkindex{help, :highlight}
+@vindex *standard-output*
+@xref{Help}, @ref{Using Multiple Contexts} and @ref{Programmatic Help
+Strings}.
+@end defun
+
 
 @c -------------
 @c Extension API
