@@ -278,6 +278,7 @@ it explains how to use @clon{} in your application.
 * Advanced Usage::      Things rarely needed
 * Conclusion::          That's all folks
 * Quick Start Program:: The complete listing
+* API Quick Reference:: The Complete protocols
 * Indexes::             Concept, Function and Variable
 @end menu
 
@@ -1902,7 +1903,7 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
 @c ====================================================================
 @c Quick Start Program
 @c ====================================================================
-@node Quick Start Program, Indexes, Conclusion, Top
+@node Quick Start Program, API Quick Reference, Conclusion, Top
 @appendix Quick Start Program
 
 @cartouche
@@ -1943,7 +1944,42 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
 @c ====================================================================
 @c Indexes
 @c ====================================================================
-@node Indexes, , Quick Start Program, Top
+@node API Quick Reference, Indexes, Quick Start Program, Top
+@appendix API Quick Reference
+
+@menu
+* Initialization Phase API::
+* Runtime Phase API::
+* Extension API::
+@end menu
+
+@c ------------------------
+@c Initialization Phase API
+@c ------------------------
+@node Initialization Phase API, Runtime Phase API, API Quick Reference, API Quick Reference
+@section Initialization Phase API
+
+
+
+@c -----------------
+@c Runtime Phase API
+@c -----------------
+@node Runtime Phase API, Extension API, Initialization Phase API, API Quick Reference
+@section Runtime Phase API
+
+
+@c -------------
+@c Extension API
+@c -------------
+@node Extension API, , Runtime Phase API, API Quick Reference
+@section Extension API
+
+
+
+@c ====================================================================
+@c Indexes
+@c ====================================================================
+@node Indexes, , API Quick Reference, Top
 @appendix Indexes
 
 @menu
