@@ -170,8 +170,10 @@ Command-Line
 @cindex Classes, built-in, @t{\cls\}
 @end macro
 
+@alias ecindex = tpindex
+
 @macro ecsindex{cond, slot}
-@tpindex \cond\@r{, slots, }\slot\
+@ecindex \cond\@r{, slots, }\slot\
 @end macro
 
 @macro fiaindex{func, arg}
@@ -1345,7 +1347,7 @@ expand this.
 The value check protocol is implemented through a @code{check-value}
 generic function for which you must provide a method.
 
-@tpindex invalid-value
+@ecindex invalid-value
 @deffn {Generic Function} check-value OPTION VALUE
 Check that @var{VALUE} is valid for @var{OPTION}. If @var{VALUE} is
 valid, return it. Otherwise, raise an @code{invalid-value} error.
@@ -1377,7 +1379,7 @@ Properties}) and the provided value is @code{nil}, your method will
 actually be bypassed. Nullable options turn out to be very common, so
 this simplifies the writing of @code{check-value} methods.
 
-@tpindex invalid-value
+@ecindex invalid-value
 @clon{} maintains a hierarchy of error conditions. The
 @code{invalid-value} error condition is defined like this:
 
@@ -1398,12 +1400,12 @@ this simplifies the writing of @code{check-value} methods.
 @end verbatim
 @end cartouche
 
-@tpindex invalid-value
+@ecindex invalid-value
 @ecsindex{invalid-value, value}
 @ecsindex{invalid-value, comment}
 When the error is raised, you must fill in the @code{value} and
 @code{comment} slots appropriately.
-@tpindex option-error
+@ecindex option-error
 @ecsindex{option-error, option}
 The super-condition @code{option-error} provides an additional
 @code{option} slot that you must also fill in when the error is raised.
@@ -1456,7 +1458,7 @@ and arguments provided from a debugger restart FIXME: expand this.
 The conversion protocol is implemented through a @code{convert} generic
 function for which you must provide a method.
 
-@tpindex invalid-argument
+@ecindex invalid-argument
 @deffn {Generic Function} convert OPTION ARGUMENT
 Convert @var{ARGUMENT} to @var{OPTION's} value. If @var{ARGUMENT} is
 invalid, raise an @code{invalid-argument} error.
@@ -1467,7 +1469,7 @@ specialized to your new option type. This method must return the
 conversion of @var{ARGUMENT} to the appropriate type if it is valid, and
 raise an @code{invalid-argument} error otherwise.
 
-@tpindex invalid-argument
+@ecindex invalid-argument
 The @code{invalid-argument} error condition is defined like this:
 
 @cartouche
@@ -1488,12 +1490,12 @@ The @code{invalid-argument} error condition is defined like this:
 @end verbatim
 @end cartouche
 
-@tpindex invalid-argument
+@ecindex invalid-argument
 @ecsindex{invalid-argument, argument}
 @ecsindex{invalid-argument, comment}
 When the error is raised, you must fill in the @code{argument} and
 @code{comment} slots appropriately.
-@tpindex option-error
+@ecindex option-error
 @ecsindex{option-error, option}
 As before, the super-condition @code{option-error} provides an
 additional @code{option} slot that you must also fill in when the error
