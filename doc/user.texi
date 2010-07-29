@@ -1860,9 +1860,11 @@ versions (@eg{} beta 1, beta 2 @etc{}), but start at 0 for stable
 releases (@eg{} 2.4.0, 2.4.1 @etc{}).
 @end itemize
 
+@vindex +release-name+
 In addition to that, each version of @clon{} (in the sense
-@emph{major.minor}, regardless of the status) has a name. The chosen
-theme for the 1.x series is ``Great Jazz Sax Players''.
+@emph{major.minor}, regardless of the status) has a name, stored in teh
+constant @code{+release-name+}. The chosen theme for the 1.x series is
+``Great Jazz Sax Players''.
 
 Here is how the @code{version} function computes its value.
 @itemize
