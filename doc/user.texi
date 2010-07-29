@@ -192,6 +192,15 @@ Command-Line
 @findex \func\@r{, options, }\opt\
 @end macro
 
+@macro fiindex{func, item}
+@findex \func\@r{, items, }\item\
+@end macro
+
+@macro fmindex{func, method}
+@findex \func\@r{, methods, }\method\
+@end macro
+
+
 
 @c ====================================================================
 @c Info Category and Directory
@@ -575,7 +584,7 @@ We now examine the syntax for each one of them.
 @subsubsection Text
 @cindex Text, in synopsis
 @cindex Synopsis, text
-@findex defsynopsis@r{, items, }text
+@fiindex{defsynopsis, text}
 In order to add arbitrary text to your help string, use the following
 form:
 
@@ -593,7 +602,7 @@ a newline. This would break potential theme specifications.
 @subsubsection Options
 @cindex Options, in synopsis
 @cindex Synopsis, options
-@findex defsynopsis@r{, items, }options
+@fiindex{defsynopsis, options}
 In order to add an option to your help string, you must provide a list
 beginning with the option type and followed by key/value pairs
 describing the option's properties. For instance, to add a flag with a
@@ -611,7 +620,7 @@ in @ref{Built-In Option Types}.
 @subsubsection Groups
 @cindex Groups, in synopsis
 @cindex Synopsis, groups
-@findex defsynopsis@r{, items, }group
+@fiindex{defsynopsis, group}
 In order to add a group to your help string, you must use the following
 form:
 
@@ -961,7 +970,7 @@ this, @clon{} provides a macro called @code{defgroup}.
 @defmac defgroup (OPTIONS@dots{}) ITEMS@dots{}
 @cindex Groups, in synopsis
 @cindex Synopsis, groups
-@findex defsynopsis@r{, items, }group
+@fiindex{defsynopsis, group}
 @foindex{defgroup, :header}
 Define a new group and return it. This macro behaves exactly like the
 @code{group} form in a call to @code{defsynopsis} (@pxref{Groups}).
@@ -1352,7 +1361,7 @@ As you can see, you need to provide a method with the first argument
 specialized to your new option type. This method must return @var{VALUE}
 if it is okay, and raise an @code{invalid-value} error otherwise.
 
-@findex check-value@r{, methods, }:around
+@fmindex{check-value, :around}
 This protocol additionally has the following @code{:around} method:
 
 @cartouche
@@ -1993,9 +2002,9 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
 
 @defmac defsynopsis (&rest KEYS) &body FORMS
 @foindex{defsynopsis, :postfix}
-@findex defsynopsis@r{, items, }text
-@findex defsynopsis@r{, items, }options
-@findex defsynopsis@r{, items, }group
+@fiindex{defsynopsis, text}
+@fiindex{defsynopsis, options}
+@fiindex{defsynopsis, group}
 @xref{Synopsis Definition}.
 @end defmac
 
