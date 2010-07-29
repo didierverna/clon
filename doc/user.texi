@@ -551,7 +551,7 @@ Define a new synopsis and return it. @var{OPTIONS} are key/value pairs.
 
 @cindex Postfix
 @cindex Synopsis, postfix
-@findex defsynopsis@r{, options, }:postfix
+@foindex{defsynopsis, :postfix}
 The first argument to @code{defsynopsis} is a list of key/value pairs.
 Currently, the only available key is @code{:postfix}. Its value is a
 string which will appear at the end of the synopsis line in the help
@@ -593,7 +593,7 @@ a newline. This would break potential theme specifications.
 @subsubsection Options
 @cindex Options, in synopsis
 @cindex Synopsis, options
-@findex defsynopsis@r{, items, options}
+@findex defsynopsis@r{, items, }options
 In order to add an option to your help string, you must provide a list
 beginning with the option type and followed by key/value pairs
 describing the option's properties. For instance, to add a flag with a
@@ -962,7 +962,7 @@ this, @clon{} provides a macro called @code{defgroup}.
 @cindex Groups, in synopsis
 @cindex Synopsis, groups
 @findex defsynopsis@r{, items, }group
-@findex defgroup@r{, options, }:header
+@foindex{defgroup, :header}
 Define a new group and return it. This macro behaves exactly like the
 @code{group} form in a call to @code{defsynopsis} (@pxref{Groups}).
 @end defmac
@@ -1979,11 +1979,12 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
 @end defun
 
 @defmac defgroup (&rest KEYS) &body FORMS
+@foindex{defgroup, :header}
 @xref{Group Definition}.
 @end defmac
 
 @defmac defsynopsis (&rest KEYS) &body FORMS
-@findex defsynopsis@r{, options, }:postfix
+@foindex{defsynopsis, :postfix}
 @findex defsynopsis@r{, items, }text
 @findex defsynopsis@r{, items, }options
 @findex defsynopsis@r{, items, }group
