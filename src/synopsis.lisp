@@ -245,6 +245,7 @@ remainder."
 ;; #### FIXME: we could expand this macro to handle a mix of declarative forms
 ;; and explicit objects: we just need to distinguish between atomic and list
 ;; forms.
+;; #### FIXME: KEYS should be explicit
 (defmacro defsynopsis ((&rest keys) &body forms)
   "Define a new synopsis."
   `(make-synopsis ,@keys
