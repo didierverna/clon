@@ -1959,6 +1959,52 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
 @node Initialization Phase API, Runtime Phase API, API Quick Reference, API Quick Reference
 @section Initialization Phase API
 
+@defun make-text &key CONTENTS
+@fiaindex{make-text, :contents}
+@defunx make-@var{OPTION} :INITARG INITVAL@dots{}
+@findex make-flag
+@findex make-stropt
+@findex make-lispobj
+@findex make-enum
+@findex make-path
+@findex make-switch
+@findex make-xswitch
+@defunx make-group &key HEADER ITEM
+@fiaindex{make-group, :header}
+@fiaindex{make-group, :item}
+@defunx make-synopsis &key POSTFIX ITEM
+@fiaindex{make-synopsis, :postfix}
+@fiaindex{make-synopsis, :item}
+@xref{Constructors}.
+@end defun
+
+@defmac defgroup (&rest KEYS) &body FORMS
+@xref{Group Definition}.
+@end defmac
+
+@defmac defsynopsis (&rest KEYS) &body FORMS
+@findex defsynopsis@r{, options, }:postfix
+@findex defsynopsis@r{, items, }text
+@findex defsynopsis@r{, items, }options
+@findex defsynopsis@r{, items, }group
+@xref{Synopsis Definition}.
+@end defmac
+
+@defun make-context &key SYNOPSIS ERROR-HANDLER GETOPT-ERROR-HANDLER @
+CMDLINE (MAKE-CURRENT t)
+@fiaindex{make-context, :synopsis}
+@fiaindex{make-context, :error-handler}
+@fiaindex{make-context, :getopt-error-handler}
+@fiaindex{make-context, :cmdline}
+@fiaindex{make-context, :make-current}
+@xref{Context Creation}, @ref{Not Using the Command-Line} and @ref{Using
+Multiple Contexts}.
+@end defun
+
+@defvar *current-context*
+@xref{Using Multiple Contexts}.
+@end defvar
+
 
 
 @c -----------------
