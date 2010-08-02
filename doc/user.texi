@@ -393,13 +393,26 @@ too long, or if you don't want to @t{use-package} it.
 @end verbatim
 @end cartouche
 
-@cindex Synopsis, definition
+@cindex Synopsis
 @findex defsynopsis
+@cindex Postfix
+@cindex Synopsis, postfix
+@cindex Text, in synopsis
+@cindex Synopsis, text
+@cindex Options, in synopsis
+@cindex Synopsis, options
+@cindex Groups, in synopsis
+@cindex Synopsis, groups
+@cindex Help String
 The next thing you want to do is to create a set of options, groups or
 texts that your application will recognize and/or display in its help
 string. The structure of your @cmdline{} is known to @clon{} as the
 @dfn{synopsis}. In order to create it, use the macro @code{defsynopsis}.
 
+@foindex{defsynopsis, :postfix}
+@fiindex{defsynopsis, text}
+@fiindex{defsynopsis, options}
+@fiindex{defsynopsis, group}
 @cartouche
 @verbatim
 (defvar *synopsis*
@@ -542,7 +555,6 @@ application's help string. When you create a synopsis, you describe the
 
 @node Synopsis Items, Built-In Option Types, Synopsis Definition, Synopsis Definition
 @subsection Synopsis Items
-@cindex Synopsis, definition
 Look again at the synopsis definition provided in @ref{Quick Start}.
 
 @cartouche
@@ -836,7 +848,6 @@ optional.
 
 @node Advanced Synopsis Creation, , Built-In Option Types, Synopsis Definition
 @subsection Advanced Synopsis Creation
-@cindex Synopsis, definition
 @findex defsynopsis
 The fact that @code{defsynopsis} lets you define things in a
 @emph{declarative} way has not escaped you. Declarative is nice but
@@ -930,7 +941,6 @@ an arbitrary text object, option object or group object. The order is
 important.
 @end defun
 
-@cindex Synopsis, creation
 @defun make-synopsis @code{:postfix} STRING @code{:item} ITEM1 @
 @code{:item} ITEM2@dots{}
 @fiaindex{make-synopsis, :postfix}
