@@ -395,13 +395,9 @@ too long, or if you don't want to @t{use-package} it.
 @cindex Synopsis
 @findex defsynopsis
 @cindex Postfix
-@cindex Synopsis, postfix
 @cindex Text, in synopsis
-@cindex Synopsis, text
 @cindex Options, in synopsis
-@cindex Synopsis, options
 @cindex Groups, in synopsis
-@cindex Synopsis, groups
 @cindex Help String
 The next thing you want to do is to create a set of options, groups or
 texts that your application will recognize and/or display in its help
@@ -575,7 +571,6 @@ Define a new synopsis and return it. @var{OPTIONS} are key/value pairs.
 @var{ITEMS} is a list of either text, group, or option descriptions.
 
 @cindex Postfix
-@cindex Synopsis, postfix
 @foindex{defsynopsis, :postfix}
 The first argument to @code{defsynopsis} is a list of key/value pairs.
 Currently, the only available key is @code{:postfix}. Its value is a
@@ -598,8 +593,8 @@ We now examine the syntax for each one of them.
 
 @node Text, Options, Synopsis Items, Synopsis Items
 @subsubsection Text
+@cindex Text
 @cindex Text, in synopsis
-@cindex Synopsis, text
 @fiindex{defsynopsis, text}
 In order to add arbitrary text to your help string, use the following
 form:
@@ -616,8 +611,8 @@ a newline. This would break potential theme specifications.
 
 @node Options, Groups, Text, Synopsis Items
 @subsubsection Options
+@cindex Options
 @cindex Options, in synopsis
-@cindex Synopsis, options
 @fiindex{defsynopsis, options}
 In order to add an option to your help string, you must provide a list
 beginning with the option type and followed by key/value pairs
@@ -634,8 +629,8 @@ in @ref{Built-In Option Types}.
 
 @node Groups, , Options, Synopsis Items
 @subsubsection Groups
+@cindex Groups
 @cindex Groups, in synopsis
-@cindex Synopsis, groups
 @fiindex{defsynopsis, group}
 In order to add a group to your help string, you must use the following
 form:
@@ -983,7 +978,6 @@ this, @clon{} provides a macro called @code{defgroup}.
 
 @defmac defgroup (OPTIONS@dots{}) ITEMS@dots{}
 @cindex Groups, in synopsis
-@cindex Synopsis, groups
 @fiindex{defsynopsis, group}
 @foindex{defgroup, :header}
 Define a new group and return it. This macro behaves exactly like the
