@@ -889,7 +889,7 @@ And once the macro is expanded, it will look like this:
 @findex make-text
 @findex make-group
 @findex make-flag
-@cindex @t{defsynopsis}, expansion
+@findex defsynopsis@r{, expansion}
 @cartouche
 @verbatim
 (make-synopsis :postfix "FILES..."
