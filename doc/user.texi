@@ -131,11 +131,6 @@ Command-Line
 @c Indexing macros
 @c ---------------
 
-@macro copindex{prop}
-@cindex Options, common properties, \prop\
-@cindex Options, properties, common, \prop\
-@end macro
-
 @macro cvopindex{prop}
 @cindex Valued Options, common properties, \prop\
 @cindex Valued Options, properties, common, \prop\
@@ -172,6 +167,10 @@ Command-Line
 @macro ocindex{cls}
 @clsindex{\cls\}
 @tpindex @r{Option Classes, }\cls\
+@end macro
+
+@macro copindex{prop}
+@clssindex{option, \prop\}
 @end macro
 
 @macro ecindex{cond}
@@ -680,17 +679,17 @@ is a list of them.
 
 @table @code
 @item :short-name
-@copindex{short name}
+@copindex{short-name}
 The option's short name. A string or @code{nil}.
 @item :long-name
-@copindex{long name}
+@copindex{long-name}
 The option's long name. A string or @code{nil}.
 @item :description
 @copindex{description}
 The option's descriptive text. A string or @code{nil}. The same
 formatting recommendations as for arbitrary text apply (@pxref{Text}).
 @item :env-var
-@copindex{environment variable}
+@copindex{env-var}
 The option's associated environment variable. A string or @code{nil}.
 @end table
 
@@ -1106,7 +1105,7 @@ completed long name if the option's name was abbreviated. A completed
 name displays the omitted parts in parentheses (@code{"he(lp)"} for
 instance).
 @item (:environment @var{VAR})
-@copindex{environment variable}
+@copindex{env-var}
 @cindex Values, source, environment
 This is for options not found on the @cmdline{} but for which there is
 an associated environment variable set in the application's environment.
