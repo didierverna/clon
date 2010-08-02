@@ -426,7 +426,7 @@ the options recognized by your application, but also the order in which
 every element appears in the help string. In that particular example, we
 define a line of text and a group with a header and two flags.
 
-@cindex Context, creation
+@cindex Context
 @findex make-context
 Now, we are going to define a function @code{main} for our standalone
 application. The first thing that we need to do is create a
@@ -1003,7 +1003,6 @@ Step two of the @clon{} initialization phase consists in creating a
 @dfn{context}. A context is an object representing a particular instance
 of your program, for example (and most notably) with an actual
 @cmdline{} as the user typed it.
-@cindex Context, creation
 @findex make-context
 You create a context with the @code{make-context} function.
 
