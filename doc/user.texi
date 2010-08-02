@@ -638,7 +638,8 @@ form:
 @noindent
 @t{(group (@var{OPTIONS}@dots{}) @var{ITEMS}@dots{})}
 
-@cindex Groups, options, header
+@cindex Group Header
+@cindex Header, in group
 The group's options are key/value pairs. Currently, the only available
 option is @code{:header}. The corresponding value must be a string which
 will be displayed above the group's contents in the help string. The
@@ -646,11 +647,8 @@ same formatting recommendations as for arbitrary text apply
 (@pxref{Text}).
 
 @cindex Text, in groups
-@cindex Groups, items, text
 @cindex Options, in groups
-@cindex Groups, items, options
 @cindex Groups, in groups
-@cindex Groups, items, groups
 The group's items are simply arbitrary text, option or sub-group
 descriptions as we've just seen.
 
@@ -925,7 +923,6 @@ available initialization arguments (depending on the option type),
 @xref{Built-In Option Types}.
 @end defun
 
-@cindex Groups, creation
 @defun make-group @code{:header} STRING @code{:item} ITEM1 @
 @code{:item} ITEM2@dots{}
 @fiaindex{make-group, :header}
@@ -969,7 +966,6 @@ single option definition.
 
 @node Group Definition, , Advantages, Advanced Synopsis Creation
 @subsubsection Group Definition
-@cindex Groups, definition
 There is one last point we need to address in order to complete this
 section. There might be times when you need to manipulate an explicit
 group object, but the object itself can still be created in a
