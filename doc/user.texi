@@ -1538,7 +1538,7 @@ possible values. Otherwise, the @code{invalid-argument} error is raised.
 
 @node Constructor Functions, , Conversion Protocol, New Option Types
 @subsection Constructor Functions
-@cindex Constructors
+@findex @r{Constructors}
 The last required step to complete our new option type extension is to
 provide a @dfn{constructor} function that wraps around
 @code{make-instance} on the corresponding option class. I won't insult
@@ -1567,7 +1567,7 @@ and @ref{Group Definition}).
 @voindex{enum}
 @cindex Valued Options, @t{enum}, constructor
 @cindex Options, valued, @t{enum}, constructor
-@cindex Constructors, @t{make-enum}
+@findex @r{Constructors, }@t{make-enum}
 @findex make-enum
 Let's look at the enumeration example now.
 
