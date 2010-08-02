@@ -143,12 +143,6 @@ Command-Line
 @cindex Options, valued, properties, common, \prop\
 @end macro
 
-@macro biotindex{type}
-@cindex Built-In Option Types, @t{\type\}
-@cindex Options, built-in types, @t{\type\}
-@cindex Options, types, built-in, @t{\type\}
-@end macro
-
 @macro voindex{opt}
 @cindex Valued Options, @t{\opt\}
 @cindex Options, valued, @t{\opt\}
@@ -173,6 +167,11 @@ Command-Line
 @macro clssindex{cls, slot}
 @tpindex \cls\@r{, slots, }\slot\
 @tpindex @r{Classes, }\cls\@r{, slots, }\slot\
+@end macro
+
+@macro ocindex{cls}
+@clsindex{\cls\}
+@tpindex @r{Option Classes, }\cls\
 @end macro
 
 @macro ecindex{cond}
@@ -710,7 +709,7 @@ mistaken for a long name, but did I really need to mention this?).
 @node Flags, Common Valued Option Properties, Common Properties, Built-In Option Types
 @subsubsection Flags
 @cindex Flags
-@biotindex{flag}
+@ocindex{flag}
 In @clon{}, options that don't take any argument are of type
 @code{flag}. These options don't provide additional properties on top of
 the common set described in @ref{Common Properties}. All properties
@@ -763,7 +762,7 @@ below.
 @table @code
 @item stropt
 @cindex String Options
-@biotindex{stropt}
+@ocindex{stropt}
 @voindex{stropt}
 @cvopindex{argument name}
 This option type is for options taking strings as their argument. String
@@ -771,7 +770,7 @@ options don't provide any additional properties, but their default
 argument name is changed from @code{"ARG"} to @code{"STR"}.
 @item lispobj
 @cindex Lisp Options
-@biotindex{lispobj}
+@ocindex{lispobj}
 @voindex{lispobj}
 @cvopindex{argument name}
 @vopindex{lispobj, type specifier}
@@ -782,7 +781,7 @@ called @code{:typespec} which must be a @cl{} type specifier that the
 argument must satisfy. It defaults to @code{t}.
 @item enum
 @cindex Enumerations
-@biotindex{enum}
+@ocindex{enum}
 @voindex{enum}
 @cvopindex{argument name}
 @vopindex{enum, enumeration}
@@ -799,7 +798,7 @@ ability to abbreviate the possible values. Look at the
 @code{--clon-version} built-in option for an example.
 @item path
 @cindex Path Options
-@biotindex{path}
+@ocindex{path}
 @voindex{path}
 @cvopindex{argument name}
 @cvopindex{nullable}
@@ -814,7 +813,7 @@ expected. Possible values are: @code{:file}, @code{:directory},
 anything is allowed).
 @item switch
 @cindex Switches
-@biotindex{switch}
+@ocindex{switch}
 @voindex{switch}
 @cvopindex{argument type}
 @cvopindex{nullable}
@@ -830,7 +829,7 @@ the argument name @emph{only}. All possible switch arguments
 (@pxenduserref{Switches}) are always availble to all switches.
 @item xswitch
 @cindex Extended Switches
-@biotindex{xswitch}
+@ocindex{xswitch}
 @voindex{xswitch}
 @cvopindex{argument type}
 @cvopindex{nullable}
@@ -1131,7 +1130,7 @@ was provided.
 @end table
 
 @cindex Flags
-@biotindex{flag}
+@ocindex{flag}
 @findex getopt
 Note that flags don't take any argument, so @code{getopt} returns a
 virtual value of @code{t} when they are found, or a corresponding
@@ -1235,7 +1234,7 @@ types fullfill your requirements exactly. There are two ways around
 this: the right way or the wrong way (hint).
 
 @cindex String Options
-@biotindex{stropt}
+@ocindex{stropt}
 The wrong, although perhaps quicker way would be to use the
 @code{stropt} option type to simply retrieve unprocessed string values,
 and then do whatever tweaking required on them. In doing so, you risk
@@ -1246,7 +1245,7 @@ types are a good thing because they allow for reusability and also
 extensibility, since new option types can always be defined on top of
 others.
 @cindex Enumerations
-@biotindex{enum}
+@ocindex{enum}
 In this chapter we explain how to extend @clon{} by providing new option
 types. We illustrate the process with the example of the built-in
 @code{enum} one.
@@ -1254,7 +1253,7 @@ types. We illustrate the process with the example of the built-in
 @cindex Valued Options
 @cindex Options, valued
 @cindex Flags
-@biotindex{flag}
+@ocindex{flag}
 Oh, and I almost forgot. I hope it is obvious to everyone that new
 option types are always @emph{valued}. There's no point in extending
 @clon{} with options that don't take any arguments, since we already
@@ -1332,11 +1331,11 @@ This class implements options whose values belong to a set of keywords."))
 @end cartouche
 
 @cindex Enumerations
-@biotindex{enum}
+@ocindex{enum}
 @voindex{enum}
 @vopindex{enum, enumeration}
 @cindex Extended Switches
-@biotindex{xswitch}
+@ocindex{xswitch}
 @voindex{xswitch}
 @vopindex{xswitch, enumeration}
 @clsindex{enum-base}
@@ -1452,7 +1451,7 @@ Let's look at the enumeration example now.
 @end cartouche
 
 @cindex Enumerations
-@biotindex{enum}
+@ocindex{enum}
 @voindex{enum}
 @cvopindex{nullable}
 This code should be self-explanatory. We first check that we got a
@@ -1538,7 +1537,7 @@ If ARGUMENT doesn't name one of ENUM's symbols, raise a conversion error."
 @end cartouche
 
 @cindex Enumerations
-@biotindex{enum}
+@ocindex{enum}
 @voindex{enum}
 @vopindex{enum, enumeration}
 Since enumerations allow their arguments to be abbreviated, a utility
@@ -1573,7 +1572,7 @@ and @ref{Group Definition}).
 
 
 @cindex Enumerations
-@biotindex{enum}
+@ocindex{enum}
 @voindex{enum}
 @cindex Valued Options, @t{enum}, constructor
 @cindex Options, valued, @t{enum}, constructor
@@ -1650,7 +1649,7 @@ Lisp is a world of mess@t{^D^D^D^D}freedom.
 @node Lisp Option Abuse, , Incremental Option Types, Extension Tips
 @subsection Lisp Option Abuse
 @cindex Lisp Options
-@biotindex{lispobj}
+@ocindex{lispobj}
 @voindex{lispobj}
 @vopindex{lispobj, type specifier}
 Along with the same lines, you may find that the @code{lispobj} type is
