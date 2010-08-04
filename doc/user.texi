@@ -131,87 +131,117 @@ Command-Line
 @c Indexing macros
 @c ---------------
 
-@macro voindex{opt}
-@cindex Valued Options, @t{\opt\}
-@cindex Options, valued, @t{\opt\}
-@end macro
+@c Concept index
+@c -------------
 
-@macro vopindex{opt, prop}
-@cindex Valued Options, @t{\opt\}, properties, \prop\
-@cindex Options, valued, @t{\opt\}, properties, \prop\
-@end macro
-
+@c Built-in options
 @macro bioindex{opt}
 @cindex @t{--clon-\opt\}
 @cindex Built-In Options, @t{--clon-\opt\}
 @cindex Options, built-in, @t{--clon-\opt\}
 @end macro
 
+@c Valued options
+@macro voindex{opt}
+@cindex Valued Options, @t{\opt\}
+@cindex Options, valued, @t{\opt\}
+@end macro
+
+@c Valued option properties
+@macro vopindex{opt, prop}
+@cindex Valued Options, @t{\opt\}, properties, \prop\
+@cindex Options, valued, @t{\opt\}, properties, \prop\
+@end macro
+
+@c Functions index
+@c ---------------
+
+@c Function options
+@macro foindex{func, opt}
+@findex \func\@r{, options, }\opt\
+@end macro
+
+@c Function items
+@macro fiindex{func, item}
+@findex \func\@r{, items, }\item\
+@end macro
+
+@c Function keys
+@macro fkindex{func, key}
+@findex \func\@r{, keys, }\key\
+@end macro
+
+@c Function initargs
+@macro fiaindex{func, arg}
+@findex \func\@r{, initargs, }\arg\
+@end macro
+
+@c Generic function methods
+@macro fmindex{func, method}
+@findex \func\@r{, methods, }\method\
+@end macro
+
+@c Variables index
+@c ---------------
+
+@c Environment variables
+@macro evindex{var}
+@vindex \var\
+@vindex @r{Environment, }\var\
+@end macro
+
+@c Data Types index
+@c ----------------
+
+@c Classes
 @macro clsindex{cls}
 @tpindex \cls\
 @tpindex @r{Classes, }\cls\
 @end macro
 
+@c Class slots
 @macro clssindex{cls, slot}
 @tpindex \cls\@r{, slots, }\slot\
 @tpindex @r{Classes, }\cls\@r{, slots, }\slot\
 @end macro
 
+@c Class initargs
 @macro clsiaindex{cls, arg}
 @tpindex \cls\@r{, initargs, }\arg\
 @tpindex @r{Classes, }\cls\@r{, initargs, }\arg\
 @end macro
 
+@c Option classes
 @macro ocindex{cls}
 @clsindex{\cls\}
 @tpindex @r{Option Classes, }\cls\
 @end macro
 
+@c Class option properties
 @macro copindex{prop}
 @clssindex{option, \prop\}
 @end macro
 
+@c Class valued option properties
 @macro cvopindex{prop}
 @clssindex{valued-option, \prop\}
 @end macro
 
+@c Class valued option initargs
 @macro cvoiaindex{arg}
 @clsiaindex{valued-option, \arg\}
 @end macro
 
+@c Error conditions
 @macro ecindex{cond}
 @tpindex \cond\
 @tpindex @r{Error Conditions, }\cond\
 @end macro
 
+@c Error condition slots
 @macro ecsindex{cond, slot}
 @tpindex \cond\@r{, slots, }\slot\
 @tpindex @r{Error Conditions, }\cond\@r{, slots, }\slot\
-@end macro
-
-@macro fiaindex{func, arg}
-@findex \func\@r{, initargs, }\arg\
-@end macro
-
-@macro fkindex{func, key}
-@findex \func\@r{, keys, }\key\
-@end macro
-
-@macro foindex{func, opt}
-@findex \func\@r{, options, }\opt\
-@end macro
-
-@macro fiindex{func, item}
-@findex \func\@r{, items, }\item\
-@end macro
-
-@macro fmindex{func, method}
-@findex \func\@r{, methods, }\method\
-@end macro
-
-@macro evindex{var}
-@vindex \var\
-@vindex @r{Environment, }\var\
 @end macro
 
 
