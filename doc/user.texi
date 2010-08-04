@@ -181,6 +181,18 @@ Command-Line
 @findex \func\@r{, methods, }\method\
 @end macro
 
+@c Constructor functions
+@macro cfindex{func}
+@findex \func\
+@findex @r{Constructors, }\func\
+@end macro
+
+@c Constructor function initargs
+@macro cfiaindex{func, arg}
+@fiaindex{\func\, \arg\}
+@findex @r{Constructors, }\func\@r{, initargs, }\arg\
+@end macro
+
 @c Variables index
 @c ---------------
 
@@ -469,7 +481,7 @@ every element appears in the help string. In that particular example, we
 define a line of text and a group with a header and two flags.
 
 @cindex Context
-@findex make-context
+@cfindex{make-context}
 Now, we are going to define a function @code{main} for our standalone
 application. The first thing that we need to do is create a
 @dfn{context}. A context is an object that @clon{} uses to store various
@@ -922,10 +934,10 @@ The original code is like this:
 
 And once the macro is expanded, it will look like this:
 
-@findex make-synopsis
-@findex make-text
-@findex make-group
-@findex make-flag
+@cfindex make-synopsis
+@cfindex make-text
+@cfindex make-group
+@cfindex make-flag
 @findex defsynopsis@r{, expansion}
 @cartouche
 @verbatim
@@ -948,19 +960,21 @@ constructors. We now examine those constructors in greater detail.
 
 @cindex Options, creation
 @defun make-text @code{:contents} STRING
-@fiaindex{make-text, :contents}
+@findex @r{Constructors, }make-text
+@cfiaindex{make-text, :contents}
 Create an arbitrary text object whose contents is @var{STRING}.
 @end defun
 
 @c FIXME: I would like an environment without indexing here.
 @defun make-@var{OPTION} :INITARG INITVAL@dots{}
-@findex make-flag
-@findex make-stropt
-@findex make-lispobj
-@findex make-enum
-@findex make-path
-@findex make-switch
-@findex make-xswitch
+@findex @r{Constructors, }make-@var{OPTION}
+@cfindex make-flag
+@cfindex make-stropt
+@cfindex make-lispobj
+@cfindex make-enum
+@cfindex make-path
+@cfindex make-switch
+@cfindex make-xswitch
 Create a new @var{OPTION} object, @var{OPTION} being any built-in option
 type (@code{flag}, @code{stropt} @etc{}, see @ref{Built-In Valued
 Options}) or user-defined one (@pxref{Extending Clon}). For a list of
@@ -970,8 +984,9 @@ available initialization arguments (depending on the option type),
 
 @defun make-group @code{:header} STRING @code{:item} ITEM1 @
 @code{:item} ITEM2@dots{}
-@fiaindex{make-group, :header}
-@fiaindex{make-group, :item}
+@findex @r{Constructors, }make-group
+@cfiaindex{make-group, :header}
+@cfiaindex{make-group, :item}
 Create a group object whose header is @var{STRING}. Every @var{ITEM} is
 an arbitrary text object, option object or group object. The order is
 important.
@@ -979,8 +994,9 @@ important.
 
 @defun make-synopsis @code{:postfix} STRING @code{:item} ITEM1 @
 @code{:item} ITEM2@dots{}
-@fiaindex{make-synopsis, :postfix}
-@fiaindex{make-synopsis, :item}
+@findex @r{Constructors, }make-synopsis
+@cfiaindex{make-synopsis, :postfix}
+@cfiaindex{make-synopsis, :item}
 Create a synopsis object whose postfix is @var{STRING}. Every @var{ITEM} is
 an arbitrary text object, option object or group object. The order is
 important.
@@ -1044,19 +1060,25 @@ Step two of the @clon{} initialization phase consists in creating a
 @dfn{context}. A context is an object representing a particular instance
 of your program, for example (and most notably) with an actual
 @cmdline{} as the user typed it.
-@findex make-context
+@cfindex{make-context}
 You create a context with the @code{make-context} function.
 
+@c #### FIXME: I have previously indexed make-context with @cfindex.
+@c @defun indexes it as well but I end up with separate index entries
+@c instead of only one with two page references. What's more, I need to
+@c replicate the effect of @cfindex. That sucks. I really need the
+@c ability to define my own @def macros.
 @defun make-context :INITARG INITVAL@dots{}
+@findex @r{Constructors, }make-index
 Create a new context. The following initargs are available.
 
 @table @code
 @item :synopsis
-@fiaindex{make-context, :synopsis}
+@cfiaindex{make-context, :synopsis}
 Use this key to associate the context with a synopsis previously defined
 by @code{defsynopsis} (@pxref{Synopsis Definition}).
 @item :error-handler
-@fiaindex{make-context, :error-handler}
+@cfiaindex{make-context, :error-handler}
 The behavior to adopt in case an error happens during the initialization
 phase, when the @cmdline{} is parsed. This is where you get errors like
 ``unknown option'', ``invalid argument'' @etc{}). Possible values are
@@ -1067,7 +1089,7 @@ behavior will depend on the underlying @cl{} implementation. For
 instance, the debugger might be raised or a stack trace might be printed
 (this is the case in SBCL with the @option{--script} option).
 @item :getopt-error-handler
-@fiaindex{make-context, :getopt-error-handler}
+@cfiaindex{make-context, :getopt-error-handler}
 The behavior to adopt in case an error happens when an option is
 retrieved in any way (@pxref{Option Retrieval}). Since @cmdline{} errors
 are throw at initialization time, the errors you can get here are
@@ -1579,7 +1601,8 @@ possible values. Otherwise, the @code{invalid-argument} error is raised.
 
 @node Constructor Functions, , Conversion Protocol, New Option Types
 @subsection Constructor Functions
-@findex @r{Constructors}
+@cindex Constructors, for options objects
+@cindex Option Constructors
 The last required step to complete our new option type extension is to
 provide a @dfn{constructor} function that wraps around
 @code{make-instance} on the corresponding option class. I won't insult
@@ -1606,10 +1629,7 @@ and @ref{Group Definition}).
 @cindex Enumerations
 @ocindex{enum}
 @voindex{enum}
-@cindex Valued Options, @t{enum}, constructor
-@cindex Options, valued, @t{enum}, constructor
-@findex @r{Constructors, }@t{make-enum}
-@findex make-enum
+@cfindex{make-enum}
 Let's look at the enumeration example now.
 
 @cartouche
@@ -1744,7 +1764,7 @@ however that the @cmdline{} doesn't need to be the actual program's
 @cmdline{}, as the user typed it. Any list of strings can act as a
 @cmdline{}.
 
-@fiaindex{make-context, :cmdline}
+@cfiaindex{make-context, :cmdline}
 The function @code{make-context} has a @code{:cmdline} key that allows
 you to provide any list of strings that will act as the @cmdline{}. Of
 course, the default is to use the actual program's one.
@@ -1761,7 +1781,7 @@ any explicit reference to it anymore? So where is the magick? In fact,
 there's no magick at all involved.
 
 @vindex *current-context*
-@fiaindex{make-context, :make-current}
+@cfiaindex{make-context, :make-current}
 @clon{} has a global variable named @code{*current-context*} which holds
 the@dots{} current context, yeah. When you create a context with
 @code{make-context}, it is automatically made current, unless you use
@@ -2019,21 +2039,25 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
 @section Initialization Phase API
 
 @defun make-text &key CONTENTS
-@fiaindex{make-text, :contents}
+@findex @r{Constructors, }make-text
+@cfiaindex{make-text, :contents}
 @defunx make-@var{OPTION} :INITARG INITVAL@dots{}
-@findex make-flag
-@findex make-stropt
-@findex make-lispobj
-@findex make-enum
-@findex make-path
-@findex make-switch
-@findex make-xswitch
+@findex @r{Constructors, }make-@var{OPTION}
+@cfindex make-flag
+@cfindex make-stropt
+@cfindex make-lispobj
+@cfindex make-enum
+@cfindex make-path
+@cfindex make-switch
+@cfindex make-xswitch
 @defunx make-group &key HEADER ITEM
-@fiaindex{make-group, :header}
-@fiaindex{make-group, :item}
+@findex @r{Constructors, }make-group
+@cfiaindex{make-group, :header}
+@cfiaindex{make-group, :item}
 @defunx make-synopsis &key POSTFIX ITEM
-@fiaindex{make-synopsis, :postfix}
-@fiaindex{make-synopsis, :item}
+@findex @r{Constructors, }make-synopsis
+@cfiaindex{make-synopsis, :postfix}
+@cfiaindex{make-synopsis, :item}
 @xref{Constructors}.
 @end defun
 
@@ -2052,11 +2076,12 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
 
 @defun make-context &key SYNOPSIS ERROR-HANDLER GETOPT-ERROR-HANDLER @
 CMDLINE (MAKE-CURRENT t)
-@fiaindex{make-context, :synopsis}
-@fiaindex{make-context, :error-handler}
-@fiaindex{make-context, :getopt-error-handler}
-@fiaindex{make-context, :cmdline}
-@fiaindex{make-context, :make-current}
+@findex @r{Constructors, }make-context
+@cfiaindex{make-context, :synopsis}
+@cfiaindex{make-context, :error-handler}
+@cfiaindex{make-context, :getopt-error-handler}
+@cfiaindex{make-context, :cmdline}
+@cfiaindex{make-context, :make-current}
 @xref{Context Creation}, @ref{Not Using the Command-Line} and @ref{Using
 Multiple Contexts}.
 @end defun
