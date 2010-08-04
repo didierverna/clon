@@ -498,7 +498,7 @@ needs to be associated with the synopsis we created earlier.
 @end cartouche
 
 @cindex Retrieval, explicit
-@cindex Options, retrieval, explicit
+@cindex Option Retrieval, explicit
 @findex getopt
 @cindex Help String, display
 @findex help
@@ -520,7 +520,7 @@ name.
 @end cartouche
 
 @cindex Retrieval, sequential
-@cindex Options, retrieval, sequential
+@cindex Option Retrieval, sequential
 @findex do-cmdline-options
 And now, we are going to retrieve the other options and simply print
 them. This time however, we process the @cmdline{} sequentially. This is
@@ -1107,7 +1107,7 @@ as above, and the same comments apply as well.
 @cindex Runtime Phase
 @cindex Phase, runtime
 @cindex Retrieval
-@cindex Options, retrieval
+@cindex Option Retrieval
 
 During the runtime phase of @clon{}, your main activity will be to
 retrieve options and their values. @clon{} provides two techniques for
@@ -1128,7 +1128,7 @@ fact, @clon{} never works on the original @cmdline{}, but uses a mutable
 @node Explicit Retrieval, Sequential Retrieval, Option Retrieval, Option Retrieval
 @subsection Explicit Retrieval
 @cindex Retrieval, explicit
-@cindex Options, retrieval, explicit
+@cindex Option Retrieval, explicit
 Since @clon{} lets you retrieve options on demand (at any time), it
 makes sense to be able to request the value of a specific option
 explicitely. For instance, you might want to try the @samp{--help}
@@ -1204,7 +1204,7 @@ value of @code{nil}.
 @node Sequential Retrieval, , Explicit Retrieval, Option Retrieval
 @subsection Sequential Retrieval
 @cindex Retrieval, sequential
-@cindex Options, retrieval, sequential
+@cindex Option Retrieval, sequential
 The more traditional approach to option retrieval is to scan the
 @cmdline{} for options in their order of appearance. @clon{} supports
 this by providing you with one function and two macros, as explained
