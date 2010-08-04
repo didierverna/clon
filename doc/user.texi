@@ -209,6 +209,11 @@ Command-Line
 @findex \func\@r{, methods, }\method\
 @end macro
 
+@macro evindex{var}
+@vindex \var\
+@vindex @r{Environment, }\var\
+@end macro
+
 
 
 @c ====================================================================
@@ -1187,17 +1192,13 @@ help string, use the @code{help} function.
 
 @defun help @code{:item} ITEM
 @bioindex{search-path}
-@cindex CLON_SEARCH_PATH
-@cindex Environment Variables, CLON_SEARCH_PATH
+@evindex{CLON_SEARCH_PATH}
 @bioindex{highlight}
-@cindex CLON_HIGHLIGHT
-@cindex Environment Variables, CLON_HIGHLIGHT
+@evindex{CLON_HIGHLIGHT}
 @bioindex{theme}
-@cindex CLON_THEME
-@cindex Environment Variables, CLON_THEME
+@evindex{CLON_THEME}
 @bioindex{line-width}
-@cindex CLON_LINE_WIDTH
-@cindex Environment Variables, CLON_LINE_WIDTH
+@evindex{CLON_LINE_WIDTH}
 Print the application's help string. Printing honors the search path,
 theme, line width and highlight settings provided by the corresponding
 built-in options (@pxenduserref{Theme Mechanism}).
@@ -1794,17 +1795,13 @@ install} creates a @file{REFCARD} file in
 formatted with the @code{refcard} theme, @etc{}.
 
 @bioindex{theme}
-@cindex CLON_THEME
-@cindex Environment Variables, CLON_THEME
+@evindex{CLON_THEME}
 @bioindex{search-path}
-@cindex CLON_SEARCH_PATH
-@cindex Environment Variables, CLON_SEARCH_PATH
+@evindex{CLON_SEARCH_PATH}
 @bioindex{line-width}
-@cindex CLON_LINE_WIDTH
-@cindex Environment Variables, CLON_LINE_WIDTH
+@evindex{CLON_LINE_WIDTH}
 @bioindex{highlight}
-@cindex CLON_HIGHLIGHT
-@cindex Environment Variables, CLON_HIGHLIGHT
+@evindex{CLON_HIGHLIGHT}
 In such situations, calling the @code{help} function might not be
 directly associated with an end-user level option, or at least not
 @code{--help}, and you might not want to honor the end-user level
