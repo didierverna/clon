@@ -421,6 +421,7 @@ extend @clon{} with your own option types.
 @c ====================================================================
 @node Quick Start, Using Clon, Introduction, Top
 @chapter Quick Start
+
 In this chapter, we quickly build a very short program to get you
 started. We assume that you have properly installed @clon{} for ASDF.
 Since several bits are compiler-specific, we also assume that SBCL is
@@ -503,12 +504,12 @@ needs to be associated with the synopsis we created earlier.
 @cindex Help String, display
 @findex help
 At that point, @clon{} is ready to retrieve the options you want from
-the @cmdline{}. Let's first see if the user has used the option
+the @cmdline{}. Let's first see if the user has called the option
 @option{-h}, and give him the help string. Option retrieval is done with
 the function @code{getopt}, and automatic help string output with the
 function @code{help}. Note that what we do here is @emph{not} process
 the @cmdline{} in sequence, but look directly for a specific option by
-name.
+name (this retrieval method is said to be @dfn{explicit}).
 
 @fkindex{getopt, :short-name}
 @cartouche
@@ -523,9 +524,9 @@ name.
 @cindex Option Retrieval, sequential
 @findex do-cmdline-options
 And now, we are going to retrieve the other options and simply print
-them. This time however, we process the @cmdline{} sequentially. This is
-done with the @code{do-cmdline-options} macro. We also close the
-@code{main} function.
+them. This time however, we process the @cmdline{} sequentially (so this
+retrieval method is said to be @dfn{sequential}). This is done with the
+@code{do-cmdline-options} macro. We also close the @code{main} function.
 
 @cartouche
 @verbatim
@@ -583,11 +584,11 @@ options values. Steps one and two form the @dfn{initialization phase} of
 @c -------------------
 @node Synopsis Definition, Context Creation, Using Clon, Using Clon
 @section Synopsis Definition
+
 @cindex Initialization Phase
 @cindex Phase, initialization
 @cindex Synopsis
 @cindex Help String
-
 Step one of the @clon{} initialization phase consists in defining a
 @dfn{synopsis}. A synopsis is essentially a description of your
 application's @cmdline{}: it describes what are the available options,
