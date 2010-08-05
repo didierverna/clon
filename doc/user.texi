@@ -954,8 +954,8 @@ And once the macro is expanded, it will look like this:
 
 As you can see, every synopsis element has a corresponding
 @code{make-@var{SOMETHING}} constructor, and the keywords used here and
-there in @code{defsyopsis} are in fact initialization arguments to those
-constructors. We now examine those constructors in greater detail.
+there in @code{defsyopsis} are in fact initargs to those constructors.
+We now examine those constructors in greater detail.
 
 @cindex Options, creation
 @defun make-text @code{:contents} STRING
