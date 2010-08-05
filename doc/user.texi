@@ -710,7 +710,7 @@ descriptions as we've just seen.
 @subsection Built-In Option Types
 @cindex Built-In Option Types
 @cindex Options, built-in types
-@cindex Options, types, built-in
+@cindex Option Types, built-in
 In this section, we will review all the built-in option types that
 @clon{} provides, along with their corresponding properties. You can use
 them directly in your synopsis description. For adding personal option
@@ -801,10 +801,10 @@ Check Protocol}).
 
 @node Built-In Valued Options, , Common Valued Option Properties, Built-In Option Types
 @subsubsection Built-In Valued Options
-@cindex Options, types, valued
+@cindex Option Types, valued
 @cindex Built-In Option Types, valued
 @cindex Options, built-in types, valued
-@cindex Options, types, built-in, valued
+@cindex Option Types, built-in, valued
 @clon{} currently defines 6 built-in valued option types. These option
 types may change the default value for some common properties, and / or
 provide additional properties of their own. All of this is described
