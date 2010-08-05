@@ -959,14 +959,14 @@ We now examine those constructors in greater detail.
 
 @cindex Options, creation
 @defun make-text @code{:contents} STRING
-@findex @r{Constructors, }make-text
+@cfindex{make-text}
 @cfiaindex{make-text,:contents}
 Create an arbitrary text object whose contents is @var{STRING}.
 @end defun
 
 @c FIXME: I would like an environment without indexing here.
 @defun make-@var{OPTION} :INITARG INITVAL@dots{}
-@findex @r{Constructors, }make-@var{OPTION}
+@cfindex{make-@var{OPTION}}
 @cfindex make-flag
 @cfindex make-stropt
 @cfindex make-lispobj
@@ -983,7 +983,7 @@ available initialization arguments (depending on the option type),
 
 @defun make-group @code{:header} STRING @code{:item} ITEM1 @
 @code{:item} ITEM2@dots{}
-@findex @r{Constructors, }make-group
+@cfindex{make-group}
 @cfiaindex{make-group,:header}
 @cfiaindex{make-group,:item}
 Create a group object whose header is @var{STRING}. Every @var{ITEM} is
@@ -993,7 +993,7 @@ important.
 
 @defun make-synopsis @code{:postfix} STRING @code{:item} ITEM1 @
 @code{:item} ITEM2@dots{}
-@findex @r{Constructors, }make-synopsis
+@cfindex{make-synopsis}
 @cfiaindex{make-synopsis,:postfix}
 @cfiaindex{make-synopsis,:item}
 Create a synopsis object whose postfix is @var{STRING}. Every @var{ITEM} is
@@ -1068,7 +1068,7 @@ You create a context with the @code{make-context} function.
 @c replicate the effect of @cfindex. That sucks. I really need the
 @c ability to define my own @def macros.
 @defun make-context :INITARG INITVAL@dots{}
-@findex @r{Constructors, }make-index
+@cfindex{make-index}
 Create a new context. The following initargs are available.
 
 @table @code
@@ -2022,10 +2022,10 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
 @section Initialization Phase API
 
 @defun make-text &key CONTENTS
-@findex @r{Constructors, }make-text
+@cfindex{make-text}
 @cfiaindex{make-text,:contents}
 @defunx make-@var{OPTION} :INITARG INITVAL@dots{}
-@findex @r{Constructors, }make-@var{OPTION}
+@cfindex{make-@var{OPTION}}
 @cfindex make-flag
 @cfindex make-stropt
 @cfindex make-lispobj
@@ -2034,11 +2034,11 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
 @cfindex make-switch
 @cfindex make-xswitch
 @defunx make-group &key HEADER ITEM
-@findex @r{Constructors, }make-group
+@cfindex{make-group}
 @cfiaindex{make-group,:header}
 @cfiaindex{make-group,:item}
 @defunx make-synopsis &key POSTFIX ITEM
-@findex @r{Constructors, }make-synopsis
+@cfindex{make-synopsis}
 @cfiaindex{make-synopsis,:postfix}
 @cfiaindex{make-synopsis,:item}
 @xref{Constructors}.
@@ -2059,7 +2059,7 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
 
 @defun make-context &key SYNOPSIS ERROR-HANDLER GETOPT-ERROR-HANDLER @
 CMDLINE (MAKE-CURRENT t)
-@findex @r{Constructors, }make-context
+@cfindex{make-context}
 @cfiaindex{make-context,:synopsis}
 @cfiaindex{make-context,:error-handler}
 @cfiaindex{make-context,:getopt-error-handler}
