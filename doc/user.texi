@@ -179,27 +179,27 @@ Command-Line
 @c ---------------
 
 @c Function options
-@macro foindex{func, opt}
+@macro foindex{func,opt}
 @findex \func\@r{, options, }\opt\
 @end macro
 
 @c Function items
-@macro fiindex{func, item}
+@macro fiindex{func,item}
 @findex \func\@r{, items, }\item\
 @end macro
 
 @c Function keys
-@macro fkindex{func, key}
+@macro fkindex{func,key}
 @findex \func\@r{, keys, }\key\
 @end macro
 
 @c Function initargs
-@macro fiaindex{func, arg}
+@macro fiaindex{func,arg}
 @findex \func\@r{, initargs, }\arg\
 @end macro
 
 @c Generic function methods
-@macro fmindex{func, method}
+@macro fmindex{func,method}
 @findex \func\@r{, methods, }\method\
 @end macro
 
@@ -210,7 +210,7 @@ Command-Line
 @end macro
 
 @c Constructor function initargs
-@macro cfiaindex{func, arg}
+@macro cfiaindex{func,arg}
 @fiaindex{\func\, \arg\}
 @findex @r{Constructors, }\func\@r{, initargs, }\arg\
 @end macro
@@ -234,13 +234,13 @@ Command-Line
 @end macro
 
 @c Class slots
-@macro clssindex{cls, slot}
+@macro clssindex{cls,slot}
 @tpindex \cls\@r{, slots, }\slot\
 @tpindex @r{Classes, }\cls\@r{, slots, }\slot\
 @end macro
 
 @c Class initargs
-@macro clsiaindex{cls, arg}
+@macro clsiaindex{cls,arg}
 @tpindex \cls\@r{, initargs, }\arg\
 @tpindex @r{Classes, }\cls\@r{, initargs, }\arg\
 @end macro
@@ -258,7 +258,7 @@ Command-Line
 @end macro
 
 @c Error condition slots
-@macro ecsindex{cond, slot}
+@macro ecsindex{cond,slot}
 @tpindex \cond\@r{, slots, }\slot\
 @tpindex @r{Error Conditions, }\cond\@r{, slots, }\slot\
 @end macro
@@ -466,10 +466,10 @@ texts that your application will recognize and/or display in its help
 string. The structure of your @cmdline{} is known to @clon{} as the
 @dfn{synopsis}. In order to create it, use the macro @code{defsynopsis}.
 
-@foindex{defsynopsis, :postfix}
-@fiindex{defsynopsis, text}
-@fiindex{defsynopsis, options}
-@fiindex{defsynopsis, group}
+@foindex{defsynopsis,:postfix}
+@fiindex{defsynopsis,text}
+@fiindex{defsynopsis,options}
+@fiindex{defsynopsis,group}
 @cartouche
 @verbatim
 (defvar *synopsis*
@@ -518,7 +518,7 @@ function @code{help}. Note that what we do here is @emph{not} process
 the @cmdline{} in sequence, but look directly for a specific option by
 name (this retrieval method is said to be @dfn{explicit}).
 
-@fkindex{getopt, :short-name}
+@fkindex{getopt,:short-name}
 @cartouche
 @verbatim
   (when (getopt :short-name "h")
@@ -633,7 +633,7 @@ Define a new synopsis and return it. @var{OPTIONS} are key/value pairs.
 @var{ITEMS} is a list of either text, group, or option descriptions.
 
 @cindex Postfix
-@foindex{defsynopsis, :postfix}
+@foindex{defsynopsis,:postfix}
 The first argument to @code{defsynopsis} is a list of key/value pairs.
 Currently, the only available key is @code{:postfix}. Its value is a
 string which will appear at the end of the synopsis line in the help
@@ -657,7 +657,7 @@ We now examine the syntax for each one of them.
 @subsubsection Text
 @cindex Text
 @cindex Text, in synopsis
-@fiindex{defsynopsis, text}
+@fiindex{defsynopsis,text}
 In order to add arbitrary text to your help string, use the following
 form:
 
@@ -675,7 +675,7 @@ a newline. This would break potential theme specifications.
 @subsubsection Options
 @cindex Options
 @cindex Options, in synopsis
-@fiindex{defsynopsis, options}
+@fiindex{defsynopsis,options}
 In order to add an option to your help string, you must provide a list
 beginning with the option type and followed by key/value pairs
 describing the option's properties. For instance, to add a flag with a
@@ -693,7 +693,7 @@ in @ref{Built-In Option Types}.
 @subsubsection Groups
 @cindex Groups
 @cindex Groups, in synopsis
-@fiindex{defsynopsis, group}
+@fiindex{defsynopsis,group}
 In order to add a group to your help string, you must use the following
 form:
 
@@ -965,7 +965,7 @@ constructors. We now examine those constructors in greater detail.
 @cindex Options, creation
 @defun make-text @code{:contents} STRING
 @findex @r{Constructors, }make-text
-@cfiaindex{make-text, :contents}
+@cfiaindex{make-text,:contents}
 Create an arbitrary text object whose contents is @var{STRING}.
 @end defun
 
@@ -989,8 +989,8 @@ available initialization arguments (depending on the option type),
 @defun make-group @code{:header} STRING @code{:item} ITEM1 @
 @code{:item} ITEM2@dots{}
 @findex @r{Constructors, }make-group
-@cfiaindex{make-group, :header}
-@cfiaindex{make-group, :item}
+@cfiaindex{make-group,:header}
+@cfiaindex{make-group,:item}
 Create a group object whose header is @var{STRING}. Every @var{ITEM} is
 an arbitrary text object, option object or group object. The order is
 important.
@@ -999,8 +999,8 @@ important.
 @defun make-synopsis @code{:postfix} STRING @code{:item} ITEM1 @
 @code{:item} ITEM2@dots{}
 @findex @r{Constructors, }make-synopsis
-@cfiaindex{make-synopsis, :postfix}
-@cfiaindex{make-synopsis, :item}
+@cfiaindex{make-synopsis,:postfix}
+@cfiaindex{make-synopsis,:item}
 Create a synopsis object whose postfix is @var{STRING}. Every @var{ITEM} is
 an arbitrary text object, option object or group object. The order is
 important.
@@ -1039,8 +1039,8 @@ this, @clon{} provides a macro called @code{defgroup}.
 
 @defmac defgroup (OPTIONS@dots{}) ITEMS@dots{}
 @cindex Groups, in synopsis
-@fiindex{defsynopsis, group}
-@foindex{defgroup, :header}
+@fiindex{defsynopsis,group}
+@foindex{defgroup,:header}
 Define a new group and return it. This macro behaves exactly like the
 @code{group} form in a call to @code{defsynopsis} (@pxref{Groups}).
 @end defmac
@@ -1078,11 +1078,11 @@ Create a new context. The following initargs are available.
 
 @table @code
 @item :synopsis
-@cfiaindex{make-context, :synopsis}
+@cfiaindex{make-context,:synopsis}
 Use this key to associate the context with a synopsis previously defined
 by @code{defsynopsis} (@pxref{Synopsis Definition}).
 @item :error-handler
-@cfiaindex{make-context, :error-handler}
+@cfiaindex{make-context,:error-handler}
 The behavior to adopt in case an error happens during the initialization
 phase, when the @cmdline{} is parsed. This is where you get errors like
 ``unknown option'', ``invalid argument'' @etc{}). Possible values are
@@ -1093,7 +1093,7 @@ behavior will depend on the underlying @cl{} implementation. For
 instance, the debugger might be raised or a stack trace might be printed
 (this is the case in SBCL with the @option{--script} option).
 @item :getopt-error-handler
-@cfiaindex{make-context, :getopt-error-handler}
+@cfiaindex{make-context,:getopt-error-handler}
 The behavior to adopt in case an error happens when an option is
 retrieved in any way (@pxref{Option Retrieval}). Since @cmdline{} errors
 are throw at initialization time, the errors you can get here are
@@ -1147,16 +1147,16 @@ available.
 @table @code
 @item :short-name
 @item :long-name
-@fkindex{getopt, :short-name}
-@fkindex{getopt, :long-name}
+@fkindex{getopt,:short-name}
+@fkindex{getopt,:long-name}
 Use one of these 2 keys to specify the name of the option you wish to
 retrieve.
 @item :option
-@fkindex{getopt, :option}
+@fkindex{getopt,:option}
 Alternatively, you can use a handle to an option object
 (@pxref{Constructors}).
 @item :error-handler
-@fkindex{getopt, :error-handler}
+@fkindex{getopt,:error-handler}
 Lets you locally override the error handler established by the
 @code{:getopt-error-handler} to @code{make-context} (@pxref{Context
 Creation}). Note again that this handler will only affect retrieval from
@@ -1262,7 +1262,7 @@ theme, line width and highlight settings provided by the corresponding
 built-in options (@pxenduserref{Theme Mechanism}).
 @end defun
 
-@fkindex{help, :item}
+@fkindex{help,:item}
 By default, @code{help} prints the whole application help string.
 However, if you have kept a handle on any synopsis item (option, text,
 group), you can pass it as the value of the @code{:item} key, and
@@ -1431,7 +1431,7 @@ As you can see, you need to provide a method with the first argument
 specialized to your new option type. This method must return @var{VALUE}
 if it is okay, and raise an @code{invalid-value} error otherwise.
 
-@fmindex{check-value, :around}
+@fmindex{check-value,:around}
 This protocol additionally has the following @code{:around} method:
 
 @cartouche
@@ -1475,12 +1475,12 @@ this simplifies the writing of @code{check-value} methods.
 @end cartouche
 
 @ecindex invalid-value
-@ecsindex{invalid-value, value}
-@ecsindex{invalid-value, comment}
+@ecsindex{invalid-value,value}
+@ecsindex{invalid-value,comment}
 When the error is raised, you must fill in the @code{value} and
 @code{comment} slots appropriately.
 @ecindex option-error
-@ecsindex{option-error, option}
+@ecsindex{option-error,option}
 The super-condition @code{option-error} provides an additional
 @code{option} slot that you must also fill in when the error is raised.
 
@@ -1564,12 +1564,12 @@ The @code{invalid-argument} error condition is defined like this:
 @end cartouche
 
 @ecindex invalid-argument
-@ecsindex{invalid-argument, argument}
-@ecsindex{invalid-argument, comment}
+@ecsindex{invalid-argument,argument}
+@ecsindex{invalid-argument,comment}
 When the error is raised, you must fill in the @code{argument} and
 @code{comment} slots appropriately.
 @ecindex option-error
-@ecsindex{option-error, option}
+@ecsindex{option-error,option}
 As before, the super-condition @code{option-error} provides an
 additional @code{option} slot that you must also fill in when the error
 is raised.
@@ -1762,7 +1762,7 @@ however that the @cmdline{} doesn't need to be the actual program's
 @cmdline{}, as the user typed it. Any list of strings can act as a
 @cmdline{}.
 
-@cfiaindex{make-context, :cmdline}
+@cfiaindex{make-context,:cmdline}
 The function @code{make-context} has a @code{:cmdline} key that allows
 you to provide any list of strings that will act as the @cmdline{}. Of
 course, the default is to use the actual program's one.
@@ -1779,7 +1779,7 @@ any explicit reference to it anymore? So where is the magick? In fact,
 there's no magick at all involved.
 
 @vindex *current-context*
-@cfiaindex{make-context, :make-current}
+@cfiaindex{make-context,:make-current}
 @clon{} has a global variable named @code{*current-context*} which holds
 the@dots{} current context, yeah. When you create a context with
 @code{make-context}, it is automatically made current, unless you use
@@ -1805,11 +1805,11 @@ At any time in your program, you may change the value of
 @code{*current-context*}. All subsequent calls to the runtime phase API
 will hence use this other context.
 @item
-@fkindex{getopt, :context}
-@fkindex{getopt-cmdline, :context}
-@fkindex{help, :context}
-@foindex{multiple-value-getopt-cmdline, :context}
-@foindex{do-cmdline-options, :context}
+@fkindex{getopt,:context}
+@fkindex{getopt-cmdline,:context}
+@fkindex{help,:context}
+@foindex{multiple-value-getopt-cmdline,:context}
+@foindex{do-cmdline-options,:context}
 If you prefer to use another context only temporarily, you can use the
 @code{context} key instead. The whole runtime phase API of @clon{}
 understands it. For the functions @code{getopt}, @code{getopt-cmdline}
@@ -1862,16 +1862,16 @@ settings for theme, search path, line-width, or highlighting either
 associated with @option{--clon-theme}, @option{--clon-search-path},
 @option{--clon-line-width} and @option{--clon-highlight}).
 
-@fkindex{help, :theme}
-@fkindex{help, :search-path}
-@fkindex{help, :line-width}
-@fkindex{help, :highlight}
+@fkindex{help,:theme}
+@fkindex{help,:search-path}
+@fkindex{help,:line-width}
+@fkindex{help,:highlight}
 Because of this, the @code{help} function provides additional keys that
 allow you to override those settings (they are in fact stored in the
 context object). The keys in question are: @code{:theme},
 @code{:search-path}, @code{:line-width} and @code{:highlight}.
 
-@fkindex{help, :output-stream}
+@fkindex{help,:output-stream}
 @vindex *standard-output*
 In addition to that, there is an @code{:output-stream} key which
 defaults to @code{*standard-output*} which you could use for instance to
@@ -2038,7 +2038,7 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
 
 @defun make-text &key CONTENTS
 @findex @r{Constructors, }make-text
-@cfiaindex{make-text, :contents}
+@cfiaindex{make-text,:contents}
 @defunx make-@var{OPTION} :INITARG INITVAL@dots{}
 @findex @r{Constructors, }make-@var{OPTION}
 @cfindex make-flag
@@ -2050,36 +2050,36 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
 @cfindex make-xswitch
 @defunx make-group &key HEADER ITEM
 @findex @r{Constructors, }make-group
-@cfiaindex{make-group, :header}
-@cfiaindex{make-group, :item}
+@cfiaindex{make-group,:header}
+@cfiaindex{make-group,:item}
 @defunx make-synopsis &key POSTFIX ITEM
 @findex @r{Constructors, }make-synopsis
-@cfiaindex{make-synopsis, :postfix}
-@cfiaindex{make-synopsis, :item}
+@cfiaindex{make-synopsis,:postfix}
+@cfiaindex{make-synopsis,:item}
 @xref{Constructors}.
 @end defun
 
 @defmac defgroup (&rest KEYS) &body FORMS
-@foindex{defgroup, :header}
+@foindex{defgroup,:header}
 @xref{Group Definition}.
 @end defmac
 
 @defmac defsynopsis (&rest KEYS) &body FORMS
-@foindex{defsynopsis, :postfix}
-@fiindex{defsynopsis, text}
-@fiindex{defsynopsis, options}
-@fiindex{defsynopsis, group}
+@foindex{defsynopsis,:postfix}
+@fiindex{defsynopsis,text}
+@fiindex{defsynopsis,options}
+@fiindex{defsynopsis,group}
 @xref{Synopsis Definition}.
 @end defmac
 
 @defun make-context &key SYNOPSIS ERROR-HANDLER GETOPT-ERROR-HANDLER @
 CMDLINE (MAKE-CURRENT t)
 @findex @r{Constructors, }make-context
-@cfiaindex{make-context, :synopsis}
-@cfiaindex{make-context, :error-handler}
-@cfiaindex{make-context, :getopt-error-handler}
-@cfiaindex{make-context, :cmdline}
-@cfiaindex{make-context, :make-current}
+@cfiaindex{make-context,:synopsis}
+@cfiaindex{make-context,:error-handler}
+@cfiaindex{make-context,:getopt-error-handler}
+@cfiaindex{make-context,:cmdline}
+@cfiaindex{make-context,:make-current}
 @xref{Context Creation}, @ref{Not Using the Command-Line} and @ref{Using
 Multiple Contexts}.
 @end defun
@@ -2098,17 +2098,17 @@ Multiple Contexts}.
 
 @defun getopt &key (CONTEXT *current-context*) SHORT-NAME LONG-NAME @
 OPTION (ERROR-HANDLER (getopt-error-handler context))
-@fkindex{getopt, :context}
-@fkindex{getopt, :short-name}
-@fkindex{getopt, :long-name}
-@fkindex{getopt, :option}
-@fkindex{getopt, :error-handler}
+@fkindex{getopt,:context}
+@fkindex{getopt,:short-name}
+@fkindex{getopt,:long-name}
+@fkindex{getopt,:option}
+@fkindex{getopt,:error-handler}
 @vindex *current-context*
 See @ref{Explicit Retrieval} and @ref{Using Multiple Contexts}.
 @end defun
 
 @defun getopt-cmdline &key (CONTEXT *current-context*)
-@fkindex{getopt-cmdline, :context}
+@fkindex{getopt-cmdline,:context}
 @vindex *current-context*
 See @ref{Sequential Retrieval} and @ref{Using Multiple Contexts}.
 @end defun
@@ -2117,8 +2117,8 @@ See @ref{Sequential Retrieval} and @ref{Using Multiple Contexts}.
 &body BODY
 @defmacx do-cmdline-options (OPTION NAME VALUE &key CONTEXT) @
 &body BODY
-@foindex{multiple-value-getopt-cmdline, :context}
-@foindex{do-cmdline-options, :context}
+@foindex{multiple-value-getopt-cmdline,:context}
+@foindex{do-cmdline-options,:context}
 See @ref{Sequential Retrieval} and @ref{Using Multiple Contexts}.
 @end defmac
 
@@ -2129,13 +2129,13 @@ See @ref{Sequential Retrieval} and @ref{Using Multiple Contexts}.
 (THEME (theme context)) @
 (LINE-WIDTH (line-width context)) @
 (HIGHLIGHT (highlight context)))
-@fkindex{help, :context}
-@fkindex{help, :item}
-@fkindex{help, :output-stream}
-@fkindex{help, :theme}
-@fkindex{help, :search-path}
-@fkindex{help, :line-width}
-@fkindex{help, :highlight}
+@fkindex{help,:context}
+@fkindex{help,:item}
+@fkindex{help,:output-stream}
+@fkindex{help,:theme}
+@fkindex{help,:search-path}
+@fkindex{help,:line-width}
+@fkindex{help,:highlight}
 @vindex *current-context*
 @vindex *standard-output*
 @xref{Help}, @ref{Using Multiple Contexts} and @ref{Programmatic Help
