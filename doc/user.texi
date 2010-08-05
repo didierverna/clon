@@ -153,6 +153,13 @@ Command-Line
 @cindex Options, valued, @t{\opt\}
 @end macro
 
+@c Common valued option properties
+@macro cvopindex{prop}
+@cindex Valued Options, common properties, @t{\prop\}
+@cindex Common Valued Option Properties, @t{\prop\}
+@cindex Options, valued, common properties, @t{\prop\}
+@end macro
+
 @c Valued option properties
 @macro vopindex{opt, prop}
 @cindex Valued Options, @t{\opt\}, properties, \prop\
@@ -233,16 +240,6 @@ Command-Line
 @macro ocindex{cls}
 @clsindex{\cls\}
 @tpindex @r{Option Classes, }\cls\
-@end macro
-
-@c Class valued option properties
-@macro cvopindex{prop}
-@clssindex{valued-option, \prop\}
-@end macro
-
-@c Class valued option initargs
-@macro cvoiaindex{arg}
-@clsiaindex{valued-option, \arg\}
 @end macro
 
 @c Error conditions
@@ -730,6 +727,7 @@ types to @clon{}, see @ref{Extending Clon}.
 @subsubsection Common Properties
 @cindex Options, common properties
 @cindex Common Option Properties
+@clsindex{option}
 All option types in @clon{}, including those you define yourself
 (@pxref{Extending Clon}), have a set of basic, common properties. Here
 is a list of them.
@@ -768,6 +766,7 @@ default to @code{nil}.
 @subsubsection Common Valued Option Properties
 @cindex Valued Options
 @cindex Options, valued
+@clsindex{valued-option}
 All non-flag options in @clon{} are said to be @dfn{valued}. All valued
 options, including those you define yourself (@pxref{Extending Clon}),
 share a set of additional properties. Here is a list of them.
@@ -777,24 +776,24 @@ share a set of additional properties. Here is a list of them.
 @cindex Options, valued, common properties
 @table @code
 @item :argument-name
-@cvopindex{argument-name}
+@cvopindex{:argument-name}
 The name of the option's argument, as it appears in the help string. It
 defaults to @code{"ARG"}, so that for instance, a @samp{name} option
 would appear like this: @samp{--name=ARG}.
 @item :argument-type
-@cvoiaindex{argument-type}
+@cvopindex{:argument-type}
 The status of the argument. Possible values are @code{:required} (the
 default) and @code{:mandatory} which are synonyms, or @code{:optional}.
 @item :default-value
-@cvopindex{default-value}
+@cvopindex{:default-value}
 @item :fallback-value
-@cvopindex{fallback-value}
+@cvopindex{:fallback-value}
 The option's default and fallback values. Remember that a fallback value
 only makes sense when the argument is optional. Besides, also when the
 argument is optional, you need to provide at least a fallback or a
 default value (or both of course).
 @item :nullablep
-@cvopindex{nullablep}
+@cvopindex{:nullablep}
 Whether the option accepts a null value. Default to @code{nil}. This
 property is useful when you define your own option types (@pxref{Value
 Check Protocol}).
@@ -816,7 +815,7 @@ below.
 @cindex String Options
 @ocindex{stropt}
 @voindex{stropt}
-@cvopindex{argument-name}
+@cvopindex{:argument-name}
 This option type is for options taking strings as their argument. String
 options don't provide any additional properties, but their default
 argument name is changed from @code{"ARG"} to @code{"STR"}.
@@ -824,7 +823,7 @@ argument name is changed from @code{"ARG"} to @code{"STR"}.
 @cindex Lisp Options
 @ocindex{lispobj}
 @voindex{lispobj}
-@cvopindex{argument-name}
+@cvopindex{:argument-name}
 @vopindex{lispobj, type specifier}
 This option type is for options taking any kind of Lisp object as their
 argument. @code{lispobj} options change their default argument name from
@@ -835,7 +834,7 @@ argument must satisfy. It defaults to @code{t}.
 @cindex Enumerations
 @ocindex{enum}
 @voindex{enum}
-@cvopindex{argument-name}
+@cvopindex{:argument-name}
 @vopindex{enum, enumeration}
 @bioindex{version}
 This option type is for options taking values from an enumerated set.
@@ -852,8 +851,8 @@ ability to abbreviate the possible values. Look at the
 @cindex Path Options
 @ocindex{path}
 @voindex{path}
-@cvopindex{argument-name}
-@cvopindex{nullablep}
+@cvopindex{:argument-name}
+@cvopindex{:nullablep}
 @vopindex{path, path type}
 This option type is for options taking a colon-separated list of
 pathnames as argument. @code{path} options change their default argument
@@ -867,8 +866,8 @@ anything is allowed).
 @cindex Switches
 @ocindex{switch}
 @voindex{switch}
-@cvoiaindex{argument-type}
-@cvopindex{nullablep}
+@cvopindex{:argument-type}
+@cvopindex{:nullablep}
 @vopindex{switch, argument style}
 This option type is for Boolean options. @code{switch} options change
 their default nullable property from @code{nil} to @code{t}, and their
@@ -883,8 +882,8 @@ the argument name @emph{only}. All possible switch arguments
 @cindex Extended Switches
 @ocindex{xswitch}
 @voindex{xswitch}
-@cvoiaindex{argument-type}
-@cvopindex{nullablep}
+@cvopindex{:argument-type}
+@cvopindex{:nullablep}
 @vopindex{xswitch, enumeration}
 @bioindex{highlight}
 This option type stands for @dfn{extended} switch. Extended switches
@@ -1181,7 +1180,7 @@ This is for options not found on the @cmdline{} but for which there is
 an associated environment variable set in the application's environment.
 @var{VAR} is the name of the corresponding environment variable.
 @item :default
-@cvopindex{default-value}
+@cvopindex{:default-value}
 @cindex Values, source, default
 This is for options not found anywhere, but for which a default value
 was provided.
@@ -1194,7 +1193,7 @@ Note that flags don't take any argument, so @code{getopt} returns a
 virtual value of @code{t} when they are found, or a corresponding
 environment variable exists in the environment.
 
-@cvopindex{nullablep}
+@cvopindex{:nullablep}
 @findex getopt
 When an option is not found anywhere and there is no default value,
 @code{getopt} just returns nil (no second value). Also, note that when
@@ -1402,7 +1401,7 @@ facility: @code{enum} and @code{xswitch}, so @code{xswitch} also
 inherits from @code{enum-base}.
 
 @clsindex{valued-option}
-@cvopindex{argument-name}
+@cvopindex{:argument-name}
 There are no new slots in this class, but the @code{argument-name} slot
 provided by the @code{valued-option} class has its initform changed from
 @code{"ARG"} to @code{"TYPE"}.
@@ -1447,7 +1446,7 @@ This protocol additionally has the following @code{:around} method:
 @end verbatim
 @end cartouche
 
-@cvopindex{nullablep}
+@cvopindex{:nullablep}
 This means that if your option is nullable (@pxref{Common Valued Option
 Properties}) and the provided value is @code{nil}, your method will
 actually be bypassed. Nullable options turn out to be very common, so
@@ -1509,7 +1508,7 @@ Let's look at the enumeration example now.
 @cindex Enumerations
 @ocindex{enum}
 @voindex{enum}
-@cvopindex{nullablep}
+@cvopindex{:nullablep}
 This code should be self-explanatory. We first check that we got a
 keyword, and then that it belongs the the enumeration. Also, note that
 the nullable case is not treated explicitely. If the option was nullable
