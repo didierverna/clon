@@ -147,10 +147,18 @@ Command-Line
 @cindex Common Option Properties, @t{\prop\}
 @end macro
 
+@c Options
+@c #### NOTE: not an alias because of argument syntax.
+@macro oindex{name,class}
+@cindex \name\ (@t{\class\})
+@cindex Options, \name\ (@t{\class\})
+@end macro
+
 @c Valued options
-@macro voindex{opt}
-@cindex Valued Options, @t{\opt\}
-@cindex Options, valued, @t{\opt\}
+@macro voindex{name,class}
+@cindex \name\ (@t{\class\})
+@cindex Valued Options, \name\ (@t{\class\})
+@cindex Options, valued, \name\ (@t{\class\})
 @end macro
 
 @c Common valued option properties
@@ -161,9 +169,10 @@ Command-Line
 @end macro
 
 @c Valued option properties
-@macro vopindex{opt, prop}
-@cindex Valued Options, @t{\opt\}, properties, \prop\
-@cindex Options, valued, @t{\opt\}, properties, \prop\
+@macro vopindex{name,class,prop}
+@cindex \name\ (@t{\class\}), properties, @t{\prop\}
+@cindex Valued Options, \name\ (@t{\class\}), properties, @t{\prop\}
+@cindex Options, valued, \name\ (@t{\class\}), properties, @t{\prop\}
 @end macro
 
 @c Functions index
@@ -755,7 +764,7 @@ mistaken for a long name, but did I really need to mention this?).
 
 @node Flags, Common Valued Option Properties, Common Properties, Built-In Option Types
 @subsubsection Flags
-@cindex Flags
+@oindex{Flags,flag}
 @ocindex{flag}
 In @clon{}, options that don't take any argument are of type
 @code{flag}. These options don't provide additional properties on top of
@@ -812,30 +821,27 @@ below.
 
 @table @code
 @item stropt
-@cindex String Options
+@voindex{Strings,stropt}
 @ocindex{stropt}
-@voindex{stropt}
 @cvopindex{:argument-name}
 This option type is for options taking strings as their argument. String
 options don't provide any additional properties, but their default
 argument name is changed from @code{"ARG"} to @code{"STR"}.
 @item lispobj
-@cindex Lisp Options
+@voindex{Lisp Objects,lispobj}
 @ocindex{lispobj}
-@voindex{lispobj}
 @cvopindex{:argument-name}
-@vopindex{lispobj, type specifier}
+@vopindex{Lisp Objects,lispobj,:typespec}
 This option type is for options taking any kind of Lisp object as their
 argument. @code{lispobj} options change their default argument name from
 @code{"ARG"} to @code{"OBJ"}. Also, they provide an additional property
 called @code{:typespec} which must be a @cl{} type specifier that the
 argument must satisfy. It defaults to @code{t}.
 @item enum
-@cindex Enumerations
+@voindex{Enumerations,enum}
 @ocindex{enum}
-@voindex{enum}
 @cvopindex{:argument-name}
-@vopindex{enum, enumeration}
+@vopindex{Enumerations,enum,:enum}
 @bioindex{version}
 This option type is for options taking values from an enumerated set.
 @code{enum} options change their default argument name from @code{"ARG"}
@@ -848,12 +854,11 @@ not use a colon when providing an argument. The end-user also has the
 ability to abbreviate the possible values. Look at the
 @code{--clon-version} built-in option for an example.
 @item path
-@cindex Path Options
+@voindex{Paths,path}
 @ocindex{path}
-@voindex{path}
 @cvopindex{:argument-name}
 @cvopindex{:nullablep}
-@vopindex{path, path type}
+@vopindex{Paths,path,:type}
 This option type is for options taking a colon-separated list of
 pathnames as argument. @code{path} options change their default argument
 name from @code{"ARG"} to @code{"PATH"} and their default nullable
@@ -863,12 +868,11 @@ expected. Possible values are: @code{:file}, @code{:directory},
 @code{:file-list}, @code{:directory-list} or @code{nil} (meaning that
 anything is allowed).
 @item switch
-@cindex Switches
+@voindex{Switches,switch}
 @ocindex{switch}
-@voindex{switch}
 @cvopindex{:argument-type}
 @cvopindex{:nullablep}
-@vopindex{switch, argument style}
+@vopindex{Switches,switch,:argument-style}
 This option type is for Boolean options. @code{switch} options change
 their default nullable property from @code{nil} to @code{t}, and their
 default argument type from required to optional. Also, instead of using
@@ -879,12 +883,11 @@ property called @code{:argument-style}. Possible values are
 the argument name @emph{only}. All possible switch arguments
 (@pxenduserref{Switches}) are always availble to all switches.
 @item xswitch
-@cindex Extended Switches
+@voindex{Extended Switches,xswitch}
 @ocindex{xswitch}
-@voindex{xswitch}
 @cvopindex{:argument-type}
 @cvopindex{:nullablep}
-@vopindex{xswitch, enumeration}
+@vopindex{Extended Switches,xswitch,:enum}
 @bioindex{highlight}
 This option type stands for @dfn{extended} switch. Extended switches
 result from the mating of a male switch and a female enumeration, or the
@@ -1186,7 +1189,7 @@ This is for options not found anywhere, but for which a default value
 was provided.
 @end table
 
-@cindex Flags
+@oindex{Flags,flag}
 @ocindex{flag}
 @findex getopt
 Note that flags don't take any argument, so @code{getopt} returns a
@@ -1286,7 +1289,7 @@ brilliant and perfectly designed it is, none of the provided built-in
 types fullfill your requirements exactly. There are two ways around
 this: the right way or the wrong way (hint).
 
-@cindex String Options
+@voindex{Strings,stropt}
 @ocindex{stropt}
 The wrong, although perhaps quicker way would be to use the
 @code{stropt} option type to simply retrieve unprocessed string values,
@@ -1297,7 +1300,7 @@ The right way is to define a new option type. Properly defined option
 types are a good thing because they allow for reusability and also
 extensibility, since new option types can always be defined on top of
 others.
-@cindex Enumerations
+@voindex{Enumerations,enum}
 @ocindex{enum}
 In this chapter we explain how to extend @clon{} by providing new option
 types. We illustrate the process with the example of the built-in
@@ -1305,7 +1308,7 @@ types. We illustrate the process with the example of the built-in
 
 @cindex Valued Options
 @cindex Options, valued
-@cindex Flags
+@oindex{Flags,flag}
 @ocindex{flag}
 Oh, and I almost forgot. I hope it is obvious to everyone that new
 option types are always @emph{valued}. There's no point in extending
@@ -1385,14 +1388,12 @@ This class implements options whose values belong to a set of keywords."))
 @end verbatim
 @end cartouche
 
-@cindex Enumerations
+@voindex{Enumerations,enum}
 @ocindex{enum}
-@voindex{enum}
-@vopindex{enum, enumeration}
-@cindex Extended Switches
+@vopindex{Enumerations,enum,:enum}
+@voindex{Extended Switches,xswitch}
 @ocindex{xswitch}
-@voindex{xswitch}
-@vopindex{xswitch, enumeration}
+@vopindex{Extended Switches,xswitch,:enum}
 @clsindex{enum-base}
 As you can see, this class inherits from @code{enum-base}, which is the
 class providing the @code{enum} slot. The reason for this split is that
@@ -1505,9 +1506,8 @@ Let's look at the enumeration example now.
 @end verbatim
 @end cartouche
 
-@cindex Enumerations
+@voindex{Enumerations,enum}
 @ocindex{enum}
-@voindex{enum}
 @cvopindex{:nullablep}
 This code should be self-explanatory. We first check that we got a
 keyword, and then that it belongs the the enumeration. Also, note that
@@ -1591,10 +1591,9 @@ If ARGUMENT doesn't name one of ENUM's symbols, raise a conversion error."
 @end verbatim
 @end cartouche
 
-@cindex Enumerations
+@voindex{Enumerations,enum}
 @ocindex{enum}
-@voindex{enum}
-@vopindex{enum, enumeration}
+@vopindex{Enumerations,enum,:enum}
 Since enumerations allow their arguments to be abbreviated, a utility
 function is used to find the closest match between an argument and the
 possible values. Otherwise, the @code{invalid-argument} error is raised.
@@ -1627,9 +1626,8 @@ and @ref{Group Definition}).
 @end enumerate
 
 
-@cindex Enumerations
+@voindex{Enumerations,enum}
 @ocindex{enum}
-@voindex{enum}
 @cfindex{make-enum}
 Let's look at the enumeration example now.
 
@@ -1701,10 +1699,9 @@ Lisp is a world of mess@t{^D^D^D^D}freedom.
 
 @node Lisp Option Abuse, , Incremental Option Types, Extension Tips
 @subsection Lisp Option Abuse
-@cindex Lisp Options
+@voindex{Lisp Objects,lispobj}
 @ocindex{lispobj}
-@voindex{lispobj}
-@vopindex{lispobj, type specifier}
+@vopindex{Lisp Objects,lispobj,:typespec}
 Along with the same lines, you may find that the @code{lispobj} type is
 all you need in many situations. Let's take an example. Suppose you want
 to implement a @code{--stars} option to assign a rank to a movie, from 0
