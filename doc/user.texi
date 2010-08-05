@@ -205,10 +205,20 @@ Command-Line
 @findex \func\@r{, methods, }\method\
 @end macro
 
+@c #### FIXME: I need this because when using @defun, the function is
+@c referenced directly but not under the Constructors sub-index. This
+@c sucks because what I would like is the ability to define my own
+@c @defXXX macros, which apparently I can't. Besides, doing this
+@c produces 2 separate index entries, instead of only one with two pagerefs.
+@c Constructor functions sub-index
+@macro cfsubindex{func}
+@findex @r{Constructors, }\func\
+@end macro
+
 @c Constructor functions
 @macro cfindex{func}
 @findex \func\
-@findex @r{Constructors, }\func\
+@cfsubindex{\func\}
 @end macro
 
 @c Constructor function initargs
@@ -959,14 +969,14 @@ We now examine those constructors in greater detail.
 
 @cindex Options, creation
 @defun make-text @code{:contents} STRING
-@cfindex{make-text}
+@cfsubindex{make-text}
 @cfiaindex{make-text,:contents}
 Create an arbitrary text object whose contents is @var{STRING}.
 @end defun
 
-@c FIXME: I would like an environment without indexing here.
+@c #### FIXME: I would like an environment without indexing here.
 @defun make-@var{OPTION} :INITARG INITVAL@dots{}
-@cfindex{make-@var{OPTION}}
+@cfsubindex{make-@var{OPTION}}
 @cfindex make-flag
 @cfindex make-stropt
 @cfindex make-lispobj
@@ -983,7 +993,7 @@ available initialization arguments (depending on the option type),
 
 @defun make-group @code{:header} STRING @code{:item} ITEM1 @
 @code{:item} ITEM2@dots{}
-@cfindex{make-group}
+@cfsubindex{make-group}
 @cfiaindex{make-group,:header}
 @cfiaindex{make-group,:item}
 Create a group object whose header is @var{STRING}. Every @var{ITEM} is
@@ -993,7 +1003,7 @@ important.
 
 @defun make-synopsis @code{:postfix} STRING @code{:item} ITEM1 @
 @code{:item} ITEM2@dots{}
-@cfindex{make-synopsis}
+@cfsubindex{make-synopsis}
 @cfiaindex{make-synopsis,:postfix}
 @cfiaindex{make-synopsis,:item}
 Create a synopsis object whose postfix is @var{STRING}. Every @var{ITEM} is
@@ -1062,13 +1072,8 @@ of your program, for example (and most notably) with an actual
 @cfindex{make-context}
 You create a context with the @code{make-context} function.
 
-@c #### FIXME: I have previously indexed make-context with @cfindex.
-@c @defun indexes it as well but I end up with separate index entries
-@c instead of only one with two page references. What's more, I need to
-@c replicate the effect of @cfindex. That sucks. I really need the
-@c ability to define my own @def macros.
 @defun make-context :INITARG INITVAL@dots{}
-@cfindex{make-index}
+@cfsubindex{make-context}
 Create a new context. The following initargs are available.
 
 @table @code
@@ -2022,10 +2027,10 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
 @section Initialization Phase API
 
 @defun make-text &key CONTENTS
-@cfindex{make-text}
+@cfsubindex{make-text}
 @cfiaindex{make-text,:contents}
 @defunx make-@var{OPTION} :INITARG INITVAL@dots{}
-@cfindex{make-@var{OPTION}}
+@cfsubindex{make-@var{OPTION}}
 @cfindex make-flag
 @cfindex make-stropt
 @cfindex make-lispobj
@@ -2034,11 +2039,11 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
 @cfindex make-switch
 @cfindex make-xswitch
 @defunx make-group &key HEADER ITEM
-@cfindex{make-group}
+@cfsubindex{make-group}
 @cfiaindex{make-group,:header}
 @cfiaindex{make-group,:item}
 @defunx make-synopsis &key POSTFIX ITEM
-@cfindex{make-synopsis}
+@cfsubindex{make-synopsis}
 @cfiaindex{make-synopsis,:postfix}
 @cfiaindex{make-synopsis,:item}
 @xref{Constructors}.
@@ -2059,7 +2064,7 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
 
 @defun make-context &key SYNOPSIS ERROR-HANDLER GETOPT-ERROR-HANDLER @
 CMDLINE (MAKE-CURRENT t)
-@cfindex{make-context}
+@cfsubindex{make-context}
 @cfiaindex{make-context,:synopsis}
 @cfiaindex{make-context,:error-handler}
 @cfiaindex{make-context,:getopt-error-handler}
