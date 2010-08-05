@@ -1286,7 +1286,7 @@ and six other types for valued options (@pxref{Built-In Valued
 Options}). After using @clon{} for a while, you may find that however
 brilliant and perfectly designed it is, none of the provided built-in
 types fullfill your requirements exactly. There are two ways around
-this: the right way or the wrong way (hint).
+this: the right way and the wrong way (hint).
 
 @voindex{Strings,stropt}
 The wrong, although perhaps quicker way would be to use the
@@ -1353,12 +1353,13 @@ order.
 @clsindex{option}
 @clsindex{valued-option}
 @clon{} maintains a class hierarchy for all option types. The mother of
-all option types is the @code{option} abstract class. It provides slots
-for storing the options'short and long names, description and associated
-environment variable. Valued options inherit from an abstract subclass
-of @code{option} called @code{valued-option}. This class provides
-additional slots for storing the argument name and status (optional or
-mandatory), fallback and default values, and nullable status.
+all option types is the @code{option} abstract class. It handles the
+options'short and long names, description and associated environment
+variable (@pxref{Common Properties}). Valued options inherit from an
+abstract subclass of @code{option} called @code{valued-option}. This
+class handles the option's argument name and status (optional or
+mandatory), fallback and default values, and nullable status
+(@pxref{Common Valued Option Properties}).
 
 @cindex User-Defined Option Classes
 @cindex Option Classes, user-defined
@@ -1390,8 +1391,8 @@ This class implements options whose values belong to a set of keywords."))
 @vopindex{Extended Switches,xswitch,:enum}
 @clsindex{enum-base}
 As you can see, this class inherits from @code{enum-base}, which is the
-class providing the @code{enum} slot. The reason for this split is that
-there are currently two option types providing enumeration-like
+class handling the @code{:enum} property. The reason for this split is
+that there are currently two option types providing enumeration-like
 facility: @code{enum} and @code{xswitch}, so @code{xswitch} also
 inherits from @code{enum-base}.
 
