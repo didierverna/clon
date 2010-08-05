@@ -152,6 +152,7 @@ Command-Line
 @macro oindex{name,class}
 @cindex \name\ (@t{\class\})
 @cindex Options, \name\ (@t{\class\})
+@ocindex{\class\}
 @end macro
 
 @c Valued options
@@ -159,6 +160,7 @@ Command-Line
 @cindex \name\ (@t{\class\})
 @cindex Valued Options, \name\ (@t{\class\})
 @cindex Options, valued, \name\ (@t{\class\})
+@ocindex{\class\}
 @end macro
 
 @c Common valued option properties
@@ -765,7 +767,6 @@ mistaken for a long name, but did I really need to mention this?).
 @node Flags, Common Valued Option Properties, Common Properties, Built-In Option Types
 @subsubsection Flags
 @oindex{Flags,flag}
-@ocindex{flag}
 In @clon{}, options that don't take any argument are of type
 @code{flag}. These options don't provide additional properties on top of
 the common set described in @ref{Common Properties}. All properties
@@ -822,14 +823,12 @@ below.
 @table @code
 @item stropt
 @voindex{Strings,stropt}
-@ocindex{stropt}
 @cvopindex{:argument-name}
 This option type is for options taking strings as their argument. String
 options don't provide any additional properties, but their default
 argument name is changed from @code{"ARG"} to @code{"STR"}.
 @item lispobj
 @voindex{Lisp Objects,lispobj}
-@ocindex{lispobj}
 @cvopindex{:argument-name}
 @vopindex{Lisp Objects,lispobj,:typespec}
 This option type is for options taking any kind of Lisp object as their
@@ -839,7 +838,6 @@ called @code{:typespec} which must be a @cl{} type specifier that the
 argument must satisfy. It defaults to @code{t}.
 @item enum
 @voindex{Enumerations,enum}
-@ocindex{enum}
 @cvopindex{:argument-name}
 @vopindex{Enumerations,enum,:enum}
 @bioindex{version}
@@ -855,7 +853,6 @@ ability to abbreviate the possible values. Look at the
 @code{--clon-version} built-in option for an example.
 @item path
 @voindex{Paths,path}
-@ocindex{path}
 @cvopindex{:argument-name}
 @cvopindex{:nullablep}
 @vopindex{Paths,path,:type}
@@ -869,7 +866,6 @@ expected. Possible values are: @code{:file}, @code{:directory},
 anything is allowed).
 @item switch
 @voindex{Switches,switch}
-@ocindex{switch}
 @cvopindex{:argument-type}
 @cvopindex{:nullablep}
 @vopindex{Switches,switch,:argument-style}
@@ -884,7 +880,6 @@ the argument name @emph{only}. All possible switch arguments
 (@pxenduserref{Switches}) are always availble to all switches.
 @item xswitch
 @voindex{Extended Switches,xswitch}
-@ocindex{xswitch}
 @cvopindex{:argument-type}
 @cvopindex{:nullablep}
 @vopindex{Extended Switches,xswitch,:enum}
@@ -1190,7 +1185,6 @@ was provided.
 @end table
 
 @oindex{Flags,flag}
-@ocindex{flag}
 @findex getopt
 Note that flags don't take any argument, so @code{getopt} returns a
 virtual value of @code{t} when they are found, or a corresponding
@@ -1290,7 +1284,6 @@ types fullfill your requirements exactly. There are two ways around
 this: the right way or the wrong way (hint).
 
 @voindex{Strings,stropt}
-@ocindex{stropt}
 The wrong, although perhaps quicker way would be to use the
 @code{stropt} option type to simply retrieve unprocessed string values,
 and then do whatever tweaking required on them. In doing so, you risk
@@ -1301,7 +1294,6 @@ types are a good thing because they allow for reusability and also
 extensibility, since new option types can always be defined on top of
 others.
 @voindex{Enumerations,enum}
-@ocindex{enum}
 In this chapter we explain how to extend @clon{} by providing new option
 types. We illustrate the process with the example of the built-in
 @code{enum} one.
@@ -1309,7 +1301,6 @@ types. We illustrate the process with the example of the built-in
 @cindex Valued Options
 @cindex Options, valued
 @oindex{Flags,flag}
-@ocindex{flag}
 Oh, and I almost forgot. I hope it is obvious to everyone that new
 option types are always @emph{valued}. There's no point in extending
 @clon{} with options that don't take any arguments, since we already
@@ -1389,10 +1380,8 @@ This class implements options whose values belong to a set of keywords."))
 @end cartouche
 
 @voindex{Enumerations,enum}
-@ocindex{enum}
 @vopindex{Enumerations,enum,:enum}
 @voindex{Extended Switches,xswitch}
-@ocindex{xswitch}
 @vopindex{Extended Switches,xswitch,:enum}
 @clsindex{enum-base}
 As you can see, this class inherits from @code{enum-base}, which is the
@@ -1507,7 +1496,6 @@ Let's look at the enumeration example now.
 @end cartouche
 
 @voindex{Enumerations,enum}
-@ocindex{enum}
 @cvopindex{:nullablep}
 This code should be self-explanatory. We first check that we got a
 keyword, and then that it belongs the the enumeration. Also, note that
@@ -1592,7 +1580,6 @@ If ARGUMENT doesn't name one of ENUM's symbols, raise a conversion error."
 @end cartouche
 
 @voindex{Enumerations,enum}
-@ocindex{enum}
 @vopindex{Enumerations,enum,:enum}
 Since enumerations allow their arguments to be abbreviated, a utility
 function is used to find the closest match between an argument and the
@@ -1627,7 +1614,6 @@ and @ref{Group Definition}).
 
 
 @voindex{Enumerations,enum}
-@ocindex{enum}
 @cfindex{make-enum}
 Let's look at the enumeration example now.
 
@@ -1700,7 +1686,6 @@ Lisp is a world of mess@t{^D^D^D^D}freedom.
 @node Lisp Option Abuse, , Incremental Option Types, Extension Tips
 @subsection Lisp Option Abuse
 @voindex{Lisp Objects,lispobj}
-@ocindex{lispobj}
 @vopindex{Lisp Objects,lispobj,:typespec}
 Along with the same lines, you may find that the @code{lispobj} type is
 all you need in many situations. Let's take an example. Suppose you want
