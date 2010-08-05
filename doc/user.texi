@@ -987,8 +987,8 @@ Create an arbitrary text object whose contents is @var{STRING}.
 Create a new @var{OPTION} object, @var{OPTION} being any built-in option
 type (@code{flag}, @code{stropt} @etc{}, see @ref{Built-In Valued
 Options}) or user-defined one (@pxref{Extending Clon}). For a list of
-available initialization arguments (depending on the option type),
-@xref{Built-In Option Types}.
+available initialization arguments (depending on the option type), see
+@ref{Built-In Option Types}.
 @end defun
 
 @defun make-group @code{:header} STRING @code{:item} ITEM1 @
