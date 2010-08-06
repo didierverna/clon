@@ -200,9 +200,21 @@ Command-Line
 @findex \func\@r{, initargs, }\arg\
 @end macro
 
+@c Generic functions sub-index
+@macro gfsubindex{func}
+@findex @r{Generic Functions, }\func\
+@end macro
+
+@c Generic functions
+@macro gfindex{func}
+@findex \func\
+@gfsubindex{\func\}
+@end macro
+
 @c Generic function methods
-@macro fmindex{func,method}
+@macro gfmindex{func,method}
 @findex \func\@r{, methods, }\method\
+@findex @r{Generic Functions, }\func\@r{, methods, }\method\
 @end macro
 
 @c #### FIXME: I need this because when using @defun, the function is
@@ -210,6 +222,7 @@ Command-Line
 @c sucks because what I would like is the ability to define my own
 @c @defXXX macros, which apparently I can't. Besides, doing this
 @c produces 2 separate index entries, instead of only one with two pagerefs.
+@c This problem stands for @gfsubindex as well (see above).
 @c Constructor functions sub-index
 @macro cfsubindex{func}
 @findex @r{Constructors, }\func\
@@ -1416,8 +1429,9 @@ expand this.
 The value check protocol is implemented through a @code{check-value}
 generic function for which you must provide a method.
 
-@ecindex invalid-value
 @deffn {Generic Function} check-value OPTION VALUE
+@gfsubindex{check-value}
+@ecindex invalid-value
 Check that @var{VALUE} is valid for @var{OPTION}. If @var{VALUE} is
 valid, return it. Otherwise, raise an @code{invalid-value} error.
 @end deffn
@@ -1426,7 +1440,7 @@ As you can see, you need to provide a method with the first argument
 specialized to your new option type. This method must return @var{VALUE}
 if it is okay, and raise an @code{invalid-value} error otherwise.
 
-@fmindex{check-value,:around}
+@gfmindex{check-value,:around}
 This protocol additionally has the following @code{:around} method:
 
 @cartouche
@@ -1525,8 +1539,9 @@ and arguments provided from a debugger restart FIXME: expand this.
 The conversion protocol is implemented through a @code{convert} generic
 function for which you must provide a method.
 
-@ecindex invalid-argument
 @deffn {Generic Function} convert OPTION ARGUMENT
+@gfsubindex{convert}
+@ecindex invalid-argument
 Convert @var{ARGUMENT} to @var{OPTION's} value. If @var{ARGUMENT} is
 invalid, raise an @code{invalid-argument} error.
 @end deffn
@@ -1569,6 +1584,7 @@ additional @code{option} slot that you must also fill in when the error
 is raised.
 
 @findex convert@r{, methods, for enumerations}
+@findex @r{Generic Functions, }convert@r{, methods, Enumerations (@t{enum})}
 Let's look at the enumeration example now.
 
 @cartouche
@@ -2145,6 +2161,7 @@ Strings}.
 @end defmac
 
 @deffn {Generic Function} check-value OPTION VALUE
+@gfsubindex{check-value}
 @xref{Value Check Protocol}.
 @end deffn
 
@@ -2154,6 +2171,7 @@ Strings}.
 @end deftp
 
 @deffn {Generic Function} convert OPTION ARGUMENT
+@gfsubindex{convert}
 @xref{Conversion Protocol}.
 @end deffn
 
