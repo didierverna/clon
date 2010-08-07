@@ -1062,8 +1062,8 @@ single option definition.
 There is one last point we need to address in order to complete this
 section. There might be times when you need to manipulate an explicit
 group object, but the object itself can still be created in a
-declarative way because you don't need to keep handles on its items. For
-this, @clon{} provides a macro called @code{defgroup}.
+declarative way because you don't need to keep references on its items.
+For this, @clon{} provides a macro called @code{defgroup}.
 
 @defmac defgroup (OPTIONS@dots{}) ITEMS@dots{}
 @cindex Groups, in synopsis
@@ -1179,7 +1179,7 @@ Use one of these 2 keys to specify the name of the option you wish to
 retrieve.
 @item :option
 @fkindex{getopt,:option}
-Alternatively, you can use a handle to an option object
+Alternatively, you can use a reference to an option object
 (@pxref{Constructors}).
 @item :error-handler
 @fkindex{getopt,:error-handler}
@@ -1289,8 +1289,8 @@ built-in options (@pxenduserref{Theme Mechanism}).
 
 @fkindex{help,:item}
 By default, @code{help} prints the whole application help string.
-However, if you have kept a handle on any synopsis item (option, text,
-group), you can pass it as the value of the @code{:item} key, and
+However, if you have kept a reference to any synopsis item (option,
+text, group), you can pass it as the value of the @code{:item} key, and
 @clon{} will only print the help string for that particular item.
 
 @bioindex{help}
