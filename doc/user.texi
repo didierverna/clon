@@ -288,6 +288,11 @@ Command-Line
 @tpindex @r{Error Conditions, }\cond\@r{, slots, }\slot\
 @end macro
 
+@c Packages
+@macro pkgindex{name}
+@tpindex \name\
+@tpindex @r{Packages, }\name\
+@end macro
 
 
 @c ====================================================================
@@ -462,8 +467,7 @@ listing is available for cut'n paste in @ref{Quick Start Program}. For a
 slightly longer example, have a look at the @t{demo} program provided in
 the distribution.
 
-@tpindex com.dvlsoft.clon
-@tpindex @r{Package, }com.dvlsoft.clon
+@pkgindex{com.dvlsoft.clon}
 Let's put us in the @cl{} user package, and load @clon{} first. @clon{}
 lives in a package named @samp{com.dvlsoft.clon}. The @t{demo} program
 from the distribution shows how to create a nickname if you find this
@@ -1337,8 +1341,7 @@ have flags.
 @section New Option Types
 @cindex Option Types, in files
 @cindex Files, one per option type
-@tpindex com.dvlsoft.clon
-@tpindex @r{Package, }com.dvlsoft.clon
+@pkgindex{com.dvlsoft.clon}
 From a software engineering point of view, it is better to implement new
 option types in a file of their own, preferably named after the option
 type itself, and to put this file in the @clon{} package, like this:
