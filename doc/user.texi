@@ -241,6 +241,12 @@ Command-Line
 @findex @r{Constructors, }\func\@r{, initargs, }\arg\
 @end macro
 
+@c Accessor functions
+@macro afindex{func}
+@findex \func\
+@findex @r{Accessors, }\func\
+@end macro
+
 @c Variables index
 @c ---------------
 
@@ -1250,6 +1256,17 @@ option object from the synopsis definition (@pxref{Constructors}), the
 name used on the @cmdline{}, and the option's value. As in the case of
 explicit retrieval (@pxref{Explicit Retrieval}), the option's name may
 be completed in case of abbreviation.
+
+@afindex{short-name}
+@afindex{long-name}
+@copindex{:short-name}
+@copindex{:long-name}
+Unless you keep references to all your option objects (and thus can
+compare them directly to the one returned by this function), you can
+still identify the retrieved option by using the @code{short-name} and
+@code{long-name} accessors on it: simply use @code{(long-name
+@var{OPTION})} or @code{(short-name @var{OPTION})} and you will get the
+corresponding strings.
 @end defun
 
 @defmac multiple-value-getopt-cmdline (OPTION NAME VALUE) BODY
