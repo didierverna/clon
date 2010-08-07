@@ -222,7 +222,8 @@ Command-Line
 @c sucks because what I would like is the ability to define my own
 @c @defXXX macros, which apparently I can't. Besides, doing this
 @c produces 2 separate index entries, instead of only one with two pagerefs.
-@c This problem stands for @gfsubindex as well (see above).
+@c This problem stands for @gfsubindex (see above) and @ecsubindex (see
+@c below) as well.
 @c Constructor functions sub-index
 @macro cfsubindex{func}
 @findex @r{Constructors, }\func\
@@ -276,10 +277,15 @@ Command-Line
 @tpindex @r{Option Classes, }\cls\
 @end macro
 
+@c Error conditions subindex
+@macro ecsubindex{cond}
+@tpindex @r{Error Conditions, }\cond\
+@end macro
+
 @c Error conditions
 @macro ecindex{cond}
 @tpindex \cond\
-@tpindex @r{Error Conditions, }\cond\
+@ecsubindex{\cond\}
 @end macro
 
 @c Error condition slots
@@ -2169,7 +2175,12 @@ Strings}.
 @end deffn
 
 @deftp {Error Condition} option-error OPTION
+@ecsubindex{option-error}
+@ecsindex{option-error,option}
 @deftpx {Error Condition} invalid-value VALUE COMMENT
+@ecsubindex{invalid-value}
+@ecsindex{invalid-value,value}
+@ecsindex{invalid-value,comment}
 @xref{Value Check Protocol}.
 @end deftp
 
@@ -2179,6 +2190,9 @@ Strings}.
 @end deffn
 
 @deftp {Error Condition} invalid-argument ARGUMENT COMMENT
+@ecsubindex{invalid-argument}
+@ecsindex{invalid-argument,argument}
+@ecsindex{invalid-argument,comment}
 @xref{Conversion Protocol}.
 @end deftp
 
