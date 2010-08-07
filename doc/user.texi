@@ -1147,6 +1147,9 @@ because @clon{} keeps track of the current status of the @cmdline{}. In
 fact, @clon{} never works on the original @cmdline{}, but uses a mutable
 @emph{copy} of it after parsing.
 
+Finally, remember that the @cmdline{} is scanned from left to right
+during option retrieval (@pxenduserref{Option Retrieval}).
+
 @menu
 * Explicit Retrieval::          Accessing options by name
 * Sequential Retrieval::        Accessing options in order
