@@ -1502,7 +1502,7 @@ When the error is raised, you must fill in the @code{value} and
 The super-condition @code{option-error} provides an additional
 @code{option} slot that you must also fill in when the error is raised.
 
-@findex check-value@r{, methods, for enumerations}
+@gfmindex{check-value,@r{Enumerations (}enum@r{)}}
 Let's look at the enumeration example now.
 
 @cartouche
@@ -1592,8 +1592,7 @@ As before, the super-condition @code{option-error} provides an
 additional @code{option} slot that you must also fill in when the error
 is raised.
 
-@findex convert@r{, methods, for enumerations}
-@findex @r{Generic Functions, }convert@r{, methods, Enumerations (@t{enum})}
+@gfmindex{convert,@r{Enumerations (}enum@r{)}}
 Let's look at the enumeration example now.
 
 @cartouche
