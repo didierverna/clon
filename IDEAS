@@ -23,6 +23,13 @@ provide another value). For instance, in path options, the converter handles
 ~/ abbreviations. However, this is not valid when typing a value directly,
 which is a shame.
 
+And another post-processing-related idea: a :variable property to
+automatically setf a variable to the value of an option once it is retrieved.
+
+Now if all options have post-processing, a simple (do-all-cmdline-options)
+macro could do all the work (just getopt and execute the associated
+post-process).
+
 * Support for resource files ala X11
 This could be used to provide values for options depending on the
 application's class/name.
@@ -122,4 +129,3 @@ Cool hey ?
 
 * Store all release names in a hashtable
 and provide a short bio, with option --clon-about=RELEASE
-
