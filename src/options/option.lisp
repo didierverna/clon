@@ -256,6 +256,9 @@ If AS-STRING, return a string of that character.")
     ((option option) &rest keys &key long-name env-var internal)
   "If INTERNAL, prefix LONG-NAME with \"clon-\" and ENV-VAR with \"CLON_\"."
   (when internal
+    ;; #### NOTE: technically, the calls to REMOVE-KEYS below are not needed
+    ;; because in case of duplication, the leftmost initarg is used (see
+    ;; section 7.1.4 "Rules for Initialization Arguments" of the Hyperspec).
     (setq long-name (concatenate 'string "clon-" long-name))
     (setq keys (list* :long-name long-name (remove-keys keys :long-name)))
     (when env-var

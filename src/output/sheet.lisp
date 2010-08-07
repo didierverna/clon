@@ -687,6 +687,10 @@ than the currently available right margin."
 	 :output-stream output-stream
 	 :line-width line-width
 	 :highlightp highlight
+	 ;; #### NOTE: technically, the call to REMOVE-KEYS below is not
+	 ;; needed because in case of duplication, the leftmost initarg is
+	 ;; used (see section 7.1.4 "Rules for Initialization Arguments" of
+	 ;; the Hyperspec).
 	 (remove-keys keys :output-stream :line-width :highlight)))
 
 (defun read-sface-tree (pathname)
