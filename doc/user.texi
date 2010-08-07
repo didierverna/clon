@@ -222,8 +222,8 @@ Command-Line
 @c sucks because what I would like is the ability to define my own
 @c @defXXX macros, which apparently I can't. Besides, doing this
 @c produces 2 separate index entries, instead of only one with two pagerefs.
-@c This problem stands for @gfsubindex (see above) and @ecsubindex (see
-@c below) as well.
+@c This problem stands for @gfsubindex (see above), @rfsubindex (see
+@c below) and @ecsubindex (see below) as well.
 @c Constructor functions sub-index
 @macro cfsubindex{func}
 @findex @r{Constructors, }\func\
@@ -241,10 +241,15 @@ Command-Line
 @findex @r{Constructors, }\func\@r{, initargs, }\arg\
 @end macro
 
-@c Accessor functions
-@macro afindex{func}
+@c Reader functions subindex
+@macro rfsubindex{func}
+@findex @r{Readers, }\func\
+@end macro
+
+@c Reader functions
+@macro rfindex{func}
 @findex \func\
-@findex @r{Accessors, }\func\
+@rfsubindex{\func\}
 @end macro
 
 @c Variables index
@@ -1257,14 +1262,14 @@ name used on the @cmdline{}, and the option's value. As in the case of
 explicit retrieval (@pxref{Explicit Retrieval}), the option's name may
 be completed in case of abbreviation.
 
-@afindex{short-name}
-@afindex{long-name}
+@rfindex{short-name}
+@rfindex{long-name}
 @copindex{:short-name}
 @copindex{:long-name}
 Unless you keep references to all your option objects (and thus can
 compare them directly to the one returned by this function), you can
 still identify the retrieved option by using the @code{short-name} and
-@code{long-name} accessors on it: simply use @code{(long-name
+@code{long-name} readers on it: simply use @code{(long-name
 @var{OPTION})} or @code{(short-name @var{OPTION})} and you will get the
 corresponding strings.
 @end defun
@@ -2156,6 +2161,13 @@ See @ref{Sequential Retrieval} and @ref{Using Multiple Contexts}.
 @foindex{do-cmdline-options,:context}
 See @ref{Sequential Retrieval} and @ref{Using Multiple Contexts}.
 @end defmac
+
+@deffn Reader short-name OPTION
+@rfsubindex{short-name}
+@deffnx Reader long-name OPTION
+@rfsubindex long-name
+@xref{Sequential Retrieval}.
+@end deffn
 
 @defun help &key (CONTEXT *current-context*) @
 (ITEM (synopsis context)) @
