@@ -40,7 +40,8 @@ argument. There's only empty arguments. This will lead to problems if the
 option is supposed to accept empty strings.
 
 * Support for dynamic default value / fallback
-computed at run-time from a lambda expression for instance.
+computed at run-time from a lambda expression for instance. But is this
+different from supporting post-processing ?
 
 * Support for a complete cmdline syntax description
 Currently, there's just the notion of non-Clon remainder, but some programs
