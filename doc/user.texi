@@ -674,25 +674,24 @@ Look again at the synopsis definition provided in @ref{Quick Start}.
 
 You define a synopsis with the @code{defsynopsis} macro.
 
-@defmac defsynopsis (OPTIONS@dots{}) ITEMS@dots{}
+@defmac defsynopsis ([OPTIONS@dots{}]) ITEMS@dots{}
 Define a new synopsis and return it. @var{OPTIONS} are key/value pairs.
-@var{ITEMS} is a list of either text, group, or option descriptions.
+@var{ITEMS} are text, group or option descriptions.
 
+The following options are currently available.
+@table @t
+@item :postfix
 @cindex Postfix
-@foindex{defsynopsis,:postfix}
-The first argument to @code{defsynopsis} is a list of key/value pairs.
-Currently, the only available key is @code{:postfix}. Its value is a
-string which will appear at the end of the synopsis line in the help
-string. When you provide a postfix, you also implicitely tell @clon{}
-that your application accepts non-option arguments at the end of the
-@cmdline{}. See @enduserref{Option Separator} for more information on
-the behavior of @clon{} with respect to postfixes.
-
-The remainder of the arguments to @code{defsynopsis} are text, group or
-options descriptions.
+@foindex{defsynopsis,:postfix}@c
+A string which will appear at the end of the synopsis line
+in the help string. When you provide a postfix, you also implicitely
+tell @clon{} that your application accepts non-option arguments at the
+end of the @cmdline{}. See @enduserref{Option Separator} for more
+information on the behavior of @clon{} with respect to postfixes.
+@end table
 @end defmac
 
-We now examine the syntax for each one of them.
+We now examine the syntax for each possible @var{ITEM}.
 @menu
 * Text::        Adding arbitrary text
 * Options::     Adding options
@@ -707,9 +706,8 @@ We now examine the syntax for each one of them.
 In order to add arbitrary text to your help string, use the following
 form:
 
-@verbatim
-(text :contents "Blah blah.")
-@end verbatim
+@noindent
+@t{(text :contents} @var{STRING}@t{)}
 
 Try to make proper sentences when adding arbitrary text. You can use
 explicit newline characters in your text if you really want to go next
@@ -740,26 +738,27 @@ in @ref{Built-In Option Types}.
 @cindex Groups
 @cindex Groups, in synopsis
 @fiindex{defsynopsis,group}
-In order to add a group to your help string, you must use the following
-form:
+In order to add a group to your help string, use the following form:
 
 @noindent
-@t{(group (@var{OPTIONS}@dots{}) @var{ITEMS}@dots{})}
-
-@cindex Group Header
-@cindex Header, in group
-The group's options are key/value pairs. Currently, the only available
-option is @code{:header}. The corresponding value must be a string which
-will be displayed above the group's contents in the help string. The
-same formatting recommendations as for arbitrary text apply
-(@pxref{Text}).
+@t{(group} ([@var{OPTIONS@dots{}}]) @var{ITEMS@dots{}}@t{)}
 
 @cindex Text, in groups
 @cindex Options, in groups
 @cindex Groups, in groups
-The group's items are simply arbitrary text, option or sub-group
-descriptions as we've just seen.
+@var{OPTIONS} are key/value pairs. @var{ITEMS} simply are arbitrary
+text, option or sub-group descriptions as we've just seen.
 
+The following @var{OPTIONS} are currently available.
+@table @t
+@item :header
+@cindex Group Header
+@cindex Header, in group
+@foindex{defgroup,:header}@c
+A string which will be displayed above the group's contents in the help
+string. The same formatting recommendations as for arbitrary text apply
+(@pxref{Text}).
+@end table
 
 @node Built-In Option Types, Advanced Synopsis Creation, Synopsis Items, Synopsis Definition
 @subsection Built-In Option Types
@@ -1081,12 +1080,11 @@ For this, @clon{} provides a macro called @code{defgroup}.
 @fiindex{defsynopsis,group}
 @foindex{defgroup,:header}
 Define a new group and return it. This macro behaves exactly like the
-@code{group} form in a call to @code{defsynopsis} (@pxref{Groups}).
-@end defmac
-
-In fact, an intermediate step in the expansion of the @code{defsynopsis}
+@code{group} form in a call to @code{defsynopsis} (@pxref{Groups}). In
+fact, an intermediate step in the expansion of the @code{defsynopsis}
 macro is to transform @code{group} forms into @code{defgroup} macro
 calls.
+@end defmac
 
 
 
