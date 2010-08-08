@@ -364,8 +364,9 @@ This function returns two values:
     (values (default-value option) :default)))
 
 (defun getopt-cmdline (&key (context *current-context*))
-  "Get the next cmdline option in CONTEXT.
-This function returns three values:
+  "Get the next command-line option in CONTEXT.
+When there is no next command-line option, return nil.
+Otherwise, return three values:
 - the option object,
 - the option's name used on the command-line,
 - the retrieved value."
