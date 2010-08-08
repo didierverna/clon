@@ -5,7 +5,7 @@
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Sun Jul 13 11:14:19 2008
-;; Last Revision: Sat Jun 12 18:19:58 2010
+;; Last Revision: Sun Aug  8 13:55:46 2010
 
 ;; This file is part of Clon.
 
@@ -32,6 +32,10 @@
 
 (in-package :com.dvlsoft.clon)
 (in-readtable :com.dvlsoft.clon)
+
+
+(defvar *default-synopsis* nil "The default synopsis.")
+
 
 
 ;; ==========================================================================
@@ -235,19 +239,24 @@ Auto (the default) means on for tty output and off otherwise."
     (setf (slot-value synopsis 'minus-pack) minus-pack)
     (setf (slot-value synopsis 'plus-pack) plus-pack)))
 
-(defun make-synopsis (&rest keys &key postfix item)
+(defun make-synopsis (&rest keys &key postfix item (make-default t))
   "Make a new SYNOPSIS.
 - POSTFIX is a string to append to the program synopsis, in case it accepts a
-remainder."
+remainder.
+- If MAKE-DEFAULT, make the new synopsis the default one."
   (declare (ignore postfix item))
-  (apply #'make-instance 'synopsis keys))
+  (let ((synopsis (apply #'make-instance 'synopsis
+			 (remove-keys keys :make-default))))
+    (when make-default
+      (setq *default-synopsis* synopsis))
+    synopsis))
 
 ;; #### FIXME: we could expand this macro to handle a mix of declarative forms
 ;; and explicit objects: we just need to distinguish between atomic and list
 ;; forms.
-(defmacro defsynopsis ((&rest keys &key postfix) &body forms)
+(defmacro defsynopsis ((&rest keys &key postfix make-default) &body forms)
   "Define a new synopsis."
-  (declare (ignore postfix))
+  (declare (ignore postfix make-default))
   `(make-synopsis ,@keys
     ,@(loop :for form :in forms
 	    :nconc (list :item

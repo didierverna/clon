@@ -518,14 +518,13 @@ string. The structure of your @cmdline{} is known to @clon{} as the
 @fiindex{defsynopsis,group}
 @cartouche
 @verbatim
-(defvar *synopsis*
-  (defsynopsis (:postfix "FILES...")
-    (text :contents "A very short program.")
-    (group (:header "Immediate exit options:")
-      (flag :short-name "h" :long-name "help"
-	    :description "Print this help and exit.")
-      (flag :short-name "v" :long-name "version"
-	    :description "Print version number and exit."))))
+(defsynopsis (:postfix "FILES...")
+  (text :contents "A very short program.")
+  (group (:header "Immediate exit options:")
+    (flag :short-name "h" :long-name "help"
+      :description "Print this help and exit.")
+    (flag :short-name "v" :long-name "version"
+	  :description "Print version number and exit.")))
 @end verbatim
 @end cartouche
 
@@ -540,14 +539,13 @@ Now, we are going to define a function @code{main} for our standalone
 application. The first thing that we need to do is create a
 @dfn{context}. A context is an object that @clon{} uses to store various
 things, including some state related to the parsing of the @cmdline{}.
-You create a context with the function @code{make-context}. Our context
-needs to be associated with the synopsis we created earlier.
+You create a context with the function @code{make-context}.
 
 @cartouche
 @verbatim
 (defun main ()
   "Entry point for our standalone application."
-  (make-context :synopsis *synopsis*)
+  (make-context)
 @end verbatim
 @end cartouche
 
@@ -1109,10 +1107,6 @@ You create a context with the @code{make-context} function.
 Create a new context. The following @var{:INITARG}s are currently available.
 
 @table @code
-@item :synopsis
-@cfiaindex{make-context,:synopsis}
-Use this key to associate the context with a synopsis previously defined
-by @code{defsynopsis} (@pxref{Synopsis Definition}).
 @item :error-handler
 @cfiaindex{make-context,:error-handler}
 The behavior to adopt in case an error happens during the initialization
@@ -1784,10 +1778,16 @@ used only rarely, if at all.
 @menu
 * Not Using the Command-Line::  But any list of strings instead
 * Using Multiple Contexts::     The current one, and the others
+* Using Different Synopsis::    The default one, and the others
 * Programmatic Help Strings::   Beyond the --help option
 * Version Numbering::           In case you need to conditionalize
 @end menu
 
+
+@c @item :synopsis
+@c @cfiaindex{make-context,:synopsis}
+@c Use this key to associate the context with a synopsis previously defined
+@c by @code{defsynopsis} (@pxref{Synopsis Definition}).
 
 @c --------------------------
 @c Not Using the Command-Line
@@ -1812,7 +1812,7 @@ course, the default is to use the actual program's one.
 @c -----------------------
 @c Using Multiple Contexts
 @c -----------------------
-@node Using Multiple Contexts, Programmatic Help Strings, Not Using the Command-Line, Advanced Usage
+@node Using Multiple Contexts, Using Different Synopsis, Not Using the Command-Line, Advanced Usage
 @section Using Multiple Contexts
 
 @cindex Context, current
@@ -1867,10 +1867,68 @@ already seen. For the macros @code{multiple-value-getopt-cmdline} and
 @end enumerate
 
 
+@c ------------------------
+@c Using Different Synopsis
+@c ------------------------
+@node Using Different Synopsis, Programmatic Help Strings, Using Multiple Contexts, Advanced Usage
+@section Using Different Synopsis
+
+@cindex Synopsis, default
+Did you also notice that after defining a synopsis, there is actually
+never any explicit reference to it anymore? So again, where is the
+magick? In fact, there's no magick at all involved here either.
+
+@vindex *default-synopsis*
+@foindex{defsynopsis,:make-default}
+@cfiaindex{make-synopsis,:make-default}
+@clon{} has a global variable named @code{*default-synopsis*} which
+holds the@dots{} default synopsis, yeah. When you define/create a
+synopsis with either @code{defsynopsis} or @code{make-synopsis}, it is
+automatically made the default one, unless you use the
+@code{:make-default} option/initarg with a value of @code{nil}, like
+this:
+
+@verbatim
+(defsynopsis (:make-default nil) ...)
+@end verbatim
+
+or this:
+
+@verbatim
+(make-synopsis :make-default nil ...)
+@end verbatim
+
+@cfindex{make-context}
+
+When you create a context with @code{make-context}, the default synopsis
+is used implicitely, but you have two ways to avoid this.
+
+@enumerate
+@item
+@vindex *default-synopsis*
+At any time in your program, you may change the value of
+@code{*default-synopsis*}. All subsequent calls to @code{make-context}
+will hence use this other synopsis.
+@item
+@cfiaindex{make-context,:synopsis}@c
+If you prefer to use another synopsis only temporarily, you can use the
+@code{:synopsis} initarg to @code{make-context} instead.
+@end enumerate
+
+By combining @clon{}'s ability to use a virtual @cmdline{}, different
+synopsis and multiple contexts, you can achieve very neat (read: totally
+useless) things. For instance, you could write an application that takes
+an option providing @cmdline{} arguments for an external program to be
+forked. Some revision control systems do that for controlling external
+@code{diff} programs for instance, so no big deal. The big deal is that
+you can completely control the validity of the external program's
+@cmdline{}, before it is forked, from your original one.
+
+
 @c -------------------------
 @c Programmatic Help Strings
 @c -------------------------
-@node Programmatic Help Strings, Version Numbering, Using Multiple Contexts, Advanced Usage
+@node Programmatic Help Strings, Version Numbering, Using Different Synopsis, Advanced Usage
 @section Programmatic Help Strings
 
 @findex help
@@ -2094,11 +2152,12 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
 @cfsubindex{make-group}
 @cfiaindex{make-group,:header}
 @cfiaindex{make-group,:item}
-@defunx make-synopsis &key POSTFIX ITEM
+@defunx make-synopsis &key POSTFIX ITEM (MAKE-DEFAULT t)
 @cfsubindex{make-synopsis}
 @cfiaindex{make-synopsis,:postfix}
 @cfiaindex{make-synopsis,:item}
-@xref{Constructors}.
+@cfiaindex{make-synopsis,:make-default}
+See @ref{Constructors} and @ref{Using Different Synopsis}.
 @end defun
 
 @defmac defgroup (&key HEADER) &body FORMS
@@ -2106,24 +2165,29 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
 @xref{Group Definition}.
 @end defmac
 
-@defmac defsynopsis (&key POSTFIX) &body FORMS
+@defmac defsynopsis (&key POSTFIX MAKE-DEFAULT) &body FORMS
 @foindex{defsynopsis,:postfix}
+@foindex{defsynopsis,:make-default}
 @fiindex{defsynopsis,text}
 @fiindex{defsynopsis,options}
 @fiindex{defsynopsis,group}
-@xref{Synopsis Definition}.
+See @ref{Synopsis Definition} and @ref{Using Different Synopsis}.
 @end defmac
 
-@defun make-context &key SYNOPSIS ERROR-HANDLER GETOPT-ERROR-HANDLER @
-CMDLINE (MAKE-CURRENT t)
+@defopt *default-synopsis*
+@xref{Using Different Synopsis}.
+@end defopt
+
+@defun make-context &key ERROR-HANDLER GETOPT-ERROR-HANDLER @
+(SYNOPSIS *default-synopsis*) CMDLINE (MAKE-CURRENT t)
 @cfsubindex{make-context}
-@cfiaindex{make-context,:synopsis}
 @cfiaindex{make-context,:error-handler}
 @cfiaindex{make-context,:getopt-error-handler}
+@cfiaindex{make-context,:synopsis}
 @cfiaindex{make-context,:cmdline}
 @cfiaindex{make-context,:make-current}
-@xref{Context Creation}, @ref{Not Using the Command-Line} and @ref{Using
-Multiple Contexts}.
+@xref{Context Creation}, @ref{Not Using the Command-Line}, @ref{Using
+Multiple Contexts} and @ref{Using Different Synopsis}.
 @end defun
 
 @defopt *current-context*

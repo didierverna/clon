@@ -69,6 +69,7 @@
    ;; From src/group.lisp:
    :make-group :defgroup
    ;; From src/synopsis.lisp:
+   :*default-synopsis*
    :make-synopsis :defsynopsis
    ;; From src/context.lisp:
    :*current-context*

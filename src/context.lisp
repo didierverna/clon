@@ -119,7 +119,8 @@
   ((synopsis :documentation "The program synopsis."
 	     :type synopsis
 	     :initarg :synopsis
-	     :reader synopsis)
+	     :reader synopsis
+	     :initform *default-synopsis*)
    (progname :documentation "The program name, as it appears on the command-line."
 	     :type string
 	     :reader progname)
@@ -692,12 +693,8 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.~%"
 
 (defun make-context
     (&rest keys
-     &key synopsis cmdline error-handler getopt-error-handler (make-current t))
+     &key error-handler getopt-error-handler synopsis cmdline (make-current t))
   "Make a new context.
-- SYNOPSIS is the program synopsis to use in that context.
-  It defaults to *DEFAULT-SYNOPSIS*.
-- CMDLINE is the argument list (strings) to process.
-  It defaults to a POSIX conformant argv.
 - ERROR-HANDLER is the behavior to adopt on errors at command-line parsing time.
   It can be one of:
   * :quit, meaning print the error and abort execution,
@@ -707,6 +704,10 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.~%"
 in the functions themselves). It can be one of:
   * :quit, meaning print the error and abort execution,
   * :none, meaning let the debugger handle the situation.
+- SYNOPSIS is the program synopsis to use in that context.
+  It defaults to *DEFAULT-SYNOPSIS*.
+- CMDLINE is the argument list (strings) to process.
+  It defaults to a POSIX conformant argv.
 - If MAKE-CURRENT, make the new context current."
   (declare (ignore synopsis error-handler getopt-error-handler cmdline))
   (let ((context (apply #'make-instance 'context
