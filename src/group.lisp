@@ -73,8 +73,9 @@ implementing hierarchical program command-line."))
   (declare (ignore header item))
   (apply #'make-instance 'group keys))
 
-(defmacro %defgroup (internalp (&rest keys) &body forms)
+(defmacro %defgroup (internalp (&rest keys &key header) &body forms)
   "Define a new group."
+  (declare (ignore header))
   `(make-group ,@keys
     ,@(loop :for form :in forms
 	    :nconc (list :item
@@ -90,14 +91,14 @@ implementing hierarchical program command-line."))
 				      (list* internalp (cdr form))
 				      (cdr form))))))))
 
-;; #### FIXME: KEYS should be explicit.
-(defmacro defgroup ((&rest keys) &body forms)
+(defmacro defgroup ((&rest keys &key header) &body forms)
   "Define a new group.
 KEYS are initargs to MAKE-GROUP (currently, only :header).
 Each form in FORMS will be treated as a new :item.
 The CAR of each form is the name of the operation to perform: TEXT, GROUP, or
 an option class name. The rest are the arguments to the MAKE-<OP> function or
 the DEFGROUP macro."
+  (declare (ignore header))
   `(%defgroup nil ,keys ,@forms))
 
 

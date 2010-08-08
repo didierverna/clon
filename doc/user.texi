@@ -2099,7 +2099,7 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
 @xref{Constructors}.
 @end defun
 
-@defmac defgroup (&rest KEYS) &body FORMS
+@defmac defgroup (&key HEADER) &body FORMS
 @foindex{defgroup,:header}
 @xref{Group Definition}.
 @end defmac
