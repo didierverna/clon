@@ -1276,7 +1276,10 @@ corresponding strings.
 
 @defmac multiple-value-getopt-cmdline (OPTION NAME VALUE) BODY
 Evaluate @var{BODY} with @var{OPTION}, @var{NAME} and @var{VALUE} bound
-to the values returned by the @code{getopt-cmdline} function above.
+to the values returned by the @code{getopt-cmdline} function above. Note
+that @var{BODY} is not evaluated if there was no remaining option on the
+@cmdline{}, so you don't need to conditionalize on @var{OPTION} being
+@code{null} yourself.
 @end defmac
 
 @defmac do-cmdline-options (OPTION NAME VALUE) BODY

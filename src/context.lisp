@@ -376,15 +376,15 @@ Otherwise, return three values:
 	      (cmdline-option-name cmdline-option)
 	      (cmdline-option-value cmdline-option)))))
 
-;; #### FIXME: maybe conditionalize BODY on the presence of an actual option.
 (defmacro multiple-value-getopt-cmdline
     ((option name value &key context) &body body)
-  "Evaluate BODY on the next command-line option in CONTEXT.
-OPTION, NAME and VALUE are bound to the option's object, name used on the
-command-line and retrieved value."
+  "Get the next command-line option in CONTEXT. and evaluate BODY.
+OPTION, NAME and VALUE are bound to the values returned by GETOPT-CMDLINE.
+BODY is executed only if there is a next command-line option."
   `(multiple-value-bind (,option ,name ,value)
     (getopt-cmdline :context (or ,context *current-context*))
-    ,@body))
+    (when ,option
+      ,@body)))
 
 (defmacro do-cmdline-options
     ((option name value &key context) &body body)
