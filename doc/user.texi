@@ -1815,6 +1815,7 @@ course, the default is to use the actual program's one.
 @node Using Multiple Contexts, Programmatic Help Strings, Not Using the Command-Line, Advanced Usage
 @section Using Multiple Contexts
 
+@cindex Context, current
 Did you notice that after creating a context, there is actually never
 any explicit reference to it anymore? So where is the magick? In fact,
 there's no magick at all involved.
