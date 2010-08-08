@@ -1845,11 +1845,11 @@ At any time in your program, you may change the value of
 @code{*current-context*}. All subsequent calls to the runtime phase API
 will hence use this other context.
 @item
-@fkindex{getopt,:context}
-@fkindex{getopt-cmdline,:context}
-@fkindex{help,:context}
-@foindex{multiple-value-getopt-cmdline,:context}
-@foindex{do-cmdline-options,:context}
+@fkindex{getopt,:context}@c
+@fkindex{getopt-cmdline,:context}@c
+@fkindex{help,:context}@c
+@foindex{multiple-value-getopt-cmdline,:context}@c
+@foindex{do-cmdline-options,:context}@c
 If you prefer to use another context only temporarily, you can use the
 @code{context} key instead. The whole runtime phase API of @clon{}
 understands it. For the functions @code{getopt}, @code{getopt-cmdline}
