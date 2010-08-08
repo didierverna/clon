@@ -1856,8 +1856,8 @@ If you prefer to use another context only temporarily, you can use the
 understands it. For the functions @code{getopt}, @code{getopt-cmdline}
 and @code{help}, it's just another key in addition to those we've
 already seen. For the macros @code{multiple-value-getopt-cmdline} and
-@code{do-cmdline-options}, the key belongs to the first (list) argument,
-like this:
+@code{do-cmdline-options}, the key must appear at the end of the first
+(list) argument, like this:
 
 @verbatim
 (multiple-value-getopt-cmdline (option name value :context ctx) ...)
