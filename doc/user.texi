@@ -678,7 +678,7 @@ You define a synopsis with the @code{defsynopsis} macro.
 Define a new synopsis and return it. @var{OPTIONS} are key/value pairs.
 @var{ITEMS} are text, group or option descriptions.
 
-The following options are currently available.
+The following @var{OPTIONS} are currently available.
 @table @t
 @item :postfix
 @cindex Postfix
@@ -1106,7 +1106,7 @@ You create a context with the @code{make-context} function.
 
 @defun make-context :INITARG INITVAL@dots{}
 @cfsubindex{make-context}
-Create a new context. The following initargs are available.
+Create a new context. The following @var{:INITARG}s are currently available.
 
 @table @code
 @item :synopsis
@@ -1176,8 +1176,8 @@ application will in fact quit immediately after having displayed the
 help string.
 
 @defun getopt :KEY VALUE@dots{}
-Retrieve the value of a specific option. The following keys are
-available.
+Retrieve the value of a specific option. The following @var{:KEY}s are
+currently available.
 
 @table @code
 @item :short-name
