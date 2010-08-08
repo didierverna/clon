@@ -2104,7 +2104,7 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
 @xref{Group Definition}.
 @end defmac
 
-@defmac defsynopsis (&rest KEYS) &body FORMS
+@defmac defsynopsis (&key POSTFIX) &body FORMS
 @foindex{defsynopsis,:postfix}
 @fiindex{defsynopsis,text}
 @fiindex{defsynopsis,options}
