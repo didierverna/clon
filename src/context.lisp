@@ -233,7 +233,7 @@ options based on it."))
 ;; =========================================================================
 
 (defun search-option-by-name (context &rest keys &key short-name long-name)
-  "Search for option with either SHORT-NAME or LONG-NAME in SYNOPSIS.
+  "Search for option with either SHORT-NAME or LONG-NAME in CONTEXT.
 When such an option exists, return two values:
 - the option itself,
 - the name that matched."
@@ -244,7 +244,7 @@ When such an option exists, return two values:
 	(return-from search-option-by-name (values option name))))))
 
 (defun search-option-by-abbreviation (context partial-name)
-  "Search for option abbreviated with PARTIAL-NAME in SYNOPSIS.
+  "Search for option abbreviated with PARTIAL-NAME in CONTEXT.
 When such an option exists, return two values:
 - the option itself,
 - the completed name."
