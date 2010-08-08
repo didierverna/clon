@@ -690,13 +690,14 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.~%"
     (help :context context :item (clon-options-group context))
     (quit 0)))
 
-;; #### FIXME: just as the :cmdline key defaults to the posix cmdline, the
-;; synopsis should default to *default-synopsis*.
 (defun make-context
     (&rest keys
-     &key synopsis error-handler getopt-error-handler cmdline (make-current t))
+     &key synopsis cmdline error-handler getopt-error-handler (make-current t))
   "Make a new context.
 - SYNOPSIS is the program synopsis to use in that context.
+  It defaults to *DEFAULT-SYNOPSIS*.
+- CMDLINE is the argument list (strings) to process.
+  It defaults to a POSIX conformant argv.
 - ERROR-HANDLER is the behavior to adopt on errors at command-line parsing time.
   It can be one of:
   * :quit, meaning print the error and abort execution,
@@ -706,8 +707,6 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.~%"
 in the functions themselves). It can be one of:
   * :quit, meaning print the error and abort execution,
   * :none, meaning let the debugger handle the situation.
-- CMDLINE is the argument list (strings) to process.
-  It defaults to a POSIX conformant argv.
 - If MAKE-CURRENT, make the new context current."
   (declare (ignore synopsis error-handler getopt-error-handler cmdline))
   (let ((context (apply #'make-instance 'context
