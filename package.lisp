@@ -71,6 +71,7 @@
    ;; From src/synopsis.lisp:
    :make-synopsis :defsynopsis
    ;; From src/context.lisp:
+   :*current-context*
    :make-context
    :getopt
    :getopt-cmdline

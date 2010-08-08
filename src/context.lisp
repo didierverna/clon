@@ -33,7 +33,6 @@
 (in-package :com.dvlsoft.clon)
 (in-readtable :com.dvlsoft.clon)
 
-;; #### FIXME: export so that people can change its value.
 (defvar *current-context* nil "The current context.")
 
 
