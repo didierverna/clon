@@ -121,7 +121,7 @@ This class handles the description of the program's command-line options."))
 	   '(options "[OPTIONS]")
 	   (accumulate (postfix)
 	     (postfix synopsis)))
-	 ;; This calls the CONTAINER method.
+	 ;; This calls the container's method.
 	 (call-next-method)))
 
 
