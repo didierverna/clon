@@ -53,7 +53,7 @@ This class is used for traversing graphs with loop avoidance."))
 
 (defgeneric untraverse (object)
   (:documentation "Reset OBJECT's traversal state, and return OBJECT.")
-  (:method :after((traversable traversable))
+  (:method :after ((traversable traversable))
     "Mark TRAVERSABLE as untraversed."
     (setf (traversedp traversable) nil)))
 
