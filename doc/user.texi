@@ -549,8 +549,8 @@ You create a context with the function @code{make-context}.
 @end verbatim
 @end cartouche
 
-@cindex Retrieval, explicit
-@cindex Option Retrieval, explicit
+@cindex Options Retrieval, explicit
+@cindex Retrieval, of options, explicit
 @findex getopt
 @cindex Help String, display
 @findex help
@@ -571,8 +571,8 @@ name (this retrieval method is said to be @dfn{explicit}).
 @end verbatim
 @end cartouche
 
-@cindex Retrieval, sequential
-@cindex Option Retrieval, sequential
+@cindex Options Retrieval, sequential
+@cindex Retrieval, of options, sequential
 @findex do-cmdline-options
 And now, we are going to retrieve the other options and simply print
 them. This time however, we process the @cmdline{} sequentially (so this
@@ -1176,8 +1176,8 @@ as above, and the same comments apply as well.
 @section Option Retrieval
 @cindex Runtime Phase
 @cindex Phase, runtime
-@cindex Retrieval
-@cindex Option Retrieval
+@cindex Retrieval, of options
+@cindex Options Retrieval
 
 During the runtime phase of @clon{}, your main activity will be to
 retrieve options and their values. @clon{} provides two techniques for
@@ -1200,8 +1200,8 @@ during option retrieval (@pxenduserref{Option Retrieval}).
 
 @node Explicit Retrieval, Sequential Retrieval, Option Retrieval, Option Retrieval
 @subsection Explicit Retrieval
-@cindex Retrieval, explicit
-@cindex Option Retrieval, explicit
+@cindex Options Retrieval, explicit
+@cindex Retrieval, of options, explicit
 Since @clon{} lets you retrieve options on demand (at any time), it
 makes sense to be able to request the value of a specific option
 explicitely. For instance, you might want to try the @samp{--help}
@@ -1275,8 +1275,8 @@ value of @code{nil}.
 
 @node Sequential Retrieval, , Explicit Retrieval, Option Retrieval
 @subsection Sequential Retrieval
-@cindex Retrieval, sequential
-@cindex Option Retrieval, sequential
+@cindex Options Retrieval, sequential
+@cindex Retrieval, of options, sequential
 The more traditional approach to option retrieval is to scan the
 @cmdline{} for options in their order of appearance. @clon{} supports
 this by providing you with one function and two macros, as explained
