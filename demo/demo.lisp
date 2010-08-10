@@ -98,22 +98,22 @@
   "Entry point for the standalone application."
   ;; This context will use the POSIX command line and is made current by
   ;; default:
-  (clon:make-context :error-handler :none
-		     :getopt-error-handler :none)
-  (when (clon:getopt :short-name "h")
-    (clon:help)
-    (quit))
-  (multiple-value-bind (value source)
-      (clon:getopt :short-name "F")
-    (print (list value source)))
-  (format t "~%~%Other options:")
-  (clon:do-cmdline-options (option name value)
-    (print (list option name value)))
+  (let ((ctx (clon:make-context :error-handler :none
+				:getopt-error-handler :none)))
+    (when (clon:getopt :short-name "h")
+      (clon:help)
+      (quit))
+    (multiple-value-bind (value source)
+	(clon:getopt :short-name "F")
+      (print (list value source)))
+    (format t "~%~%Other options:")
+    (clon:do-cmdline-options (option name value)
+      (print (list option name value)))
+    (terpri)
 ;    (format t "~%~%Unknown options:")
 ;    (clon:do-unknown-options (name value)
 ;      (print (list name value)))
-
-  (terpri)
+    (format t "Remainder: ~A~%" (clon:remainder ctx)))
   (quit))
 
 ;; #### PORTME.
