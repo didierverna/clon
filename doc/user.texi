@@ -2093,18 +2093,17 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
 (asdf:operate 'asdf:load-op :com.dvlsoft.clon)
 (use-package :com.dvlsoft.clon)
 
-(defvar *synopsis*
-  (defsynopsis (:postfix "FILES...")
-    (text :contents "A very short program.")
-    (group (:header "Immediate exit options:")
-      (flag :short-name "h" :long-name "help"
-	    :description "Print this help and exit.")
-      (flag :short-name "v" :long-name "version"
-	    :description "Print version number and exit."))))
+(defsynopsis (:postfix "FILES...")
+  (text :contents "A very short program.")
+  (group (:header "Immediate exit options:")
+    (flag :short-name "h" :long-name "help"
+      :description "Print this help and exit.")
+    (flag :short-name "v" :long-name "version"
+	  :description "Print version number and exit.")))
 
 (defun main ()
   "Entry point for our standalone application."
-  (make-context :synopsis *synopsis*)
+  (make-context)
   (when (getopt :short-name "h")
     (help)
     (quit))
