@@ -1027,19 +1027,22 @@ available initialization arguments (depending on the option type), see
 @cfsubindex{make-group}
 @cfiaindex{make-group,:header}
 @cfiaindex{make-group,:item}
-Create a group object whose header is @var{STRING}. Every @var{ITEM} is
-an arbitrary text object, option object or group object. The order is
-important.
+@cindex Help String
+Create a group object, possibly hidden, whose header is @var{STRING}.
+Every @var{ITEM} is an arbitrary text object, option object or group
+object. The order is important as it determines the display of the help
+string.
 @end defun
 
-@defun make-synopsis @code{:postfix} STRING @code{:item} ITEM1 @
-@code{:item} ITEM2@dots{}
+@defun make-synopsis [@code{:postfix} STRING] @
+@code{:item} ITEM1 @code{:item} ITEM2@dots{}
 @cfsubindex{make-synopsis}
 @cfiaindex{make-synopsis,:postfix}
 @cfiaindex{make-synopsis,:item}
+@cindex Help String
 Create a synopsis object whose postfix is @var{STRING}. Every @var{ITEM} is
 an arbitrary text object, option object or group object. The order is
-important.
+important as it determines the display of the help string.
 @end defun
 
 @node Advantages, Group Definition, Constructors, Advanced Synopsis Creation
@@ -1102,7 +1105,7 @@ of your program, for example (and most notably) with an actual
 @cfindex{make-context}
 You create a context with the @code{make-context} function.
 
-@defun make-context :INITARG INITVAL@dots{}
+@defun make-context [:INITARG INITVAL@dots{}]
 @cfsubindex{make-context}
 Create a new context. The following @var{:INITARG}s are currently available.
 
@@ -1284,13 +1287,14 @@ As above, but loop over all @cmdline{} options.
 @c ----
 @node Help, , Option Retrieval, Using Clon
 @section Help
+@cindex Help String
 One of the first motivations in the design of @clon{} was to automate
 the generation of the help string, which is a very boring maintenance
 task to do by hand. The application's synopsis contains all the
 necessary information to do so. In order to print your application's
 help string, use the @code{help} function.
 
-@defun help @code{:item} ITEM
+@defun help [@code{:item} ITEM]
 @bioindex{search-path}
 @evindex{CLON_SEARCH_PATH}
 @bioindex{highlight}
