@@ -1896,49 +1896,91 @@ present in @clon{} because of design decisions, but that I expect to be
 used only rarely, if at all.
 
 @menu
-* Not Using the Command-Line::  But any list of strings instead
-* Using Multiple Contexts::     The current one, and the others
-* Using Different Synopsis::    The default one, and the others
+* Multiple Clon Instances::     Different command-lines, synopsis or contexts
 * Programmatic Help Strings::   Beyond the --help option
 * Version Numbering::           In case you need to conditionalize
 @end menu
 
 
-@c @item :synopsis
-@c @cfiaindex{make-context,:synopsis}
-@c Use this key to associate the context with a synopsis previously defined
-@c by @code{defsynopsis} (@pxref{Synopsis Definition}).
+@c -----------------------
+@c Multiple Clon Instances
+@c -----------------------
+@node Multiple Clon Instances, Programmatic Help Strings, Advanced Usage, Advanced Usage
+@section Multiple @clon{} Instances
 
-@c --------------------------
-@c Not Using the Command-Line
-@c --------------------------
-@node Not Using the Command-Line, Using Multiple Contexts, Advanced Usage, Advanced Usage
-@section Not Using the Command-Line
+It is possible to use different instances of @clon{} in parallel in a
+single application, by using a virtual @cmdline{} instead of the real
+one, different synopsis and multiple contexts simultaneously.
 
-In @ref{Context Creation}, we saw that when you create a context, you
-create an association between a specific execution of the program and
-the synopsis. In that particular instance of the application, the
-@cmdline{} must comply with the synopsis definition. It turns out,
-however that the @cmdline{} doesn't need to be the actual program's
-@cmdline{}, as the user typed it. Any list of strings can act as a
-@cmdline{}.
+@menu
+* Using Different Synopsis::            The default one, and the others
+* Using Different Command-Lines::       The real one, and the others
+* Using Multiple Contexts::             The current one, and the others
+* Potential Uses::                      What to do with all that
+@end menu
+
+@node Using Different Synopsis, Using Different Command-Lines, Multiple Clon Instances, Multiple Clon Instances
+@subsection Using Different Synopsis
+@cindex Synopsis, default
+Did you notice that after defining a synopsis, there is actually never
+any explicit reference to it anymore? So where is the magick? In fact,
+there's no magick at all involved here.
+
+@vindex *default-synopsis*
+@foindex{defsynopsis,:make-default}
+@cfiaindex{make-synopsis,:make-default}
+@clon{} has a global variable named @code{*default-synopsis*} which
+holds the@dots{} default synopsis, yeah. When you define/create a
+synopsis with either @code{defsynopsis} or @code{make-synopsis}, it is
+automatically made the default one, unless you use the
+@code{:make-default} option/initarg with a value of @code{nil}, like
+this:
+
+@verbatim
+(defsynopsis (:make-default nil) ...)
+@end verbatim
+
+or this:
+
+@verbatim
+(make-synopsis :make-default nil ...)
+@end verbatim
+
+@cfindex{make-context}
+When you create a context with @code{make-context}, the default synopsis
+is used implicitely, but you have two ways to avoid this.
+
+@enumerate
+@item
+@vindex *default-synopsis*
+At any time in your program, you may change the value of
+@code{*default-synopsis*}. All subsequent calls to @code{make-context}
+will hence use this other synopsis.
+@item
+@cfiaindex{make-context,:synopsis}@c
+If you prefer to use another synopsis only temporarily, you can use the
+@code{:synopsis} initarg to @code{make-context} instead.
+@end enumerate
+
+@node Using Different Command-Lines, Using Multiple Contexts, Using Different Synopsis, Multiple Clon Instances
+@subsection Using Different Command-Lines
+In @ref{Context Creation}, we saw that a context object describes a
+particular instance of your application, most notably depending on the
+actual @cmdline{} the end-user provided. It turns out, however that the
+@cmdline{} doesn't need to be the actual program's @cmdline{}, as the
+user typed it. Any list of strings can act as a @cmdline{}.
 
 @cfiaindex{make-context,:cmdline}
 The function @code{make-context} has a @code{:cmdline} key that allows
 you to provide any list of strings that will act as the @cmdline{}. Of
 course, the default is to use the actual program's one.
 
-
-@c -----------------------
-@c Using Multiple Contexts
-@c -----------------------
-@node Using Multiple Contexts, Using Different Synopsis, Not Using the Command-Line, Advanced Usage
-@section Using Multiple Contexts
-
+@node Using Multiple Contexts, Potential Uses, Using Different Command-Lines, Multiple Clon Instances
+@subsection Using Multiple Contexts
 @cindex Context, current
-Did you notice that after creating a context, there is actually never
-any explicit reference to it anymore? So where is the magick? In fact,
-there's no magick at all involved.
+Did you also notice that after creating a context, there is actually
+never any explicit reference to it anymore? So again, where is the
+magick? In fact, there's no magick at all involved here either.
 
 @vindex *current-context*
 @cfiaindex{make-context,:make-current}
@@ -1986,55 +2028,8 @@ already seen. For the macros @code{multiple-value-getopt-cmdline} and
 @end verbatim
 @end enumerate
 
-
-@c ------------------------
-@c Using Different Synopsis
-@c ------------------------
-@node Using Different Synopsis, Programmatic Help Strings, Using Multiple Contexts, Advanced Usage
-@section Using Different Synopsis
-
-@cindex Synopsis, default
-Did you also notice that after defining a synopsis, there is actually
-never any explicit reference to it anymore? So again, where is the
-magick? In fact, there's no magick at all involved here either.
-
-@vindex *default-synopsis*
-@foindex{defsynopsis,:make-default}
-@cfiaindex{make-synopsis,:make-default}
-@clon{} has a global variable named @code{*default-synopsis*} which
-holds the@dots{} default synopsis, yeah. When you define/create a
-synopsis with either @code{defsynopsis} or @code{make-synopsis}, it is
-automatically made the default one, unless you use the
-@code{:make-default} option/initarg with a value of @code{nil}, like
-this:
-
-@verbatim
-(defsynopsis (:make-default nil) ...)
-@end verbatim
-
-or this:
-
-@verbatim
-(make-synopsis :make-default nil ...)
-@end verbatim
-
-@cfindex{make-context}
-
-When you create a context with @code{make-context}, the default synopsis
-is used implicitely, but you have two ways to avoid this.
-
-@enumerate
-@item
-@vindex *default-synopsis*
-At any time in your program, you may change the value of
-@code{*default-synopsis*}. All subsequent calls to @code{make-context}
-will hence use this other synopsis.
-@item
-@cfiaindex{make-context,:synopsis}@c
-If you prefer to use another synopsis only temporarily, you can use the
-@code{:synopsis} initarg to @code{make-context} instead.
-@end enumerate
-
+@node Potential Uses, , Using Multiple Contexts, Multiple Clon Instances
+@subsection Potential Uses
 By combining @clon{}'s ability to use a virtual @cmdline{}, different
 synopsis and multiple contexts, you can achieve very neat (read: totally
 useless) things. For instance, you could write an application that takes
@@ -2044,11 +2039,54 @@ forked. Some revision control systems do that for controlling external
 you can completely control the validity of the external program's
 @cmdline{}, before it is forked, from your original one.
 
+Here is another idea, again related to revision control systems. Some of
+them feature a @cmdline{} syntax like the following:
+
+@verbatim
+prog [global options] command [command-specific options]
+@end verbatim
+
+@cindex Postfix
+@cindex Command-Line Remainder
+@cindex Remainder, of command-line
+You can achieve this with @clon{} quite easily I think (untested).
+First, define a synopsis which only handles the global options, and
+provide a postfix of @code{"command [command-specific option]"} or
+something. This will authorize a @cmdline{} remainder which will start
+with the command name.
+
+Now, for every command in your program, define a specific synopsis with
+only the command-specific options. Get the remainder of the original
+@cmdline{} (@pxref{Command-Line Remainder}) and figure out which command
+was used. Depending on it, create a new context with the appropriate
+synopsis and the original @cmdline{}'s remainder as the new, virtual,
+@cmdline{}. You're done: retrieve global options from the first context,
+and command-specific ones from the second one.
+
+@cindex Help String, display
+@findex help
+@fkindex{help,:item}
+@bioindex{search-path}
+@evindex{CLON_SEARCH_PATH}
+@bioindex{highlight}
+@evindex{CLON_HIGHLIGHT}
+@bioindex{theme}
+@evindex{CLON_THEME}
+@bioindex{line-width}
+@evindex{CLON_LINE_WIDTH}
+What is even cooler is that you can display the command-specific options
+on demand quite easily as well (like what @file{git} does when you call
+it like this: @code{git commit --help} for instance). Just call the
+@code{help} function with the original context (in order to preserve the
+end-user choices with respect to highlighting @etc{}), but use the
+@code{:item} key and give it the command-specific synopsis as its value.
+
+
 
 @c -------------------------
 @c Programmatic Help Strings
 @c -------------------------
-@node Programmatic Help Strings, Version Numbering, Using Different Synopsis, Advanced Usage
+@node Programmatic Help Strings, Version Numbering, Multiple Clon Instances, Advanced Usage
 @section Programmatic Help Strings
 
 @findex help
@@ -2308,8 +2346,8 @@ See @ref{Synopsis Definition} and @ref{Using Different Synopsis}.
 @cfiaindex{make-context,:synopsis}
 @cfiaindex{make-context,:cmdline}
 @cfiaindex{make-context,:make-current}
-@xref{Context Creation}, @ref{Not Using the Command-Line}, @ref{Using
-Multiple Contexts} and @ref{Using Different Synopsis}.
+@xref{Context Creation}, @ref{Using Different Synopsis} and @ref{Using
+Different Command-Lines}.
 @end defun
 
 @defopt *current-context*
