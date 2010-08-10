@@ -149,7 +149,7 @@ This class handles the description of the program's command-line options."))
 
 (defmethod initialize-instance :around ((synopsis synopsis) &rest keys)
   "Prepare Clon specific options."
-  (let ((grp (%defgroup t (:header "Clon specific options:")
+  (let ((grp (%defgroup t (:header "Clon specific options:" :hidden t)
 	       (flag "banner" "Display the full Clon banner.")
 	       (enum "version"
 		     "Display Clon's version number.

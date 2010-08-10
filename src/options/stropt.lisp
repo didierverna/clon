@@ -90,7 +90,7 @@ This class implements options the values of which are strings."))
 		    &key short-name long-name description
 			 argument-name argument-type
 			 env-var fallback-value default-value
-			 nullablep)
+			 nullablep hidden)
   "Make a new string option.
 - SHORT-NAME is the option's short name (without the dash).
   It defaults to nil.
@@ -107,18 +107,19 @@ This class implements options the values of which are strings."))
 - FALLBACK-VALUE is the option's fallback value (for missing optional
   arguments), if any.
 - DEFAULT-VALUE is the option's default value, if any.
-- NULLABLEP indicates whether this option accepts nil as a value."
+- NULLABLEP indicates whether this option accepts nil as a value.
+- When HIDDEN, the option doesn't appear in help strings."
   (declare (ignore short-name long-name description
 		   argument-name argument-type
 		   env-var fallback-value default-value
-		   nullablep))
+		   nullablep hidden))
   (apply #'make-instance 'stropt keys))
 
 (defun make-internal-stropt (long-name description
 			      &rest keys
 			      &key argument-name argument-type
 				   env-var fallback-value default-value
-				   nullablep)
+				   nullablep hidden)
   "Make a new internal (Clon-specific) string option.
 - LONG-NAME is the option's long-name, minus the 'clon-' prefix.
   (Internal options don't have short names.)
@@ -132,10 +133,11 @@ This class implements options the values of which are strings."))
 - FALLBACK-VALUE is the option's fallback value (for missing optional
   arguments), if any.
 - DEFAULT-VALUE is the option's default value, if any.
-- NULLABLEP indicates whether this option accepts nil as a value."
+- NULLABLEP indicates whether this option accepts nil as a value.
+- When HIDDEN, the option doesn't appear in help strings."
   (declare (ignore argument-name argument-type
 		   env-var fallback-value default-value
-		   nullablep))
+		   nullablep hidden))
   (apply #'make-instance 'stropt
 	 :long-name long-name
 	 :description description

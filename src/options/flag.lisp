@@ -55,7 +55,8 @@ This class implements options that don't take any argument."))
 ;; Flag Instance Creation
 ;; ==========================================================================
 
-(defun make-flag (&rest keys &key short-name long-name description env-var)
+(defun make-flag (&rest keys &key short-name long-name description env-var
+				  hidden)
   "Make a new flag.
 - SHORT-NAME is the option's short name (without the dash).
   It defaults to nil.
@@ -64,22 +65,26 @@ This class implements options that don't take any argument."))
 - DESCRIPTION is the option's description appearing in help strings.
   It defaults to nil.
 - ENV-VAR is the flag's associated environment variable.
-  It defaults to nil."
-  (declare (ignore short-name long-name description env-var))
+  It defaults to nil.
+- When HIDDEN, the option doesn't appear in help strings."
+  (declare (ignore short-name long-name description env-var hidden))
   (apply #'make-instance 'flag keys))
 
-(defun make-internal-flag (long-name description &optional env-var)
+(defun make-internal-flag (long-name description
+			   &rest keys &key env-var hidden)
   "Make a new internal (Clon-specific) flag.
 - LONG-NAME is the flag's long-name, minus the 'clon-' prefix.
   (Internal options don't have short names.)
 - DESCRIPTION is the flag's description.
 - ENV-VAR is the flag's associated environment variable, minus the 'CLON_'
-  prefix. It default to nil."
-  (make-instance 'flag
-    :long-name long-name
-    :description description
-    :env-var env-var
-    :internal t))
+  prefix. It default to nil.
+- When HIDDEN, the option doesn't appear in help strings."
+  (declare (ignore env-var hidden))
+  (apply #'make-instance 'flag
+	 :long-name long-name
+	 :description description
+	 :internal t
+	 keys))
 
 
 ;;; flag.lisp ends here

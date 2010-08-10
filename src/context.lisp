@@ -224,7 +224,9 @@ options based on it."))
 			   :line-width line-width
 			   :highlight highlight)))
     (print-help sheet
-		(help-spec item :program (pathname-name (progname context))))
+		(help-spec item
+			   :program (pathname-name (progname context))
+			   :unhide t))
     (flush-sheet sheet)))
 
 

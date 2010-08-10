@@ -705,13 +705,26 @@ In order to add arbitrary text to your help string, use the following
 form:
 
 @noindent
-@t{(text :contents} @var{STRING}@t{)}
+@t{(text} [@var{OPTIONS@dots{}}]@t{)}
 
-Try to make proper sentences when adding arbitrary text. You can use
-explicit newline characters in your text if you really want to go next
-line, but in general, you should not worry about the formatting because
-the themes are here to do so. In particular, don't finish your text with
-a newline. This would break potential theme specifications.
+@var{OPTIONS} are key/value pairs. The following @var{OPTIONS} are
+currently available.
+@table @t
+@item :contents
+@cindex Text, contents
+The actual text string. Try to make proper sentences when adding
+arbitrary text. You can use explicit newline characters in your text if
+you really want to go next line, but in general, you should not worry
+about the formatting because the themes are here to do so. In
+particular, don't finish your text with a newline. This would break
+potential theme specifications.
+@item :hidden
+@cindex Hidden Text
+@cindex Text, hidden
+@cindex Help String
+When non-@code{nil}, the text won't appear in the help string. Hidden
+texts can still be displayed individually though (@pxref{Help}).
+@end table
 
 @node Options, Groups, Text, Synopsis Items
 @subsubsection Options
@@ -756,6 +769,19 @@ The following @var{OPTIONS} are currently available.
 A string which will be displayed above the group's contents in the help
 string. The same formatting recommendations as for arbitrary text apply
 (@pxref{Text}).
+@item :hidden
+@cindex Hidden Groups
+@cindex Groups, hidden
+@foindex{defgroup,:hidden}@c
+@cindex Help String
+@cindex Built-In Groups
+@cindex Groups, built-in
+@bioindex{help}
+When non-@code{nil}, the group won't appear in the help string. Hidden
+groups can still be displayed individually though (@pxref{Help}). For
+instance, the @clon{} built-in group is hidden in the regular help
+string, but the @option{--clon-help} option still displays it
+individually.
 @end table
 
 @node Built-In Option Types, Advanced Synopsis Creation, Synopsis Items, Synopsis Definition
@@ -798,6 +824,13 @@ formatting recommendations as for arbitrary text apply (@pxref{Text}).
 @item :env-var
 @copindex{:env-var}
 The option's associated environment variable. A string or @code{nil}.
+@item :hidden
+@copindex{:hidden}
+@cindex Hidden Options
+@cindex Options, hidden
+@cindex Help String
+When non-@code{nil}, the option won't appear in the help string. Hidden
+options can still be displayed individually though (@pxref{Help}).
 @end table
 
 Note that an option is required to have at least one name (either short
@@ -999,10 +1032,12 @@ there in @code{defsyopsis} are in fact initargs to those constructors.
 We now examine those constructors in greater detail.
 
 @cindex Options, creation
-@defun make-text @code{:contents} STRING
+@defun make-text [@code{:hidden} BOOL] @code{:contents} STRING
 @cfsubindex{make-text}
 @cfiaindex{make-text,:contents}
-Create an arbitrary text object whose contents is @var{STRING}.
+@cfiaindex{make-text,:hidden}
+Create an arbitrary text object, possibly hidden, whose contents is
+@var{STRING}.
 @end defun
 
 @c #### FIXME: I would like an environment without indexing here.
@@ -1022,10 +1057,11 @@ available initialization arguments (depending on the option type), see
 @ref{Built-In Option Types}.
 @end defun
 
-@defun make-group @code{:header} STRING @code{:item} ITEM1 @
-@code{:item} ITEM2@dots{}
+@defun make-group [@code{:header} STRING @code{:hidden} BOOL] @
+@code{:item} ITEM1 @code{:item} ITEM2@dots{}
 @cfsubindex{make-group}
 @cfiaindex{make-group,:header}
+@cfiaindex{make-group,:hidden}
 @cfiaindex{make-group,:item}
 @cindex Help String
 Create a group object, possibly hidden, whose header is @var{STRING}.
@@ -1080,6 +1116,7 @@ For this, @clon{} provides a macro called @code{defgroup}.
 @cindex Groups, in synopsis
 @fiindex{defsynopsis,group}
 @foindex{defgroup,:header}
+@foindex{defgroup,:hidden}
 Define a new group and return it. This macro behaves exactly like the
 @code{group} form in a call to @code{defsynopsis} (@pxref{Groups}). In
 fact, an intermediate step in the expansion of the @code{defsynopsis}
@@ -1309,16 +1346,22 @@ built-in options (@pxenduserref{Theme Mechanism}).
 @end defun
 
 @fkindex{help,:item}
-By default, @code{help} prints the whole application help string.
-However, if you have kept a reference to any synopsis item (option,
-text, group), you can pass it as the value of the @code{:item} key, and
-@clon{} will only print the help string for that particular item.
+By default, @code{help} prints the whole application help string,
+excluding hidden items. However, if you have kept a reference to any
+synopsis item (option, text, group), you can pass it as the value of the
+@code{:item} key, and @clon{} will only print the help string for that
+particular item. In this case however, the hidden state of the item is
+discarded (but @emph{not} the ones of sub-items).
 
 @bioindex{help}
-For instance, this is how the @option{clon-help} option is implemented:
-it only prints the help string of the built-in @clon{} group.
-
-FIXME: mention the use in conjunction with hidden groups or options.
+@cindex Built-In Groups
+@cindex Groups, built-in
+@cindex Hidden Groups
+@cindex Groups, hidden
+For instance, the @clon{} built-in group is normally hidden, so it
+doesn't show up in the global help string, but the @option{--clon-help}
+option uses the @code{help} function on it explicitely, so it discards
+its hidden state.
 
 
 
@@ -1677,7 +1720,7 @@ Let's look at the enumeration example now.
 		  &key short-name long-name description
 		       argument-name argument-type
 		       enum env-var fallback-value default-value
-		       nullablep)
+		       nullablep hidden)
   "Make a new enum option.
 - SHORT-NAME is the option's short name (without the dash).
   It defaults to nil.
@@ -1695,7 +1738,8 @@ Let's look at the enumeration example now.
 - FALLBACK-VALUE is the option's fallback value (for missing optional
   arguments), if any.
 - DEFAULT-VALUE is the option's default value, if any.
-- NULLABLEP indicates whether this option accepts nil as a value."
+- NULLABLEP indicates whether this option accepts nil as a value.
+- When HIDDEN, the option doesn't appear in help strings."
   (declare (ignore short-name long-name description
 		  argument-name argument-type
 		  enum env-var fallback-value default-value
@@ -2139,9 +2183,10 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
 @node Initialization Phase API, Runtime Phase API, API Quick Reference, API Quick Reference
 @section Initialization Phase API
 
-@defun make-text &key CONTENTS
+@defun make-text &key CONTENTS HIDDEN
 @cfsubindex{make-text}
 @cfiaindex{make-text,:contents}
+@cfiaindex{make-text,:hidden}
 @defunx make-@var{OPTION} :INITARG INITVAL@dots{}
 @cfsubindex{make-@var{OPTION}}
 @cfindex make-flag
@@ -2151,9 +2196,10 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
 @cfindex make-path
 @cfindex make-switch
 @cfindex make-xswitch
-@defunx make-group &key HEADER ITEM
+@defunx make-group &key HEADER HIDDEN ITEM
 @cfsubindex{make-group}
 @cfiaindex{make-group,:header}
+@cfiaindex{make-group,:hidden}
 @cfiaindex{make-group,:item}
 @defunx make-synopsis &key POSTFIX ITEM (MAKE-DEFAULT t)
 @cfsubindex{make-synopsis}
@@ -2163,8 +2209,9 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
 See @ref{Constructors} and @ref{Using Different Synopsis}.
 @end defun
 
-@defmac defgroup (&key HEADER) &body FORMS
+@defmac defgroup (&key HEADER HIDDEN) &body FORMS
 @foindex{defgroup,:header}
+@foindex{defgroup,:hidden}
 @xref{Group Definition}.
 @end defmac
 

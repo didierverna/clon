@@ -103,7 +103,7 @@ If ARGUMENT is not valid for an xswitch, raise a conversion error."
 
 (defun make-xswitch (&rest keys &key short-name long-name description
 				    argument-name argument-type
-				    enum env-var default-value)
+				    enum env-var default-value hidden)
   "Make a new xswitch.
 - SHORT-NAME is the xswitch's short name (without the dash).
   It defaults to nil.
@@ -118,15 +118,17 @@ If ARGUMENT is not valid for an xswitch, raise a conversion error."
 - ENUM is the set of possible non-boolean values.
 - ENV-VAR is the xswitch's associated environment variable.
   It defaults to nil.
-- DEFAULT-VALUE is the xswitch's default value, if any."
+- DEFAULT-VALUE is the xswitch's default value, if any.
+- When HIDDEN, the option doesn't appear in help strings."
   (declare (ignore short-name long-name description
 		   argument-name argument-type
-		   enum env-var default-value))
+		   enum env-var default-value hidden))
   (apply #'make-instance 'xswitch keys))
 
 (defun make-internal-xswitch (long-name description
 			      &rest keys &key argument-name argument-type
-					      enum env-var default-value)
+					      enum env-var default-value
+					      hidden)
   "Make a new internal (Clon-specific) xswitch.
 - LONG-NAME is the xswitch's long-name, minus the 'clon-' prefix.
   (Internal options don't have short names.)
@@ -138,8 +140,10 @@ If ARGUMENT is not valid for an xswitch, raise a conversion error."
 - ENUM is the set of possible non-boolean values.
 - ENV-VAR is the xswitch's associated environment variable, minus the 'CLON_'
   prefix. It defaults to nil.
-- DEFAULT-VALUE is the xswitch's default value, if any."
-  (declare (ignore argument-name argument-type enum env-var default-value ))
+- DEFAULT-VALUE is the xswitch's default value, if any.
+- When HIDDEN, the option doesn't appear in help strings."
+  (declare (ignore argument-name argument-type enum env-var default-value
+		   hidden))
   (apply #'make-instance 'xswitch
 	 :long-name long-name
 	 :description description

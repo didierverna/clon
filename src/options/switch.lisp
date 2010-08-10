@@ -114,7 +114,7 @@ If ARGUMENT is not valid for a switch, raise a conversion error."
 
 (defun make-switch (&rest keys &key short-name long-name description
 				   argument-style argument-type
-				   env-var default-value)
+				   env-var default-value hidden)
   "Make a new switch.
 - SHORT-NAME is the switch's short name (without the dash).
   It defaults to nil.
@@ -130,15 +130,16 @@ If ARGUMENT is not valid for a switch, raise a conversion error."
   It defaults to :optional.
 - ENV-VAR is the switch's associated environment variable.
   It defaults to nil.
-- DEFAULT-VALUE is the switch's default value, if any."
+- DEFAULT-VALUE is the switch's default value, if any.
+- When HIDDEN, the option doesn't appear in help strings."
   (declare (ignore short-name long-name description
 		   argument-style argument-type
-		   env-var default-value))
+		   env-var default-value hidden))
   (apply #'make-instance 'switch keys))
 
 (defun make-internal-switch (long-name description
 			     &rest keys &key argument-style argument-type
-					    env-var default-value)
+					    env-var default-value hidden)
   "Make a new internal (Clon-specific) switch.
 - LONG-NAME is the switch's long-name, minus the 'clon-' prefix.
   (Internal options don't have short names.)
@@ -151,8 +152,9 @@ If ARGUMENT is not valid for a switch, raise a conversion error."
   It defaults to :optional.
 - ENV-VAR is the switch's associated environment variable, minus the 'CLON_'
   prefix. It defaults to nil.
-- DEFAULT-VALUE is the switch's default value, if any."
-  (declare (ignore  argument-style argument-type env-var default-value))
+- DEFAULT-VALUE is the switch's default value, if any.
+- When HIDDEN, the option doesn't appear in help strings."
+  (declare (ignore  argument-style argument-type env-var default-value hidden))
   (apply #'make-instance 'switch
 	 :long-name long-name
 	 :description description

@@ -61,8 +61,14 @@ This class implements plain text objects appearing in a synopsis."))
 ;; The Help Specification Protocol
 ;; ==========================================================================
 
+;; #### FIXME: this protocol should be declared in traversable when it is made
+;; the base class for all synopsis items.
 (defgeneric help-spec (item &key &allow-other-keys)
   (:documentation "Return a help specification for ITEM.")
+  (:method :around (item &key unhide)
+    "Call the actual method only when ITEM is not hidden or UNHIDE."
+    (when (or (not (hiddenp item)) unhide)
+      (call-next-method)))
   (:method ((text text) &key)
     (accumulate (text)
       (contents text))))
@@ -73,17 +79,18 @@ This class implements plain text objects appearing in a synopsis."))
 ;; Text Instance Creation
 ;; ==========================================================================
 
-(defun make-text (&rest keys &key contents)
+(defun make-text (&rest keys &key contents hidden)
   "Make a new text.
-- CONTENTS is the actual text to display."
-  (declare (ignore contents))
+- CONTENTS is the actual text to display.
+- When HIDDEN, the text doesn't appear in help strings."
+  (declare (ignore contents hidden))
   (apply #'make-instance 'text keys))
 
 ;; #### NOTE: currently, there is no difference between internal and external
 ;; text, but this might change in the future. Besides, having this function it
 ;; simplifies the defgroup and defsynopsis macros.
-(defun make-internal-text (&rest keys &key contents)
-  (declare (ignore contents))
+(defun make-internal-text (&rest keys &key contents hidden)
+  (declare (ignore contents hidden))
   (apply #'make-text keys))
 
 ;;; text.lisp ends here

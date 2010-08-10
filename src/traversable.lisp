@@ -41,7 +41,14 @@
 (defabstract traversable ()
   ((traversedp :documentation "The object's traversal state."
 	       :initform nil
-	       :accessor traversedp))
+	       :accessor traversedp)
+   (hiddenp :documentation "Whether the object is hidden in help strings."
+	    :initform nil
+	    ;; #### NOTE: the initarg below doesn't follow the *p convention
+	    ;; because that would look strange in a declarative group
+	    ;; construction.
+	    :initarg :hidden
+	    :reader hiddenp))
   (:documentation "The TRAVERSABLE class.
 This class is used for traversing graphs with loop avoidance."))
 

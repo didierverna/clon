@@ -98,7 +98,7 @@ This class implements read-from-string options."))
 			  argument-name argument-type
 			  env-var
 			  typespec fallback-value default-value
-			  nullablep)
+			  nullablep hidden)
   "Make a new lispobj option.
 - SHORT-NAME is the option's short name (without the dash).
   It defaults to nil.
@@ -116,12 +116,13 @@ This class implements read-from-string options."))
 - FALLBACK-VALUE is the option's fallback value (for missing optional
   arguments), if any.
 - DEFAULT-VALUE is the option's default value, if any.
-- NULLABLEP indicates whether this option accepts nil as a value."
+- NULLABLEP indicates whether this option accepts nil as a value.
+- When HIDDEN, the option doesn't appear in help strings."
   (declare (ignore short-name long-name description
 		   argument-name argument-type
 		   env-var
 		   typespec fallback-value default-value
-		   nullablep))
+		   nullablep hidden))
   (apply #'make-instance 'lispobj keys))
 
 (defun make-internal-lispobj (long-name description
@@ -129,7 +130,7 @@ This class implements read-from-string options."))
 			       &key argument-name argument-type
 				    env-var
 				    typespec fallback-value default-value
-				    nullablep)
+				    nullablep hidden)
   "Make a new internal (Clon-specific) string option.
 - LONG-NAME is the option's long-name, minus the 'clon-' prefix.
   (Internal options don't have short names.)
@@ -144,11 +145,12 @@ This class implements read-from-string options."))
 - FALLBACK-VALUE is the option's fallback value (for missing optional
   arguments), if any.
 - DEFAULT-VALUE is the option's default value, if any.
-- NULLABLEP indicates whether this option accepts nil as a value."
+- NULLABLEP indicates whether this option accepts nil as a value.
+- When HIDDEN, the option doesn't appear in help strings."
   (declare (ignore argument-name argument-type
 		   env-var
 		   typespec fallback-value default-value
-		   nullablep))
+		   nullablep hidden))
   (apply #'make-instance 'lispobj
 	 :long-name long-name
 	 :description description

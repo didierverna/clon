@@ -207,7 +207,7 @@ If AS-DIRECTORY, make sure the resulting pathname denotes a directory."
 		  &key short-name long-name description
 		       argument-name argument-type
 		       env-var fallback-value default-value
-		       nullablep type)
+		       nullablep type hidden)
   "Make a new path option.
 - SHORT-NAME is the option's short name (without the dash).
   It defaults to nil.
@@ -226,17 +226,18 @@ If AS-DIRECTORY, make sure the resulting pathname denotes a directory."
 - DEFAULT-VALUE is the option's default value, if any.
 - NULLABLEP indicates whether this option accepts nil as a value.
 - TYPE is the pathname type. It can be one of :file, :directory, :file-list,
-  :directory-list or nil meaning that everything is allowed."
+  :directory-list or nil meaning that everything is allowed.
+- When HIDDEN, the option doesn't appear in help strings."
   (declare (ignore short-name long-name description env-var
 		  argument-name argument-type fallback-value default-value
-		  nullablep type))
+		  nullablep type hidden))
   (apply #'make-instance 'path keys))
 
 (defun make-internal-path (long-name description
 			    &rest keys
 			    &key argument-name argument-type
 				 env-var fallback-value default-value
-				 nullablep type)
+				 nullablep type hidden)
   "Make a new internal (Clon-specific) path option.
 - LONG-NAME is the option's long-name, minus the 'clon-' prefix.
   (Internal options don't have short names.)
@@ -252,10 +253,11 @@ If AS-DIRECTORY, make sure the resulting pathname denotes a directory."
 - DEFAULT-VALUE is the option's default value, if any.
 - NULLABLEP indicates whether this option accepts nil as a value.
 - TYPE is the pathname type. It can be one of :file, :directory, :file-list,
-  :directory-list or nil meaning that everything is allowed."
+  :directory-list or nil meaning that everything is allowed.
+- When HIDDEN, the option doesn't appear in help strings."
   (declare (ignore argument-name argument-type
 		   env-var fallback-value default-value
-		   nullablep type))
+		   nullablep type hidden))
   (apply #'make-instance 'path
 	 :long-name long-name
 	 :description description

@@ -89,7 +89,7 @@ If ARGUMENT doesn't name one of ENUM's symbols, raise a conversion error."
 		  &key short-name long-name description
 		       argument-name argument-type
 		       enum env-var fallback-value default-value
-		       nullablep)
+		       nullablep hidden)
   "Make a new enum option.
 - SHORT-NAME is the option's short name (without the dash).
   It defaults to nil.
@@ -107,18 +107,19 @@ If ARGUMENT doesn't name one of ENUM's symbols, raise a conversion error."
 - FALLBACK-VALUE is the option's fallback value (for missing optional
   arguments), if any.
 - DEFAULT-VALUE is the option's default value, if any.
-- NULLABLEP indicates whether this option accepts nil as a value."
+- NULLABLEP indicates whether this option accepts nil as a value.
+- When HIDDEN, the option doesn't appear in help strings."
   (declare (ignore short-name long-name description
 		  argument-name argument-type
 		  enum env-var fallback-value default-value
-		  nullablep))
+		  nullablep hidden))
   (apply #'make-instance 'enum keys))
 
 (defun make-internal-enum (long-name description
 			    &rest keys
 			    &key argument-name argument-type
 				 enum env-var fallback-value default-value
-				 nullablep)
+				 nullablep hidden)
   "Make a new internal (Clon-specific) enum option.
 - LONG-NAME is the option's long-name, minus the 'clon-' prefix.
   (Internal options don't have short names.)
@@ -133,10 +134,11 @@ If ARGUMENT doesn't name one of ENUM's symbols, raise a conversion error."
 - FALLBACK-VALUE is the option's fallback value (for missing optional
   arguments), if any.
 - DEFAULT-VALUE is the option's default value, if any.
-- NULLABLEP indicates whether this option accepts nil as a value."
+- NULLABLEP indicates whether this option accepts nil as a value.
+- When HIDDEN, the option doesn't appear in help strings."
   (declare (ignore argument-name argument-type
 		   enum env-var fallback-value default-value
-		   nullablep))
+		   nullablep hidden))
   (apply #'make-instance 'enum
 	 :long-name long-name
 	 :description description
