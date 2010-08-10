@@ -614,13 +614,13 @@ and voila!
 @node Using Clon, Extending Clon, Quick Start, Top
 @chapter Using Clon
 
-Using @clon{} in your application involves three steps. In the first
-step, you create a @dfn{synopsis}, which is a description of your
-application's @cmdline{}. In the second step, you create a
-@dfn{context}, which associates the synopsis with this specific
-execution of the program. In the third step finally, you retrieve the
-options values. Steps one and two form the @dfn{initialization phase} of
-@clon{}, while step 3 is called the @dfn{runtime phase}.
+Using @clon{} in your application is a two stages process. In phase 1,
+you create a @dfn{synopsis}, which is a description of your
+application's @cmdline{}m and a @dfn{context}, which describes this
+specific execution of the program. In phase 2, you retrieve the options
+values and possibly display help strings. Phase 1 is called the
+@dfn{initialization phase}, while phase 2 is called the @dfn{runtime
+phase}.
 
 @menu
 * Synopsis Definition:: Describing your command-line
