@@ -1363,6 +1363,26 @@ doesn't show up in the global help string, but the @option{--clon-help}
 option uses the @code{help} function on it explicitely, so it discards
 its hidden state.
 
+Here is a potentially useful application of hidden groups in conjunction
+with the @code{:item} key. Look at ImageMagick's @file{convert}
+program's help string for instance: it is 276 lines long. Gosh. The help
+string is decomposed into several categories: image settings, image
+operators, misc options @etc{}. If I were to implement this program, I
+would rather have the @option{--help} option display an overview of the
+program, advertise @option{--version} and a couple of others, and I
+would then implement @option{--help} as an enumeration for listing every
+option category individually (they would normally be stored in hidden
+groups). The user could then use @option{--help=settings},
+@option{--help=operators} and so on to display only the category she's
+interested in.
+
+Finally, here is potentially useful application of hidden options that
+are never ever displayed in any help string whatsoever, and I mean,
+like, ever. This is the perfect tool for backdoor'ing a program. For
+instance, if you ever need to implement a
+@option{--discard-all-security-measures-and-blow-the-nuke} option, then
+you'd better have it hidden@dots{}
+
 
 
 @c ====================================================================
