@@ -681,11 +681,15 @@ The following @var{OPTIONS} are currently available.
 @item :postfix
 @cindex Postfix
 @foindex{defsynopsis,:postfix}@c
-A string which will appear at the end of the synopsis line
-in the help string. When you provide a postfix, you also implicitely
-tell @clon{} that your application accepts non-option arguments at the
-end of the @cmdline{}. See @enduserref{Option Separator} for more
-information on the behavior of @clon{} with respect to postfixes.
+@cindex Command-Line Remainder
+@cindex Remainder, of command-line
+A string which will appear at the end of the synopsis line in the help
+string. When you provide a postfix, you also implicitely tell @clon{}
+that your application accepts non-option arguments at the end of the
+@cmdline{} (this is called the @dfn{remainder} of the @cmdline{}). See
+@enduserref{Option Separator} for more information on the behavior of
+@clon{} with respect to postfixes. Also, see @ref{Command-Line
+Remainder} on how to access the @cmdline{} remainder.
 @end table
 @end defmac
 
@@ -1131,14 +1135,23 @@ calls.
 @c ----------------
 @node Context Creation, Option Retrieval, Synopsis Definition, Using Clon
 @section Context Creation
+
 @cindex Initialization Phase
 @cindex Phase, initialization
 @cindex Context
-
 Step two of the @clon{} initialization phase consists in creating a
 @dfn{context}. A context is an object representing a particular instance
 of your program, for example (and most notably) with an actual
 @cmdline{} as the user typed it.
+
+@menu
+* Making A Context::    The Constructor function
+* Context Readers::     Interesting context slots
+@end menu
+
+@node Making A Context, Context Readers, Context Creation, Context Creation
+@subsection Making A Context
+
 @cfindex{make-context}
 You create a context with the @code{make-context} function.
 
@@ -1167,6 +1180,45 @@ related to retrieval from the environment. Possible values are the same
 as above, and the same comments apply as well.
 @end table
 @end defun
+
+@node Context Readers, , Making A Context, Context Creation
+@subsection Context Readers
+
+Once a context object is created, you have access to two interesting
+slots in it.
+
+@menu
+* Program Name::                As it appear on the command-line
+* Command-Line Remainder::      The non-options part
+@end menu
+
+@node Program Name, Command-Line Remainder, Context Readers, Context Readers
+@subsubsection Program Name
+The application's program name, as it appears on the @cmdline{}, may be
+accessed from @clon{} via the context object. You may find it easier to
+do this way, as @clon{} wraps around implementation-dependent access
+methods to @code{argv[0]}.
+
+@rfindex{progname}
+In order to retrieve @code{argv[0]}, use the @code{progname} reader on
+the context object like this: @code{(progname context)}.
+
+@node Command-Line Remainder, , Program Name, Context Readers
+@subsubsection Command-Line Remainder
+@cindex Remainder, of command-line
+@cindex Command-Line Remainder
+In the case your @cmdline{} has a remainder (that is, a non-options
+part; see @enduserref{Option Separator} and @ref{Synopsis Items}), you
+may need to access it in order to process it independently from @clon{}.
+Since @clon{} is responsible for parsing the @cmdline{}, it is also in
+charge of figuring out where the remainder of the @cmdline{} begins.
+
+@rfindex{remainder}
+The @cmdline{} remainder is known to @clon{} as soon as a context is
+created. You can retrieve it by using the @code{remainder} reader on the
+context object like this: @code{(remainder context)}. The remainder is
+provided as a list of strings.
+
 
 
 @c ----------------

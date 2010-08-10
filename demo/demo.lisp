@@ -103,6 +103,7 @@
     (when (clon:getopt :short-name "h")
       (clon:help)
       (quit))
+    (format t "Program name: ~A~%" (clon:progname ctx))
     (multiple-value-bind (value source)
 	(clon:getopt :short-name "F")
       (print (list value source)))

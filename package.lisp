@@ -74,6 +74,7 @@
    ;; From src/context.lisp:
    :*current-context*
    :make-context
+   :progname
    :remainder
    :getopt
    :getopt-cmdline
