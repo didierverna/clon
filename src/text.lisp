@@ -38,7 +38,7 @@
 ;; The Text Class
 ;; ==========================================================================
 
-(defclass text (traversable)
+(defclass text (item)
   ((contents :documentation "The actual text string."
 	     :type string
 	     :initarg :contents
@@ -61,7 +61,7 @@ This class implements plain text objects appearing in a synopsis."))
 ;; The Help Specification Protocol
 ;; ==========================================================================
 
-;; #### FIXME: this protocol should be declared in traversable when it is made
+;; #### FIXME: this protocol should be declared in item when it is made
 ;; the base class for all synopsis items.
 (defgeneric help-spec (item &key &allow-other-keys)
   (:documentation "Return a help specification for ITEM.")

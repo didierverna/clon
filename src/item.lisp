@@ -1,11 +1,11 @@
-;;; traversable.lisp --- Traversable objects
+;;; item.lisp --- Item objects
 
 ;; Copyright (C) 2010 Didier Verna
 
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Sun Nov  2 22:10:17 2008
-;; Last Revision: Sat Jun 12 18:21:17 2010
+;; Last Revision: Thu Aug 12 11:21:10 2010
 
 ;; This file is part of Clon.
 
@@ -35,22 +35,22 @@
 
 
 ;; ==========================================================================
-;; The Traversable Class
+;; The Item Class
 ;; ==========================================================================
 
-(defabstract traversable ()
-  ((traversedp :documentation "The object's traversal state."
+(defabstract item ()
+  ((traversedp :documentation "The item's traversal state."
 	       :initform nil
 	       :accessor traversedp)
-   (hiddenp :documentation "Whether the object is hidden in help strings."
+   (hiddenp :documentation "Whether the item is hidden in help strings."
 	    :initform nil
 	    ;; #### NOTE: the initarg below doesn't follow the *p convention
 	    ;; because that would look strange in a declarative group
 	    ;; construction.
 	    :initarg :hidden
 	    :reader hiddenp))
-  (:documentation "The TRAVERSABLE class.
-This class is used for traversing graphs with loop avoidance."))
+  (:documentation "The ITEM class.
+This class is the base class for all synopsis items."))
 
 
 
@@ -58,11 +58,11 @@ This class is used for traversing graphs with loop avoidance."))
 ;; The Traversal Protocol
 ;; ==========================================================================
 
-(defgeneric untraverse (object)
-  (:documentation "Reset OBJECT's traversal state, and return OBJECT.")
-  (:method :after ((traversable traversable))
-    "Mark TRAVERSABLE as untraversed."
-    (setf (traversedp traversable) nil)))
+(defgeneric untraverse (item)
+  (:documentation "Reset ITEM's traversal state, and return ITEM.")
+  (:method :after ((item item))
+    "Mark ITEM as untraversed."
+    (setf (traversedp item) nil)))
 
 
-;;; traversable.lisp ends here
+;;; item.lisp ends here

@@ -38,7 +38,7 @@
 ;; The Option Class
 ;; ==========================================================================
 
-(defabstract option (traversable)
+(defabstract option (item)
   ((short-name :documentation "The option's short name."
 	       :type (or null string)
 	       :initarg :short-name

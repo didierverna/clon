@@ -43,7 +43,7 @@
 ;; ==========================================================================
 
 ;; #### NOTE: there are two very good reasons for updating the traversal state
-;; of traversable objects in an after method, as done below:
+;; of item objects in an after method, as done below:
 ;; 1/ this is obviously the right thing to do,
 ;; 2/ moving it away from the primary method makes this primary method return
 ;;    the value of FUNC itself when FUNC is actually called. This is an
@@ -56,9 +56,9 @@
   (:method (func elsewhere)
     "Do nothing by default."
     (values))
-  (:method :after (func (traversable traversable))
+  (:method :after (func (item item))
     "Mark TRAVERSABLE as traversed."
-    (setf (traversedp traversable) t))
+    (setf (traversedp item) t))
   (:method (func (container container))
     "Map FUNC over all containers or options in CONTAINER."
     (unless (traversedp container)

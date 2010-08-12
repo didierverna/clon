@@ -162,8 +162,8 @@ The most important features of Clon are:
 		 ;; #### PORTME.
 		 :depends-on ("sbcl" "package")
 		 :components ((:file "util")
-			      (:file "traversable" :depends-on ("util"))
-			      (:file "text" :depends-on ("traversable"))
+			      (:file "item" :depends-on ("util"))
+			      (:file "text" :depends-on ("item"))
 			      (:module "options"
 				:depends-on ("text")
 				:components ((:file "option")
