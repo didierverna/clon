@@ -130,7 +130,7 @@ If ARGUMENT is not valid for an xswitch, raise a conversion error."
 					      enum env-var default-value
 					      hidden)
   "Make a new internal (Clon-specific) xswitch.
-- LONG-NAME is the xswitch's long-name, minus the 'clon-' prefix.
+- LONG-NAME is the xswitch's long-name, sans the 'clon-' prefix.
   (Internal options don't have short names.)
 - DESCRIPTION is the xswitch's description.
 - ARGUMENT-NAME is the option's argument name appearing in help strings.
@@ -138,7 +138,7 @@ If ARGUMENT is not valid for an xswitch, raise a conversion error."
   :mandatory are synonyms).
   It defaults to :optional.
 - ENUM is the set of possible non-boolean values.
-- ENV-VAR is the xswitch's associated environment variable, minus the 'CLON_'
+- ENV-VAR is the xswitch's associated environment variable, sans the 'CLON_'
   prefix. It defaults to nil.
 - DEFAULT-VALUE is the xswitch's default value, if any.
 - When HIDDEN, the option doesn't appear in help strings."

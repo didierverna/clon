@@ -169,9 +169,9 @@ options based on it."))
   "Return the postfix of CONTEXT's synopsis."
   (postfix (synopsis context)))
 
-(defmethod minus-pack ((context context))
-  "Return the minus-pack of CONTEXT's synopsis."
-  (minus-pack (synopsis context)))
+(defmethod short-pack ((context context))
+  "Return the short pack of CONTEXT's synopsis."
+  (short-pack (synopsis context)))
 
 (defmethod plus-pack ((context context))
   "Return the plus-pack of CONTEXT's synopsis."
@@ -417,9 +417,9 @@ command-line and retrieved value."
 
 (defun read-call (&optional plus)
   "Read an option's call or pack from standard input.
-If PLUS, read a plus call or pack. Otherwise, read a short call or minus pack."
+If PLUS, read a plus call or pack. Otherwise, read a short call or pack."
   (format t "Please type in the correct ~
-	    ~:[short call or minus~;plus call or~] pack:~%"
+	    ~:[short~;plus~] call or pack:~%"
     plus)
   (list (read-line)))
 
@@ -526,7 +526,7 @@ CONTEXT is where to look for the options."
 			      :interactive read-long-name
 			      (setq cmdline-name new-cmdline-name)
 			      (go find-option)))))))
-		;; A short call, or a minus pack.
+		;; A short call, or a short pack.
 		((beginning-of-string-p "-" arg)
 		 (tagbody figure-this-short-call
 		    (let* ((value-start (position #\= arg :start 2))
@@ -558,7 +558,7 @@ CONTEXT is where to look for the options."
 						    option cmdline-value
 						    cmdline))
 			    ((potential-pack-p cmdline-name context)
-			     ;; #### NOTE: When parsing a minus pack, only the
+			     ;; #### NOTE: When parsing a short pack, only the
 			     ;; last option gets a cmdline argument because
 			     ;; only the last one is allowed to retrieve an
 			     ;; argument from there.

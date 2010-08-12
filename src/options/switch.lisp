@@ -141,7 +141,7 @@ If ARGUMENT is not valid for a switch, raise a conversion error."
 			     &rest keys &key argument-style argument-type
 					    env-var default-value hidden)
   "Make a new internal (Clon-specific) switch.
-- LONG-NAME is the switch's long-name, minus the 'clon-' prefix.
+- LONG-NAME is the switch's long-name, sans the 'clon-' prefix.
   (Internal options don't have short names.)
 - DESCRIPTION is the switch's description.
 - ARGUMENT-STYLE is the switch's argument display style. It can be one of
@@ -150,7 +150,7 @@ If ARGUMENT is not valid for a switch, raise a conversion error."
 - ARGUMENT-TYPE is one of :required, :mandatory or :optional (:required and
   :mandatory are synonyms).
   It defaults to :optional.
-- ENV-VAR is the switch's associated environment variable, minus the 'CLON_'
+- ENV-VAR is the switch's associated environment variable, sans the 'CLON_'
   prefix. It defaults to nil.
 - DEFAULT-VALUE is the switch's default value, if any.
 - When HIDDEN, the option doesn't appear in help strings."

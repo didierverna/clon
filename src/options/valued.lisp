@@ -84,11 +84,11 @@ If OPTION matches, return its short name's length; otherwise 0."
 ;; -------------------
 
 ;; Options with a one-character short name and requiring an argument may
-;; appear as the last option in a minus pack. However, we don't make them
+;; appear as the last option in a short pack. However, we don't make them
 ;; appear in the usage string. This is why this function filters out options
 ;; with mandatory argument.
-(defmethod minus-pack-char ((option valued-option) &optional as-string)
-  "Return OPTION's minus pack character if OPTION's argument is optional."
+(defmethod short-pack-char ((option valued-option) &optional as-string)
+  "Return OPTION's short pack character if OPTION's argument is optional."
   (unless (argument-required-p option)
     (potential-pack-char option as-string)))
 

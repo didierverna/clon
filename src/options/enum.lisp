@@ -121,7 +121,7 @@ If ARGUMENT doesn't name one of ENUM's symbols, raise a conversion error."
 				 enum env-var fallback-value default-value
 				 nullablep hidden)
   "Make a new internal (Clon-specific) enum option.
-- LONG-NAME is the option's long-name, minus the 'clon-' prefix.
+- LONG-NAME is the option's long-name, sans the 'clon-' prefix.
   (Internal options don't have short names.)
 - DESCRIPTION is the options's description.
 - ARGUMENT-NAME is the option's argument name appearing in help strings.
@@ -129,7 +129,7 @@ If ARGUMENT doesn't name one of ENUM's symbols, raise a conversion error."
   :mandatory are synonyms).
   It defaults to :optional.
 - ENUM is the set of possible values.
-- ENV-VAR is the option's associated environment variable, minus the 'CLON_'
+- ENV-VAR is the option's associated environment variable, sans the 'CLON_'
   prefix. It defaults to nil.
 - FALLBACK-VALUE is the option's fallback value (for missing optional
   arguments), if any.

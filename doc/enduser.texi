@@ -249,7 +249,7 @@ applications. It provides a unified option syntax with both short and
 long names, automatic completion of partial names and automatic
 retrieval/conversion of option arguments from the @cmdline{}, associated
 environment variables, fallback or default values. @clon{} comes with a
-set of extensible option types (switches, paths, strings @etc{}). 
+set of extensible option types (switches, paths, strings @etc{}).
 @clon{} also provides automatic generation and formatting of help
 strings, with support for highlighting on @tty{}'s through ISO/IEC 6429
 SGR. This formatting is customizable through @emph{themes}.
@@ -1310,7 +1310,7 @@ specifications according to where it appears in a face tree.
 @cindex Faces, @t{synopsis}
 @cindex Faces, @t{header}
 @cindex Faces, @t{program}
-@cindex Faces, @t{minus-pack}
+@cindex Faces, @t{short-pack}
 @cindex Faces, @t{plus-pack}
 @cindex Faces, @t{options}
 @cindex Faces, @t{postfix}
@@ -1331,7 +1331,7 @@ specifications according to where it appears in a face tree.
 @cindex Themes, faces, @t{synopsis}
 @cindex Themes, faces, @t{header}
 @cindex Themes, faces, @t{program}
-@cindex Themes, faces, @t{minus-pack}
+@cindex Themes, faces, @t{short-pack}
 @cindex Themes, faces, @t{plus-pack}
 @cindex Themes, faces, @t{options}
 @cindex Themes, faces, @t{postfix}
@@ -1362,7 +1362,7 @@ of text each face applies to.
 
 :face (synopsis :face header
 		:face program
-		:face minus-pack
+		:face short-pack
 		:face plus-pack
 		:face options
 		:face postfix)

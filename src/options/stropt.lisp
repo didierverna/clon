@@ -121,14 +121,14 @@ This class implements options the values of which are strings."))
 				   env-var fallback-value default-value
 				   nullablep hidden)
   "Make a new internal (Clon-specific) string option.
-- LONG-NAME is the option's long-name, minus the 'clon-' prefix.
+- LONG-NAME is the option's long-name, sans the 'clon-' prefix.
   (Internal options don't have short names.)
 - DESCRIPTION is the options's description.
 - ARGUMENT-NAME is the option's argument name appearing in help strings.
 - ARGUMENT-TYPE is one of :required, :mandatory or :optional (:required and
   :mandatory are synonyms).
   It defaults to :optional.
-- ENV-VAR is the option's associated environment variable, minus the 'CLON_'
+- ENV-VAR is the option's associated environment variable, sans the 'CLON_'
   prefix. It defaults to nil.
 - FALLBACK-VALUE is the option's fallback value (for missing optional
   arguments), if any.

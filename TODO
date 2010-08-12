@@ -82,7 +82,7 @@ the PATH option class can lead to a null value from user input (stropts and
 enums can't). Should we change this, or just let the user provide new option
 classes to do so ?
 
-* Better detection of minus-packs
+* Better detection of short packs
 When parsing a short call, we try a known option, a known option with a sticky
 argument, a pack, and then barf. Sometimes, a pack can be mistaken for a known
 option with a sticky (however invalid) argument. For instance, suppose we have
@@ -91,7 +91,7 @@ whereas the user probably meant -v -d (or -vd which works). We could improve
 the detection of this situation by catching the invalid argument error, and
 then trying a pack instead of immediately reporting the error.
 
-* Better advertisement of minus-packs
+* Better advertisement of short packs
 [ See also above ] When Clon computes the pack string for the synopsis, we
 should put flags first in the pack, because it does not make nay sense to
 start a pack with a valued option (the pack would be seen as an option with a

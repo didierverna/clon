@@ -187,7 +187,7 @@ If OPTION matches, return the length of OPTION's short name; otherwise 0.")
 ;; ==========================================================================
 
 ;; When examining the command-line, we first try to spot an option, then a
-;; minus or plus pack, and then fall back to an unknown option. When things
+;; short or plus pack, and then fall back to an unknown option. When things
 ;; are messed up, we prefer to try to spot options misplaced in a pack rather
 ;; than directly an unknown option. That's what a "potential" pack is: a pack
 ;; composed of single character options that are potentially misused.
@@ -202,13 +202,13 @@ If AS-STRING, return a string of that character."
 	  short-name
 	  (coerce short-name 'character)))))
 
-(defgeneric minus-pack-char (option &optional as-string)
-  (:documentation "Return OPTION's minus pack character, if any.
+(defgeneric short-pack-char (option &optional as-string)
+  (:documentation "Return OPTION's short pack character, if any.
 If AS-STRING, return a string of that character.")
   ;; #### NOTE: this method currently only applies to flags.
   (:method ((option option) &optional as-string)
     "Return OPTION's potential pack character."
-    ;; Since non-valued options don't take any argument, being minus-packable
+    ;; Since non-valued options don't take any argument, being short-pack'able
     ;; is the same as being potentially packable.
     (potential-pack-char option as-string)))
 

@@ -73,10 +73,10 @@ This class implements options that don't take any argument."))
 (defun make-internal-flag (long-name description
 			   &rest keys &key env-var hidden)
   "Make a new internal (Clon-specific) flag.
-- LONG-NAME is the flag's long-name, minus the 'clon-' prefix.
+- LONG-NAME is the flag's long-name, sans the 'clon-' prefix.
   (Internal options don't have short names.)
 - DESCRIPTION is the flag's description.
-- ENV-VAR is the flag's associated environment variable, minus the 'CLON_'
+- ENV-VAR is the flag's associated environment variable, sans the 'CLON_'
   prefix. It default to nil.
 - When HIDDEN, the option doesn't appear in help strings."
   (declare (ignore env-var hidden))

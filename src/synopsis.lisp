@@ -86,9 +86,9 @@
 	    :initarg :postfix
 	    :initform nil
 	    :reader postfix)
-   (minus-pack :documentation "The minus pack string."
+   (short-pack :documentation "The short pack string."
 	       :type (or null string)
-	       :reader minus-pack)
+	       :reader short-pack)
    (plus-pack :documentation "The plus pack string."
 	      :type (or null string)
 	      :reader plus-pack)
@@ -112,9 +112,9 @@ This class handles the description of the program's command-line options."))
   (list* (accumulate (synopsis)
 	   '(header "Usage:")
 	   `(program ,program)
-	   (accumulate (minus-pack)
-	     (when (minus-pack synopsis)
-	       (format nil "[-~A]" (minus-pack synopsis))))
+	   (accumulate (short-pack)
+	     (when (short-pack synopsis)
+	       (format nil "[-~A]" (short-pack synopsis))))
 	   (accumulate (plus-pack)
 	     (when (plus-pack synopsis)
 	       (format nil "[+~A]" (plus-pack synopsis))))
@@ -222,21 +222,21 @@ Auto (the default) means on for tty output and off otherwise."
 	   (nconc keys (list :item grp)))))
 
 (defmethod initialize-instance :after ((synopsis synopsis) &key)
-  "Compute SYNOSPSIS's minus and plus packs."
-  (let (potential-pack minus-pack plus-pack)
+  "Compute SYNOSPSIS's short and plus packs."
+  (let (potential-pack short-pack plus-pack)
     (do-options (option synopsis)
       (let ((potential-pack-char (potential-pack-char option :as-string))
-	    (minus-pack-char (minus-pack-char option :as-string))
+	    (short-pack-char (short-pack-char option :as-string))
 	    (plus-pack-char (plus-pack-char option  :as-string)))
 	(when potential-pack-char
 	  (setq potential-pack
 		(concatenate 'string potential-pack potential-pack-char)))
-	(when minus-pack-char
-	  (setq minus-pack (concatenate 'string minus-pack minus-pack-char)))
+	(when short-pack-char
+	  (setq short-pack (concatenate 'string short-pack short-pack-char)))
 	(when plus-pack-char
 	  (setq plus-pack (concatenate 'string plus-pack plus-pack-char)))))
     (setf (slot-value synopsis 'potential-pack) potential-pack)
-    (setf (slot-value synopsis 'minus-pack) minus-pack)
+    (setf (slot-value synopsis 'short-pack) short-pack)
     (setf (slot-value synopsis 'plus-pack) plus-pack)))
 
 (defun make-synopsis (&rest keys &key postfix item (make-default t))

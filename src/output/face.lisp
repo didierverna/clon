@@ -312,7 +312,7 @@ This involves:
 			   :padding-bottom 1
 			   :face header
 			   :face program
-			   :face minus-pack
+			   :face short-pack
 			   :face plus-pack
 			   :face options
 			   :face postfix)
