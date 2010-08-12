@@ -56,22 +56,14 @@ This class implements plain text objects appearing in a synopsis."))
   text)
 
 
+;; ---------------------------
+;; Help specification protocol
+;; ---------------------------
 
-;; ==========================================================================
-;; The Help Specification Protocol
-;; ==========================================================================
-
-;; #### FIXME: this protocol should be declared in item when it is made
-;; the base class for all synopsis items.
-(defgeneric help-spec (item &key &allow-other-keys)
-  (:documentation "Return a help specification for ITEM.")
-  (:method :around (item &key unhide)
-    "Call the actual method only when ITEM is not hidden or UNHIDE."
-    (when (or (not (hiddenp item)) unhide)
-      (call-next-method)))
-  (:method ((text text) &key)
-    (accumulate (text)
-      (contents text))))
+(defmethod help-spec ((text text) &key)
+  "Return TEXT's help specification."
+  (accumulate (text)
+    (contents text)))
 
 
 

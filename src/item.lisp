@@ -5,7 +5,7 @@
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Sun Nov  2 22:10:17 2008
-;; Last Revision: Thu Aug 12 11:21:10 2010
+;; Last Revision: Thu Aug 12 11:29:31 2010
 
 ;; This file is part of Clon.
 
@@ -63,6 +63,19 @@ This class is the base class for all synopsis items."))
   (:method :after ((item item))
     "Mark ITEM as untraversed."
     (setf (traversedp item) nil)))
+
+
+
+;; ==========================================================================
+;; The Help Specification Protocol
+;; ==========================================================================
+
+(defgeneric help-spec (item &key &allow-other-keys)
+  (:documentation "Return ITEM's help specification.")
+  (:method :around ((item item) &key unhide)
+    "Call the actual method only when ITEM is not hidden or UNHIDE."
+    (when (or (not (hiddenp item)) unhide)
+      (call-next-method))))
 
 
 ;;; item.lisp ends here
