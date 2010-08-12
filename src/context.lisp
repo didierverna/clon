@@ -426,20 +426,37 @@ If NEGATED, read a negated call or pack. Otherwise, read a short call or pack."
 (defmethod initialize-instance :after ((context context) &key cmdline)
   "Parse CMDLINE."
   (setf (slot-value context 'progname) (pop cmdline))
+  ;; #### WARNING: we have a chicken-and-egg problem here. The error handler
+  ;; is supposed to be set from the --clon-error-handler option, but in order
+  ;; to retrieve this option, we need to parse the command-line, which might
+  ;; trigger some errors. Since we want the correct error handler to be set as
+  ;; soon as possible, we need to treat this option in a very special way.
+  ;; Here is what we do.
+  ;; 1/ A very early value of :quit is provided in the class definition,
+  ;;    thanks to an :initform.
+  ;; 2/ Before doing anything else, we try to get a value from the
+  ;;    environment. This is actually very simple: we can already use our
+  ;;    context, eventhough it is not completely initialized yet. The only
+  ;;    thing we need is a nil CMDLINE-OPTIONS slot, so that GETOPT directly
+  ;;    goes to environment retrieval. If there's an error during this
+  ;;    process, the handler is :quit. If nothing is found in the environment
+  ;;    variable, the default value is retrieved, which is also :quit.
+  (setf (slot-value context 'error-handler)
+	(getopt :long-name "clon-error-handler" :context context))
+  ;; 3/ Finally, during command-line parsing, we check if we got that
+  ;; particular option, and handle it immediately.
   ;; Step one: parse the command-line =======================================
   (let ((cmdline-options (list))
 	(remainder (list)))
     (macrolet ((push-cmdline-option (place &rest body)
 		 "Push a new CMDLINE-OPTION created with BODY onto PLACE."
 		 `(push (make-cmdline-option ,@body) ,place))
-	       (push-retrieved-option
-		   (place func option &optional cmdline-value cmdline name-form)
+	       (push-retrieved-option (place func option
+				       &optional cmdline-value cmdline)
 		   "Retrieve OPTION from a FUNC call and push it onto PLACE.
-- FUNC must be either :long, :short or :negated,
+- FUNC must be either :short or :negated,
 - CMDLINE-VALUE is a potentially already parsed option argument,
-- CMDILNE is where to find a potentially required argument,
-- NAME-FORM is how to compute the :name slot of the CMDLINE-OPTION structure.
-  If not given, the option's long or short name will be used as appropriate."
+- CMDILNE is where to find a potentially required argument."
 		   (let* ((value (gensym "value"))
 			  (vars (list value))
 			  (call (list option
@@ -449,14 +466,6 @@ If NEGATED, read a negated call or pack. Otherwise, read a short call or pack."
 						     "-CALL")
 						   :com.dvlsoft.clon)))
 			  new-cmdline)
-		     (unless name-form
-		       (setq name-form
-			     (ecase func
-			       (:long `(long-name ,option))
-			       (:short `(short-name ,option))
-			       (:negated `(short-name ,option)))))
-		     (when (eq func :long)
-		       (push name-form call))
 		     (when cmdline-value
 		       (push cmdline-value call))
 		     (when cmdline
@@ -468,7 +477,7 @@ If NEGATED, read a negated call or pack. Otherwise, read a short call or pack."
 		     `(multiple-value-bind ,(reverse vars) ,(reverse call)
 		       ,(when cmdline `(setq ,cmdline ,new-cmdline))
 		       (push-cmdline-option ,place
-			:name ,name-form
+			:name (short-name ,option)
 			:option ,option
 			:value ,value))))
 	       (do-pack ((option pack context) &body body)
@@ -512,20 +521,27 @@ CONTEXT is where to look for the options."
 			(multiple-value-setq (option option-name)
 			  (search-option context :partial-name cmdline-name)))
 		      (if option
-			  (push-retrieved-option cmdline-options :long option
-						 cmdline-value cmdline
-						 option-name)
-			  (restart-case (error 'unknown-cmdline-option-error
-					       :name cmdline-name
-					       :argument cmdline-value)
-			    (discard ()
-			      :report "Discard unknown option."
-			      nil)
-			    (fix-option-name (new-cmdline-name)
-			      :report "Fix the option's long name."
-			      :interactive read-long-name
-			      (setq cmdline-name new-cmdline-name)
-			      (go find-option)))))))
+			  (multiple-value-bind (value new-cmdline)
+			      (retrieve-from-long-call option
+						       option-name
+						       cmdline-value
+						       cmdline)
+			    (setq cmdline new-cmdline)
+			    (push-cmdline-option cmdline-options
+						 :name option-name
+						 :option option
+						 :value value))
+			(restart-case (error 'unknown-cmdline-option-error
+					     :name cmdline-name
+					     :argument cmdline-value)
+			  (discard ()
+			    :report "Discard unknown option."
+			    nil)
+			  (fix-option-name (new-cmdline-name)
+			    :report "Fix the option's long name."
+			    :interactive read-long-name
+			    (setq cmdline-name new-cmdline-name)
+			    (go find-option)))))))
 		;; A short call, or a short pack.
 		((beginning-of-string-p "-" arg)
 		 (tagbody figure-this-short-call
