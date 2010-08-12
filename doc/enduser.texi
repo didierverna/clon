@@ -7,7 +7,7 @@
 @c Author:        Didier Verna <didier@lrde.epita.fr>
 @c Maintainer:    Didier Verna <didier@lrde.epita.fr>
 @c Created:       Tue Jun  2 18:29:49 2009
-@c Last Revision: Sat Jun 12 18:04:25 2010
+@c Last Revision: Thu Aug 12 14:57:09 2010
 
 @c This file is part of Clon.
 

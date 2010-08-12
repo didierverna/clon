@@ -41,19 +41,19 @@
 ;; Command-line error management (not regarding known options)
 ;; ==========================================================================
 
-(define-condition invalid--=-syntax (cmdline-error)
+(define-condition invalid-short-equal-syntax (cmdline-error)
   ()
   (:report (lambda (error stream)
 	     (format stream "Invalid = syntax in short call: ~S."
 	       (item error))))
-  (:documentation "An error related to a -= syntax."))
+  (:documentation "An error related to a short-equal syntax."))
 
-(define-condition invalid-+=-syntax (cmdline-error)
+(define-condition invalid-negated-equal-syntax (cmdline-error)
   ()
   (:report (lambda (error stream)
 	     (format stream "Invalid = syntax in negated call: ~S."
 	       (item error))))
-  (:documentation "An error related to a += syntax."))
+  (:documentation "An error related to a negated-equal syntax."))
 
 (define-condition cmdline-junk-error (cmdline-error)
   ((item ;; inherited from the CMDLINE-ERROR condition
@@ -535,7 +535,8 @@ CONTEXT is where to look for the options."
 					    (subseq arg (1+ value-start))))
 			   option)
 		      (when cmdline-value
-			(restart-case (error 'invalid--=-syntax :item arg)
+			(restart-case
+			    (error 'invalid-short-equal-syntax :item arg)
 			  (discard-argument ()
 			    :report "Discard the argument."
 			    (setq cmdline-value nil))
@@ -598,7 +599,8 @@ CONTEXT is where to look for the options."
 					      (subseq arg (1+ value-start))))
 			     option)
 			(when cmdline-value
-			  (restart-case (error 'invalid-+=-syntax :item arg)
+			  (restart-case
+			      (error 'invalid-negated-equal-syntax :item arg)
 			    (discard-argument ()
 			      :report "Discard the argument."
 			      (setq cmdline-value nil))
