@@ -251,9 +251,6 @@ remainder.
       (setq *default-synopsis* synopsis))
     synopsis))
 
-;; #### FIXME: we could expand this macro to handle a mix of declarative forms
-;; and explicit objects: we just need to distinguish between atomic and list
-;; forms.
 (defmacro defsynopsis ((&rest keys &key postfix make-default) &body forms)
   "Define a new synopsis."
   (declare (ignore postfix make-default))

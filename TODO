@@ -123,7 +123,9 @@ Cool hey ?
 * Provide a negated long form as well ?
 ++debug
 
-* Extend defsynopsis and defgroup to support a mix of declarative and explicit forms
+* Extend defsynopsis and defgroup
+to support a mix of declarative and explicit forms. Every form that does not
+begin with "(group", "(text" or "(<option-name>" should be kept as-is.
 
 * Provide a WITH-CONTEXT macro which changes temporarily the value of
 *current-context*. 
