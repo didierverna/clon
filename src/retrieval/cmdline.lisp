@@ -108,19 +108,20 @@ should act as if ARGUMENT had not been provided."
      :report "Discard spurious argument."
      ,@body)))
 
-(define-condition invalid-+-syntax (cmdline-option-error)
+(define-condition invalid-negated-syntax (cmdline-option-error)
   ()
   (:report (lambda (error stream)
-	     (format stream "Option '~A': invalid +-syntax." (name error))))
-  (:documentation "An invalid +-syntax error."))
+	     (format stream "Option '~A': invalid negated syntax."
+	       (name error))))
+  (:documentation "An invalid negated syntax error."))
 
-(defmacro restartable-invalid-+-syntax-error ((option) &body body)
-  "Restartably throw an invalid-+-syntax error.
+(defmacro restartable-invalid-negated-syntax-error ((option) &body body)
+  "Restartably throw an invalid-negated-syntax error.
 The error relates to the command-line use of OPTION.
 BODY constitutes the body of the only restart available,
 use-short-call, and should act as if OPTION had been normally called by short
 name."
-  `(restart-case (error 'invalid-+-syntax
+  `(restart-case (error 'invalid-negated-syntax
 		  :option ,option
 		  :name (short-name ,option))
     (use-short-call ()
@@ -147,7 +148,7 @@ name."
 ;; ==========================================================================
 
 ;; #### FIXME: we should split this into flag.lisp and valued.lisp but we
-;; can't because this fiel is loaded only after the options files.
+;; can't because this file is loaded only after the options files.
 
 (defun cmdline-convert (valued-option cmdline-name cmdline-argument)
   "Convert CMDLINE-ARGUMENT to VALUED-OPTION's value.
@@ -261,18 +262,18 @@ This function returns two values:
      (restartable-cmdline-convert option (short-name option) cmdline-argument)
      cmdline)))
 
-(defgeneric retrieve-from-plus-call (option)
-  (:documentation "Retrieve OPTION's value from a plus call.")
+(defgeneric retrieve-from-negated-call (option)
+  (:documentation "Retrieve OPTION's value from a negated call.")
   ;; Method for non-valued options (currently, only flags):
   (:method ((option option))
-    (restartable-invalid-+-syntax-error (option)
+    (restartable-invalid-negated-syntax-error (option)
       t))
   ;; Method for valued options:
   (:method ((option valued-option))
-    (restartable-invalid-+-syntax-error (option)
+    (restartable-invalid-negated-syntax-error (option)
       (retrieve-from-short-call option)))
-  ;; Method for plus-callable options (currently, the switch hierarchy):
-  (:method ((plus-callable plus-callable))
+  ;; Method for negatable options (currently, the switch-based ones):
+  (:method ((negatable negatable))
     nil))
 
 

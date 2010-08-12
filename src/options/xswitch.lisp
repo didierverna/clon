@@ -47,7 +47,7 @@
       :argument-type :optional)
   (:documentation "The XSWITCH class.
 This class merges the functionalities of switches and enumerations.
-As such, the plus-syntax is available for extended xswitches."))
+As such, the negated syntax is available for extended xswitches."))
 
 
 ;; -------------------

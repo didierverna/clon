@@ -44,14 +44,14 @@
 (define-condition invalid--=-syntax (cmdline-error)
   ()
   (:report (lambda (error stream)
-	     (format stream "Invalid =-syntax in short call: ~S."
+	     (format stream "Invalid = syntax in short call: ~S."
 	       (item error))))
   (:documentation "An error related to a -= syntax."))
 
 (define-condition invalid-+=-syntax (cmdline-error)
   ()
   (:report (lambda (error stream)
-	     (format stream "Invalid =-syntax in plus call: ~S."
+	     (format stream "Invalid = syntax in negated call: ~S."
 	       (item error))))
   (:documentation "An error related to a += syntax."))
 
@@ -79,14 +79,14 @@
 	     (format stream "Unrecognized short call: ~S." (short-call error))))
   (:documentation "An error related to an unrecognized short call."))
 
-(define-condition unrecognized-plus-call-error (cmdline-error)
+(define-condition unrecognized-negated-call-error (cmdline-error)
   ((item ;; inherited from the CMDLINE-ERROR condition
-    :documentation "The unrecognized plus call on the command-line."
-    :initarg :plus-call
-    :reader plus-call))
+    :documentation "The unrecognized negated call on the command-line."
+    :initarg :negated-call
+    :reader negated-call))
   (:report (lambda (error stream)
-	     (format stream "Unrecognized plus call: ~S." (plus-call error))))
-  (:documentation "An error related to an unrecognized plus call."))
+	     (format stream "Unrecognized negated call: ~S." (negated-call error))))
+  (:documentation "An error related to an unrecognized negated call."))
 
 (define-condition unknown-cmdline-option-error (cmdline-error)
   ((item ;; inherited from the CMDLINE-ERROR condition
@@ -173,9 +173,9 @@ options based on it."))
   "Return the short pack of CONTEXT's synopsis."
   (short-pack (synopsis context)))
 
-(defmethod plus-pack ((context context))
-  "Return the plus-pack of CONTEXT's synopsis."
-  (plus-pack (synopsis context)))
+(defmethod negated-pack ((context context))
+  "Return the negated pack of CONTEXT's synopsis."
+  (negated-pack (synopsis context)))
 
 (defmethod clon-options-group ((context context))
   "Return the Clon options group of CONTEXT's synopsis."
@@ -415,12 +415,12 @@ command-line and retrieved value."
 	    (format t "Option names can't contain equal signs. Try again:~%")
 	    (return (list line))))))
 
-(defun read-call (&optional plus)
+(defun read-call (&optional negated)
   "Read an option's call or pack from standard input.
-If PLUS, read a plus call or pack. Otherwise, read a short call or pack."
+If NEGATED, read a negated call or pack. Otherwise, read a short call or pack."
   (format t "Please type in the correct ~
-	    ~:[short~;plus~] call or pack:~%"
-    plus)
+	    ~:[short~;negated~] call or pack:~%"
+    negated)
   (list (read-line)))
 
 (defmethod initialize-instance :after ((context context) &key cmdline)
@@ -435,7 +435,7 @@ If PLUS, read a plus call or pack. Otherwise, read a short call or pack."
 	       (push-retrieved-option
 		   (place func option &optional cmdline-value cmdline name-form)
 		   "Retrieve OPTION from a FUNC call and push it onto PLACE.
-- FUNC must be either :long, :short or :plus,
+- FUNC must be either :long, :short or :negated,
 - CMDLINE-VALUE is a potentially already parsed option argument,
 - CMDILNE is where to find a potentially required argument,
 - NAME-FORM is how to compute the :name slot of the CMDLINE-OPTION structure.
@@ -454,7 +454,7 @@ If PLUS, read a plus call or pack. Otherwise, read a short call or pack."
 			     (ecase func
 			       (:long `(long-name ,option))
 			       (:short `(short-name ,option))
-			       (:plus `(short-name ,option)))))
+			       (:negated `(short-name ,option)))))
 		     (when (eq func :long)
 		       (push name-form call))
 		     (when cmdline-value
@@ -588,10 +588,10 @@ CONTEXT is where to look for the options."
 				 (setq arg (concatenate 'string
 					     "-" new-cmdline-name))
 				 (go figure-this-short-call))))))))
-		;; A plus call or a plus pack.
+		;; A negated call or pack.
 		((beginning-of-string-p "+" arg)
-		 (block processing-+-call
-		   (tagbody figure-this-+-call
+		 (block processing-negated-call
+		   (tagbody figure-this-negated-call
 		      (let* ((value-start (position #\= arg :start 2))
 			     (cmdline-name (subseq arg 1 value-start))
 			     (cmdline-value (when value-start
@@ -607,42 +607,42 @@ CONTEXT is where to look for the options."
 			      (push (concatenate 'string
 				      "-" cmdline-name cmdline-value)
 				    cmdline)
-			      (return-from processing-+-call))
+			      (return-from processing-negated-call))
 			    (convert-to-short-and-split ()
 			      :report "Convert to short call and split argument."
 			      (push cmdline-value cmdline)
 			      (push (concatenate 'string "-" cmdline-name)
 				    cmdline)
-			      (return-from processing-+-call))))
+			      (return-from processing-negated-call))))
 			;; #### NOTE: in theory, we could allow partial
 			;; matches on short names when they're used with the
-			;; +-syntax, because there's no sticky argument or
-			;; whatever. But we don't. That's all. Short names are
-			;; not meant to be long (otherwise, that would be long
-			;; names right?), so they're not meant to be
+			;; negated syntax, because there's no sticky argument
+			;; or whatever. But we don't. That's all. Short names
+			;; are not meant to be long (otherwise, that would be
+			;; long names right?), so they're not meant to be
 			;; abbreviated.
 			(setq option
 			      (search-option context :short-name cmdline-name))
 			(cond (option
-			       (push-retrieved-option cmdline-options :plus
+			       (push-retrieved-option cmdline-options :negated
 						      option))
 			      ((potential-pack-p cmdline-name context)
 			       (do-pack (option cmdline-name context)
-				 (push-retrieved-option cmdline-options :plus
+				 (push-retrieved-option cmdline-options :negated
 							option)))
 			      (t
 			       (restart-case
-				   (error 'unrecognized-plus-call-error
-					  :plus-call cmdline-name)
+				   (error 'unrecognized-negated-call-error
+					  :negated-call cmdline-name)
 				 (discard ()
-				   :report "Discard this plus call."
+				   :report "Discard this negated call."
 				   nil)
-				 (fix-plus-call (new-cmdline-name)
-				   :report "Fix this plus call."
-				   :interactive (lambda () (read-call :plus))
+				 (fix-negated-call (new-cmdline-name)
+				   :report "Fix this negated call."
+				   :interactive (lambda () (read-call :negated))
 				   (setq arg (concatenate 'string
 					       "+" new-cmdline-name))
-				   (go figure-this-+-call)))))))))
+				   (go figure-this-negated-call)))))))))
 		(t
 		 ;; Not an option call. If there's no more option on the
 		 ;; cmdline, consider this as an implicit remainder. However,

@@ -89,9 +89,9 @@
    (short-pack :documentation "The short pack string."
 	       :type (or null string)
 	       :reader short-pack)
-   (plus-pack :documentation "The plus pack string."
+   (negated-pack :documentation "The negated pack string."
 	      :type (or null string)
-	      :reader plus-pack)
+	      :reader negated-pack)
    (potential-pack :documentation "The potential pack string."
 		   :type (or null string)
 		   :reader potential-pack)
@@ -115,9 +115,9 @@ This class handles the description of the program's command-line options."))
 	   (accumulate (short-pack)
 	     (when (short-pack synopsis)
 	       (format nil "[-~A]" (short-pack synopsis))))
-	   (accumulate (plus-pack)
-	     (when (plus-pack synopsis)
-	       (format nil "[+~A]" (plus-pack synopsis))))
+	   (accumulate (negated-pack)
+	     (when (negated-pack synopsis)
+	       (format nil "[+~A]" (negated-pack synopsis))))
 	   '(options "[OPTIONS]")
 	   (accumulate (postfix)
 	     (postfix synopsis)))
@@ -222,22 +222,22 @@ Auto (the default) means on for tty output and off otherwise."
 	   (nconc keys (list :item grp)))))
 
 (defmethod initialize-instance :after ((synopsis synopsis) &key)
-  "Compute SYNOSPSIS's short and plus packs."
-  (let (potential-pack short-pack plus-pack)
+  "Compute SYNOSPSIS's short and negated packs."
+  (let (potential-pack short-pack negated-pack)
     (do-options (option synopsis)
       (let ((potential-pack-char (potential-pack-char option :as-string))
 	    (short-pack-char (short-pack-char option :as-string))
-	    (plus-pack-char (plus-pack-char option  :as-string)))
+	    (negated-pack-char (negated-pack-char option  :as-string)))
 	(when potential-pack-char
 	  (setq potential-pack
 		(concatenate 'string potential-pack potential-pack-char)))
 	(when short-pack-char
 	  (setq short-pack (concatenate 'string short-pack short-pack-char)))
-	(when plus-pack-char
-	  (setq plus-pack (concatenate 'string plus-pack plus-pack-char)))))
+	(when negated-pack-char
+	  (setq negated-pack (concatenate 'string negated-pack negated-pack-char)))))
     (setf (slot-value synopsis 'potential-pack) potential-pack)
     (setf (slot-value synopsis 'short-pack) short-pack)
-    (setf (slot-value synopsis 'plus-pack) plus-pack)))
+    (setf (slot-value synopsis 'negated-pack) negated-pack)))
 
 (defun make-synopsis (&rest keys &key postfix item (make-default t))
   "Make a new SYNOPSIS.

@@ -1311,7 +1311,7 @@ specifications according to where it appears in a face tree.
 @cindex Faces, @t{header}
 @cindex Faces, @t{program}
 @cindex Faces, @t{short-pack}
-@cindex Faces, @t{plus-pack}
+@cindex Faces, @t{negated-pack}
 @cindex Faces, @t{options}
 @cindex Faces, @t{postfix}
 @cindex Faces, @t{text}
@@ -1332,7 +1332,7 @@ specifications according to where it appears in a face tree.
 @cindex Themes, faces, @t{header}
 @cindex Themes, faces, @t{program}
 @cindex Themes, faces, @t{short-pack}
-@cindex Themes, faces, @t{plus-pack}
+@cindex Themes, faces, @t{negated-pack}
 @cindex Themes, faces, @t{options}
 @cindex Themes, faces, @t{postfix}
 @cindex Themes, faces, @t{text}
@@ -1363,7 +1363,7 @@ of text each face applies to.
 :face (synopsis :face header
 		:face program
 		:face short-pack
-		:face plus-pack
+		:face negated-pack
 		:face options
 		:face postfix)
 

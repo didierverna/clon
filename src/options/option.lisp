@@ -187,12 +187,12 @@ If OPTION matches, return the length of OPTION's short name; otherwise 0.")
 ;; ==========================================================================
 
 ;; When examining the command-line, we first try to spot an option, then a
-;; short or plus pack, and then fall back to an unknown option. When things
+;; short or negated pack, and then fall back to an unknown option. When things
 ;; are messed up, we prefer to try to spot options misplaced in a pack rather
 ;; than directly an unknown option. That's what a "potential" pack is: a pack
 ;; composed of single character options that are potentially misused.
-;; Potential misuse means non-switches in a plus pack, options with mandatory
-;; arguments in the middle of a pack and so on.
+;; Potential misuse means non switch-based in a negated pack, options with
+;; mandatory arguments in the middle of a pack and so on.
 (defun potential-pack-char (option &optional as-string)
   "Return OPTION's potential pack character, if any.
 If AS-STRING, return a string of that character."
@@ -212,11 +212,11 @@ If AS-STRING, return a string of that character.")
     ;; is the same as being potentially packable.
     (potential-pack-char option as-string)))
 
-(defgeneric plus-pack-char (option &optional as-string)
-  (:documentation "Return OPTION's plus pack character, if any.
+(defgeneric negated-pack-char (option &optional as-string)
+  (:documentation "Return OPTION's negated pack character, if any.
 If AS-STRING, return a string of that character.")
   (:method ((option option) &optional as-string)
-    "Return nil (only the switch hierarchy is plus-packable)."
+    "Return nil (only the switch hierarchy is negated-pack'able)."
     (declare (ignore as-string))
     nil))
 

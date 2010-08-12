@@ -313,7 +313,7 @@ This involves:
 			   :face header
 			   :face program
 			   :face short-pack
-			   :face plus-pack
+			   :face negated-pack
 			   :face options
 			   :face postfix)
 		    :face (text

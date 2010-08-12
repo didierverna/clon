@@ -1,4 +1,4 @@
-;;; +-callable.lisp --- Plus callable options
+;;; negatable.lisp --- Negatable options
 
 ;; Copyright (C) 2010 Didier Verna
 
@@ -35,25 +35,25 @@
 
 
 ;; ==========================================================================
-;; The Plus Callable Class
+;; The Negatable Class
 ;; ==========================================================================
 
-;; #### NOTE: currently, only the yes/no hierarchy is plus-callable (the +
-;; syntax meaning to return nil). The need for other kinds of plus-callable
+;; #### NOTE: currently, only the yes/no hierarchy is negatable (the negated
+;; syntax meaning to return nil). The need for other kinds of negatable
 ;; options might pop up someday. Then, it would be advisable to design a
 ;; mechanism by which a + call would return something else than nil, actually
 ;; defined by the option class. A slot in the class below would do I think.
-(defclass plus-callable ()
+(defclass negatable ()
   ()
-  (:documentation "The PLUS-CALLABLE Class.
-This class is a mixin used to authorize the +-syntax for the switch hierarchy."))
+  (:documentation "The NEGATABLE Class.
+This class implements the negated syntax for the switch-based hierarchy."))
 
 
 ;; ---------------------------
 ;; Help specification protocol
 ;; ---------------------------
 
-(defmethod short-syntax-help-spec-prefix ((option plus-callable))
+(defmethod short-syntax-help-spec-prefix ((option negatable))
   "-(+)")
 
 
@@ -61,9 +61,9 @@ This class is a mixin used to authorize the +-syntax for the switch hierarchy.")
 ;; Char packs protocol
 ;; -------------------
 
-(defmethod plus-pack-char ((plus-callable plus-callable) &optional as-string)
-  "Return PLUS-CALLABLE plus pack character, if any."
-  (potential-pack-char plus-callable as-string))
+(defmethod negated-pack-char ((negatable negatable) &optional as-string)
+  "Return NEGATABLE's negated pack character, if any."
+  (potential-pack-char negatable as-string))
 
 
-;;; +-callable.lisp ends here
+;;; negatable.lisp ends here
