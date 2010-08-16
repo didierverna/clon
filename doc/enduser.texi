@@ -770,9 +770,12 @@ Finally, default values are used when every other source has failed.
 
 When @clon{} attempts to retrieve a value for a particular option, it
 always does so in a specific order: first, the @cmdline{} is searched.
-If an argument is present, it is used. Otherwise, a fallback value is
-used (if any). Next, an environment variable is tried (when
-appropriate), and finally, the option's default value is used (if any).
+If an argument is present, it is used. Otherwise, a fallback or default
+value is used in that order (note that when an option's argument is
+optional, the option is required to provide at least a fallback or a
+default value). Next, an environment variable is tried (when
+appropriate). Finally, when everything else fails, the option's default
+value is used (if any).
 
 @cindex Retrieval, from command-line
 @cindex Command-Line, retrieval

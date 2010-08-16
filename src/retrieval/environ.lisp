@@ -152,7 +152,7 @@ ENV-VAL is the value stored in the associated environment variable.")
   (:method :before (option env-val)
      "Assert that ENV-VAL is not null."
      ;; That's because getopt is not supposed to call this function unless
-     ;; there is actually somethign to retrieve.
+     ;; there is actually something to retrieve.
      (assert env-val))
   ;; Method for flags:
   (:method ((flag flag) env-val)

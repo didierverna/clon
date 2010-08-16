@@ -872,14 +872,14 @@ would appear like this: @samp{--name=ARG}.
 @cvopindex{:argument-type}
 The status of the argument. Possible values are @code{:required} (the
 default) and @code{:mandatory} which are synonyms, or @code{:optional}.
-@item :default-value
-@cvopindex{:default-value}
 @item :fallback-value
 @cvopindex{:fallback-value}
-The option's default and fallback values. Remember that a fallback value
+@item :default-value
+@cvopindex{:default-value}
+The option's fallback and default values. Remember that a fallback value
 only makes sense when the argument is optional. Besides, also when the
 argument is optional, you need to provide at least a fallback or a
-default value (or both of course).
+default value (or both of course; see @enduserref{Value Sources}).
 @item :nullablep
 @cvopindex{:nullablep}
 Whether the option accepts a null value. Default to @code{nil}. This
@@ -1258,7 +1258,7 @@ Alternatively, you can use a reference to an option object
 @end table
 
 This function return two values: the option's value and the value's
-source.
+source (@pxenduserref{Value Sources}).
 @end defun
 
 The value's source may have the following forms:
@@ -1270,6 +1270,16 @@ on the @cmdline{}. It can be the option's long or short name, or a
 completed long name if the option's name was abbreviated. A completed
 name displays the omitted parts in parentheses (@code{"he(lp)"} for
 instance).
+@item (:fallback @var{NAME})
+@cvopindex{:fallback-value}
+@cindex Values, source, fallback
+The same but when the fallback value is used, that is, when an option is
+not provided with its (optional) argument.
+@item (:default @var{NAME})
+@cvopindex{:default-value}
+@cindex Values, source, default
+The same, but when the default value is used (because there is no
+fallback).
 @item (:environment @var{VAR})
 @copindex{:env-var}
 @cindex Values, source, environment
@@ -1285,9 +1295,11 @@ was provided.
 
 @oindex{Flags,flag}
 @findex getopt
-Note that flags don't take any argument, so @code{getopt} returns a
-virtual value of @code{t} when they are found, or a corresponding
-environment variable exists in the environment.
+Note that because flags don't take any argument, @code{getopt} returns a
+virtual value of @code{t} when they are found or a corresponding
+environment variable exists in the environment. For the same reason, a
+flag's value source may ony be @code{(:cmdline @var{NAME})} or
+@code{(:environment @var{VAR})}.
 
 @cvopindex{:nullablep}
 @findex getopt
@@ -1313,11 +1325,12 @@ Get the @dfn{next} @cmdline{} option, that is, the first option on the
 sequentially.
 
 When there are no more options on the @cmdline{}, this function returns
-@code{nil}. Otherwise, three values are returned: the corresponding
+@code{nil}. Otherwise, four values are returned: the corresponding
 option object from the synopsis definition (@pxref{Constructors}), the
-name used on the @cmdline{}, and the option's value. As in the case of
-explicit retrieval (@pxref{Explicit Retrieval}), the option's name may
-be completed in case of abbreviation.
+name used on the @cmdline{}, the option's value and the value source
+(@code{:cmdline}, @code{:fallback} or @code{:default}). As in the case
+of explicit retrieval (@pxref{Explicit Retrieval}), the option's name
+may be completed in case of abbreviation.
 
 @rfindex{short-name}
 @rfindex{long-name}
@@ -1331,15 +1344,15 @@ still identify the retrieved option by using the @code{short-name} and
 corresponding strings.
 @end defun
 
-@defmac multiple-value-getopt-cmdline (OPTION NAME VALUE) BODY
-Evaluate @var{BODY} with @var{OPTION}, @var{NAME} and @var{VALUE} bound
-to the values returned by the @code{getopt-cmdline} function above. Note
-that @var{BODY} is not evaluated if there was no remaining option on the
-@cmdline{}, so you don't need to conditionalize on @var{OPTION} being
-@code{null} yourself.
+@defmac multiple-value-getopt-cmdline (OPTION NAME VALUE SOURCE) BODY
+Evaluate @var{BODY} with @var{OPTION}, @var{NAME}, @var{VALUE} and
+@var{SOURCE} bound to the values returned by the @code{getopt-cmdline}
+function above. Note that @var{BODY} is not evaluated if there was no
+remaining option on the @cmdline{}, so you don't need to conditionalize
+on @var{OPTION} being @code{null} yourself.
 @end defmac
 
-@defmac do-cmdline-options (OPTION NAME VALUE) BODY
+@defmac do-cmdline-options (OPTION NAME VALUE SOURCE) BODY
 As above, but loop over all @cmdline{} options.
 @end defmac
 
@@ -2350,9 +2363,9 @@ See @ref{Explicit Retrieval} and @ref{Using Multiple Contexts}.
 See @ref{Sequential Retrieval} and @ref{Using Multiple Contexts}.
 @end defun
 
-@defmac multiple-value-getopt-cmdline (OPTION NAME VALUE &key CONTEXT) @
+@defmac multiple-value-getopt-cmdline (OPTION NAME VALUE SOURCE &key CONTEXT) @
 &body BODY
-@defmacx do-cmdline-options (OPTION NAME VALUE &key CONTEXT) @
+@defmacx do-cmdline-options (OPTION NAME VALUE SOURCE &key CONTEXT) @
 &body BODY
 @foindex{multiple-value-getopt-cmdline,:context}
 @foindex{do-cmdline-options,:context}

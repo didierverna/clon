@@ -113,6 +113,7 @@
   name ;; the option's name as used on the cmdline
   option ;; the corresponding option object
   value ;; the converted option's cmdline value
+  source ;; the value source
   )
 
 (defclass context ()
@@ -313,8 +314,6 @@ Return two values:
 	   (synopsis context)
 	   context))
   ;; Try the command-line:
-  ;; #### FIXME: in addition to :cmdline, I would like to have :fallback /
-  ;; :default for options not providing an optional argument.
   (let ((cmdline-options (list)))
     (do ((cmdline-option
 	  (pop (cmdline-options context))
@@ -326,7 +325,8 @@ Return two values:
 		   (nreconc cmdline-options (cmdline-options context)))
 	     (return-from getopt
 	       (values (cmdline-option-value cmdline-option)
-		       (list :cmdline (cmdline-option-name cmdline-option)))))
+		       (list (cmdline-option-source cmdline-option)
+			     (cmdline-option-name cmdline-option)))))
 	    (t
 	     (push cmdline-option cmdline-options))))
     (setf (cmdline-options context) (nreverse cmdline-options)))
@@ -355,36 +355,39 @@ Return two values:
 (defun getopt-cmdline (&key (context *current-context*))
   "Get the next command-line option in CONTEXT.
 When there is no next command-line option, return nil.
-Otherwise, return three values:
+Otherwise, return four values:
 - the option object,
 - the option's name used on the command-line,
-- the retrieved value."
+- the retrieved value,
+- the value source."
   (let ((cmdline-option (pop (cmdline-options context))))
     (when cmdline-option
       (values (cmdline-option-option cmdline-option)
 	      (cmdline-option-name cmdline-option)
-	      (cmdline-option-value cmdline-option)))))
+	      (cmdline-option-value cmdline-option)
+	      (cmdline-option-source cmdline-option)))))
 
 (defmacro multiple-value-getopt-cmdline
-    ((option name value &key context) &body body)
+    ((option name value source &key context) &body body)
   "Get the next command-line option in CONTEXT. and evaluate BODY.
 OPTION, NAME and VALUE are bound to the values returned by GETOPT-CMDLINE.
 BODY is executed only if there is a next command-line option."
-  `(multiple-value-bind (,option ,name ,value)
+  `(multiple-value-bind (,option ,name ,value ,source)
     (getopt-cmdline :context (or ,context *current-context*))
     (when ,option
       ,@body)))
 
 (defmacro do-cmdline-options
-    ((option name value &key context) &body body)
+    ((option name value source &key context) &body body)
   "Evaluate BODY over all command-line options in CONTEXT.
 OPTION, NAME and VALUE are bound to each option's object, name used on the
 command-line and retrieved value."
   (let ((ctx (gensym "context")))
     `(let ((,ctx (or ,context *current-context*)))
       (do () ((null (cmdline-options ,ctx)))
-	(multiple-value-getopt-cmdline (,option ,name ,value :context ,ctx)
-	   ,@body)))))
+	(multiple-value-getopt-cmdline
+	    (,option ,name ,value ,source :context ,ctx)
+	  ,@body)))))
 
 
 
@@ -444,7 +447,8 @@ If NEGATED, read a negated call or pack. Otherwise, read a short call or pack."
 - CMDLINE-VALUE is a potentially already parsed option argument,
 - CMDILNE is where to find a potentially required argument."
 		   (let* ((value (gensym "value"))
-			  (vars (list value))
+			  (source (gensym "source"))
+			  (vars (list source value))
 			  (call (list option
 				      (find-symbol (concatenate 'string
 						     "RETRIEVE-FROM-"
@@ -465,7 +469,8 @@ If NEGATED, read a negated call or pack. Otherwise, read a short call or pack."
 		       (push-cmdline-option ,place
 			:name (short-name ,option)
 			:option ,option
-			:value ,value))))
+			:value ,value
+			:source ,source))))
 	       (do-pack ((option pack context) &body body)
 		 "Evaluate BODY with OPTION bound to each option from PACK.
 CONTEXT is where to look for the options."
@@ -507,7 +512,7 @@ CONTEXT is where to look for the options."
 			(multiple-value-setq (option option-name)
 			  (search-option context :partial-name cmdline-name)))
 		      (if option
-			  (multiple-value-bind (value new-cmdline)
+			  (multiple-value-bind (value source new-cmdline)
 			      (retrieve-from-long-call option
 						       option-name
 						       cmdline-value
@@ -522,7 +527,8 @@ CONTEXT is where to look for the options."
 			      (push-cmdline-option cmdline-options
 						   :name option-name
 						   :option option
-						   :value value)))
+						   :value value
+						   :source source)))
 			(restart-case (error 'unknown-cmdline-option-error
 					     :name cmdline-name
 					     :argument cmdline-value)

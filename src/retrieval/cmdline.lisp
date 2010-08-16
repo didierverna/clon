@@ -176,19 +176,26 @@ Available restarts are (depending on the context):
 - use-fallback-value: return FALLBACK-VALUE,
 - use-default-value: return VALUED-OPTION's default value,
 - use-value: return another (already converted) value,
-- use-argument: return the conversion of another argument."
+- use-argument: return the conversion of another argument.
+
+Return two values: VALUED-OPTION's value and the actual value source.
+The value source may be :cmdline, :fallback or :default."
   (restart-case
       (cond ((argument-required-p valued-option)
 	     (if cmdline-argument
-		 (cmdline-convert valued-option cmdline-name cmdline-argument)
-		 (error 'missing-cmdline-argument
-			:option valued-option :name cmdline-name)))
+		 (values
+		  (cmdline-convert valued-option cmdline-name cmdline-argument)
+		  :cmdline)
+	       (error 'missing-cmdline-argument
+		      :option valued-option :name cmdline-name)))
 	    (cmdline-argument
-	     (cmdline-convert valued-option cmdline-name cmdline-argument))
+	     (values
+	      (cmdline-convert valued-option cmdline-name cmdline-argument)
+	      :cmdline))
 	    (t
 	     (if (slot-boundp valued-option 'fallback-value)
-		 (fallback-value valued-option)
-		 (default-value valued-option))))
+		 (values (fallback-value valued-option) :fallback)
+	       (values (default-value valued-option) :default))))
     (use-fallback-value ()
       :test (lambda (error)
 	      (declare (ignore error))
@@ -197,7 +204,7 @@ Available restarts are (depending on the context):
       :report (lambda (stream)
 		(format stream "Use fallback value (~S)."
 		  (fallback-value valued-option)))
-      (fallback-value valued-option))
+      (values (fallback-value valued-option) :fallback))
     (use-default-value ()
       :test (lambda (error)
 	      (declare (ignore error))
@@ -205,11 +212,11 @@ Available restarts are (depending on the context):
       :report (lambda (stream)
 		(format stream "Use option's default value (~S)."
 		  (default-value valued-option)))
-      (default-value valued-option))
+      (values (default-value valued-option) :default))
     (use-value (value)
       :report "Use an already converted value."
       :interactive read-value
-      (restartable-check-value valued-option value))
+      (values (restartable-check-value valued-option value) :cmdline))
     (use-argument (cmdline-argument)
       :report "Use the conversion of an argument."
       :interactive read-argument
@@ -222,8 +229,9 @@ Available restarts are (depending on the context):
 CMDLINE-NAME is the name used on the command-line.
 CMDLINE-ARGUMENT is a potentially already parsed cmdline argument.
 Otherwise, CMDLINE is where to find an argument.
-This function returns two values:
+This function returns three values:
 - the retrieved value,
+- the value source,
 - the new command-line (possibly with the first item popped if the option
   requires an argument).")
   ;; Method for non-valued options (currently, only flags):
@@ -233,48 +241,50 @@ This function returns two values:
     (if cmdline-argument
 	(restartable-spurious-cmdline-argument-error
 	    (option cmdline-name cmdline-argument)
-	  (values t cmdline))
-	(values t cmdline)))
+	  (values t :cmdline cmdline))
+	(values t :cmdline cmdline)))
   ;; Method for all valued options:
   (:method ((option valued-option) cmdline-name &optional cmdline-argument cmdline)
     (maybe-pop-argument cmdline option cmdline-argument)
-    (values
-     (restartable-cmdline-convert option cmdline-name cmdline-argument)
-     cmdline)))
+    (multiple-value-bind (value source)
+	(restartable-cmdline-convert option cmdline-name cmdline-argument)
+      (values value source cmdline))))
 
 (defgeneric retrieve-from-short-call (option &optional cmdline-argument cmdline)
   (:documentation "Retrieve OPTION's value from a short call.
 CMDLINE-ARGUMENT is a potentially already parsed cmdline argument.
 Otherwise, CMDLINE is where to find an argument.
-This function returns two values:
+This function returns three values:
 - the retrieved value,
+- the value source,
 - the new command-line (possibly with the first item popped if the option
   requires an argument).")
   ;; Method for non-valued options (currently, only flags):
   (:method ((option option) &optional cmdline-argument cmdline)
     ;; See comment about this assertion in OPTION-STICKY-DISTANCE.
     (assert (null cmdline-argument))
-    (values t cmdline))
+    (values t :cmdline cmdline))
   ;; Method for valued options:
   (:method ((option valued-option) &optional cmdline-argument cmdline)
     (maybe-pop-argument cmdline option cmdline-argument)
-    (values
-     (restartable-cmdline-convert option (short-name option) cmdline-argument)
-     cmdline)))
+    (multiple-value-bind (value source)
+	(restartable-cmdline-convert option (short-name option)
+				     cmdline-argument)
+      (values value source cmdline))))
 
 (defgeneric retrieve-from-negated-call (option)
   (:documentation "Retrieve OPTION's value from a negated call.")
   ;; Method for non-valued options (currently, only flags):
   (:method ((option option))
     (restartable-invalid-negated-syntax-error (option)
-      t))
+      (values t :cmdline)))
   ;; Method for valued options:
   (:method ((option valued-option))
     (restartable-invalid-negated-syntax-error (option)
       (retrieve-from-short-call option)))
   ;; Method for negatable options (currently, the switch-based ones):
   (:method ((negatable negatable))
-    nil))
+    (values nil :cmdline)))
 
 
 ;;; cmdline.lisp ends here
