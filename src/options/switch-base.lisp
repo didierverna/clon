@@ -38,11 +38,10 @@
 ;; The SWITCH-BASE Class
 ;; ==========================================================================
 
-;; #### FIXME: consider defaulting nullablep to t here instead of in SWITCH
-;; and XSWITCH. Same for ARGUMENT-TYPE -> OPTIONAL.
-
 (defabstract switch-base (negatable)
-  ((yes-values :documentation "The possible 'yes' values."
+  ((nullablep ;; inherited from the VALUED-OPTION class
+    :initform t)
+   (yes-values :documentation "The possible 'yes' values."
 	       :allocation :class
 	       :type list
 	       :initform '("yes" "on" "true" "yup" "yeah")
@@ -52,6 +51,8 @@
 	      :type list
 	      :initform '("no" "off" "false" "nope" "nah")
 	      :accessor no-values))
+  (:default-initargs
+      :argument-type :optional)
   (:documentation "The SWITCH-BASE abstract class.
 This class provides support for options including boolean values."))
 

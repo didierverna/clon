@@ -39,12 +39,8 @@
 ;; ==========================================================================
 
 (defoption xswitch (switch-base enum-base)
-  ((nullablep ;; inherited from the VALUED-OPTION class
-    :initform t)
-   (enum ;; inherited from the ENUM-BASE class
+  ((enum ;; inherited from the ENUM-BASE class
     :documentation "The set of possible non-boolean values."))
-  (:default-initargs
-      :argument-type :optional)
   (:documentation "The XSWITCH class.
 This class merges the functionalities of switches and enumerations.
 As such, the negated syntax is available for extended xswitches."))

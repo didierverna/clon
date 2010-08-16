@@ -54,8 +54,6 @@
     :documentation "The option's argument style."
     :initarg :argument-style
     :reader argument-style)
-   (nullablep ;; inherited from the VALUED-OPTION class
-    :initform t)
    (argument-styles :documentation "The possible argument styles."
 		    :allocation :class
 		    :type list
@@ -63,7 +61,6 @@
 				:yeah/nah)
 		    :accessor argument-styles))
   (:default-initargs
-    :argument-type :optional
     :argument-style :yes/no)
   (:documentation "The SWITCH class.
 This class implements boolean options."))
