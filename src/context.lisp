@@ -121,11 +121,13 @@
 	     :initarg :synopsis
 	     :reader synopsis
 	     :initform *default-synopsis*)
-   (progname :documentation "The program name, as it appears on the command-line."
+   (progname :documentation ~"The program name "
+			    ~"as it appears on the command-line."
 	     :type string
 	     :reader progname)
    (cmdline-options :documentation "The options from the command-line."
 	  :type list ;; of cmdline-option objects
+	  :initform nil  ;; see the warning in initialize-instance
 	  :accessor cmdline-options)
    (remainder :documentation "The non-Clon part of the command-line."
 	      :type list
@@ -139,20 +141,11 @@
 	       :initform nil)
    (highlight :documentation "Clon's output highlight mode."
 	      :reader highlight)
-   ;; #### FIXME: these should be built-in options ! In fact, there shouldn't
-   ;; be two different handlers. One is enough.
-   (error-handler :documentation ~"The behavior to adopt on errors "
-			       ~"at command-line parsing time."
+   (error-handler :documentation ~"The behavior to adopt "
+				 ~"on option retrieval errors."
 		  :type symbol
-		  :initarg :error-handler
-		  :initform :quit
-		  :reader error-handler)
-   (getopt-error-handler :documentation ~"The default behavior to adopt on errors "
-				     ~"in the getopt family of functions."
-			:type symbol
-			:initarg :getopt-error-handler
-			:initform :quit
-			:reader getopt-error-handler))
+		  :initform :quit ;; see the warning in initialize-instance
+		  :reader error-handler))
   (:default-initargs
       ;; #### PORTME.
       :cmdline sb-ext:*posix-argv*)
@@ -304,23 +297,16 @@ When such an option exists, return two values:
 ;; ==========================================================================
 
 (defun getopt (&rest keys
-	       &key (context *current-context*)
-		    short-name long-name option
-		   (error-handler (getopt-error-handler context)))
+	       &key (context *current-context*) short-name long-name option)
   "Get an option's value in CONTEXT.
 The option can be specified either by SHORT-NAME, LONG-NAME, or directly via
 an OPTION object.
-ERROR-HANDLER is the behavior to adopt on errors. Its default value depends on
-the CONTEXT. See `make-context' for a list of possible values. Note that
-command-line errors are treated at context-creation time, so the only errors
-that can occur here are coming from the environment.
-This function returns two values:
+Return two values:
 - the retrieved value,
 - the value's source."
   (unless option
     (setq option
-	  (apply #'search-option context
-		 (remove-keys keys :context :error-handler))))
+	  (apply #'search-option context (remove-keys keys :context))))
   (unless option
     (error "Getting option ~S from synopsis ~A in context ~A: unknown option."
 	   (or short-name long-name)
@@ -347,12 +333,12 @@ This function returns two values:
   ;; Try an environment variable:
   (handler-bind ((environment-error
 		  (lambda (error)
-		    (ecase error-handler
+		    (ecase (error-handler context)
 		      (:quit
 		       (let (*print-escape*) (print-object error t))
 		       (terpri)
 		       ;; #### PORTME.
-		       (sb-ext:quit :unix-status 1))
+		       (quit 1))
 		      (:none)))))
     (let* ((env-var (env-var option))
 	   ;; #### PORTME.
@@ -527,10 +513,16 @@ CONTEXT is where to look for the options."
 						       cmdline-value
 						       cmdline)
 			    (setq cmdline new-cmdline)
-			    (push-cmdline-option cmdline-options
-						 :name option-name
-						 :option option
-						 :value value))
+			    ;; #### NOTE: see comment at the top of this
+			    ;; function about this hack.
+			    (if (string= (long-name option)
+					 "clon-error-handler")
+				(setf (slot-value context 'error-handler)
+				      value)
+			      (push-cmdline-option cmdline-options
+						   :name option-name
+						   :option option
+						   :value value)))
 			(restart-case (error 'unknown-cmdline-option-error
 					     :name cmdline-name
 					     :argument cmdline-value)
@@ -711,25 +703,14 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.~%"
     (help :context context :item (clon-options-group context))
     (quit 0)))
 
-(defun make-context
-    (&rest keys
-     &key error-handler getopt-error-handler synopsis cmdline (make-current t))
+(defun make-context (&rest keys &key synopsis cmdline (make-current t))
   "Make a new context.
-- ERROR-HANDLER is the behavior to adopt on errors at command-line parsing time.
-  It can be one of:
-  * :quit, meaning print the error and abort execution,
-  * :none, meaning let the debugger handle the situation.
-- GETOPT-ERROR-HANDLER is the default behavior to adopt on command-line errors
-  in the GETOPT family of functions (note that this behavior can be overridden
-in the functions themselves). It can be one of:
-  * :quit, meaning print the error and abort execution,
-  * :none, meaning let the debugger handle the situation.
 - SYNOPSIS is the program synopsis to use in that context.
   It defaults to *DEFAULT-SYNOPSIS*.
 - CMDLINE is the argument list (strings) to process.
   It defaults to a POSIX conformant argv.
 - If MAKE-CURRENT, make the new context current."
-  (declare (ignore synopsis error-handler getopt-error-handler cmdline))
+  (declare (ignore synopsis cmdline))
   (let ((context (apply #'make-instance 'context
 			(remove-keys keys :make-current))))
     (when make-current

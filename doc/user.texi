@@ -1155,30 +1155,9 @@ of your program, for example (and most notably) with an actual
 @cfindex{make-context}
 You create a context with the @code{make-context} function.
 
-@defun make-context [:INITARG INITVAL@dots{}]
+@defun make-context
 @cfsubindex{make-context}
-Create a new context. The following @var{:INITARG}s are currently available.
-
-@table @code
-@item :error-handler
-@cfiaindex{make-context,:error-handler}
-The behavior to adopt in case an error happens during the initialization
-phase, when the @cmdline{} is parsed. This is where you get errors like
-``unknown option'', ``invalid argument'' @etc{}). Possible values are
-@code{:quit} and @code{:none}. When @code{:quit} and an error happens,
-print the error and terminate the application (this is the default).
-When @code{:none}, no error handler is installed, which means that the
-behavior will depend on the underlying @cl{} implementation. For
-instance, the debugger might be raised or a stack trace might be printed
-(this is the case in SBCL with the @option{--script} option).
-@item :getopt-error-handler
-@cfiaindex{make-context,:getopt-error-handler}
-The behavior to adopt in case an error happens when an option is
-retrieved in any way (@pxref{Option Retrieval}). Since @cmdline{} errors
-are throw at initialization time, the errors you can get here are
-related to retrieval from the environment. Possible values are the same
-as above, and the same comments apply as well.
-@end table
+Create a new context. That's it.
 @end defun
 
 @node Context Readers, , Making A Context, Context Creation
@@ -1276,12 +1255,6 @@ retrieve.
 @fkindex{getopt,:option}
 Alternatively, you can use a reference to an option object
 (@pxref{Constructors}).
-@item :error-handler
-@fkindex{getopt,:error-handler}
-Lets you locally override the error handler established by the
-@code{:getopt-error-handler} to @code{make-context} (@pxref{Context
-Creation}). Note again that this handler will only affect retrieval from
-the environment.
 @end table
 
 This function return two values: the option's value and the value's
@@ -1571,8 +1544,8 @@ Now that we have our new option class, we need to implement the
 so-called @dfn{value check} protocol. This protocol is used to make sure
 that values provided for options of your new type actually comply with
 the type in question. Values currently checked are fallback values,
-default values, and values provided from a debugger restart FIXME:
-expand this.
+default values, and values provided from a debugger restart
+(@pxenduserref{Error Management}).
 
 The value check protocol is implemented through a @code{check-value}
 generic function for which you must provide a method.
@@ -1682,7 +1655,8 @@ The next protocol we need to implement is the so-called @dfn{conversion}
 protocol. This protocol is used to convert option arguments (that is,
 strings) to an actual value of the proper type. Arguments currently
 converted may come the @cmdline{}, the value of an environment variable,
-and arguments provided from a debugger restart FIXME: expand this.
+and arguments provided from a debugger restart (@pxenduserref{Error
+Management}).
 
 The conversion protocol is implemented through a @code{convert} generic
 function for which you must provide a method.
@@ -2338,11 +2312,9 @@ See @ref{Synopsis Definition} and @ref{Using Different Synopsis}.
 @xref{Using Different Synopsis}.
 @end defopt
 
-@defun make-context &key ERROR-HANDLER GETOPT-ERROR-HANDLER @
-(SYNOPSIS *default-synopsis*) CMDLINE (MAKE-CURRENT t)
+@defun make-context &key (SYNOPSIS *default-synopsis*) CMDLINE @
+(MAKE-CURRENT t)
 @cfsubindex{make-context}
-@cfiaindex{make-context,:error-handler}
-@cfiaindex{make-context,:getopt-error-handler}
 @cfiaindex{make-context,:synopsis}
 @cfiaindex{make-context,:cmdline}
 @cfiaindex{make-context,:make-current}
@@ -2363,12 +2335,11 @@ Different Command-Lines}.
 @section Runtime Phase API
 
 @defun getopt &key (CONTEXT *current-context*) SHORT-NAME LONG-NAME @
-OPTION (ERROR-HANDLER (getopt-error-handler context))
+OPTION
 @fkindex{getopt,:context}
 @fkindex{getopt,:short-name}
 @fkindex{getopt,:long-name}
 @fkindex{getopt,:option}
-@fkindex{getopt,:error-handler}
 @vindex *current-context*
 See @ref{Explicit Retrieval} and @ref{Using Multiple Contexts}.
 @end defun

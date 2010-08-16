@@ -160,7 +160,17 @@ FMT can be `number', `short' or `long'."
 		     :fallback-value :long
 		     #|:env-var "VERSION_FORMAT"|#)
 	       (flag "help" "Display Clon-specific help.")
-	       (group (:header "Clon output:")
+	       (group (:header "Option retrieval:")
+		 (enum "error-handler"
+		       "Set the option retrieval error handler.
+HDL can be `quit' or `none'."
+		       :argument-name "HDL"
+		       :argument-type :optional
+		       :enum '(:quit :none)
+		       :fallback-value :none
+		       :default-value :quit
+		       :env-var "ERROR_HANDLER"))
+	       (group (:header "Help string output:")
 		 (path "search-path"
 		       "Set Clon's search path.
 If you don't want any search path at all, use this option with no argument."

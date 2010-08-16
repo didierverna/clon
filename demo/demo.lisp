@@ -98,8 +98,7 @@
   "Entry point for the standalone application."
   ;; This context will use the POSIX command line and is made current by
   ;; default:
-  (let ((ctx (clon:make-context :error-handler :none
-				:getopt-error-handler :none)))
+  (let ((ctx (clon:make-context)))
     (when (clon:getopt :short-name "h")
       (clon:help)
       (quit))

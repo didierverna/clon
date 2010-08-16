@@ -726,31 +726,24 @@ You don't want to confuse @clon{}. @clon{} is nasty when it is scared.
 @c ----------------
 @node Option Retrieval, , Option Separator, The Command Line
 @section Option Retrieval
+
 @cindex Retrieval
 @cindex Options, retrieval
+The process of getting a value for a specific option is called
+@dfn{retrieval}. This section explains how it works.
 
-@cindex Retrieval, from command-line
-@cindex Command-Line, retrieval
-@cindex Options, retrieval, from command-line
-When an application wants to retrieve a specific option, @clon{} looks
-at the @cmdline{}, from left to right, and stops at the first match.
-Please note that the match in question may be a regular option call or a
-pack, depending on what appears first on the @cmdline{}. There is no
-concept of priority amongst option forms.
+@menu
+* Value Sources::       The command-line, and more
+* Error Management::    What to do when something goes wrong
+@end menu
 
-@cindex Options, multiple calls
-Note that it is possible to provide several calls to the same option on
-a single @cmdline{}. Some applications may take advantage of this: every
-consecutive request for an option will use the next match on the
-@cmdline{} until there is none left.
-
+@node Value Sources, Error Management, Option Retrieval, Option Retrieval
+@subsection Value Sources
 The @cmdline{} is not the only place where @clon{} looks for option
-@emph{values} however. Other sources for option values are:
-@emph{fallback} values, @emph{environment} variables and @emph{default}
-values. The existence of a fallback value, environment variable or
-default value should be advertised in the application's help string
-(@pxref{Output}).
-
+@emph{values}. Other sources for option values are: @emph{fallback}
+values, @emph{environment} variables and @emph{default} values. The
+existence of a fallback value, environment variable or default value
+should be advertised in the application's help string (@pxref{Output}).
 
 @itemize @bullet
 @item
@@ -760,7 +753,7 @@ default value should be advertised in the application's help string
 @cindex Options, retrieval, from fallback value
 Fallback values are used when an option exists on the @cmdline{} without
 a corresponding argument (so this applies only to options taking
-optional arguments).
+@emph{optional} arguments only).
 @item
 @cindex Environment variables
 @cindex Retrieval, from environment
@@ -772,8 +765,7 @@ variable which contains a value for it.
 @cindex Values, default
 @cindex Retrieval, from default value
 @cindex Options, retrieval, from default value
-Finally, default values are used for options not provided on the
-@cmdline{}.
+Finally, default values are used when every other source has failed.
 @end itemize
 
 When @clon{} attempts to retrieve a value for a particular option, it
@@ -782,16 +774,130 @@ If an argument is present, it is used. Otherwise, a fallback value is
 used (if any). Next, an environment variable is tried (when
 appropriate), and finally, the option's default value is used (if any).
 
+@cindex Retrieval, from command-line
+@cindex Command-Line, retrieval
+@cindex Options, retrieval, from command-line
+@clon{} always scans the @cmdline{} from left to right, and stops at the
+first match. Please note that the match in question may be a regular
+option call or a pack, depending on what appears first on the
+@cmdline{}. There is no concept of priority amongst option forms.
+
+@cindex Options, multiple calls
+Also, note that it is possible to provide several calls to the same
+option on a single @cmdline{}. Some applications may take advantage of
+this: every consecutive request for an option will use the next match on
+the @cmdline{} until there is none left.
+
 @cindex Flags
 @cindex Options, types, flags
 @cindex Environment variables
 @cindex Retrieval, from environment
 @cindex Options, retrieval, from environment
-One last note: fallback or default values don't make any sense for
+Finally, note that fallback or default values don't make any sense for
 flags, but flags can still be associated with environment variables. In
 such a case, the very @emph{existence} of the variable in the
 environment, regardless of its value, stands for the presence of the
 corresponding option on the @cmdline{}.
+
+@node Error Management, , Value Sources, Option Retrieval
+@subsection Error Management
+@cindex Error Management
+@cindex Retrieval, errors
+@cindex Options, retrieval, errors
+OK, now you're completely overwhelmed by the power and flexibility of
+@clon{}, to the point that the fact that you didn't write it (because
+@emph{I} did) even starts to upset you. So I know what you're thinking:
+``there's gotta be a way to break it''. I don't know, like, giving a
+value to a flag, using an unknown option, providing an invalid value for
+an option, using an equal sign in a negated call @etc{}
+
+Unfortunately for you, @clon{} is like a pitbull. Whatever you do to
+beat it, it @emph{will} fight back. The behavior of @clon{} with respect
+to error management during option retrieval is well defined, but
+contrary to the traditional approach, @emph{you}, the end-user have
+control over it. Not the application. Error handling may occur when the
+@cmdline{} is parsed, but also when environment variables are used.
+
+@cindex @t{--clon-error-handler}
+@cindex Built-in Options, @t{--clon-error-handler}
+@cindex Options, built-in, @t{--clon-error-handler}
+@cindex CLON_ERROR_HANDLER
+@cindex Environment Variables, CLON_ERROR_HANDLER
+The error management behavior of @clon{} is controlled by a built-in
+option named @option{--clon-error-handler}, and its accompanying
+environment variable @code{CLON_ERROR_HANDLER}. Possibles values for it
+are currently the following.
+
+@table @t
+@item quit
+@cindex Error Management, quitting
+This is the default. It means that when @clon{} encounters an error
+related to option retrieval, it prints an informative message about the
+error and terminates the application immediately (with an exit status of
+1). This is the behavior of most programs out there I guess.
+@item none
+@cindex Debugger
+@cindex Error Management, interactive debugging
+A value of @code{none} literally means no particular error handler.
+Here, I must apologize because I need to go into some technical details
+about @cl{}, the language in which applications using @clon{} are
+written. @cl{} mandates the existence of a @dfn{debugger} in which you
+are dropped in when an unhandled error condition is thrown. However some
+@cl{} implementations may disable the debugger when creating standalone
+programs. So the situation when the @clon{} error handler is set to
+@code{none} depends on the application (application developers are
+encouraged @emph{not} to disable the debugger).
+@itemize @bullet
+@item
+If the debugger is disabled, you will get more or less the same error
+message as if the value were @code{quit}, only with an additional and
+cryptic stack trace that you may simply disregard.
+@item
+@cindex Debugger, restarts
+If on the other hand, you end up in the debugger, you're in luck.
+@clon{} provides a very comprehensive set of so-called @dfn{restarts}
+that will allow you to interactively fix the problem and proceed, as if
+nothing ever happened. Such restarts include notably the ability to
+modify an option's name or value (handy in case of @cmdline{} typo),
+discard the call altogether and many others, depending on the exact
+error.
+@end itemize
+Note that the debugger will also provide you with a cryptic stack trace
+and other information that you can probably just disregard. Don't be
+afraid, simply answer the question you are asked for and follow the
+instructions.
+
+When the error implies a bad value for a particular option, you will
+notice that some of the choices that @clon{} proposes in order to fix
+the problem involve providing another @emph{value} or another
+@emph{argument}. Again, you need to remember the terminology here
+(@pxref{Valued Options}). The argument is what you provide on the
+@cmdline{}, and the value is the conversion of the argument to the
+proper type. This means that most of the time, you will want to use the
+``argument'' choice. If you know the @cl{} language, you can also
+provide a value directly, in which case what you type in is in fact
+@cl{} code.
+@end table
+
+One last note about the @option{--clon-error-handler} option: we have a
+chicken-and-egg problem with it. The error handler must be known for
+parsing the @cmdline{}, but in order to get it, we need to retrieve the
+option which implies parsing the @cmdline{}@dots{} Whoops. Because of
+this problem, the option is treated in a very special way.
+
+@enumerate
+@item
+First of all, a built-in default value of @code{quit} is used initially.
+@item
+However, if the @code{CLON_ERROR_HANDLER} environment variable is set,
+its value will be used immediately, even before trying to get the option
+on the @cmdline{} (if an error happens when trying the environment
+variable, the @code{quit} handler is used).
+@item
+Finally, if the option is found on the @cmdline{} during the parsing of
+it, its value is updated immediately (so it also applies for parsing the
+rest of the @cmdline{}).
+@end enumerate
 
 Now you need to get some rest.
 
