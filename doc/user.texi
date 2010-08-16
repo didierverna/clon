@@ -904,7 +904,8 @@ below.
 @cvopindex{:argument-name}
 This option type is for options taking strings as their argument. String
 options don't provide any additional properties, but their default
-argument name is changed from @code{"ARG"} to @code{"STR"}.
+argument name is changed from @code{"ARG"} to @code{"STR"}. When the
+option is nullable, the empty string stands for the @code{nil} value.
 @item lispobj
 @voindex{Lisp Objects,lispobj}
 @cvopindex{:argument-name}
@@ -927,8 +928,11 @@ possible values. In fact, the values are not the keywords themselves,
 but rather their corresponding symbol name. This means that an end-user
 needs not be aware of the underlying implementation, and actually does
 not use a colon when providing an argument. The end-user also has the
-ability to abbreviate the possible values. Look at the
-@code{--clon-version} built-in option for an example.
+ability to abbreviate the possible values. When the option is nullable,
+the empty string stands for a @code{nil} value. Otherwise, it is
+considered as an abbreviation for the first element in the enumerated
+set of values. Look at the @code{--clon-version} built-in option for an
+example.
 @item path
 @voindex{Paths,path}
 @cvopindex{:argument-name}
@@ -941,21 +945,23 @@ property from @code{nil} to @code{t}. Also, they provide an additional
 property called @code{:type} which specifies the kind of path which is
 expected. Possible values are: @code{:file}, @code{:directory},
 @code{:file-list}, @code{:directory-list} or @code{nil} (meaning that
-anything is allowed).
+anything is allowed). When the option is nullable, the empty string
+stands for the @code{nil} value.
 @item switch
 @voindex{Switches,switch}
 @cvopindex{:argument-type}
 @cvopindex{:nullablep}
 @vopindex{Switches,switch,:argument-style}
 This option type is for Boolean options. @code{switch} options change
-their default nullable property from @code{nil} to @code{t}, and their
-default argument type from required to optional. Also, instead of using
-the @code{:argument-name} property, @code{switch} options provide a
-property called @code{:argument-style}. Possible values are
-@code{:yes/no} (the default), @code{:on/off}, @code{:true/false},
-@code{:yup/nope}, @code{:yeah/nah}. Note that this property determines
-the argument name @emph{only}. All possible switch arguments
-(@pxenduserref{Switches}) are always availble to all switches.
+their default nullable property from @code{nil} to @code{t} (but in
+fact, this property is ignored), and their default argument type from
+required to optional. Also, instead of using the @code{:argument-name}
+property, @code{switch} options provide a property called
+@code{:argument-style}. Possible values are @code{:yes/no} (the
+default), @code{:on/off}, @code{:true/false}, @code{:yup/nope},
+@code{:yeah/nah}. Note that this property determines the argument name
+@emph{only}. All possible switch arguments (@pxenduserref{Switches}) are
+always availble to all switches.
 @item xswitch
 @voindex{Extended Switches,xswitch}
 @cvopindex{:argument-type}
@@ -968,8 +974,8 @@ other way around (elementary decency prevents me from describing this
 mating process in detail): their possible values are either Boolean or
 from an @code{:enum} property as in the case of @code{enum} options.
 @code{xswitch} options change their default nullable property from
-@code{nil} to @code{t}, and their default argument type from required to
-optional.
+@code{nil} to @code{t} (but in fact, this property is ignored), and
+their default argument type from required to optional.
 @end table
 
 @node Advanced Synopsis Creation, , Built-In Option Types, Synopsis Definition

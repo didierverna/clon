@@ -141,61 +141,65 @@ If AS-DIRECTORY, ensure that it denotes a directory."
 
 (defmethod convert ((path path) argument)
   "Convert ARGUMENT to PATH's value."
-  (flet ((string-pathname (string &key as-file as-directory)
-	   "Make a pathname from STRING.
+  ;; #### NOTE: a nil value for a nullable path option may be provided by the
+  ;; empty string as argument.
+  (if (and (nullablep path) (zerop (length argument)))
+      nil
+    (flet ((string-pathname (string &key as-file as-directory)
+	     "Make a pathname from STRING.
 If AS-FILE, make sure the resulting pathname does not denote a directory.
 If AS-DIRECTORY, make sure the resulting pathname denotes a directory."
-	   (let ((pathname (pathname string)))
-	     (when (wild-pathname-p pathname)
-	       (error 'invalid-argument
-		      :option path
-		      :argument argument
-		      :comment "Path contains wildcards."))
-	     (when (and as-file (directory-pathname-p pathname))
-	       (error 'invalid-argument
-		      :option path
-		      :argument argument
-		      ;; #### FIXME: misleading error message when a single
-		      ;; path is requested.
-		      :comment "Path is or contains a directory."))
-	     ;; #### NOTE: instead of forcing users to end their directories
-	     ;; with a slash (and hence triggering an error here if it
-	     ;; doesn't), we simply convert a normal pathname into a directory
-	     ;; one.
-	     (when (and as-directory (not (directory-pathname-p pathname)))
-	       (setq pathname
-		     (make-pathname
-		      :directory (append (or (pathname-directory pathname)
-					     (list :relative))
-					 (list (file-namestring pathname)))
-		      :name nil
-		      :type nil
-		      :defaults pathname)))
-	     (when (string= (cadr (pathname-directory pathname)) "~")
-	       (setq pathname
-		     (merge-pathnames
-		      (make-pathname
-		       :directory
-		       (list* :relative (cddr (pathname-directory pathname)))
-		       :defaults pathname)
-		      (user-homedir-pathname))))
-	     pathname)))
-    (ecase (path-type path)
-      (:file
-       (string-pathname argument :as-file t))
-      (:directory
-       (string-pathname argument :as-directory t))
-      (:file-list
-       (mapcar (lambda (filename)
-		 (string-pathname filename :as-file t))
-	       (split-path argument)))
-      (:directory-list
-       (mapcar (lambda (dirname)
-		 (string-pathname dirname :as-directory t))
-	       (split-path argument)))
-      ((nil)
-       (mapcar #'string-pathname
-	       (split-path argument))))))
+	     (let ((pathname (pathname string)))
+	       (when (wild-pathname-p pathname)
+		 (error 'invalid-argument
+			:option path
+			:argument argument
+			:comment "Path contains wildcards."))
+	       (when (and as-file (directory-pathname-p pathname))
+		 (error 'invalid-argument
+			:option path
+			:argument argument
+			;; #### FIXME: misleading error message when a single
+			;; path is requested.
+			:comment "Path is or contains a directory."))
+	       ;; #### NOTE: instead of forcing users to end their directories
+	       ;; with a slash (and hence triggering an error here if it
+	       ;; doesn't), we simply convert a normal pathname into a
+	       ;; directory one.
+	       (when (and as-directory (not (directory-pathname-p pathname)))
+		 (setq pathname
+		       (make-pathname
+			:directory (append (or (pathname-directory pathname)
+					       (list :relative))
+					   (list (file-namestring pathname)))
+			:name nil
+			:type nil
+			:defaults pathname)))
+	       (when (string= (cadr (pathname-directory pathname)) "~")
+		 (setq pathname
+		       (merge-pathnames
+			(make-pathname
+			 :directory
+			 (list* :relative (cddr (pathname-directory pathname)))
+			 :defaults pathname)
+			(user-homedir-pathname))))
+	       pathname)))
+      (ecase (path-type path)
+	(:file
+	 (string-pathname argument :as-file t))
+	(:directory
+	 (string-pathname argument :as-directory t))
+	(:file-list
+	 (mapcar (lambda (filename)
+		   (string-pathname filename :as-file t))
+		 (split-path argument)))
+	(:directory-list
+	 (mapcar (lambda (dirname)
+		   (string-pathname dirname :as-directory t))
+		 (split-path argument)))
+	((nil)
+	 (mapcar #'string-pathname
+		 (split-path argument)))))))
 
 
 

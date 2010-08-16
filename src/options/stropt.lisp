@@ -78,7 +78,12 @@ This class implements options the values of which are strings."))
 
 (defmethod convert ((stropt stropt) argument)
   "Return ARGUMENT."
-  argument)
+  ;; #### NOTE: a nil value for a nullable string option may be provided by
+  ;; the empty string as argument. Otherwise, the empty string is used as
+  ;; such.
+  (if (and (nullablep stropt) (zerop (length argument)))
+      nil
+    argument))
 
 
 
