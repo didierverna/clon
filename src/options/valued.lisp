@@ -295,17 +295,19 @@ ARGUMENT-REQUIRED-P slot."
   ;; #### NOTE: previously, I performed the validity checks on FALLBACK-VALUE
   ;; and DEFAULT-VALUE in the :before method, which feels better. However,
   ;; when the ENUM option class appeared, I realized that option values could
-  ;; depend on an option slot (the ENUM slot ikn that case), so we need to
+  ;; depend on an option slot (the ENUM slot in that case), so we need to
   ;; delay this check until right here.
-  ;; Here, we catch and convert a potential invalid-value error into a simple
-  ;; error because this check is intended for the Clon user, as opposed to the
-  ;; Clon end-user. In other words, a potential error here is in the program
-  ;; itself; not in the usage of the program.
   (when fallback-value-supplied-p
+    ;; An error here is in the program itself, not in the usage of the
+    ;; program, so wrap the check in a simple error instead of a restartable
+    ;; one.
     (handler-case (check option fallback-value)
       (invalid-value ()
 	(error "Option ~A: invalid fallback value ~S." option fallback-value))))
   (when default-value-supplied-p
+    ;; An error here is in the program itself, not in the usage of the
+    ;; program, so wrap the check in a simple error instead of a restartable
+    ;; one.
     (handler-case (check option default-value)
       (invalid-value ()
 	(error "Option ~A: invalid default value ~S." option default-value)))))
