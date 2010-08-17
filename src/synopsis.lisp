@@ -177,10 +177,9 @@ If you don't want any search path at all, use this option with no argument."
 		       :argument-type :optional
 		       :type :directory-list
 		       :fallback-value nil
-		       ;; paths are nullable by default #### PORTME. I'm using
-		       ;; Unix-like default for everything here, plus OSX
-		       ;; specific values that I know of. Not sure about
-		       ;; Windows or anything else.
+		       ;; #### PORTME. I'm using Unix-like default for
+		       ;; everything here, plus OSX specific values that I
+		       ;; know of. Not sure about Windows or anything else.
 		       :default-value
 		       (let ((local-path '("share/clon/"))
 			     (global-path '(#p"/usr/local/share/clon/"
