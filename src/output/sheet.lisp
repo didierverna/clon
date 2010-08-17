@@ -141,7 +141,7 @@ is a shortcut for: (PROPERTY-NAME ((on t) YES) ((off nil) NO))."
 
 (defun princ-highlight-property-instances (sheet instances)
   "Princ highlight proeprty INSTANCES on SHEET's stream."
-  ;; #### FIXME: #\esc is not a standard name (see CLHS 13.1.7):
+  ;; #### PORTME: #\esc is not a standard name (see CLHS 13.1.7):
   (when instances
     (format (output-stream sheet) "~C[~A~{;~A~}m"
       #\esc
