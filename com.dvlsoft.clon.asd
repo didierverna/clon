@@ -38,7 +38,8 @@
 (defpackage :com.dvlsoft.clon.asdf
     ;; #### PORTME.
     (:use :cl :asdf :sb-grovel :sb-alien)
-  (:export :+release-major-level+
+  (:export :define-constant
+	   :+release-major-level+
 	   :+release-minor-level+
 	   :+release-status+ :+release-status-level+
 	   :+release-name+

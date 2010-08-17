@@ -145,8 +145,7 @@ This property can take the following forms:
 ;; The Face Property Access Protocol
 ;; =========================================================================
 
-;; #### FIXME: investigate why define-constant doesn't work here.
-(defvar *highlight-properties*
+(define-constant +highlight-properties+
   '(intensity italicp underline blink inversep concealedp crossed-out-p
     framedp foreground background)
   "The highlight face properties.")
@@ -155,7 +154,7 @@ This property can take the following forms:
   "Look up SLOT's value in FACE's parent if it's a highlight property.
 If FACE has no parent, return nil.
 For other properties, trigger an error."
-  (let ((property (member slot *highlight-properties*)))
+  (let ((property (member slot +highlight-properties+)))
     (if property
 	(when (parent face)
 	  (slot-value (parent face) slot))

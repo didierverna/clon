@@ -36,6 +36,7 @@
     (:use :cl)
   (:shadow :*readtable*)
   (:import-from :com.dvlsoft.clon.asdf
+    :define-constant
     :+release-major-level+
     :+release-minor-level+
     :+release-status+
