@@ -41,10 +41,6 @@
 (defoption path ()
   ((argument-name ;; inherited from the VALUED-OPTION class
     :initform "PATH")
-   (nullablep ;; inherited from the VALUED-OPTION class
-    ;; Note that this doesn't really matter, as empty paths are already
-    ;; handled below.
-    :initform t)
    (path-type :documentation "The path type."
 	      :initarg :type
 	      :initform nil
@@ -57,10 +53,6 @@ pathnames."))
 ;; -------------------
 ;; Conversion protocol
 ;; -------------------
-
-;; #### FIXME: (not the right place here). We should always call check
-;; on the converted values. That would make convert methods simpler sometimes
-;; because they would not have to duplicate the work in check.
 
 ;; Some parts of the code below are stolen or adapted from Peter Seibel's
 ;; Practical Common Lisp book, Chapter 15: A Portable Pahtname Library.
@@ -77,59 +69,61 @@ pathnames."))
 
 ;; Value check subprotocol
 (defmethod check ((path path) value)
-  "Check that VALUE is a valid PATH."
-  (flet ((check-pathname (pathname &key as-file as-directory)
-	   "Check that PATHNAME is valid.
+  "Check that VALUE is valid for PATH."
+  (unless (null value)
+    (flet ((check-pathname (pathname &key as-file as-directory)
+	     "Check that PATHNAME is valid.
 If AS-FILE, ensure that it denotes a file.
 If AS-DIRECTORY, ensure that it denotes a directory."
-	   (unless (pathnamep pathname)
-	     (error 'invalid-value
-		    :option path
-		    :value value
-		    :comment (format nil "~S is not a pathname." pathname)))
-	   (when (and as-file (directory-pathname-p pathname))
-	     (error 'invalid-value
-		    :option path
-		    :value value
-		    :comment (format nil "~S denotes a directory." pathname)))
-	   (when (and as-directory (not (directory-pathname-p pathname)))
-	     (error 'invalid-value
-		    :option path
-		    :value value
-		    :comment (format nil "~S does not denote a directory."
-			       pathname)))
-	   (when (wild-pathname-p pathname)
-	     (error 'invalid-value
-		    :option path
-		    :value value
-		    :comment (format nil "~S contains wildcards." pathname)))
-	   (when (string= (cadr (pathname-directory pathname)) "~")
-	     (error 'invalid-value
-		    :option path
-		    :value value
-		    :comment
-		    (format nil "~S contains a ~~/ abbreviation." pathname)))
-	   pathname))
-    (ecase (path-type path)
-      (:file
-       (check-pathname value :as-file t))
-      (:directory
-       (check-pathname value :as-directory t))
-      (:file-list
-       (mapc (lambda (pathname)
-	       (check-pathname pathname :as-file t))
-	     value)
-       value)
-      (:directory-list
-       (mapc (lambda (pathname)
-	       (check-pathname pathname :as-directory t))
-	     value)
-       value)
-      ((nil)
-       (mapc (lambda (pathname)
-	       (check-pathname pathname))
-	     value)
-       value))))
+	     (unless (pathnamep pathname)
+	       (error 'invalid-value
+		      :option path
+		      :value value
+		      :comment (format nil "~S is not a pathname." pathname)))
+	     (when (and as-file (directory-pathname-p pathname))
+	       (error 'invalid-value
+		      :option path
+		      :value value
+		      :comment (format nil "~S denotes a directory."
+				 pathname)))
+	     (when (and as-directory (not (directory-pathname-p pathname)))
+	       (error 'invalid-value
+		      :option path
+		      :value value
+		      :comment (format nil "~S does not denote a directory."
+				 pathname)))
+	     (when (wild-pathname-p pathname)
+	       (error 'invalid-value
+		      :option path
+		      :value value
+		      :comment (format nil "~S contains wildcards." pathname)))
+	     (when (string= (cadr (pathname-directory pathname)) "~")
+	       (error 'invalid-value
+		      :option path
+		      :value value
+		      :comment
+		      (format nil "~S contains a ~~/ abbreviation." pathname)))
+	     pathname))
+      (ecase (path-type path)
+	(:file
+	 (check-pathname value :as-file t))
+	(:directory
+	 (check-pathname value :as-directory t))
+	(:file-list
+	 (mapc (lambda (pathname)
+		 (check-pathname pathname :as-file t))
+	       value)
+	 value)
+	(:directory-list
+	 (mapc (lambda (pathname)
+		 (check-pathname pathname :as-directory t))
+	       value)
+	 value)
+	((nil)
+	 (mapc (lambda (pathname)
+		 (check-pathname pathname))
+	       value)
+	 value)))))
 
 (defun split-path (path)
   "Split PATH into a list of directories."
@@ -140,10 +134,8 @@ If AS-DIRECTORY, ensure that it denotes a directory."
 	:while path))
 
 (defmethod convert ((path path) argument)
-  "Convert ARGUMENT to PATH's value."
-  ;; #### NOTE: a nil value for a nullable path option may be provided by the
-  ;; empty string as argument.
-  (if (and (nullablep path) (zerop (length argument)))
+  "Convert ARGUMENT to a PATH value."
+  (if (zerop (length argument))
       nil
     (flet ((string-pathname (string &key as-file as-directory)
 	     "Make a pathname from STRING.
@@ -211,7 +203,7 @@ If AS-DIRECTORY, make sure the resulting pathname denotes a directory."
 		  &key short-name long-name description
 		       argument-name argument-type
 		       env-var fallback-value default-value
-		       nullablep type hidden)
+		       type hidden)
   "Make a new path option.
 - SHORT-NAME is the option's short name (without the dash).
   It defaults to nil.
@@ -228,20 +220,19 @@ If AS-DIRECTORY, make sure the resulting pathname denotes a directory."
 - FALLBACK-VALUE is the option's fallback value (for missing optional
   arguments), if any.
 - DEFAULT-VALUE is the option's default value, if any.
-- NULLABLEP indicates whether this option accepts nil as a value.
 - TYPE is the pathname type. It can be one of :file, :directory, :file-list,
   :directory-list or nil meaning that everything is allowed.
 - When HIDDEN, the option doesn't appear in help strings."
   (declare (ignore short-name long-name description env-var
 		  argument-name argument-type fallback-value default-value
-		  nullablep type hidden))
+		  type hidden))
   (apply #'make-instance 'path keys))
 
 (defun make-internal-path (long-name description
 			    &rest keys
 			    &key argument-name argument-type
 				 env-var fallback-value default-value
-				 nullablep type hidden)
+				 type hidden)
   "Make a new internal (Clon-specific) path option.
 - LONG-NAME is the option's long-name, sans the 'clon-' prefix.
   (Internal options don't have short names.)
@@ -255,13 +246,12 @@ If AS-DIRECTORY, make sure the resulting pathname denotes a directory."
 - FALLBACK-VALUE is the option's fallback value (for missing optional
   arguments), if any.
 - DEFAULT-VALUE is the option's default value, if any.
-- NULLABLEP indicates whether this option accepts nil as a value.
 - TYPE is the pathname type. It can be one of :file, :directory, :file-list,
   :directory-list or nil meaning that everything is allowed.
 - When HIDDEN, the option doesn't appear in help strings."
   (declare (ignore argument-name argument-type
 		   env-var fallback-value default-value
-		   nullablep type hidden))
+		   type hidden))
   (apply #'make-instance 'path
 	 :long-name long-name
 	 :description description

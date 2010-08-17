@@ -62,10 +62,11 @@ This class implements read-from-string options."))
 	     :option lispobj
 	     :value value
 	     :comment (format nil "Value must satisfy ~A." (typespec lispobj)))))
+
 ;; #### FIXME: I need to handle other errors than just end-of-file. Probably
 ;; all reader errors, and why not simply all errors.
 (defmethod convert ((lispobj lispobj) argument)
-  "Return the evaluation of ARGUMENT string."
+  "Convert ARGUMENT to a LISPOBJ value."
   (multiple-value-bind (value position)
       (handler-case (read-from-string argument)
 	(end-of-file ()
@@ -98,7 +99,7 @@ This class implements read-from-string options."))
 			  argument-name argument-type
 			  env-var
 			  typespec fallback-value default-value
-			  nullablep hidden)
+			  hidden)
   "Make a new lispobj option.
 - SHORT-NAME is the option's short name (without the dash).
   It defaults to nil.
@@ -116,13 +117,12 @@ This class implements read-from-string options."))
 - FALLBACK-VALUE is the option's fallback value (for missing optional
   arguments), if any.
 - DEFAULT-VALUE is the option's default value, if any.
-- NULLABLEP indicates whether this option accepts nil as a value.
 - When HIDDEN, the option doesn't appear in help strings."
   (declare (ignore short-name long-name description
 		   argument-name argument-type
 		   env-var
 		   typespec fallback-value default-value
-		   nullablep hidden))
+		   hidden))
   (apply #'make-instance 'lispobj keys))
 
 (defun make-internal-lispobj (long-name description
@@ -130,7 +130,7 @@ This class implements read-from-string options."))
 			       &key argument-name argument-type
 				    env-var
 				    typespec fallback-value default-value
-				    nullablep hidden)
+				    hidden)
   "Make a new internal (Clon-specific) string option.
 - LONG-NAME is the option's long-name, sans the 'clon-' prefix.
   (Internal options don't have short names.)
@@ -145,12 +145,11 @@ This class implements read-from-string options."))
 - FALLBACK-VALUE is the option's fallback value (for missing optional
   arguments), if any.
 - DEFAULT-VALUE is the option's default value, if any.
-- NULLABLEP indicates whether this option accepts nil as a value.
 - When HIDDEN, the option doesn't appear in help strings."
   (declare (ignore argument-name argument-type
 		   env-var
 		   typespec fallback-value default-value
-		   nullablep hidden))
+		   hidden))
   (apply #'make-instance 'lispobj
 	 :long-name long-name
 	 :description description

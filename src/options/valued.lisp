@@ -51,11 +51,7 @@
 		   :reader fallback-value)
    (default-value :documentation "The option's default value."
 		 :initarg :default-value
-		 :reader default-value)
-   (nullablep :documentation "Whether this option's value can be nil."
-	      :initarg :nullablep
-	      :initform nil
-	      :reader nullablep))
+		 :reader default-value))
   (:default-initargs
     :argument-type :required)
   (:documentation "The VALUED-OPTION class.
@@ -160,6 +156,11 @@ If OPTION matches, return its short name's length; otherwise 0."
 ;; #### FIXME: this protocol is currently used to check for the validity of
 ;; fallback values, default values, and values provided from a debugger
 ;; restart. We should also use it to check converted values.
+;; Or not. the job of checking a value is useful when values are provided
+;; directly. Otherwise, it really is the job of the convert method to check
+;; that the conversion is possible. Besides, the error messages should be
+;; different betwee check and convert: we speak of a /value/ in one case, and
+;; of an /argument/ in another. I need to update all such error messages.
 
 (define-condition invalid-value (option-error)
   ((value :documentation "The invalid value."
@@ -177,14 +178,7 @@ If OPTION matches, return its short name's length; otherwise 0."
 
 (defgeneric check (valued-option value)
   (:documentation "Check that VALUE is valid for VALUED-OPTION.
-If VALUE is valid, return it. Otherwise, raise an invalid-value error.")
-  (:method :around ((option valued-option) value)
-    "Bypass the provided user method if VALUE is nil and OPTION is nullable."
-    ;; #### NOTE: check must return the value if it is valid. This is
-    ;; exactly what happens below when the unless clause fails (it returns
-    ;; nil).
-    (unless (and (nullablep option) (null value))
-      (call-next-method))))
+If VALUE is valid, return it. Otherwise, raise an invalid-value error."))
 
 (defun read-value ()
   "Read an option value from standard input."

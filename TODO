@@ -75,13 +75,6 @@ currently possible because invalid-argument errors are trapped and converted
 to invalid-cmdline-argument or invalid-environment-value ones. So we can't
 benefit from all the restarts that we could define at the lower-level.
 
-* Inputing nil
-Currently, nullablep is mainly used for options with optional arguments, in
-which case we might use nil as a fallback or a default value. However, only
-the PATH option class can lead to a null value from user input (stropts and
-enums can't). Should we change this, or just let the user provide new option
-classes to do so ?
-
 * Better detection of short packs
 When parsing a short call, we try a known option, a known option with a sticky
 argument, a pack, and then barf. Sometimes, a pack can be mistaken for a known

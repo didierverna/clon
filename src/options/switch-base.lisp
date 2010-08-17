@@ -39,9 +39,7 @@
 ;; ==========================================================================
 
 (defabstract switch-base (negatable)
-  ((nullablep ;; inherited from the VALUED-OPTION class
-    :initform t)
-   (yes-values :documentation "The possible 'yes' values."
+  ((yes-values :documentation "The possible 'yes' values."
 	       :allocation :class
 	       :type list
 	       :initform '("yes" "on" "true" "yup" "yeah")

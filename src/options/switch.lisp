@@ -81,8 +81,7 @@ This class implements boolean options."))
   value)
 
 (defmethod convert ((switch switch) argument)
-  "Convert (possibly abbreviated) ARGUMENT to SWITCH's value.
-If ARGUMENT is not valid for a switch, raise a conversion error."
+  "Convert ARGUMENT to a SWITCH value."
   (let ((match (closest-match argument
 			      (append (yes-values switch) (no-values switch))
 			      :ignore-case t)))

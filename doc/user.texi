@@ -880,11 +880,6 @@ The option's fallback and default values. Remember that a fallback value
 only makes sense when the argument is optional. Besides, also when the
 argument is optional, you need to provide at least a fallback or a
 default value (or both of course; see @enduserref{Value Sources}).
-@item :nullablep
-@cvopindex{:nullablep}
-Whether the option accepts a null value. Default to @code{nil}. This
-property is useful when you define your own option types (@pxref{Value
-Check Protocol}).
 @end table
 
 @node Built-In Valued Options, , Common Valued Option Properties, Built-In Option Types
@@ -904,8 +899,7 @@ below.
 @cvopindex{:argument-name}
 This option type is for options taking strings as their argument. String
 options don't provide any additional properties, but their default
-argument name is changed from @code{"ARG"} to @code{"STR"}. When the
-option is nullable, the empty string stands for the @code{nil} value.
+argument name is changed from @code{"ARG"} to @code{"STR"}.
 @item lispobj
 @voindex{Lisp Objects,lispobj}
 @cvopindex{:argument-name}
@@ -920,44 +914,39 @@ argument must satisfy. It defaults to @code{t}.
 @cvopindex{:argument-name}
 @vopindex{Enumerations,enum,:enum}
 @bioindex{version}
-This option type is for options taking values from an enumerated set.
-@code{enum} options change their default argument name from @code{"ARG"}
-to @code{"TYPE"}. Also, they provide an additional property called
-@code{:enum} which must be a list of @cl{} keywords enumerating the
-possible values. In fact, the values are not the keywords themselves,
-but rather their corresponding symbol name. This means that an end-user
-needs not be aware of the underlying implementation, and actually does
-not use a colon when providing an argument. The end-user also has the
-ability to abbreviate the possible values. When the option is nullable,
-the empty string stands for a @code{nil} value. Otherwise, it is
-considered as an abbreviation for the first element in the enumerated
-set of values. Look at the @code{--clon-version} built-in option for an
-example.
+This option type is for options taking values from an enumerated set of
+keywords. @code{enum} options change their default argument name from
+@code{"ARG"} to @code{"TYPE"}. Also, they provide an additional property
+called @code{:enum} to store the list of @cl{} keywords enumerating the
+possible values. The end-user does not use a colon when providing an
+argument to an @code{enum} option. Only the keyword's name. The end-user
+also has the ability to abbreviate the possible values. An empty
+argument is considered as an abbreviation for the first element in the
+set. Look at the @code{--clon-version} built-in option for an example.
 @item path
+@bioindex{search-path}
+@bioindex{theme}
 @voindex{Paths,path}
 @cvopindex{:argument-name}
-@cvopindex{:nullablep}
 @vopindex{Paths,path,:type}
 This option type is for options taking a colon-separated list of
 pathnames as argument. @code{path} options change their default argument
-name from @code{"ARG"} to @code{"PATH"} and their default nullable
-property from @code{nil} to @code{t}. Also, they provide an additional
-property called @code{:type} which specifies the kind of path which is
-expected. Possible values are: @code{:file}, @code{:directory},
+name from @code{"ARG"} to @code{"PATH"}. Also, they provide an
+additional property called @code{:type} which specifies the kind of path
+which is expected. Possible values are: @code{:file}, @code{:directory},
 @code{:file-list}, @code{:directory-list} or @code{nil} (meaning that
-anything is allowed). When the option is nullable, the empty string
-stands for the @code{nil} value.
+anything is allowed). Null paths are allowed, and may be provided by an
+empty argument. Look at the @code{--clon-search-path} and
+@code{--clon-theme} built-in options for examples.
 @item switch
 @voindex{Switches,switch}
 @cvopindex{:argument-type}
-@cvopindex{:nullablep}
 @vopindex{Switches,switch,:argument-style}
 This option type is for Boolean options. @code{switch} options change
-their default nullable property from @code{nil} to @code{t} (but in
-fact, this property is ignored), and their default argument type from
-required to optional. Also, instead of using the @code{:argument-name}
-property, @code{switch} options provide a property called
-@code{:argument-style}. Possible values are @code{:yes/no} (the
+their default argument type from required to optional and provide a
+fallback value of @code{t} automatically. Also, instead of using the
+@code{:argument-name} property, @code{switch} options provide a property
+called @code{:argument-style}. Possible values are @code{:yes/no} (the
 default), @code{:on/off}, @code{:true/false}, @code{:yup/nope},
 @code{:yeah/nah}. Note that this property determines the argument name
 @emph{only}. All possible switch arguments (@pxenduserref{Switches}) are
@@ -965,7 +954,6 @@ always availble to all switches.
 @item xswitch
 @voindex{Extended Switches,xswitch}
 @cvopindex{:argument-type}
-@cvopindex{:nullablep}
 @vopindex{Extended Switches,xswitch,:enum}
 @bioindex{highlight}
 This option type stands for @dfn{extended} switch. Extended switches
@@ -973,9 +961,8 @@ result from the mating of a male switch and a female enumeration, or the
 other way around (elementary decency prevents me from describing this
 mating process in detail): their possible values are either Boolean or
 from an @code{:enum} property as in the case of @code{enum} options.
-@code{xswitch} options change their default nullable property from
-@code{nil} to @code{t} (but in fact, this property is ignored), and
-their default argument type from required to optional.
+@code{xswitch} options change their default argument type from required
+to optional and provide a fallback value of @code{t} automatically.
 @end table
 
 @node Advanced Synopsis Creation, , Built-In Option Types, Synopsis Definition
@@ -1307,13 +1294,12 @@ environment variable exists in the environment. For the same reason, a
 flag's value source may ony be @code{(:cmdline @var{NAME})} or
 @code{(:environment @var{VAR})}.
 
-@cvopindex{:nullablep}
 @findex getopt
 When an option is not found anywhere and there is no default value,
 @code{getopt} just returns nil (no second value). Also, note that when
-your option is nullable, you @emph{need} to handle the second retrun
-value to make the difference between an option not found, and an actual
-value of @code{nil}.
+your option accepts @code{nil} as a value, you @emph{need} to handle the
+second retrun value to make the difference between an option not found,
+and an actual value of @code{nil}.
 
 
 @node Sequential Retrieval, , Explicit Retrieval, Option Retrieval
@@ -1511,8 +1497,8 @@ options'short and long names, description and associated environment
 variable (@pxref{Common Properties}). Valued options inherit from an
 abstract subclass of @code{option} called @code{valued-option}. This
 class handles the option's argument name and status (optional or
-mandatory), fallback and default values, and nullable status
-(@pxref{Common Valued Option Properties}).
+mandatory), fallback and default values (@pxref{Common Valued Option
+Properties}).
 
 @cindex User-Defined Option Classes
 @cindex Option Classes, user-defined
@@ -1580,28 +1566,6 @@ As you can see, you need to provide a method with the first argument
 specialized to your new option type. This method must return @var{VALUE}
 if it is okay, and raise an @code{invalid-value} error otherwise.
 
-@gfmindex{check,:around}
-This protocol additionally has the following @code{:around} method:
-
-@cartouche
-@verbatim
-(defgeneric check (valued-option value)
-  (:method :around ((option valued-option) value)
-    "Bypass the provided user method if VALUE is nil and OPTION is nullable."
-    ;; #### NOTE: check must return the value if it is valid. This is
-    ;; exactly what happens below when the unless clause fails (it returns
-    ;; nil).
-    (unless (and (nullablep option) (null value))
-      (call-next-method))))
-@end verbatim
-@end cartouche
-
-@cvopindex{:nullablep}
-This means that if your option is nullable (@pxref{Common Valued Option
-Properties}) and the provided value is @code{nil}, your method will
-actually be bypassed. Nullable options turn out to be very common, so
-this simplifies the writing of @code{check} methods.
-
 @ecindex invalid-value
 @clon{} maintains a hierarchy of error conditions. The
 @code{invalid-value} error condition is defined like this:
@@ -1640,11 +1604,6 @@ Let's look at the enumeration example now.
 @verbatim
 (defmethod check ((enum enum) value)
   "Check that VALUE is a valid ENUM."
-  (unless (keywordp value)
-    (error 'invalid-value
-	   :option enum
-	   :value value
-	   :comment "Value must be a keyword."))
   (unless (member value (enum enum))
     (error 'invalid-value
 	   :option enum
@@ -1656,15 +1615,8 @@ Let's look at the enumeration example now.
 @end cartouche
 
 @voindex{Enumerations,enum}
-@cvopindex{:nullablep}
-This code should be self-explanatory. We first check that we got a
-keyword, and then that it belongs the the enumeration. Also, note that
-the nullable case is not treated explicitely. If the option was nullable
-and @code{nil} was provided, this method is not called at all. If
-@var{VALUE} is non-@var{nil}, then it goes through this method as any
-other value, and if @code{nil} was provided for a non-nullable option,
-the checks above will fail all the same.
-
+This code should be self-explanatory. We check that the value we got
+belongs to the enumeration.
 
 @node Conversion Protocol, Constructor Functions, Value Check Protocol, New Option Types
 @subsection Conversion Protocol
@@ -1785,7 +1737,7 @@ Let's look at the enumeration example now.
 		  &key short-name long-name description
 		       argument-name argument-type
 		       enum env-var fallback-value default-value
-		       nullablep hidden)
+		       hidden)
   "Make a new enum option.
 - SHORT-NAME is the option's short name (without the dash).
   It defaults to nil.
@@ -1803,12 +1755,11 @@ Let's look at the enumeration example now.
 - FALLBACK-VALUE is the option's fallback value (for missing optional
   arguments), if any.
 - DEFAULT-VALUE is the option's default value, if any.
-- NULLABLEP indicates whether this option accepts nil as a value.
 - When HIDDEN, the option doesn't appear in help strings."
   (declare (ignore short-name long-name description
 		  argument-name argument-type
 		  enum env-var fallback-value default-value
-		  nullablep))
+                  hidden))
   (apply #'make-instance 'enum keys))
 @end verbatim
 @end cartouche

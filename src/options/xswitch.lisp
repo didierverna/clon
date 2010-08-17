@@ -53,40 +53,36 @@ As such, the negated syntax is available for extended xswitches."))
 ;; Value check subprotocol
 (defmethod check ((xswitch xswitch) value)
   "Check that VALUE is valid for XSWITCH."
-  (unless (member value '(t nil))
-    (unless (keywordp value)
-      (error 'invalid-value
-	     :option xswitch
-	     :value value
-	     :comment "Value must be t, nil or a keyword."))
-    (unless (member value (enum xswitch))
-      (error 'invalid-value
-	     :option xswitch
-	     :value value
-	     :comment (format nil "Valid values are: t, nil, ~A."
-			(symbols-to-string (enum xswitch))))))
+  (unless (or (member value '(t nil))
+	      (member value (enum xswitch)))
+    (error 'invalid-value
+	   :option xswitch
+	   :value value
+	   :comment (format nil "Valid values are: t, nil, ~A."
+		      (symbols-to-string (enum xswitch)))))
   value)
 
 (defmethod convert ((xswitch xswitch) argument)
-  "Convert (possibly abbreviated) ARGUMENT to XSWITCH's value.
-If ARGUMENT is not valid for an xswitch, raise a conversion error."
-  (let* ((other-values (mapcar #'symbol-to-string (enum xswitch)))
-	 (all-values (append (yes-values xswitch)
-			     (no-values xswitch)
-			     other-values))
-	 (match (closest-match argument all-values :ignore-case t)))
+  "Convert ARGUMENT to an XSWITCH value."
+  (let ((match (closest-match argument
+			      (append (yes-values xswitch) (no-values xswitch))
+			      :ignore-case t)))
     (cond ((member match (yes-values xswitch) :test #'string-equal)
 	   t)
 	  ((member match (no-values xswitch) :test #'string-equal)
 	   nil)
-	  ((member match other-values :test #'string-equal)
-	   (intern (string-upcase match) "KEYWORD"))
 	  (t
-	   (error 'invalid-argument
-		  :option xswitch
-		  :argument argument
-		  :comment (format nil "Valid arguments are: ~A."
-			     (list-to-string all-values)))))))
+	   (or (closest-match argument (enum xswitch)
+			      :ignore-case t :key #'symbol-name)
+	       (error 'invalid-argument
+		      :option xswitch
+		      :argument argument
+		      :comment (format nil "Valid arguments are: ~A."
+				 (list-to-string
+				  (append (yes-values xswitch)
+					  (no-values xswitch)
+					  (mapcar #'symbol-to-string
+						  (enum xswitch)))))))))))
 
 
 

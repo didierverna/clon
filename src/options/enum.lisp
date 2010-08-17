@@ -52,11 +52,6 @@ This class implements options whose values belong to a set of keywords."))
 ;; Value check subprotocol
 (defmethod check ((enum enum) value)
   "Check that VALUE is a valid ENUM."
-  (unless (keywordp value)
-    (error 'invalid-value
-	   :option enum
-	   :value value
-	   :comment "Value must be a keyword."))
   (unless (member value (enum enum))
     (error 'invalid-value
 	   :option enum
@@ -68,18 +63,12 @@ This class implements options whose values belong to a set of keywords."))
 (defmethod convert ((enum enum) argument)
   "Convert (possibly abbreviated) ARGUMENT to ENUM's value.
 If ARGUMENT doesn't name one of ENUM's symbols, raise a conversion error."
-  ;; #### NOTE: a nil value for a nullable enumeration may be provided by the
-  ;; empty string as argument. Otherwise, CLOSEST-MATCH on the empty string
-  ;; will return the first keyword in the enumeration list.
-  (if (and (nullablep enum) (zerop (length argument)))
-      nil
-    (or (closest-match argument (enum enum) :ignore-case t :key #'symbol-name)
-	(error 'invalid-argument
-	       :option enum
-	       :argument argument
-	       :comment (format nil
-			    "Valid arguments are: ~A and the empty string."
-			  (symbols-to-string (enum enum)))))))
+  (or (closest-match argument (enum enum) :ignore-case t :key #'symbol-name)
+      (error 'invalid-argument
+	     :option enum
+	     :argument argument
+	     :comment (format nil "Valid arguments are: ~A."
+			(symbols-to-string (enum enum))))))
 
 
 
@@ -91,7 +80,7 @@ If ARGUMENT doesn't name one of ENUM's symbols, raise a conversion error."
 		  &key short-name long-name description
 		       argument-name argument-type
 		       enum env-var fallback-value default-value
-		       nullablep hidden)
+		       hidden)
   "Make a new enum option.
 - SHORT-NAME is the option's short name (without the dash).
   It defaults to nil.
@@ -109,19 +98,18 @@ If ARGUMENT doesn't name one of ENUM's symbols, raise a conversion error."
 - FALLBACK-VALUE is the option's fallback value (for missing optional
   arguments), if any.
 - DEFAULT-VALUE is the option's default value, if any.
-- NULLABLEP indicates whether this option accepts nil as a value.
 - When HIDDEN, the option doesn't appear in help strings."
   (declare (ignore short-name long-name description
 		  argument-name argument-type
 		  enum env-var fallback-value default-value
-		  nullablep hidden))
+		  hidden))
   (apply #'make-instance 'enum keys))
 
 (defun make-internal-enum (long-name description
 			    &rest keys
 			    &key argument-name argument-type
 				 enum env-var fallback-value default-value
-				 nullablep hidden)
+				 hidden)
   "Make a new internal (Clon-specific) enum option.
 - LONG-NAME is the option's long-name, sans the 'clon-' prefix.
   (Internal options don't have short names.)
@@ -136,11 +124,10 @@ If ARGUMENT doesn't name one of ENUM's symbols, raise a conversion error."
 - FALLBACK-VALUE is the option's fallback value (for missing optional
   arguments), if any.
 - DEFAULT-VALUE is the option's default value, if any.
-- NULLABLEP indicates whether this option accepts nil as a value.
 - When HIDDEN, the option doesn't appear in help strings."
   (declare (ignore argument-name argument-type
 		   enum env-var fallback-value default-value
-		   nullablep hidden))
+		   hidden))
   (apply #'make-instance 'enum
 	 :long-name long-name
 	 :description description
