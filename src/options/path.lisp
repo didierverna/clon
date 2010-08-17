@@ -50,10 +50,6 @@ This class implements options whose values are (colon-separated lists of)
 pathnames."))
 
 
-;; -------------------
-;; Conversion protocol
-;; -------------------
-
 ;; Some parts of the code below are stolen or adapted from Peter Seibel's
 ;; Practical Common Lisp book, Chapter 15: A Portable Pahtname Library.
 
@@ -67,7 +63,11 @@ pathnames."))
        (pathname-component-null-p (pathname-type pathname))
        pathname))
 
-;; Value check subprotocol
+
+;; --------------------
+;; Value Check protocol
+;; --------------------
+
 (defmethod check ((path path) value)
   "Check that VALUE is valid for PATH."
   (unless (null value)
@@ -133,27 +133,35 @@ If AS-DIRECTORY, ensure that it denotes a directory."
 	:do (setq path (when split-point (subseq path (1+ split-point))))
 	:while path))
 
+
+;; ----------------------------
+;; Argument Conversion protocol
+;; ----------------------------
+
 (defmethod convert ((path path) argument)
   "Convert ARGUMENT to a PATH value."
   (if (zerop (length argument))
       nil
-    (flet ((string-pathname (string &key as-file as-directory)
+    (flet ((string-pathname (string &key as-file as-directory specify)
 	     "Make a pathname from STRING.
 If AS-FILE, make sure the resulting pathname does not denote a directory.
-If AS-DIRECTORY, make sure the resulting pathname denotes a directory."
+If AS-DIRECTORY, make sure the resulting pathname denotes a directory.
+If SPECIFY, print the path as part of a potential error message. This is
+useful to specify which part of ARGUMENT is concerned when it is a list."
 	     (let ((pathname (pathname string)))
 	       (when (wild-pathname-p pathname)
 		 (error 'invalid-argument
 			:option path
 			:argument argument
-			:comment "Path contains wildcards."))
+			:comment (format nil
+				     "Path~@[ ~S~] contains a wildcard."
+				   (and specify string))))
 	       (when (and as-file (directory-pathname-p pathname))
 		 (error 'invalid-argument
 			:option path
 			:argument argument
-			;; #### FIXME: misleading error message when a single
-			;; path is requested.
-			:comment "Path is or contains a directory."))
+			:comment (format nil "Path~@[ ~S~] is a directory."
+				   (and specify string))))
 	       ;; #### NOTE: instead of forcing users to end their directories
 	       ;; with a slash (and hence triggering an error here if it
 	       ;; doesn't), we simply convert a normal pathname into a
@@ -183,15 +191,19 @@ If AS-DIRECTORY, make sure the resulting pathname denotes a directory."
 	 (string-pathname argument :as-directory t))
 	(:file-list
 	 (mapcar (lambda (filename)
-		   (string-pathname filename :as-file t))
+		   (string-pathname filename :as-file t :specify t))
 		 (split-path argument)))
 	(:directory-list
 	 (mapcar (lambda (dirname)
-		   (string-pathname dirname :as-directory t))
+		   (string-pathname dirname :as-directory t :specify t))
 		 (split-path argument)))
 	((nil)
-	 (mapcar #'string-pathname
-		 (split-path argument)))))))
+	 (let ((paths (split-path argument)))
+	   (if (= (length paths) 1)
+	       (string-pathname paths)
+	     (mapcar (lambda (pathname)
+		       (string-pathname pathname :specify t))
+		     paths))))))))
 
 
 

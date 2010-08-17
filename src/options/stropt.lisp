@@ -38,23 +38,6 @@
 ;; The String Option Class
 ;; ==========================================================================
 
-;; #### NOTE: all of this applies to user-defined options as well.
-
-;; A string option can appear in the following formats:
-;;
-;;   -o, --option=STR                   both names, required argument
-;;   -o, --option[=STR]                 both names, optional argument
-;;   -o STR                             short name, required argument
-;;   -o [STR]                           short name, optional argument
-;;   --option=STR                       long name,  required argument
-;;   --option[=STR]                     long name,  optional argument
-
-;; String option's arguments are required by default. In such a case, you
-;; might provide the argument in the next cmdline item after either a short or
-;; long name. if the argument is optional, then giving it must be done after
-;; an equal sign for long names, or as a sticky argument after a short name,
-;; but that's all.
-
 (defoption stropt ()
   ((argument-name ;; inherited from the VALUED-OPTION class
     :initform "STR"))
@@ -62,11 +45,10 @@
 This class implements options the values of which are strings."))
 
 
-;; -------------------
-;; Conversion protocol
-;; -------------------
+;; --------------------
+;; Value Check protocol
+;; --------------------
 
-;; Value check subprotocol
 (defmethod check ((stropt stropt) value)
   "Check that VALUE is valid for STROPT."
   (if (stringp value)
@@ -75,6 +57,11 @@ This class implements options the values of which are strings."))
 	     :option stropt
 	     :value value
 	     :comment "Value must be a string.")))
+
+
+;; ----------------------------
+;; Argument Conversion protocol
+;; ----------------------------
 
 (defmethod convert ((stropt stropt) argument)
   "Convert ARGUMENT to an STROPT value."

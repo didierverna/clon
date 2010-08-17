@@ -38,17 +38,6 @@
 ;; The Switch Class
 ;; ==========================================================================
 
-;; A switch can appear in the following forms:
-;;
-;;  -(+)b, --boolean[=yes(no)]          both names, optional argument
-;;  -(+)b, --boolean=yes(no)            both names, required argument
-;;  -(+)b                               short name, whatever the argument
-;;  --boolean[=yes(no)]                 long name,  optional argument
-;;  --boolean=yes(no)                   long name,  required argument
-
-;; Switches arguments are optional by default. When the argument is optional,
-;; omitting it is equivalent to saying yes.
-
 (defoption switch (switch-base)
   ((argument-name ;; inherited from the VALUED-OPTION class
     :documentation "The option's argument style."
@@ -66,19 +55,23 @@
 This class implements boolean options."))
 
 
-;; -------------------
-;; Conversion protocol
-;; -------------------
+;; --------------------
+;; Value Check protocol
+;; --------------------
 
-;; Value check subprotocol
 (defmethod check ((switch switch) value)
   "Check that VALUE is valid for SWITCH."
   (unless (member value '(t nil))
     (error 'invalid-value
 	   :option switch
 	   :value value
-	   :comment "Valid values are t or nil."))
+	   :comment "Valid values are T or NIL."))
   value)
+
+
+;; ----------------------------
+;; Argument Conversion protocol
+;; ----------------------------
 
 (defmethod convert ((switch switch) argument)
   "Convert ARGUMENT to a SWITCH value."

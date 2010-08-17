@@ -46,11 +46,10 @@ This class merges the functionalities of switches and enumerations.
 As such, the negated syntax is available for extended xswitches."))
 
 
-;; -------------------
-;; Conversion protocol
-;; -------------------
+;; --------------------
+;; Value Check protocol
+;; --------------------
 
-;; Value check subprotocol
 (defmethod check ((xswitch xswitch) value)
   "Check that VALUE is valid for XSWITCH."
   (unless (or (member value '(t nil))
@@ -58,9 +57,15 @@ As such, the negated syntax is available for extended xswitches."))
     (error 'invalid-value
 	   :option xswitch
 	   :value value
-	   :comment (format nil "Valid values are: t, nil, ~A."
-		      (symbols-to-string (enum xswitch)))))
+	   :comment (format nil "Valid values are: T, NIL, ~A."
+		      (list-to-string (enum xswitch)
+				      :key #'prin1-to-string))))
   value)
+
+
+;; ----------------------------
+;; Argument Conversion protocol
+;; ----------------------------
 
 (defmethod convert ((xswitch xswitch) argument)
   "Convert ARGUMENT to an XSWITCH value."

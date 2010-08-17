@@ -38,12 +38,6 @@
 ;; The Flag Class
 ;; ==========================================================================
 
-;; A flag can appear in the following forms:
-
-;; -f, --flag                           both names
-;; -f                                   short name
-;; --flag                               long name
-
 (defclass flag (option)
   ()
   (:documentation "The FLAG class.

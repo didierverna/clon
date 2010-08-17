@@ -49,19 +49,23 @@
 This class implements read-from-string options."))
 
 
-;; -------------------
-;; Conversion protocol
-;; -------------------
+;; --------------------
+;; Value Check protocol
+;; --------------------
 
-;; Value check subprotocol
 (defmethod check ((lispobj lispobj) value)
   "Check that VALUE is valid for LISPOBJ."
-  (if (typep value (typespec lispobj))
-      value
-      (error 'invalid-value
-	     :option lispobj
-	     :value value
-	     :comment (format nil "Value must satisfy ~A." (typespec lispobj)))))
+  (unless (typep value (typespec lispobj))
+    (error 'invalid-value
+	   :option lispobj
+	   :value value
+	   :comment (format nil "Value must satisfy ~A." (typespec lispobj))))
+  value)
+
+
+;; ----------------------------
+;; Argument Conversion protocol
+;; ----------------------------
 
 ;; #### FIXME: I need to handle other errors than just end-of-file. Probably
 ;; all reader errors, and why not simply all errors.

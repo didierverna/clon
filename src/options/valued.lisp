@@ -146,21 +146,8 @@ If OPTION matches, return its short name's length; otherwise 0."
 
 
 ;; ==========================================================================
-;; The Conversion Protocol
+;; The Value Check Protocol
 ;; ==========================================================================
-
-;; ---------------------------
-;; The value check subprotocol
-;; ---------------------------
-
-;; #### FIXME: this protocol is currently used to check for the validity of
-;; fallback values, default values, and values provided from a debugger
-;; restart. We should also use it to check converted values.
-;; Or not. the job of checking a value is useful when values are provided
-;; directly. Otherwise, it really is the job of the convert method to check
-;; that the conversion is possible. Besides, the error messages should be
-;; different betwee check and convert: we speak of a /value/ in one case, and
-;; of an /argument/ in another. I need to update all such error messages.
 
 (define-condition invalid-value (option-error)
   ((value :documentation "The invalid value."
@@ -196,9 +183,9 @@ the one that was provided."
       (restartable-check valued-option value))))
 
 
-;; ------------------------------
-;; The argument check subprotocol
-;; ------------------------------
+;; ==========================================================================
+;; The Argument Conversion Protocol
+;; ==========================================================================
 
 (define-condition invalid-argument (option-error)
   ((argument :documentation "The invalid argument."

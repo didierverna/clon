@@ -45,24 +45,27 @@
 This class implements options whose values belong to a set of keywords."))
 
 
-;; -------------------
-;; Conversion protocol
-;; -------------------
+;; --------------------
+;; Value Check protocol
+;; --------------------
 
-;; Value check subprotocol
 (defmethod check ((enum enum) value)
-  "Check that VALUE is a valid ENUM."
+  "Check that VALUE is valid for ENUM."
   (unless (member value (enum enum))
     (error 'invalid-value
 	   :option enum
 	   :value value
 	   :comment (format nil "Valid values are: ~A."
-		      (symbols-to-string (enum enum)))))
+		      (list-to-string (enum enum) :key #'prin1-to-string))))
   value)
 
+
+;; ----------------------------
+;; Argument Conversion protocol
+;; ----------------------------
+
 (defmethod convert ((enum enum) argument)
-  "Convert (possibly abbreviated) ARGUMENT to ENUM's value.
-If ARGUMENT doesn't name one of ENUM's symbols, raise a conversion error."
+  "Convert ARGUMENT to an ENUM value."
   (or (closest-match argument (enum enum) :ignore-case t :key #'symbol-name)
       (error 'invalid-argument
 	     :option enum
