@@ -305,10 +305,7 @@ frames can potentially write until the available right margin."
   (close-line sheet)
   (open-line sheet))
 
-;; #### FIXME: This routine does not handle special characters (the ones that
-;; don't actually display anything. Since this is for short description
-;; strings, this would not be normally a problem, but the current situation is
-;; not totally clean.
+;; #### FIXME: control chars not handled.
 (defun print-string (sheet string)
   "Output STRING to SHEET.
 STRING is output within the current frame's bounds.
