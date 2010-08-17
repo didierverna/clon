@@ -67,7 +67,7 @@ This class implements options the values of which are strings."))
 ;; -------------------
 
 ;; Value check subprotocol
-(defmethod check-value ((stropt stropt) value)
+(defmethod check ((stropt stropt) value)
   "Check that VALUE is valid for STROPT."
   (if (stringp value)
       value

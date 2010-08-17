@@ -58,9 +58,9 @@ pathnames."))
 ;; Conversion protocol
 ;; -------------------
 
-;; #### FIXME: (not the right place here). We should always call check-value
+;; #### FIXME: (not the right place here). We should always call check
 ;; on the converted values. That would make convert methods simpler sometimes
-;; because they would not have to duplicate the work in check-value.
+;; because they would not have to duplicate the work in check.
 
 ;; Some parts of the code below are stolen or adapted from Peter Seibel's
 ;; Practical Common Lisp book, Chapter 15: A Portable Pahtname Library.
@@ -76,7 +76,7 @@ pathnames."))
        pathname))
 
 ;; Value check subprotocol
-(defmethod check-value ((path path) value)
+(defmethod check ((path path) value)
   "Check that VALUE is a valid PATH."
   (flet ((check-pathname (pathname &key as-file as-directory)
 	   "Check that PATHNAME is valid.

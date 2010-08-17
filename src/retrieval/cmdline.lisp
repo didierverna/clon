@@ -216,7 +216,7 @@ The value source may be :cmdline, :fallback or :default."
     (use-value (value)
       :report "Use an already converted value."
       :interactive read-value
-      (values (restartable-check-value valued-option value) :cmdline))
+      (values (restartable-check valued-option value) :cmdline))
     (use-argument (cmdline-argument)
       :report "Use the conversion of an argument."
       :interactive read-argument

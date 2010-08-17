@@ -175,14 +175,12 @@ If OPTION matches, return its short name's length; otherwise 0."
   (:documentation "An invalid value error."))
 
 
-;; #### FIXME: should we just call this check, as for convert ?
-
-(defgeneric check-value (valued-option value)
+(defgeneric check (valued-option value)
   (:documentation "Check that VALUE is valid for VALUED-OPTION.
 If VALUE is valid, return it. Otherwise, raise an invalid-value error.")
   (:method :around ((option valued-option) value)
     "Bypass the provided user method if VALUE is nil and OPTION is nullable."
-    ;; #### NOTE: check-value must return the value if it is valid. This is
+    ;; #### NOTE: check must return the value if it is valid. This is
     ;; exactly what happens below when the unless clause fails (it returns
     ;; nil).
     (unless (and (nullablep option) (null value))
@@ -193,15 +191,15 @@ If VALUE is valid, return it. Otherwise, raise an invalid-value error.")
   (format t "Please type in the new value:~%")
   (list (read)))
 
-(defun restartable-check-value (valued-option value)
+(defun restartable-check (valued-option value)
   "Restartably check that VALUE is valid for VALUED-OPTION.
 The only restart available, use-value, offers to try a different value from
 the one that was provided."
-  (restart-case (check-value valued-option value)
+  (restart-case (check valued-option value)
     (use-value (value)
       :report "Use another value instead."
       :interactive read-value
-      (restartable-check-value valued-option value))))
+      (restartable-check valued-option value))))
 
 
 ;; ------------------------------
@@ -253,7 +251,7 @@ Available restarts are:
     (use-value (value)
       :report "Use another (already converted) value."
       :interactive read-value
-      (restartable-check-value valued-option value))
+      (restartable-check valued-option value))
     (use-argument (argument)
       :report "Use another (to be converted) argument."
       :interactive read-argument
@@ -304,11 +302,11 @@ ARGUMENT-REQUIRED-P slot."
   ;; Clon end-user. In other words, a potential error here is in the program
   ;; itself; not in the usage of the program.
   (when fallback-value-supplied-p
-    (handler-case (check-value option fallback-value)
+    (handler-case (check option fallback-value)
       (invalid-value ()
 	(error "Option ~A: invalid fallback value ~S." option fallback-value))))
   (when default-value-supplied-p
-    (handler-case (check-value option default-value)
+    (handler-case (check option default-value)
       (invalid-value ()
 	(error "Option ~A: invalid default value ~S." option default-value)))))
 

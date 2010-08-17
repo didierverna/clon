@@ -50,7 +50,7 @@ This class implements options whose values belong to a set of keywords."))
 ;; -------------------
 
 ;; Value check subprotocol
-(defmethod check-value ((enum enum) value)
+(defmethod check ((enum enum) value)
   "Check that VALUE is a valid ENUM."
   (unless (keywordp value)
     (error 'invalid-value

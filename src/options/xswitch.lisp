@@ -51,7 +51,7 @@ As such, the negated syntax is available for extended xswitches."))
 ;; -------------------
 
 ;; Value check subprotocol
-(defmethod check-value ((xswitch xswitch) value)
+(defmethod check ((xswitch xswitch) value)
   "Check that VALUE is valid for XSWITCH."
   (unless (member value '(t nil))
     (unless (keywordp value)

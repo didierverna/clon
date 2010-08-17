@@ -127,7 +127,7 @@ Available restarts are:
     (use-value (value)
       :report "Use an already converted value."
       :interactive read-value
-      (restartable-check-value valued-option value))
+      (restartable-check valued-option value))
     (use-argument (argument)
       :report "Use the conversion of an argument."
       :interactive read-argument

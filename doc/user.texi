@@ -1566,11 +1566,11 @@ the type in question. Values currently checked are fallback values,
 default values, and values provided from a debugger restart
 (@pxenduserref{Error Management}).
 
-The value check protocol is implemented through a @code{check-value}
-generic function for which you must provide a method.
+The value check protocol is implemented through a @code{check} generic
+function for which you must provide a method.
 
-@deffn {Generic Function} check-value OPTION VALUE
-@gfsubindex{check-value}
+@deffn {Generic Function} check OPTION VALUE
+@gfsubindex{check}
 @ecindex invalid-value
 Check that @var{VALUE} is valid for @var{OPTION}. If @var{VALUE} is
 valid, return it. Otherwise, raise an @code{invalid-value} error.
@@ -1580,15 +1580,15 @@ As you can see, you need to provide a method with the first argument
 specialized to your new option type. This method must return @var{VALUE}
 if it is okay, and raise an @code{invalid-value} error otherwise.
 
-@gfmindex{check-value,:around}
+@gfmindex{check,:around}
 This protocol additionally has the following @code{:around} method:
 
 @cartouche
 @verbatim
-(defgeneric check-value (valued-option value)
+(defgeneric check (valued-option value)
   (:method :around ((option valued-option) value)
     "Bypass the provided user method if VALUE is nil and OPTION is nullable."
-    ;; #### NOTE: check-value must return the value if it is valid. This is
+    ;; #### NOTE: check must return the value if it is valid. This is
     ;; exactly what happens below when the unless clause fails (it returns
     ;; nil).
     (unless (and (nullablep option) (null value))
@@ -1600,7 +1600,7 @@ This protocol additionally has the following @code{:around} method:
 This means that if your option is nullable (@pxref{Common Valued Option
 Properties}) and the provided value is @code{nil}, your method will
 actually be bypassed. Nullable options turn out to be very common, so
-this simplifies the writing of @code{check-value} methods.
+this simplifies the writing of @code{check} methods.
 
 @ecindex invalid-value
 @clon{} maintains a hierarchy of error conditions. The
@@ -1633,12 +1633,12 @@ When the error is raised, you must fill in the @code{value} and
 The super-condition @code{option-error} provides an additional
 @code{option} slot that you must also fill in when the error is raised.
 
-@gfmindex{check-value,@r{Enumerations (}enum@r{)}}
+@gfmindex{check,@r{Enumerations (}enum@r{)}}
 Let's look at the enumeration example now.
 
 @cartouche
 @verbatim
-(defmethod check-value ((enum enum) value)
+(defmethod check ((enum enum) value)
   "Check that VALUE is a valid ENUM."
   (unless (keywordp value)
     (error 'invalid-value
@@ -2416,8 +2416,8 @@ Strings}.
 @pxref{New Option Classes}
 @end defmac
 
-@deffn {Generic Function} check-value OPTION VALUE
-@gfsubindex{check-value}
+@deffn {Generic Function} check OPTION VALUE
+@gfsubindex{check}
 @xref{Value Check Protocol}.
 @end deffn
 

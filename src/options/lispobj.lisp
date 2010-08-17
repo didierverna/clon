@@ -54,7 +54,7 @@ This class implements read-from-string options."))
 ;; -------------------
 
 ;; Value check subprotocol
-(defmethod check-value ((lispobj lispobj) value)
+(defmethod check ((lispobj lispobj) value)
   "Check that VALUE is valid for LISPOBJ."
   (if (typep value (typespec lispobj))
       value

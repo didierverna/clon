@@ -71,7 +71,7 @@ This class implements boolean options."))
 ;; -------------------
 
 ;; Value check subprotocol
-(defmethod check-value ((switch switch) value)
+(defmethod check ((switch switch) value)
   "Check that VALUE is valid for SWITCH."
   (unless (member value '(t nil))
     (error 'invalid-value
