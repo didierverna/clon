@@ -38,23 +38,8 @@
 ;; The Switch Class
 ;; ==========================================================================
 
-;; #### FIXME: the way the argument name is displayed is not satisfactory. We
-;; need to pprint it.
 (defoption switch (switch-base)
-  ((argument-name ;; inherited from the VALUED-OPTION class
-    :documentation "The option's argument style."
-    :initarg :argument-style
-    :reader argument-style)
-   (argument-styles :documentation "The possible argument styles.
-The position of every argument style in the list must correspond to the
-position of the associated strings in the yes-values and no-values slot."
-		    :allocation :class
-		    :type list
-		    :initform '(:yes/no :on/off :true/false :yup/nope
-				:yeah/nah)
-		    :accessor argument-styles))
-  (:default-initargs
-    :argument-style :yes/no)
+  ()
   (:documentation "The SWITCH class.
 This class implements boolean options."))
 
@@ -114,10 +99,10 @@ This class implements boolean options."))
 ;; Switch Instance Creation
 ;; ==========================================================================
 
-(defmethod initialize-instance :before ((switch switch) &key argument-style)
-  "Check validity of switch-specific initargs."
-  (unless (member argument-style (argument-styles switch))
-    (error "Invalid switch argument style ~S." argument-style)))
+(defmethod initialize-instance :after ((switch switch) &key)
+  "Provide an argument name conformant to the selected argument style."
+  (setf (slot-value switch 'argument-name)
+	(string-downcase (symbol-name (argument-style switch)))))
 
 (defun make-switch (&rest keys &key short-name long-name description
 				   argument-style argument-type

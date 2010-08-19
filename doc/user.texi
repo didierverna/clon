@@ -897,25 +897,25 @@ below.
 
 @table @code
 @item stropt
-@voindex{Strings,stropt}
-@cvopindex{:argument-name}
+@voindex{Strings,stropt}@c
+@cvopindex{:argument-name}@c
 This option type is for options taking strings as their argument. String
 options don't provide any additional properties, but their default
 argument name is changed from @code{"ARG"} to @code{"STR"}.
 @item lispobj
-@voindex{Lisp Objects,lispobj}
-@cvopindex{:argument-name}
-@vopindex{Lisp Objects,lispobj,:typespec}
+@voindex{Lisp Objects,lispobj}@c
+@cvopindex{:argument-name}@c
+@vopindex{Lisp Objects,lispobj,:typespec}@c
 This option type is for options taking any kind of Lisp object as their
 argument. @code{lispobj} options change their default argument name from
 @code{"ARG"} to @code{"OBJ"}. Also, they provide an additional property
 called @code{:typespec} which must be a @cl{} type specifier that the
 argument must satisfy. It defaults to @code{t}.
 @item enum
-@voindex{Enumerations,enum}
-@cvopindex{:argument-name}
-@vopindex{Enumerations,enum,:enum}
-@bioindex{version}
+@voindex{Enumerations,enum}@c
+@cvopindex{:argument-name}@c
+@vopindex{Enumerations,enum,:enum}@c
+@bioindex{version}@c
 This option type is for options taking values from an enumerated set of
 keywords. @code{enum} options change their default argument name from
 @code{"ARG"} to @code{"TYPE"}. Also, they provide an additional property
@@ -926,11 +926,11 @@ also has the ability to abbreviate the possible values. An empty
 argument is considered as an abbreviation for the first element in the
 set. Look at the @code{--clon-version} built-in option for an example.
 @item path
-@bioindex{search-path}
-@bioindex{theme}
-@voindex{Paths,path}
-@cvopindex{:argument-name}
-@vopindex{Paths,path,:type}
+@bioindex{search-path}@c
+@bioindex{theme}@c
+@voindex{Paths,path}@c
+@cvopindex{:argument-name}@c
+@vopindex{Paths,path,:type}@c
 This option type is for options taking a colon-separated list of
 pathnames as argument. @code{path} options change their default argument
 name from @code{"ARG"} to @code{"PATH"}. Also, they provide an
@@ -941,30 +941,38 @@ anything is allowed). Null paths are allowed, and may be provided by an
 empty argument. Look at the @code{--clon-search-path} and
 @code{--clon-theme} built-in options for examples.
 @item switch
-@voindex{Switches,switch}
-@cvopindex{:argument-type}
-@vopindex{Switches,switch,:argument-style}
+@voindex{Switches,switch}@c
+@cvopindex{:argument-name}@c
+@cvopindex{:argument-type}@c
+@vopindex{Switches,switch,:argument-style}@c
 This option type is for Boolean options. @code{switch} options change
 their default argument type from required to optional and provide a
-fallback value of @code{t} automatically. Also, instead of using the
-@code{:argument-name} property, @code{switch} options provide a property
-called @code{:argument-style}. Possible values are @code{:yes/no} (the
+fallback value of @code{t} automatically for optional arguments.
+@code{switch} options provide a new property called
+@code{:argument-style}. Possible values are @code{:yes/no} (the
 default), @code{:on/off}, @code{:true/false}, @code{:yup/nope},
-@code{:yeah/nah}. Note that this property determines the argument name
-@emph{only}. All possible switch arguments (@pxenduserref{Switches}) are
-always availble to all switches.
+@code{:yeah/nah}. This property affects the way the argument name and
+true or false values are advertized in help strings. However, all
+possible arguments forms (@pxenduserref{Switches}) are always available
+to all switches.
 @item xswitch
-@voindex{Extended Switches,xswitch}
-@cvopindex{:argument-type}
-@vopindex{Extended Switches,xswitch,:enum}
-@bioindex{highlight}
+@voindex{Extended Switches,xswitch}@c
+@cvopindex{:argument-name}@c
+@cvopindex{:argument-type}@c
+@vopindex{Extended Switches,xswitch,:argument-style}@c
+@vopindex{Extended Switches,xswitch,:enum}@c
+@bioindex{highlight}@c
 This option type stands for @dfn{extended} switch. Extended switches
 result from the mating of a male switch and a female enumeration, or the
 other way around (elementary decency prevents me from describing this
 mating process in detail): their possible values are either Boolean or
-from an @code{:enum} property as in the case of @code{enum} options.
-@code{xswitch} options change their default argument type from required
-to optional and provide a fallback value of @code{t} automatically.
+from an @code{:enum} property as in the case of @code{enum} options. As
+simple switches, @code{xswitch} options change their default argument
+type from required to optional and provide a fallback value of @code{t}
+automatically for optional arguments. They also provide the
+@code{:argument-style} property. Contrary to switches, however, this
+property does not affect the argument name. It only affects the way true
+or false values are displayed in help strings.
 @end table
 
 @node Advanced Synopsis Creation, , Built-In Option Types, Synopsis Definition

@@ -39,7 +39,15 @@
 ;; ==========================================================================
 
 (defabstract switch-base (negatable)
-  ((yes-values :documentation "The possible 'yes' values."
+  ((argument-styles :documentation "The possible argument styles.
+The position of every argument style in the list must correspond to the
+position of the associated strings in the yes-values and no-values slots."
+		    :allocation :class
+		    :type list
+		    :initform '(:yes/no :on/off :true/false :yup/nope
+				:yeah/nah)
+		    :accessor argument-styles)
+   (yes-values :documentation "The possible 'yes' values."
 	       :allocation :class
 	       :type list
 	       :initform '("yes" "on" "true" "yup" "yeah")
@@ -48,15 +56,35 @@
 	      :allocation :class
 	      :type list
 	      :initform '("no" "off" "false" "nope" "nah")
-	      :accessor no-values))
+	      :accessor no-values)
+   (argument-style :documentation "The selected argument style."
+		   :type keyword
+		   :initform :yes/no
+		   :initarg :argument-style
+		   :reader argument-style))
   (:default-initargs
       :argument-type :optional)
   (:documentation "The SWITCH-BASE abstract class.
 This class provides support for options including boolean values."))
 
+(defmethod initialize-instance :before
+    ((switch-base switch-base)
+     &key (argument-style :yes/no argument-style-supplied-p))
+  "Check for validity of the :ARGUMENT-STYLE initarg."
+  (when argument-style-supplied-p
+    (unless (member argument-style (argument-styles switch-base))
+      (error "Invalid argument style initarg: ~S." argument-style))))
+
+;; #### NOTE: ideally, I would like to do this in an :after method. But I
+;; can't because of the :before method for the VALUED-OPTION class which
+;; checks that when the argument type is optional, there's at least a fallback
+;; or a default value provided. Sometimes, I think I'm too maniac with checks.
+;; If I were to do all this is in :after methods, I would be stuck as well
+;; because the one for the VALUED-OPTION class would be called *before* the
+;; one for the SWITCH-BASED class. :-(
 (defmethod initialize-instance :around
     ((switch-base switch-base) &rest keys &key argument-type)
-  "Provide a fallback value of t when argument is optional."
+  "Provide a fallback value of t when ARGUMENT-TYPE is optional."
   (when (eq argument-type :optional)
     (setq keys (list* :fallback-value t keys)))
   (apply #'call-next-method switch-base keys))
