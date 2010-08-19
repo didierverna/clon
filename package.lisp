@@ -75,6 +75,7 @@
    ;; From src/context.lisp:
    :*current-context*
    :make-context
+   :with-context
    :progname
    :remainder
    :getopt

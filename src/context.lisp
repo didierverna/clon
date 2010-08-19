@@ -724,4 +724,15 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.~%"
     context))
 
 
+
+;; ==========================================================================
+;; Context Manipulation Utilities
+;; ==========================================================================
+
+(defmacro with-context (context &body body)
+  "Execute BODY with *current-context* bound to CONTEXT."
+  `(let ((*current-context* ,context))
+    ,@body))
+
+
 ;;; context.lisp ends here

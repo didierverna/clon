@@ -2021,7 +2021,7 @@ The whole runtime phase API of @clon{} uses a context implicitely. This
 involves @code{getopt}, @code{getopt-cmdline},
 @code{multiple-value-getopt-cmdline}, @code{do-cmdline-options} and
 @code{help}. As a consequence, it is possible to use @clon{} with
-multiple contexts at the same time. There are in fact two ways to
+multiple contexts at the same time. There are in fact three ways to
 achieve this.
 
 @enumerate
@@ -2031,13 +2031,18 @@ At any time in your program, you may change the value of
 @code{*current-context*}. All subsequent calls to the runtime phase API
 will hence use this other context.
 @item
+@clon{} also provides a macro which changes the current context for you.
+@defun with-context CONTEXT &body BODY
+Execute @var{BODY} with @code{*current-context*} bound to @var{CONTEXT}.
+@end defun
+@item
 @fkindex{getopt,:context}@c
 @fkindex{getopt-cmdline,:context}@c
 @fkindex{help,:context}@c
 @foindex{multiple-value-getopt-cmdline,:context}@c
 @foindex{do-cmdline-options,:context}@c
-If you prefer to use another context only temporarily, you can use the
-@code{context} key instead. The whole runtime phase API of @clon{}
+If you prefer to use another context only once, you can use the
+@code{:context} key instead. The whole runtime phase API of @clon{}
 understands it. For the functions @code{getopt}, @code{getopt-cmdline}
 and @code{help}, it's just another key in addition to those we've
 already seen. For the macros @code{multiple-value-getopt-cmdline} and
@@ -2370,10 +2375,6 @@ See @ref{Synopsis Definition} and @ref{Using Different Synopsis}.
 Different Command-Lines}.
 @end defun
 
-@defopt *current-context*
-@xref{Using Multiple Contexts}.
-@end defopt
-
 
 
 @c -----------------
@@ -2381,6 +2382,14 @@ Different Command-Lines}.
 @c -----------------
 @node Runtime Phase API, Extension API, Initialization Phase API, API Quick Reference
 @section Runtime Phase API
+
+@defopt *current-context*
+@xref{Using Multiple Contexts}.
+@end defopt
+
+@defun with-context CONTEXT &body BODY
+@xref{Using Multiple Contexts}.
+@end defun
 
 @defun getopt &key (CONTEXT *current-context*) SHORT-NAME LONG-NAME @
 OPTION
