@@ -351,30 +351,36 @@ output reaches the rightmost bound."
 	       (open-next-line sheet)
 	       (incf i))
 	      (otherwise
-	       (let ((end (or (position-if
-			       (lambda (char)
-				 (member char '(#\space #\tab #\newline)))
-			       string
-			       :start i)
-			      len)))
-		 (cond ((= (column sheet) (current-left-margin sheet))
-			;; If we're at the current-left-margin, we output the
-			;; word right here, since it couldn't fit anywhere
-			;; else. Note that since I don't do hyphenation, the
-			;; word might extend past the line-width. This is bad,
-			;; but this is life.
+	       (let* ((end (or (position-if
+				(lambda (char)
+				  (member char '(#\space #\tab #\newline)))
+				string
+				:start i)
+			       len))
+		      (chunk-width (- end i))
+		      (available-width (- (available-right-margin sheet)
+					  (column sheet)))
+		      (full-width (- (available-right-margin sheet)
+				     (current-left-margin sheet))))
+		 (cond ((<= chunk-width available-width)
+			;; The chunk fits right here, so go for it.
 			(princ-string sheet (subseq string i end))
 			(setq i end))
-		       ((< (+ (column sheet) (- end i))
-			   (available-right-margin sheet))
-			;; Otherwise, we also output the word right here if it
-			;; fits on the current-line.
-			(princ-string sheet (subseq string i end))
-			(setq i end))
+		       ((<= chunk-width full-width)
+			;; The chunk fits if we put it on the next line, so
+			;; open the next line. Note that we don't actually
+			;; output the word right now. This will be handled by
+			;; the next LOOP iteration.
+			(open-next-line sheet))
 		       (t
-			;; Otherwise, we have to go next line. Note that we
-			;; don't actually output the word right now. This will
-			;; be handled by the next LOOP iteration.
+			;; The chunk wouldn't even fit on a line of its own,
+			;; so we have no other choice than splitting it at a
+			;; non-space position. Also, insert an hyphenation
+			;; mark at the end of the chunk.
+			(setq end (+ i available-width -1))
+			(princ-string sheet (subseq string i end))
+			(princ-char sheet #\-)
+			(setq i end)
 			(open-next-line sheet))))))))
 
 
