@@ -101,7 +101,7 @@
   (let ((ctx (clon:make-context)))
     (when (clon:getopt :short-name "h")
       (clon:help)
-      (quit))
+      (clon:terminate))
     (format t "Program name: ~A~%" (clon:progname ctx))
     (multiple-value-bind (value source)
 	(clon:getopt :short-name "F")
@@ -114,7 +114,7 @@
 ;    (clon:do-unknown-options (name value)
 ;      (print (list name value)))
     (format t "Remainder: ~A~%" (clon:remainder ctx)))
-  (quit))
+  (clon:terminate))
 
 ;; #### PORTME.
 (save-lisp-and-die "demo"

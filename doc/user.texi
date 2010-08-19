@@ -567,9 +567,15 @@ name (this retrieval method is said to be @dfn{explicit}).
 @verbatim
   (when (getopt :short-name "h")
     (help)
-    (quit))
+    (terminate))
 @end verbatim
 @end cartouche
+
+@findex terminate
+The @code{terminate} function is a wrapper around an
+implementation-dependent way to quit (shall I say exit?) the @cl{}
+environment, hence the program. It takes an optional argument that
+stands for the exit status.
 
 @cindex Options Retrieval, sequential
 @cindex Retrieval, of options, sequential
@@ -584,7 +590,7 @@ retrieval method is said to be @dfn{sequential}). This is done with the
   (do-cmdline-options (option name value)
     (print (list option name value)))
   (terpri)
-  (quit))
+  (terminate))
 @end verbatim
 @end cartouche
 
@@ -2287,11 +2293,11 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
   (make-context)
   (when (getopt :short-name "h")
     (help)
-    (quit))
+    (terminate))
   (do-cmdline-options (option name value)
     (print (list option name value)))
   (terpri)
-  (quit))
+  (terminate))
 
 (save-lisp-and-die "test"
   :toplevel #'main :executable t :save-runtime-options t)
@@ -2307,6 +2313,7 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
 @appendix API Quick Reference
 
 @menu
+* Utilities::                   Miscellaneous stuff
 * Initialization Phase API::    Synopsis, items and context creation
 * Runtime Phase API::           Option retrieval and help formatting
 * Extension API::               New option types
@@ -2314,10 +2321,21 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
 @end menu
 
 
+@c ---------
+@c Utilities
+@c ---------
+@node Utilities, Initialization Phase API, API Quick Reference, API Quick Reference
+@section Utilities
+
+@defun terminate &optional (status 0)
+Quit the current application with STATUS.
+@end defun
+
+
 @c ------------------------
 @c Initialization Phase API
 @c ------------------------
-@node Initialization Phase API, Runtime Phase API, API Quick Reference, API Quick Reference
+@node Initialization Phase API, Runtime Phase API, Utilities, API Quick Reference
 @section Initialization Phase API
 
 @defun make-text &key CONTENTS HIDDEN

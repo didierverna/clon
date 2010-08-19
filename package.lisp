@@ -51,6 +51,8 @@
    :+release-status-level+
    :+release-name+
    :version
+   ;; From src/util.lisp:
+   :terminate
    ;; From src/text.lisp:
    :make-text
    ;; From src/options/flag.lisp:

@@ -304,8 +304,8 @@ invalid direction: ~S"
   "Return t if running on Mac OS X."
   (string= (software-type) "Darwin"))
 
-(defun quit (status)
-  "Quit the Lisp environment"
+(defun terminate (&optional (status 0))
+  "Terminate the current application with STATUS."
   ;; #### PORTME.
   (sb-ext:quit :unix-status status))
 
