@@ -309,5 +309,10 @@ invalid direction: ~S"
   ;; #### PORTME.
   (sb-ext:quit :unix-status status))
 
+(defun cmdline ()
+  "Get the current application's command-line."
+  ;; #### PORTME.
+  sb-ext:*posix-argv*)
+
 
 ;;; util.lisp ends here

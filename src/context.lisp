@@ -148,8 +148,7 @@
 		  :initform :quit ;; see the warning in initialize-instance
 		  :reader error-handler))
   (:default-initargs
-      ;; #### PORTME.
-      :cmdline sb-ext:*posix-argv*)
+      :cmdline (cmdline))
   (:documentation "The CONTEXT class.
 This class represents the associatiion of a synopsis and a set of command-line
 options based on it."))
