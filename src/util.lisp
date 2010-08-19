@@ -101,20 +101,13 @@ For instance, completing 'he' with 'help' will produce 'he(lp)'."
   (assert (not (string= beginning complete)))
   (concatenate 'string beginning "(" (subseq complete (length beginning)) ")"))
 
-(defun list-to-string (list &key (key #'identity))
-  "Return a coma-separated string of all LIST elements.
-KEY should provide a way to get a string from each LIST element."
-  (reduce (lambda (str1 str2) (concatenate 'string str1 ", " str2))
+(defun list-to-string (list &key (key #'identity) (separator ", "))
+  "Return a SEPARATOR-separated string of all LIST elements.
+- KEY should provide a way to get a string from each LIST element.
+- SEPARATOR is the string to insert between elements."
+  (reduce (lambda (str1 str2) (concatenate 'string str1 separator str2))
 	  list
 	  :key key))
-
-(defun symbol-to-string (symbol)
-  "Return SYMBOL name downcased."
-  (string-downcase (symbol-name symbol)))
-
-(defun symbols-to-string (symbols)
-  "Return a coma-separated list of downcased SYMBOLS names."
-  (list-to-string symbols :key #'symbol-to-string))
 
 
 

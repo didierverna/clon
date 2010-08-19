@@ -45,6 +45,15 @@
 This class implements options the values of which are strings."))
 
 
+;; ------------------------------
+;; Value Stringification protocol
+;; ------------------------------
+
+(defmethod stringify ((stropt stropt) value)
+  "Transform STROPT's VALUE into an argument."
+  value)
+
+
 ;; --------------------
 ;; Value Check protocol
 ;; --------------------

@@ -38,12 +38,16 @@
 ;; The Switch Class
 ;; ==========================================================================
 
+;; #### FIXME: the way the argument name is displayed is not satisfactory. We
+;; need to pprint it.
 (defoption switch (switch-base)
   ((argument-name ;; inherited from the VALUED-OPTION class
     :documentation "The option's argument style."
     :initarg :argument-style
     :reader argument-style)
-   (argument-styles :documentation "The possible argument styles."
+   (argument-styles :documentation "The possible argument styles.
+The position of every argument style in the list must correspond to the
+position of the associated strings in the yes-values and no-values slot."
 		    :allocation :class
 		    :type list
 		    :initform '(:yes/no :on/off :true/false :yup/nope
@@ -53,6 +57,20 @@
     :argument-style :yes/no)
   (:documentation "The SWITCH class.
 This class implements boolean options."))
+
+
+;; ------------------------------
+;; Value Stringification protocol
+;; ------------------------------
+
+(defmethod stringify ((switch switch) value)
+  "Transform SWITCH's VALUE into an argument."
+  (let ((position (position (argument-style switch)
+			    (argument-styles switch))))
+    (nth position
+	 (if value
+	     (yes-values switch)
+	   (no-values switch)))))
 
 
 ;; --------------------

@@ -125,23 +125,28 @@ If OPTION matches, return its short name's length; otherwise 0."
     (accumulate (usage)
       (accumulate (description)
 	(description option))
-      ;; #### FIXME: for the 2 cases below, we should have specialized methods
-      ;; for outputting the printed representation of values. The default one
-      ;; is not cool; we should probably print not the /values/, but their
-      ;; /argument/ form, before conversion (hence we would required the
-      ;; inverse of the conversion function !!).
       (when (slot-boundp option 'fallback-value)
 	`(fallback
 	  (header "Fallback:")
-	  (value ,(format nil "~A" (fallback-value option)))))
+	  (value ,(stringify option (fallback-value option)))))
       (when (slot-boundp option 'default-value)
 	`(default
 	  (header "Default:")
-	  (value ,(format nil "~A" (default-value option)))))
+	  (value ,(stringify option (default-value option)))))
       (when (env-var option)
 	`(environment
 	  (header "Environment:")
 	  (variable ,(env-var option)))))))
+
+
+
+;; ==========================================================================
+;; The Value Stringification Protocol
+;; ==========================================================================
+
+(defgeneric stringify (valued-option value)
+  (:documentation "Transform VALUED-OPTION's VALUE into an argument.
+This is the opposite of argument conversion."))
 
 
 

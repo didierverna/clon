@@ -874,8 +874,10 @@ The status of the argument. Possible values are @code{:required} (the
 default) and @code{:mandatory} which are synonyms, or @code{:optional}.
 @item :fallback-value
 @cvopindex{:fallback-value}
+@cindex Values, source, fallback
 @item :default-value
 @cvopindex{:default-value}
+@cindex Values, source, default
 The option's fallback and default values. Remember that a fallback value
 only makes sense when the argument is optional. Besides, also when the
 argument is optional, you need to provide at least a fallback or a
@@ -1475,16 +1477,17 @@ type itself, and to put this file in the @clon{} package, like this:
 @end verbatim
 @end cartouche
 
-Creating your own option type involves 4 steps: providing a class for
-them, implementing two protocols related to argument/value conversion,
-and providing a constructor function. We now review those 4 steps in
+Creating your own option type involves 5 steps: providing a class for
+them, implementing three protocols related to argument/value tweaking,
+and providing a constructor function. We now review those 5 steps in
 order.
 
 @menu
 * New Option Classes::                  Step 1
 * Value Check Protocol::                Step 2
 * Argument Conversion Protocol::        Step 3
-* Constructor Functions::               Step 4
+* Value Stringification Protocol::      Step 4
+* Constructor Functions::               Step 5
 @end menu
 
 @node New Option Classes, Value Check Protocol, New Option Types, New Option Types
@@ -1626,7 +1629,7 @@ This code should be self-explanatory. We check that the value we got
 belongs to the enumeration. @code{list-to-string} is a utility function
 that will separate every element with comas in the resulting string.
 
-@node Argument Conversion Protocol, Constructor Functions, Value Check Protocol, New Option Types
+@node Argument Conversion Protocol, Value Stringification Protocol, Value Check Protocol, New Option Types
 @subsection Argument Conversion Protocol
 @cindex Argument Conversion Protocol
 @cindex Protocols, argument conversion
@@ -1711,10 +1714,63 @@ Let's look at the enumeration example now.
 Since enumerations allow their arguments to be abbreviated, a utility
 function named @code{closest-match} is used to find the closest match
 between an argument and the possible values. Otherwise, an
-@code{invalid-argument} error is raised.
+@code{invalid-argument} error is raised. For an explanation of
+@code{stringify}, @xref{Value Stringification Protocol}.
 
 
-@node Constructor Functions, , Argument Conversion Protocol, New Option Types
+@node Value Stringification Protocol, Constructor Functions, Argument Conversion Protocol, New Option Types
+@subsection Value Stringification Protocol
+@cindex Value Stringification Protocol
+@cindex Protocols, value stringification
+The third and last protocol we need to implement is called the
+@dfn{value stringification} protocol. This protocol can be seen as the
+reverse protocol for argument conversion (@pxref{Argument Conversion
+Protocol}): its purpose is to transform an option's value into a
+corresponding argument that the end-user could have provided in order to
+get that value.
+
+@cindex Help String
+@cvopindex{:fallback-value}
+@cindex Values, source, fallback
+@cvopindex{:default-value}
+@cindex Values, source, default
+@gfmindex{convert,@r{Enumerations (}enum@r{)}}
+The main use for this protocol is to advertise the fallback and default
+values correctly in help strings: the end-user does not want to see
+those @emph{values}, but rather the @emph{argument} that would lead to
+them. However, you are free to use it wherever you like (see the
+@code{convert} method for @code{enum} options for instance).
+
+The value stringification protocol is implemented through a
+@code{stringify} generic function for which you must provide a method.
+
+@deffn {Generic Function} stringify OPTION VALUE
+@gfsubindex{stringify}
+Transform OPTION's @var{VALUE} into an argument.
+@end deffn
+
+I admit that this function could also have been called
+@code{argumentize} or even @code{deconvertify}. As you can see, you need
+to provide a method with the first argument specialized to your new
+option type. You can assume that @var{VALUE} is a valid value for your
+option, so no checking is necessary and no error needs to be raised.
+
+@gfmindex{stringify,@r{Enumerations (}enum@r{)}}
+@voindex{Enumerations,enum}
+Let's look at the enumeration example now.
+
+@cartouche
+@verbatim
+(defmethod stringify ((enum enum) value)
+  "Transform ENUM's VALUE into an argument."
+  (string-downcase (symbol-name value)))
+@end verbatim
+@end cartouche
+
+Pretty straightforward, right?
+
+
+@node Constructor Functions, , Value Stringification Protocol, New Option Types
 @subsection Constructor Functions
 @cindex Constructors, for options objects
 @cindex Option Constructors
@@ -2407,6 +2463,11 @@ Strings}.
 @ecsindex{invalid-argument,comment}
 @xref{Argument Conversion Protocol}.
 @end deftp
+
+@deffn {Generic Function} stringify OPTION VALUE
+@gfsubindex{stringify}
+@xref{Value Stringification Protocol}.
+@end deffn
 
 
 @c --------------

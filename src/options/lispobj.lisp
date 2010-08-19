@@ -49,6 +49,15 @@
 This class implements read-from-string options."))
 
 
+;; ------------------------------
+;; Value Stringification protocol
+;; ------------------------------
+
+(defmethod stringify ((lispobj lispobj) value)
+  "Transform LISPOBJ's VALUE into an argument."
+  (prin1-to-string value))
+
+
 ;; --------------------
 ;; Value Check protocol
 ;; --------------------

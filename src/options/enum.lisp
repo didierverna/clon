@@ -45,6 +45,15 @@
 This class implements options whose values belong to a set of keywords."))
 
 
+;; ------------------------------
+;; Value Stringification protocol
+;; ------------------------------
+
+(defmethod stringify ((enum enum) value)
+  "Transform ENUM's VALUE into an argument."
+  (string-downcase (symbol-name value)))
+
+
 ;; --------------------
 ;; Value Check protocol
 ;; --------------------
@@ -56,7 +65,8 @@ This class implements options whose values belong to a set of keywords."))
 	   :option enum
 	   :value value
 	   :comment (format nil "Valid values are: ~A."
-		      (list-to-string (enum enum) :key #'prin1-to-string))))
+		      (list-to-string (enum enum)
+				      :key #'prin1-to-string))))
   value)
 
 
@@ -71,7 +81,9 @@ This class implements options whose values belong to a set of keywords."))
 	     :option enum
 	     :argument argument
 	     :comment (format nil "Valid arguments are: ~A."
-			(symbols-to-string (enum enum))))))
+			(list-to-string (enum enum)
+					:key (lambda (value)
+					       (stringify enum value)))))))
 
 
 

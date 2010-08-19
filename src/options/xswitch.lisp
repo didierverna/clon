@@ -38,12 +38,28 @@
 ;; The Extended Switch Class
 ;; ==========================================================================
 
+;; #### FIXME: the argument style feature of switches should be available here
+;; as well, for the stringification protocol.
 (defoption xswitch (switch-base enum-base)
   ((enum ;; inherited from the ENUM-BASE class
     :documentation "The set of possible non-boolean values."))
   (:documentation "The XSWITCH class.
 This class merges the functionalities of switches and enumerations.
 As such, the negated syntax is available for extended xswitches."))
+
+
+;; ------------------------------
+;; Value Stringification protocol
+;; ------------------------------
+
+(defmethod stringify ((xswitch xswitch) value)
+  "Transform XSWITCH's VALUE into an argument."
+  (cond ((member value (enum xswitch))
+	 (string-downcase (symbol-name value)))
+	(value
+	 "true")
+	(t
+	 "false")))
 
 
 ;; --------------------
@@ -86,7 +102,8 @@ As such, the negated syntax is available for extended xswitches."))
 				 (list-to-string
 				  (append (yes-values xswitch)
 					  (no-values xswitch)
-					  (mapcar #'symbol-to-string
+					  (mapcar (lambda (value)
+						    (stringify xswitch value))
 						  (enum xswitch)))))))))))
 
 
