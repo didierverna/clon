@@ -617,12 +617,15 @@ this: @samp{program -c -u -p}, you can directly use: @samp{program
 @cindex Options, names, short, one character
 A short pack can only contain options the short names of which are
 exactly one character long. Also, it should be obvious that you cannot
-provide an argument to an option in a pack. There is one exception
-however: it @emph{is} possible to provide an argument to the @emph{last}
-option in the pack. If provided, this argument must be located in the
-next @cmdline{} item. It cannot be sticked to the option, so this means
-in particular that this option's argument is mandatory (@pxref{Valued
-Options}).
+provide an argument to an option in a pack. As a consequence, only flags
+and options with optional (and not provided) arguments may appear in a
+short pack.
+
+There is one exception however: it @emph{is} possible to provide an
+argument to the @emph{last} option in the pack. If provided, this
+argument must be located in the next @cmdline{} item. It cannot be
+sticked to the option, so this means in particular that this option's
+argument is mandatory (@pxref{Valued Options}).
 
 Beware that using short packs comes at the risk of ambiguity. When
 @clon{} parses a @cmdline{} item beginning with only one dash, it tries
