@@ -1481,10 +1481,10 @@ and providing a constructor function. We now review those 4 steps in
 order.
 
 @menu
-* New Option Classes::          Step 1
-* Value Check Protocol::        Step 2
-* Conversion Protocol::         Step 3
-* Constructor Functions::       Step 4
+* New Option Classes::                  Step 1
+* Value Check Protocol::                Step 2
+* Argument Conversion Protocol::        Step 3
+* Constructor Functions::               Step 4
 @end menu
 
 @node New Option Classes, Value Check Protocol, New Option Types, New Option Types
@@ -1541,16 +1541,20 @@ There are no new slots in this class, but the @code{argument-name} slot
 provided by the @code{valued-option} class has its initform changed from
 @code{"ARG"} to @code{"TYPE"}.
 
-@node Value Check Protocol, Conversion Protocol, New Option Classes, New Option Types
+@node Value Check Protocol, Argument Conversion Protocol, New Option Classes, New Option Types
 @subsection Value Check Protocol
 @cindex Value Check Protocol
 @cindex Protocols, value check
 Now that we have our new option class, we need to implement the
 so-called @dfn{value check} protocol. This protocol is used to make sure
 that values provided for options of your new type actually comply with
-the type in question. Values currently checked are fallback values,
-default values, and values provided from a debugger restart
-(@pxenduserref{Error Management}).
+the type in question. Values going through this protocol are fallback
+values, default values, and values provided from a debugger restart
+(@pxenduserref{Error Management}). In the case of fallback and default
+values (which, by the way, are provided by @emph{you}, the @clon{}
+user), the check is performed only once, when the option object is
+created. Values provided from a debugger restart come from the
+application end-user, and hence are checked every time.
 
 The value check protocol is implemented through a @code{check} generic
 function for which you must provide a method.
@@ -1598,6 +1602,9 @@ The super-condition @code{option-error} provides an additional
 @code{option} slot that you must also fill in when the error is raised.
 
 @gfmindex{check,@r{Enumerations (}enum@r{)}}
+@voindex{Enumerations,enum}
+@vopindex{Enumerations,enum,:enum}
+@findex list-to-string
 Let's look at the enumeration example now.
 
 @cartouche
@@ -1609,25 +1616,28 @@ Let's look at the enumeration example now.
 	   :option enum
 	   :value value
 	   :comment (format nil "Valid values are: ~A."
-		      (symbols-to-string (enum enum)))))
+		      (list-to-string (enum enum)
+                                      :key #'prin1-to-string))))
   value)
 @end verbatim
 @end cartouche
 
-@voindex{Enumerations,enum}
 This code should be self-explanatory. We check that the value we got
-belongs to the enumeration.
+belongs to the enumeration. @code{list-to-string} is a utility function
+that will separate every element with comas in the resulting string.
 
-@node Conversion Protocol, Constructor Functions, Value Check Protocol, New Option Types
-@subsection Conversion Protocol
-@cindex Conversion Protocol
-@cindex Protocols, conversion
-The next protocol we need to implement is the so-called @dfn{conversion}
-protocol. This protocol is used to convert option arguments (that is,
-strings) to an actual value of the proper type. Arguments currently
-converted may come the @cmdline{}, the value of an environment variable,
-and arguments provided from a debugger restart (@pxenduserref{Error
-Management}).
+@node Argument Conversion Protocol, Constructor Functions, Value Check Protocol, New Option Types
+@subsection Argument Conversion Protocol
+@cindex Argument Conversion Protocol
+@cindex Protocols, argument conversion
+The next protocol we need to implement is the so-called @dfn{argument
+conversion} protocol. This protocol is used to convert option arguments
+(that is, strings) to an actual value of the proper type. Arguments
+going through this protocol come from the @cmdline{}, the value of an
+environment variable or a debugger restart (@pxenduserref{Error
+Management}). Also, note that @clon{} assumes that you implement this
+protocol correctly, so no value check is performed on values coming from
+the conversion of an argument.
 
 The conversion protocol is implemented through a @code{convert} generic
 function for which you must provide a method.
@@ -1677,30 +1687,34 @@ additional @code{option} slot that you must also fill in when the error
 is raised.
 
 @gfmindex{convert,@r{Enumerations (}enum@r{)}}
+@voindex{Enumerations,enum}
+@vopindex{Enumerations,enum,:enum}
+@findex closest-match
 Let's look at the enumeration example now.
 
 @cartouche
 @verbatim
 (defmethod convert ((enum enum) argument)
-  "Convert (possibly abbreviated) ARGUMENT to ENUM's value.
-If ARGUMENT doesn't name one of ENUM's symbols, raise a conversion error."
+  "Convert ARGUMENT to an ENUM value."
   (or (closest-match argument (enum enum) :ignore-case t :key #'symbol-name)
       (error 'invalid-argument
 	     :option enum
 	     :argument argument
 	     :comment (format nil "Valid arguments are: ~A."
-			(symbols-to-string (enum enum))))))
+			(list-to-string (enum enum)
+					:key (lambda (value)
+					       (stringify enum value)))))))
+
 @end verbatim
 @end cartouche
 
-@voindex{Enumerations,enum}
-@vopindex{Enumerations,enum,:enum}
 Since enumerations allow their arguments to be abbreviated, a utility
-function is used to find the closest match between an argument and the
-possible values. Otherwise, the @code{invalid-argument} error is raised.
+function named @code{closest-match} is used to find the closest match
+between an argument and the possible values. Otherwise, an
+@code{invalid-argument} error is raised.
 
 
-@node Constructor Functions, , Conversion Protocol, New Option Types
+@node Constructor Functions, , Argument Conversion Protocol, New Option Types
 @subsection Constructor Functions
 @cindex Constructors, for options objects
 @cindex Option Constructors
@@ -2384,14 +2398,14 @@ Strings}.
 
 @deffn {Generic Function} convert OPTION ARGUMENT
 @gfsubindex{convert}
-@xref{Conversion Protocol}.
+@xref{Argument Conversion Protocol}.
 @end deffn
 
 @deftp {Error Condition} invalid-argument ARGUMENT COMMENT
 @ecsubindex{invalid-argument}
 @ecsindex{invalid-argument,argument}
 @ecsindex{invalid-argument,comment}
-@xref{Conversion Protocol}.
+@xref{Argument Conversion Protocol}.
 @end deftp
 
 
