@@ -34,7 +34,7 @@ post-process).
 This could be used to provide values for options depending on the
 application's class/name.
 
-* Treat empty env vars as options called without their (optional argument)
+* Treat empty env vars as options called without their (optional) argument
 With the restriction that there's no notion of an env var set without
 argument. There's only empty arguments. This will lead to problems if the
 option is supposed to accept empty strings.
