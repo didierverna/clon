@@ -46,7 +46,8 @@ different from supporting post-processing ?
 * Support for a complete cmdline syntax description
 Currently, there's just the notion of non-Clon remainder, but some programs
 might want to alternate options and non-option stuff, while still managing
-those parts with Clon.
+those parts with Clon. In fact, I'm not sure this is useful since I guess you
+can do that with multiple synopsis/contexts/cmdlines.
 
 * Extend abbreviated option matching to dash-parts
 e.g. --f-n == --family-name.
