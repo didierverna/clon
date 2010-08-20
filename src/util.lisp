@@ -319,5 +319,10 @@ invalid direction: ~S"
   ;; #### PORTME.
   (when variable (sb-posix:getenv variable)))
 
+(defun putenv (variable value)
+  "Set environment VARIABLE to VALUE."
+  ;; #### PORTME:
+  (sb-posix:putenv (concatenate 'string variable "=" value)))
+
 
 ;;; util.lisp ends here

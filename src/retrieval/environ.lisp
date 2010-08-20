@@ -135,8 +135,7 @@ Available restarts are:
     (modify-environment (env-val)
       :report "Modify the environment variable's value."
       :interactive (lambda () (read-env-val (env-var valued-option)))
-      ;; #### PORTME.
-      (sb-posix:putenv (concatenate 'string (env-var valued-option) "=" env-val))
+      (putenv (env-var valued-option) env-val)
       (restartable-environment-convert valued-option env-val))))
 
 ;; #### FIXME: we should split this into flag.lisp and valued.lisp but we
