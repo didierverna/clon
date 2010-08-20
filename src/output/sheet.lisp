@@ -669,8 +669,8 @@ than the currently available right margin."
     ;; #### NOTE: it is somewhat abusive to TIOCGWINSZ even if LINE-WIDTH is
     ;; specified, but this allows us to handle the ENOTTY error, and possibly
     ;; turn highlighting off if is it set to :AUTO.
+    ;; #### PORTME: this whole handler depends on sb-grovel.
     (handler-case
-	;; #### PORTME.
 	(with-winsize winsize ()
 	  (sb-posix:ioctl (stream-file-stream output-stream :output)
 			  +tiocgwinsz+
