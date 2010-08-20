@@ -1225,10 +1225,14 @@ retrieving options: you can request the value for a specific option
 directly, or you can process the @cmdline{} sequentially, which is the
 more traditional approach.
 
+@findex cmdline
 Both of these techniques can be freely combined together at any time,
 because @clon{} keeps track of the current status of the @cmdline{}. In
 fact, @clon{} never works on the original @cmdline{}, but uses a mutable
-@emph{copy} of it after parsing.
+@emph{copy} of it after parsing. If you want to access the real
+@cmdline{} of your application, you may use the @code{cmdline} function,
+which is a wrapper around an implementation-dependent way to access it.
+
 
 Finally, remember that the @cmdline{} is scanned from left to right
 during option retrieval (@pxenduserref{Option Retrieval}).
@@ -2329,6 +2333,10 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
 
 @defun exit &optional (status 0)
 Quit the current application with STATUS.
+@end defun
+
+@defun cmdline
+Get the current application's command-line.
 @end defun
 
 

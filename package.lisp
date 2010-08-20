@@ -53,6 +53,7 @@
    :version
    ;; From src/util.lisp:
    :exit
+   :cmdline
    ;; From src/text.lisp:
    :make-text
    ;; From src/options/flag.lisp:
