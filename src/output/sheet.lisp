@@ -657,8 +657,6 @@ than the currently available right margin."
 ;; Sheet Instance Creation
 ;; ==========================================================================
 
-;; #### WARNING: remove that after upgrading SBCL
-(declaim (sb-ext:muffle-conditions sb-ext:compiler-note))
 ;; #### NOTE: I need to bind output-stream here (which is early) because it is
 ;; required to do the TIOCGWINSZ business.
 (defmethod initialize-instance :around
@@ -666,6 +664,7 @@ than the currently available right margin."
 				  line-width
 				  (highlight :auto))
   "Handle unset line width and AUTO highlight according to OUTPUT-STREAM."
+  #+sbcl (declare (sb-ext:muffle-conditions sb-ext:compiler-note))
   (when (or (not line-width) (eq highlight :auto))
     ;; #### NOTE: it is somewhat abusive to TIOCGWINSZ even if LINE-WIDTH is
     ;; specified, but this allows us to handle the ENOTTY error, and possibly
