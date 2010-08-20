@@ -141,9 +141,11 @@ is a shortcut for: (PROPERTY-NAME ((on t) YES) ((off nil) NO))."
 
 (defun princ-highlight-property-instances (sheet instances)
   "Princ highlight proeprty INSTANCES on SHEET's stream."
-  ;; #### PORTME: #\esc is not a standard name (see CLHS 13.1.7):
   (when instances
     (format (output-stream sheet) "~C[~A~{;~A~}m"
+      ;; #### PORTME: #\esc is not a standard name (see CLHS 13.1.7). I can't
+      ;; even remember where I got it from. However, it seems to work in some
+      ;; implementations that I tried.
       #\esc
       (highlight-property-instance-escape-sequence (car instances))
       (mapcar #'highlight-property-instance-escape-sequence
