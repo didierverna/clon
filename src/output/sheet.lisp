@@ -723,6 +723,12 @@ than the currently available right margin."
 	(try-read-sface-tree (merge-pathnames pathname
 					      (make-pathname :type "cth"))))))
 
+;; #### FIXME: when trying Mac OSX paths, we have a mix of upcase and downcase
+;; directory names, for instance, share/clon and Application Support/Clon.
+;; Normally, when we append a "themes" subdirectory somewhere, we should
+;; respect that. However (at least by default but can this be customized?),
+;; the OSX file system is case insensitive. For other file systems, this might
+;; break someday.
 (defmethod initialize-instance :after ((sheet sheet) &key theme search-path)
   "Finish initialization of SHEET.
 This involves:
@@ -735,10 +741,7 @@ This involves:
 		   (setq theme
 			 (merge-pathnames theme
 					  (make-pathname
-					   :directory `(:relative
-							,(if (mac-os-x-p)
-							     "Themes"
-							     "themes")))))
+					   :directory `(:relative "themes"))))
 		   (loop :for path :in search-path
 			 :for sface-tree := (try-read-theme
 					     (merge-pathnames theme path))
