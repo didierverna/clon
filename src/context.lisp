@@ -339,8 +339,7 @@ Return two values:
 		       (exit 1))
 		      (:none)))))
     (let* ((env-var (env-var option))
-	   ;; #### PORTME.
-	   (env-val (when env-var (sb-posix:getenv env-var))))
+	   (env-val (getenv env-var)))
       (when env-val
 	(return-from getopt
 	  (values (retrieve-from-environment option env-val)

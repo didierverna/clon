@@ -314,5 +314,10 @@ invalid direction: ~S"
   ;; #### PORTME.
   sb-ext:*posix-argv*)
 
+(defun getenv (variable)
+  "Get environment VARIABLE's value. VARIABLE may be null."
+  ;; #### PORTME.
+  (when variable (sb-posix:getenv variable)))
+
 
 ;;; util.lisp ends here
