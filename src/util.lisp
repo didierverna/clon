@@ -300,8 +300,8 @@ invalid direction: ~S"
 ;; Wrappers around non ANSI features and operating system stuff
 ;; ==========================================================================
 
-(defun mac-os-x-p ()
-  "Return t if running on Mac OS X."
+(defun macosp ()
+  "Return t if running on Mac OS."
   (string= (software-type) "Darwin"))
 
 (defun exit (&optional (status 0))

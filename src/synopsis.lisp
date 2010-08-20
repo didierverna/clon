@@ -184,7 +184,7 @@ If you don't want any search path at all, use this option with no argument."
 		       (let ((local-path '("share/clon/"))
 			     (global-path '(#p"/usr/local/share/clon/"
 					    #p"/usr/share/clon/")))
-			 (when (mac-os-x-p)
+			 (when (macosp)
 			   (push "Library/Application Support/Clon/"
 				 local-path)
 			   (push #p"/Library/Application Support/Clon/"
