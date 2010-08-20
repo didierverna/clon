@@ -336,7 +336,7 @@ Return two values:
 		      (:quit
 		       (let (*print-escape*) (print-object error t))
 		       (terpri)
-		       (terminate 1))
+		       (exit 1))
 		      (:none)))))
     (let* ((env-var (env-var option))
 	   ;; #### PORTME.
@@ -487,7 +487,7 @@ CONTEXT is where to look for the options."
 			   (let (*print-escape*)
 			     (print-object error t))
 			   (terpri)
-			   (terminate 1))
+			   (exit 1))
 			  (:none)))))
 	(do ((arg (pop cmdline) (pop cmdline)))
 	    ((null arg))
@@ -690,11 +690,11 @@ This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.~%"
       (pathname-name (progname context))
       (version :long))
-    (terminate))
+    (exit))
   (let ((version-format (getopt :context context :long-name "clon-version")))
     (when version-format
       (format t "~A~%" (version version-format))
-      (terminate)))
+      (exit)))
   (setf (slot-value context 'search-path)
 	(getopt :context context :long-name "clon-search-path"))
   (setf (slot-value context 'theme)
@@ -705,7 +705,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.~%"
 	(getopt :context context :long-name "clon-highlight"))
   (when (getopt :context context :long-name "clon-help")
     (help :context context :item (clon-options-group context))
-    (terminate)))
+    (exit)))
 
 (defun make-context (&rest keys &key synopsis cmdline (make-current t))
   "Make a new context.

@@ -52,7 +52,7 @@
    :+release-name+
    :version
    ;; From src/util.lisp:
-   :terminate
+   :exit
    ;; From src/text.lisp:
    :make-text
    ;; From src/options/flag.lisp:

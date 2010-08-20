@@ -567,13 +567,13 @@ name (this retrieval method is said to be @dfn{explicit}).
 @verbatim
   (when (getopt :short-name "h")
     (help)
-    (terminate))
+    (exit))
 @end verbatim
 @end cartouche
 
-@findex terminate
-The @code{terminate} function is a wrapper around an
-implementation-dependent way to quit (shall I say exit?) the @cl{}
+@findex exit
+The @code{exit} function is a wrapper around an
+implementation-dependent way to exit (shall I say quit?) the @cl{}
 environment, hence the program. It takes an optional argument that
 stands for the exit status.
 
@@ -590,7 +590,7 @@ retrieval method is said to be @dfn{sequential}). This is done with the
   (do-cmdline-options (option name value)
     (print (list option name value)))
   (terpri)
-  (terminate))
+  (exit))
 @end verbatim
 @end cartouche
 
@@ -2293,11 +2293,11 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
   (make-context)
   (when (getopt :short-name "h")
     (help)
-    (terminate))
+    (exit))
   (do-cmdline-options (option name value)
     (print (list option name value)))
   (terpri)
-  (terminate))
+  (exit))
 
 (save-lisp-and-die "test"
   :toplevel #'main :executable t :save-runtime-options t)
@@ -2327,7 +2327,7 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
 @node Utilities, Initialization Phase API, API Quick Reference, API Quick Reference
 @section Utilities
 
-@defun terminate &optional (status 0)
+@defun exit &optional (status 0)
 Quit the current application with STATUS.
 @end defun
 
