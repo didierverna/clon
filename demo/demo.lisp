@@ -46,8 +46,6 @@
 		(adjoin :clon (package-nicknames :com.dvlsoft.clon)
 			:test #'string-equal))
 
-
-
 ;; Create and fill the program synopsis:
 (clon:defsynopsis (:postfix "FILES...")
   (text :contents "Demonstration of Clon.")
@@ -110,9 +108,6 @@
     (clon:do-cmdline-options (option name value source)
       (print (list option name value source)))
     (terpri)
-;    (format t "~%~%Unknown options:")
-;    (clon:do-unknown-options (name value)
-;      (print (list name value)))
     (format t "Remainder: ~A~%" (clon:remainder ctx)))
   (clon:exit))
 
