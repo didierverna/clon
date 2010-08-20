@@ -1094,12 +1094,32 @@ an arbitrary text object, option object or group object. The order is
 important as it determines the display of the help string.
 @end defun
 
+In fact, the @code{defsynopsis} macro allows you to freely mix
+declarative forms, constructor calls or whatever Lisp code you may want
+to use. The way this works is as follows: if a synopsis @var{ITEM}
+(@pxref{Synopsis Items}) is a list whose @code{car} is @code{text},
+@code{group}, or any option type (inluding those you define yourselves;
+see @ref{New Option Types}), then the @var{ITEM} is expanded as
+explained earlier. Otherwise, it is just left @emph{as-is}.
+
+To sum up, here's a example of things you can do in @code{defsynopsis}.
+
+@cartouche
+@verbatim
+(com.dvlsoft.clon:defsynopsis ()
+  (flag #| ... |#)
+  *my-great-option*
+  (setq *another-option* (com.dvlsoft.clon:make-switch #| ... |#)))
+@end verbatim
+@end cartouche
+
+
 @node Advantages, Group Definition, Constructors, Advanced Synopsis Creation
 @subsubsection Advantages
 @findex defsynopsis
-So, why would you want to use constructors directly, instead of using
-@code{defsynopsis} declaratively? There are several reasons for doing
-so.
+So, why would you want to use constructors directly or mix declarative
+and imperative forms in @code{defsynopsis}? There are several reasons
+for doing so.
 @enumerate
 @item
 Some people prefer to declare (or should I say, create) their arbitrary
@@ -1122,8 +1142,8 @@ single option definition.
 There is one last point we need to address in order to complete this
 section. There might be times when you need to manipulate an explicit
 group object, but the object itself can still be created in a
-declarative way because you don't need to keep references on its items.
-For this, @clon{} provides a macro called @code{defgroup}.
+declarative (or mixed) way because you don't need to keep references on
+its items. For this, @clon{} provides a macro called @code{defgroup}.
 
 @defmac defgroup (OPTIONS@dots{}) ITEMS@dots{}
 @cindex Groups, in synopsis
@@ -1134,7 +1154,8 @@ Define a new group and return it. This macro behaves exactly like the
 @code{group} form in a call to @code{defsynopsis} (@pxref{Groups}). In
 fact, an intermediate step in the expansion of the @code{defsynopsis}
 macro is to transform @code{group} forms into @code{defgroup} macro
-calls.
+calls. As for @code{defsynopsis}, @code{defgroup} allows you to mix
+declarative forms, constructor calls or any kind of Lisp code.
 @end defmac
 
 

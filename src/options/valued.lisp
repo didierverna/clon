@@ -298,11 +298,16 @@ ARGUMENT-REQUIRED-P slot."
       (invalid-value ()
 	(error "Option ~A: invalid default value ~S." option default-value)))))
 
+(defvar *item-names* '("FLAG" "TEXT" "GROUP")
+  "The list of defined item names.")
+
 (defmacro defoption (class superclasses slots &rest options)
   "Wrapper around defclass for defining a new Clon valued option class."
-  `(defclass ,class (,@superclasses valued-option)
+  `(progn
+    (defclass ,class (,@superclasses valued-option)
     ,slots
-    ,@options))
+    ,@options)
+    (pushnew (symbol-name ',class) *item-names* :test #'string=)))
 
 
 ;;; valued.lisp ends here

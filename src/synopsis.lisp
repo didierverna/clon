@@ -263,14 +263,21 @@ remainder.
   `(make-synopsis ,@keys
     ,@(loop :for form :in forms
 	    :nconc (list :item
-			 (let ((operation (symbol-name (car form))))
-			   (list* (intern
-				   (cond ((string= operation "GROUP")
-					  "DEFGROUP")
-					 (t
-					  (format nil "MAKE-~A" operation)))
-				   :com.dvlsoft.clon)
-				  (cdr form)))))))
+			 (let ((item-name
+				(when (consp form)
+				  (car (member (symbol-name (car form))
+					       *item-names*
+					       :test #'string=)))))
+			   (if item-name
+			       (list* (intern
+				       (cond ((string= item-name "GROUP")
+					      "DEFGROUP")
+					     (t
+					      (format nil "MAKE-~A"
+						item-name)))
+				       :com.dvlsoft.clon)
+				      (cdr form))
+			     form))))))
 
 
 ;;; synopsis.lisp ends here
