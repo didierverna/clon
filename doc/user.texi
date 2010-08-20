@@ -802,7 +802,7 @@ individually.
 In this section, we will review all the built-in option types that
 @clon{} provides, along with their corresponding properties. You can use
 them directly in your synopsis description. For adding personal option
-types to @clon{}, see @ref{Extending Clon}.
+types to @clon{}, see @ref{New Option Types}.
 
 @menu
 * Common Properties::                   For all options
@@ -817,7 +817,7 @@ types to @clon{}, see @ref{Extending Clon}.
 @cindex Common Option Properties
 @clsindex{option}
 All option types in @clon{}, including those you define yourself
-(@pxref{Extending Clon}), have a set of basic, common properties. Here
+(@pxref{New Option Types}), have a set of basic, common properties. Here
 is a list of them.
 
 @table @code
@@ -862,7 +862,7 @@ default to @code{nil}.
 @cindex Options, valued
 @clsindex{valued-option}
 All non-flag options in @clon{} are said to be @dfn{valued}. All valued
-options, including those you define yourself (@pxref{Extending Clon}),
+options, including those you define yourself (@pxref{New Option Types}),
 share a set of additional properties. Here is a list of them.
 
 @cindex Valued Options, common properties
@@ -1065,7 +1065,7 @@ Create an arbitrary text object, possibly hidden, whose contents is
 @cfindex make-xswitch
 Create a new @var{OPTION} object, @var{OPTION} being any built-in option
 type (@code{flag}, @code{stropt} @etc{}, see @ref{Built-In Valued
-Options}) or user-defined one (@pxref{Extending Clon}). For a list of
+Options}) or user-defined one (@pxref{New Option Types}). For a list of
 available initialization arguments (depending on the option type), see
 @ref{Built-In Option Types}.
 @end defun
