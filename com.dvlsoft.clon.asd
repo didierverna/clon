@@ -147,8 +147,8 @@ The most important features of Clon are:
   across Clonified applications, including customization of the help strings
   layout (with optional ISO6429 coloring on terminals that support it),
   possibly abbreviated option calls and short/long syntax."
-  :author "Didier Verna"
-  :maintainer "Didier Verna"
+  :author "Didier Verna <didier@lrde.epita.fr>"
+  :maintainer "Didier Verna <didier@lrde.epita.fr>"
   :license "GNU GPL"
   :version #.(version :long)
   ;; #### PORTME.

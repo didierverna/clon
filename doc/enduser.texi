@@ -40,6 +40,7 @@
 @c %**end of header
 
 
+
 @c ====================================================================
 @c Settings
 @c ====================================================================
@@ -48,14 +49,15 @@
 @setchapternewpage odd
 @setcontentsaftertitlepage
 @documentdescription
-This is the Clon End-User Manual for Clon version @value{VERSION}: it
-describes the use of applications powered by Clon.
+The Clon End-User Manual for version @value{VERSION}.
 @end documentdescription
+
 
 
 @c ====================================================================
 @c New Commands
 @c ====================================================================
+
 @macro clon
 @t{Clon}
 @end macro
@@ -124,6 +126,7 @@ Command-Line
 @end macro
 
 
+
 @c ====================================================================
 @c Info Category and Directory
 @c ====================================================================
@@ -131,6 +134,7 @@ Command-Line
 @direntry
 * Clon End-User: (clon-enduser). The Clon End-User Manual.
 @end direntry
+
 
 
 @c ====================================================================

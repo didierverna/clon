@@ -40,6 +40,7 @@
 @c %**end of header
 
 
+
 @c ====================================================================
 @c Settings
 @c ====================================================================
@@ -48,14 +49,15 @@
 @setchapternewpage odd
 @setcontentsaftertitlepage
 @documentdescription
-This is the Clon User Manual for Clon version @value{VERSION}: it
-explains how to use Clon in your application.
+The Clon User Manual for version @value{VERSION}.
 @end documentdescription
+
 
 
 @c ====================================================================
 @c New Commands
 @c ====================================================================
+
 @macro clon
 @t{Clon}
 @end macro
@@ -252,6 +254,7 @@ Command-Line
 @rfsubindex{\func\}
 @end macro
 
+
 @c Variables index
 @c ---------------
 
@@ -260,6 +263,7 @@ Command-Line
 @vindex \var\
 @vindex @r{Environment, }\var\
 @end macro
+
 
 @c Data Types index
 @c ----------------
@@ -312,6 +316,7 @@ Command-Line
 @end macro
 
 
+
 @c ====================================================================
 @c Info Category and Directory
 @c ====================================================================
@@ -319,6 +324,7 @@ Command-Line
 @direntry
 * Clon User: (clon-user). The Clon User Manual.
 @end direntry
+
 
 
 @c ====================================================================
