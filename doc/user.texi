@@ -2574,9 +2574,7 @@ Strings}.
 @node Concept Index, Function Index, Indexes, Indexes
 @section Concepts
 @printindex cp
-@iftex
-@par@vfil@penalty -10000
-@end iftex
+@page
 
 
 @c --------------
@@ -2585,9 +2583,7 @@ Strings}.
 @node Function Index, Variable Index, Concept Index, Indexes
 @section Functions
 @printindex fn
-@iftex
-@par@vfil@penalty -10000
-@end iftex
+@page
 
 
 @c --------------
@@ -2596,9 +2592,7 @@ Strings}.
 @node Variable Index, Data Type Index, Function Index, Indexes
 @section Variables
 @printindex vr
-@iftex
-@par@vfil@penalty -10000
-@end iftex
+@page
 
 
 @c ---------------
@@ -2607,9 +2601,6 @@ Strings}.
 @node Data Type Index, , Variable Index, Indexes
 @section Data Types
 @printindex tp
-@iftex
-@par@vfil@penalty -10000
-@end iftex
 
 
 @bye
