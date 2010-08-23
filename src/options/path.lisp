@@ -140,8 +140,8 @@ If AS-DIRECTORY, ensure that it denotes a directory."
 
 (defun split-path (path)
   "Split PATH into a list of directories."
-  (loop :for split-point = (position #\: path)
-	:for path-elt = (subseq path 0 split-point)
+  (loop :for split-point := (position #\: path)
+	:for path-elt := (subseq path 0 split-point)
 	:unless (zerop (length path-elt)) :collect path-elt
 	:do (setq path (when split-point (subseq path (1+ split-point))))
 	:while path))

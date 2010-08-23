@@ -318,7 +318,7 @@ output reaches the rightmost bound."
   ;; honor the frames'sfaces here instead of blindly spacing ?? Or am I sure
   ;; I'm in the proper frame/sface ?
   ;; First, adjust the tabbing.
-  (loop :with len = (length string) :and i = 0
+  (loop :with len := (length string) :and i := 0
 	:while (< i len)
 	:do (case (aref string i)
 	      (#\space

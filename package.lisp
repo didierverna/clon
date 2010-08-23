@@ -97,7 +97,7 @@
   "Read a series of ~\"strings\" to be concatenated together."
   (declare (ignore char))
   (apply #'concatenate 'string
-	 (loop :for str = (read stream t nil t)
+	 (loop :for str := (read stream t nil t)
 	       :then (progn (read-char stream t nil t)
 			    (read stream t nil t))
 	       :collect str
