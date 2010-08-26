@@ -47,11 +47,11 @@ all:
 	$(MAKE) gen TARGET=all
 
 install:
-	ln -fs $(ASDF_FILE) $(SYSTEMS_DIR)/
+	ln -fs "`pwd`/$(ASDF_FILE)" "$(SYSTEMS_DIR)/"
 	$(MAKE) gen TARGET=install
 
 uninstall:
-	-rm -f $(SYSTEMS_DIR)/$(ASDF_FILE)
+	-rm -f "$(SYSTEMS_DIR)/$(ASDF_FILE)"
 	$(MAKE) gen TARGET=uninstall
 
 clean:

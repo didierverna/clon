@@ -34,6 +34,7 @@
 # - ASDF file will be symlinked in $(PREFIX)/share/common-lisp/systems
 # - Data will end up in $(PREFIX)/share/clon/
 # - Documentation will end up in $(PREFIX)/share/doc/clon/
+#                            and $(PREFIX)/share/info/
 # If any of these are unsatisfactory, you will need to edit the Makefiles, or
 # do the installation by hand.
 PREFIX := /usr/local

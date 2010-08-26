@@ -33,7 +33,7 @@
 include ../Makefile.cnf
 include ../Makefile.inc
 
-INFO_DIR     := $(PREFIX)/info
+INFO_DIR     := $(PREFIX)/share/info
 DOC_DIR	     := $(SHARE)/doc
 CLON_DOC_DIR := $(DOC_DIR)/clon
 TEXI_FILES   := $(wildcard *.texi)

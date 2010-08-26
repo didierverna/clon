@@ -40,11 +40,11 @@ THEMES_DIR := $(CLON_SHARE)/themes
 all:
 
 install:
-	install -d -m 755 $(THEMES_DIR)
-	install -m 644 themes/* $(THEMES_DIR)/
+	install -d -m 755 "$(THEMES_DIR)"
+	install -m 644 themes/* "$(THEMES_DIR)/"
 
 uninstall:
-	-rm -fr $(CLON_SHARE)
+	-rm -fr "$(CLON_SHARE)"
 
 clean:
 	-rm *~ **/*~
