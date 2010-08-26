@@ -33,9 +33,13 @@
 include ../Makefile.cnf
 include ../Makefile.inc
 
+# #### NOTE: at least for the demo program, we do want the debugger enabled,
+# (to demonstrate the restarts) so I can't use the --script option here.
 # #### PORTME:
 all:
-	CC=$(CC) sbcl --script demo.lisp
+	CC=$(CC) sbcl \
+	--noinform --disable-ldb --lose-on-corruption --end-runtime-options \
+	--no-userinit --no-sysinit --load demo.lisp
 
 install:
 uninstall:
