@@ -44,7 +44,7 @@
 @c ====================================================================
 @c Settings
 @c ====================================================================
-@set VERSION 1.0
+@set VERSION 1.0 beta 1 "Michael Brecker"
 @set COPYRIGHT_DATE 2010
 @setchapternewpage odd
 @setcontentsaftertitlepage
@@ -2279,9 +2279,11 @@ releases (@eg{} 2.4.0, 2.4.1 @etc{}).
 
 @vindex +release-name+
 In addition to that, each version of @clon{} (in the sense
-@emph{major.minor}, regardless of the status) has a name, stored in teh
-constant @code{+release-name+}. The chosen theme for the 1.x series is
-``Great Jazz Sax Players''.
+@emph{major.minor}, regardless of the status) has a name, stored in the
+constant @code{+release-name+}. The general theme for @clon{} is ``Great
+Jazz Musicians'', and specifically for the 1.x series: ``Great Saxophone
+Players''. Anyone daring to mention Kenny G at that point will be shot
+on sight.
 
 Here is how the @code{version} function computes its value.
 @itemize
