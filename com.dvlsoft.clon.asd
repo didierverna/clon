@@ -37,7 +37,7 @@
 
 (defpackage :com.dvlsoft.clon.asdf
     ;; #### PORTME.
-    (:use :cl :asdf :sb-grovel :sb-alien)
+    (:use :cl :sb-grovel :sb-alien)
   (:export :define-constant
 	   :+release-major-level+
 	   :+release-minor-level+
@@ -132,8 +132,8 @@ version, a patchlevel of 0 is ignored in the output."
 	    +release-status+ +release-status-level+
 	    +release-name+))
 
-(defsystem :com.dvlsoft.clon
-  :description "The Common Lisp / Command Line Option Nuker."
+(asdf:defsystem :com.dvlsoft.clon
+  :description "The Command Line Option Nuker."
   :long-description "Clon is a library for command-line option management.
 It is intended to ease the creation of standalone Common Lisp applications by
 providing a powerful and uniform command-line option interface.
