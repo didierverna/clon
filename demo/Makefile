@@ -33,6 +33,7 @@
 include ../Makefile.cnf
 include ../Makefile.inc
 
+# #### PORTME:
 all:
 	CC=$(CC) sbcl --script demo.lisp
 
