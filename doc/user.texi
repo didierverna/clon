@@ -918,11 +918,13 @@ argument name is changed from @code{"ARG"} to @code{"STR"}.
 @voindex{Lisp Objects,lispobj}@c
 @cvopindex{:argument-name}@c
 @vopindex{Lisp Objects,lispobj,:typespec}@c
+@bioindex{line-width}@c
 This option type is for options taking any kind of Lisp object as their
 argument. @code{lispobj} options change their default argument name from
 @code{"ARG"} to @code{"OBJ"}. Also, they provide an additional property
 called @code{:typespec} which must be a @cl{} type specifier that the
-argument must satisfy. It defaults to @code{t}.
+argument must satisfy. It defaults to @code{t}. Look at the
+@code{--clon-line-width} built-in option for an example.
 @item enum
 @voindex{Enumerations,enum}@c
 @cvopindex{:argument-name}@c
@@ -984,7 +986,8 @@ type from required to optional and provide a fallback value of @code{t}
 automatically for optional arguments. They also provide the
 @code{:argument-style} property. Contrary to switches, however, this
 property does not affect the argument name. It only affects the way true
-or false values are displayed in help strings.
+or false values are displayed in help strings. Look at the
+@code{--clon-highlight} built-in option for an example.
 @end table
 
 @node Advanced Synopsis Creation, , Built-In Option Types, Synopsis Definition
