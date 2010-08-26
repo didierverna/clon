@@ -16,18 +16,20 @@
 
 ;;; Code:
 
+:item-separator #\Newline
+
 :face (synopsis :hidden t)
 
 :face (text :hidden t)
 
-:face (option :padding-left 2 :padding-top 0
+:face (option :padding-left 2
 	      :face (syntax :item-separator ", "
 			    :face (short :item-separator nil)
 			    :face (long  :item-separator nil))
 	      :face (usage :hidden t))
 
-:face (group :padding-top 0 :padding-bottom 0
-	     :face (header :hidden t))
+:face (group :face (header :hidden t)
+	     :face (items :item-separator #\Newline))
 
 
 ;;; optlist.cth ends here
