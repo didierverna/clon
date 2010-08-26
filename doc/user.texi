@@ -2145,6 +2145,11 @@ it like this: @code{git commit --help} for instance). Just call the
 end-user choices with respect to highlighting @etc{}), but use the
 @code{:item} key and give it the command-specific synopsis as its value.
 
+Finally, note that you can use the virtual @cmdline{} / specific
+synopsis technique recursively to manage complicated @cmdline{} syntax,
+for instance alternating options and non-options parts several times. In
+the future, @clon{} may provide a simpler way to achieve this.
+
 
 
 @c -------------------------
