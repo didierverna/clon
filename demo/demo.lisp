@@ -46,65 +46,67 @@
 		(adjoin :clon (package-nicknames :com.dvlsoft.clon)
 			:test #'string-equal))
 
-;; Create and fill the program synopsis:
 (clon:defsynopsis (:postfix "FILES...")
-  (text :contents "Demonstration of Clon.")
-  (group (:header "Flags:")
-    (flag :short-name "h" :long-name "help" :description "both names.")
-    (flag :short-name "v" :description "short name.")
-    (flag :long-name "version" :description "long name."))
-  (group (:header "Switches:")
-    (switch :short-name "d" :long-name "debug"
-	    :description "both names, optional argument yes/no (the default)"
-	    :env-var "DEBUG")
-    (switch :short-name "i" :long-name "interactive"
-	    :description "both names, argument required, another name"
-	    :argument-style :on/off
-	    :argument-type :required
-	    :default-value t)
-    (switch :short-name "n"
-	    :description "short name, whatever the argument")
-    (switch  :long-name "verbose"
-	     :description "long name, optional argument, yet another name"
-	     :argument-style :true/false)
-    (switch  :long-name "simulate"
-	     :description "long name, required argument"
-	     :argument-type :required))
-  (group (:header "String Options:")
-    (stropt :short-name "f" :long-name "first-name"
-	    :description "both names, required argument (default)")
-    (stropt :short-name "F" :long-name "family-name"
-	    :description "both names, optional argument, another name"
-	    :argument-type :optional
-	    :argument-name "NAME"
-	    :fallback-value "unknown")
-    (stropt :short-name "a" :description "short name, required argument")
-    (stropt :short-name "c"
-	    :description "short name, optional argument"
-	    :argument-type :optional
-	    :default-value "GNU GPL")
-    (stropt :long-name "phone" :description "long name, required argument")
-    (stropt :long-name "fax"
-	    :description "long name, optional argument"
-	    :argument-type :optional
-	    :default-value "/same as phone/"))
-  (group (:header "Group imbrication demonstration:")
-    (group (:header "This group is the child of his father.")
-      (text :contents "This is a demo of the group imbrication feature."))))
+  (text :contents
+	"Demonstration of Clon (use --clon-help for built-in options).")
+  (group (:header "Flags (non valued options):")
+    (flag :short-name "h" :long-name "help"
+	  :description "Print this help and exit."))
+  (group (:header "Built-in valued option types:")
+    (group (:header "String options:")
+	   (stropt :short-name "n" :long-name "name"
+		   :description "Set your name to NAME."
+		   :argument-name "NAME"))
+    (group (:header "Lisp objects:")
+	   (lispobj :short-name "e" :long-name "eval"
+		    :description "Evaluate EXPR."
+		    :argument-name "EXPR"))
+    (group (:header "Enumerations:")
+	   (enum :long-name "copyright"
+		 :description "Set the copyright to LICENSE.
+Possible values are: none, gpl, lppl, bsd or mit."
+		 :argument-name "LICENSE"
+		 :argument-type :optional
+		 :enum '(:none :gpl :lppl :bsd :mit)
+		 :fallback-value :gpl
+		 :default-value :none))
+    (group (:header "Path options:")
+      (path :long-name "tmpdir"
+	    :description "Set the temporary directory to DIR."
+	    :argument-name "DIR"
+	    :type :directory
+	    :default-value #p"/tmp/")
+      (path :short-name "o" :long-name "output"
+	    :description "Output to FILE."
+	    :argument-name "FILE"
+	    :type :file
+	    :default-value #p"a.out")
+      (path :short-name "I"
+	    :description "Set the include search path to SEARCH-PATH.
+SEARCH-PATH is a colon-separated list of directories. Use an empty argument to
+remove all search paths."
+	    :argument-name "SEARCH-PATH"
+	    :type :directory-list
+	    :default-value '(#p"/usr/local/share/" #p"/usr/share/")))
+    (group (:header "Switches:")
+      (switch :short-name "d" :long-name "debug"
+	      :description "Turn debugging on or off."
+	      :argument-style :on/off
+	      :env-var "DEBUG"))
+    (group (:header "Extended switches:")
+      (xswitch :short-name "c" :long-name "connect"
+	       :description "Connect to server.
+Possible values are yes, no or try. If try, no errors are reported."
+	       :enum '(:try)))))
 
 (defun main ()
   "Entry point for the standalone application."
-  ;; This context will use the POSIX command line and is made current by
-  ;; default:
   (let ((ctx (clon:make-context)))
     (when (clon:getopt :short-name "h")
       (clon:help)
       (clon:exit))
-    (format t "Program name: ~A~%" (clon:progname ctx))
-    (multiple-value-bind (value source)
-	(clon:getopt :short-name "F")
-      (print (list value source)))
-    (format t "~%~%Other options:")
+    (format t "Program name: ~A~%~%" (clon:progname ctx))
+    (format t "Options:")
     (clon:do-cmdline-options (option name value source)
       (print (list option name value source)))
     (terpri)
@@ -113,7 +115,7 @@
 
 ;; #### PORTME.
 (save-lisp-and-die "demo"
-		   :toplevel #'main :executable t :save-runtime-options t)
+  :toplevel #'main :executable t :save-runtime-options t)
 
 
 ;;; demo.lisp ends here
