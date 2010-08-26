@@ -593,8 +593,8 @@ retrieval method is said to be @dfn{sequential}). This is done with the
 
 @cartouche
 @verbatim
-  (do-cmdline-options (option name value)
-    (print (list option name value)))
+  (do-cmdline-options (option name value source)
+    (print (list option name value source)))
   (terpri)
   (exit))
 @end verbatim
@@ -2333,8 +2333,8 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
   (when (getopt :short-name "h")
     (help)
     (exit))
-  (do-cmdline-options (option name value)
-    (print (list option name value)))
+  (do-cmdline-options (option name value source)
+    (print (list option name value source)))
   (terpri)
   (exit))
 
