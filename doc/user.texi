@@ -618,6 +618,9 @@ CC=gcc sbcl --script test.lisp
 
 and voila!
 
+Err, by the way, you shoudn't use @option{--script} because it disables
+the debugger, which is not recommended (@pxref{Error Management}).
+
 
 
 @c ====================================================================
@@ -1534,6 +1537,7 @@ order.
 * New Option Classes::                  Step 1
 * Value Check Protocol::                Step 2
 * Argument Conversion Protocol::        Step 3
+* Error Management::                    In-between steps coffee time!
 * Value Stringification Protocol::      Step 4
 * Constructor Functions::               Step 5
 @end menu
@@ -1677,7 +1681,7 @@ This code should be self-explanatory. We check that the value we got
 belongs to the enumeration. @code{list-to-string} is a utility function
 that will separate every element with comas in the resulting string.
 
-@node Argument Conversion Protocol, Value Stringification Protocol, Value Check Protocol, New Option Types
+@node Argument Conversion Protocol, Error Management, Value Check Protocol, New Option Types
 @subsection Argument Conversion Protocol
 @cindex Argument Conversion Protocol
 @cindex Protocols, argument conversion
@@ -1765,9 +1769,23 @@ between an argument and the possible values. Otherwise, an
 @code{invalid-argument} error is raised. For an explanation of
 @code{stringify}, @xref{Value Stringification Protocol}.
 
+@node Error Management, Value Stringification Protocol, Argument Conversion Protocol, New Option Types
+@subsection Error Management
+@cindex Debugger
+@cindex Debugger restarts
+Let's take a short break in our @clon{} extension process. We have seen
+that @clon{} may throw errors in different situations, including invalid
+arguments or values. The end-user manual advertises a set of debugger
+restarts that are available to fix those kinds of problems interactively
+(if you don't know what I'm talking about, please read @enduserref{Error
+Management} and you will know). For that reason, you are encouraged to
+@emph{not} disable the debugger in your standalone program, at least
+when you're executing @clon{} code.
 
-@node Value Stringification Protocol, Constructor Functions, Argument Conversion Protocol, New Option Types
+@node Value Stringification Protocol, Constructor Functions, Error Management, New Option Types
 @subsection Value Stringification Protocol
+Okay, back to implementing our new option type.
+
 @cindex Value Stringification Protocol
 @cindex Protocols, value stringification
 The third and last protocol we need to implement is called the
