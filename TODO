@@ -92,8 +92,8 @@ start a pack with a valued option (the pack would be seen as an option with a
 sticky argument first).
 
 * Extend the [items-]separator face property
-Item separation would ideally depend on what's before or after the item being
-displayed. 
+Item separation would ideally depend on what's before or/and after the item
+being displayed.
 
 * Special --no-<name> option for switches
 (and probably switch-based options).
