@@ -48,6 +48,10 @@
 	 :initarg :name
 	 :reader name)
    ;; Layout properties:
+   ;; #### FIXME: currently, layout properties are not inherited (see the
+   ;; end-user manual). However, a nicer policy would be to inherit from the
+   ;; same faces and not from the other ones. E.g. group to group, syntax to
+   ;; syntax etc.
    (visiblep :documentation "Whether the face is visible."
 	     :initarg :visible
 	     :initform t
@@ -355,7 +359,11 @@ This involves:
 				  :padding-bottom 0)
 			   :face (items
 				  :padding-top 0
-				  :padding-bottom 0)))
+				  :padding-bottom 0
+				  :face (group
+					 :padding-top 0
+					 :padding-bottom 0
+					 :padding-left 2))))
 		  face-class))
 
 
