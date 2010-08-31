@@ -45,8 +45,9 @@ distclean: clean
 	-rm -fr sbcl-* **/sbcl-*
 
 update-version:
+install-www:
 
-.PHONY: all install uninstall clean distclean update-version
+.PHONY: all install uninstall clean distclean update-version install-www
 
 
 ### Makefile ends here

@@ -51,8 +51,9 @@ distclean: clean
 	-rm -fr demo
 
 update-version:
+install-www:
 
-.PHONY: all install uninstall clean distclean update-version
+.PHONY: all install uninstall clean distclean update-version install-www
 
 
 ### Makefile ends here

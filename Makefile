@@ -63,6 +63,14 @@ distclean:
 	-rm -fr sbcl-* **/sbcl-*
 	$(MAKE) gen TARGET=clean
 
+install-www:
+	-install -m 644 *.tar.gz $(W3DIR)/attic/
+	echo '$(LONG_VERSION)' > $(W3DIR)/clon-version.txt
+	chmod 644 $(W3DIR)/clon-version.txt
+	-rm $(W3DIR)/current
+	(cd $(W3DIR) && ln -s attic/clon-$(SHORT_VERSION).tar.gz current)
+	$(MAKE) gen TARGET=install-www
+
 gen:
 	@for i in $(SUBDIRS) ; do                 \
 	   echo "making $(TARGET) in $${i} ..." ; \
@@ -72,7 +80,7 @@ gen:
 .DEFAULT:
 	$(MAKE) gen TARGET=$@
 
-.PHONY: all install uninstall clean gen
+.PHONY: all install uninstall clean install-www gen
 
 
 ### Makefile ends here

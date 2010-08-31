@@ -109,11 +109,19 @@ update-version:
 	    $$f;							   \
 	done
 
+install-www: all
+	install -m 644 $(PDF_FILES) $(W3DIR)/
+	install -d -m 755 $(W3DIR)/user
+	install -m 644 user/* $(W3DIR)/user
+	install -d -m 755 $(W3DIR)/enduser
+	install -m 644 enduser/* $(W3DIR)/enduser
+
+
 .PHONY: all all-formats			\
 	install uninstall		\
 	info pdf dvi ps html		\
 	clean distclean			\
-	update-version
+	update-version install-www
 
 
 ### Makefile ends here

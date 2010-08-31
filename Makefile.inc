@@ -34,6 +34,8 @@ PERL := perl
 
 SHARE := $(PREFIX)/share
 
+W3DIR := $(HOME)/www/software/lisp/clon
+
 LONG_VERSION := $(shell if test -f ./demo/demo; then	\
 		     ./demo/demo --clon-version=long;	\
 		   elif test -f ../demo/demo; then	\

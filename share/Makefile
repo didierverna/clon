@@ -50,8 +50,9 @@ clean:
 	-rm *~ **/*~
 
 update-version:
+install-www:
 
-.PHONY: all install uninstall clean update-version
+.PHONY: all install uninstall clean update-version install-www
 
 
 ### Makefile ends here
