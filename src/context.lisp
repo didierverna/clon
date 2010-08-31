@@ -680,7 +680,7 @@ CONTEXT is where to look for the options."
   ;; Step two: handle internal options ======================================
   (when (getopt :context context :long-name "clon-banner")
     (format t "~A's command-line is powered by Clon,
-the Command-Line Option Nuker library, version ~A,
+the Command-Line Options Nuker library, version ~A,
 written by Didier Verna <didier@lrde.epita.fr>.
 
 Copyright (C) 2010 Didier Verna.
