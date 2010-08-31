@@ -5,7 +5,7 @@
 ## Author:        Didier Verna <didier@lrde.epita.fr>
 ## Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ## Created:       Sun May 31 17:13:07 2009
-## Last Revision: Sat Jun 12 17:50:23 2010
+## Last Revision: Tue Aug 31 15:05:07 2010
 
 ## This file is part of CLon
 
@@ -62,6 +62,11 @@ distclean:
 	$(MAKE) clean
 	-rm -fr sbcl-* **/sbcl-*
 	$(MAKE) gen TARGET=clean
+
+dist:
+	git archive --format=tar --prefix=clon-$(SHORT_VERSION)/	\
+	    --worktree-attributes HEAD					\
+	  | gzip -c > clon-$(SHORT_VERSION).tar.gz
 
 install-www:
 	-install -m 644 *.tar.gz $(W3DIR)/attic/
