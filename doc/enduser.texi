@@ -1481,16 +1481,13 @@ of text each face applies to.
 @cartouche
 @verbatim
 ;; Remember that everything in here belongs to the toplevel face.
-
 :face (synopsis :face header
 		:face program
 		:face short-pack
 		:face negated-pack
 		:face options
 		:face postfix)
-
 :face text
-
 :face (option :face (syntax :face (short :face name
 					 :face argument)
 			    :face (long  :face name
@@ -1502,7 +1499,6 @@ of text each face applies to.
 					  :face value)
 			   :face (environment :face header
 					      :face variable)))
-
 :face (group :face header
              :face (items #| :face text :face option :face group |#))
 @end verbatim
