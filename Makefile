@@ -5,7 +5,7 @@
 ## Author:        Didier Verna <didier@lrde.epita.fr>
 ## Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ## Created:       Sun May 31 17:13:07 2009
-## Last Revision: Tue Aug 31 15:21:46 2010
+## Last Revision: Tue Aug 31 15:54:23 2010
 
 ## This file is part of CLon
 
@@ -73,10 +73,10 @@ dist:
 
 install-www:
 	-install -m 644 *.tar.gz $(W3DIR)/attic/
-	echo '$(LONG_VERSION)' > $(W3DIR)/clon-version.txt
-	chmod 644 $(W3DIR)/clon-version.txt
-	-rm $(W3DIR)/current
-	(cd $(W3DIR) && ln -s attic/clon-$(SHORT_VERSION).tar.gz current)
+	echo '$(LONG_VERSION)' > $(W3DIR)/version.txt
+	chmod 644 $(W3DIR)/version.txt
+	echo '<? lref ("clon/attic/clon-$(SHORT_VERSION).tar.gz", "here"); ?>'\
+	  > $(W3DIR)/current.txt
 	$(MAKE) gen TARGET=install-www
 
 gen:
