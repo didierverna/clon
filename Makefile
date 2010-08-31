@@ -63,9 +63,6 @@ distclean:
 	-rm -fr sbcl-* **/sbcl-*
 	$(MAKE) gen TARGET=clean
 
-update-version:
-	$(MAKE) gen TARGET=update-version
-
 gen:
 	@for i in $(SUBDIRS) ; do                 \
 	   echo "making $(TARGET) in $${i} ..." ; \
@@ -75,7 +72,7 @@ gen:
 .DEFAULT:
 	$(MAKE) gen TARGET=$@
 
-.PHONY: all install uninstall clean update-version gen
+.PHONY: all install uninstall clean gen
 
 
 ### Makefile ends here
