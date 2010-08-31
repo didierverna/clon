@@ -46,18 +46,18 @@ PS_FILES       := $(TEXI_FILES:%.texi=%.ps)
 HTML_DIRS      := $(TEXI_FILES:%.texi=%)
 
 
-all: info pdf
+all: info pdf html
 
-all-formats: all dvi ps html
+all-formats: all dvi ps
 
-install: $(INFO_FILES) $(PDF_FILES)
+install: $(INFO_FILES) $(PDF_FILES) $(HTML_DIRS)
 	install -d $(INFO_DIR)
 	install -m 644 $(ALL_INFO_FILES) $(INFO_DIR)/
 	for i in $(INFO_FILES); do			\
 	  install-info --info-dir=$(INFO_DIR) $$i;	\
 	done
 	install -d $(CLON_DOC_DIR)
-	install -m 644 $(PDF_FILES) $(CLON_DOC_DIR)/
+	install -m 644 $(PDF_FILES) $(HTML_DIRS) $(CLON_DOC_DIR)/
 
 uninstall:
 	-rm -fr $(CLON_DOC_DIR)
@@ -70,11 +70,11 @@ info: $(INFO_FILES)
 
 pdf: clon.jpg $(PDF_FILES)
 
+html: $(HTML_DIRS)
+
 dvi: clon.eps $(DVI_FILES)
 
 ps: clon.eps $(PS_FILES)
-
-html: $(HTML_DIRS)
 
 clon-%.info: %.texi
 	$(MAKEINFO) $<
@@ -82,15 +82,15 @@ clon-%.info: %.texi
 %.pdf: %.texi
 	$(TEXI2DVI) -p $<
 
+$(HTML_DIRS): %: %.texi
+	$(MAKEINFO) --html -o $@ $<
+	touch $@
+
 %.dvi: %.texi
 	$(TEXI2DVI) $<
 
 %.ps: %.dvi
 	$(DVIPS) -o $@ $<
-
-$(HTML_DIRS): %: %.texi
-	$(MAKEINFO) --html -o $@ $<
-	touch $@
 
 %.eps: %.jpg
 	$(CONVERT) $< $@

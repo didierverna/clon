@@ -1,4 +1,4 @@
-							      -*- outline -*-
+						             -*- outline -*-
 
 * Anatomy of the tarball
 
@@ -18,9 +18,10 @@ All make targets from the toplevel propagate to the subdirectories.
 
 ** Type "make" from the toplevel directory
 The build phase generates the demo program and the documentation. By default,
-documentation is built in info and PDF formats. If you want other formats,
-type "make all-formats" in the doc directory. You can also type individually
-make "dvi", "ps" and/or "html" in order to get the corresponding format.
+documentation is built in info, PDF and HTML formats. If you want other
+formats (DVI and PostScript are available), type "make all-formats" in the doc
+directory. You can also type individually "make dvi" and/or "make ps" in order
+to get the corresponding format.
 
 
 * Installing
