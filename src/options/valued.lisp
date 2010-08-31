@@ -302,7 +302,7 @@ ARGUMENT-REQUIRED-P slot."
   "The list of defined item names.")
 
 (defmacro defoption (class superclasses slots &rest options)
-  "Wrapper around defclass for defining a new Clon valued option class."
+  "Create a new option CLASS and register it with Clon."
   `(progn
     (defclass ,class (,@superclasses valued-option)
     ,slots
