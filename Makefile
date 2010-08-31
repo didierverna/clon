@@ -5,7 +5,7 @@
 ## Author:        Didier Verna <didier@lrde.epita.fr>
 ## Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ## Created:       Sun May 31 17:13:07 2009
-## Last Revision: Tue Aug 31 15:05:07 2010
+## Last Revision: Tue Aug 31 15:18:18 2010
 
 ## This file is part of CLon
 
@@ -85,7 +85,7 @@ gen:
 .DEFAULT:
 	$(MAKE) gen TARGET=$@
 
-.PHONY: all install uninstall clean install-www gen
+.PHONY: all install uninstall clean dist install-www gen
 
 
 ### Makefile ends here
