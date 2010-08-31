@@ -132,7 +132,7 @@ Command-Line
 @c ====================================================================
 @dircategory Common Lisp
 @direntry
-* Clon End-User: (clon-enduser). The Clon End-User Manual.
+* Clon End-User: (clon-enduser).        The Clon End-User Manual.
 @end direntry
 
 
