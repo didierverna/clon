@@ -373,6 +373,8 @@ approved by the Free Software Foundation.
 @page
 @vskip 0pt plus 1filll
 @insertcopying
+
+@hfill Cover art by Alexis Angelidis.
 @end titlepage
 
 
