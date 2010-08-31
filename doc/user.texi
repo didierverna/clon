@@ -1559,14 +1559,14 @@ Properties}).
 
 @cindex User-Defined Option Classes
 @cindex Option Classes, user-defined
-In order to create a new option type, @clon{} provides a convenience
-macro named @code{defoption}.
+In order to create a new option type, use the @code{defoption} macro.
 
 @defmac defoption CLASS SUPERCLASSES SLOTS &rest OPTIONS
-Wrapper around @code{defclass} for defining a new valued option type.
-Option types created like this implicitely inherit from
-@code{valued-option} and in turn @code{option}, so you don't need to put
-them explicitely in the @var{SUPERCLASSES} list.
+Create a new option CLASS and register it with @clon{}.
+Syntactically, thismacro behaves like @code{defclass}. Option types
+created like this implicitely inherit from @code{valued-option} and in
+turn @code{option}, so you don't need to put them explicitely in the
+@var{SUPERCLASSES} list.
 @end defmac
 
 Let's look at the enumeration example now.
@@ -1926,14 +1926,19 @@ process.
 @node Incremental Option Types, Lisp Option Abuse, Extension Tips, Extension Tips
 @subsection Incremental Option Types
 @findex defoption
-@code{defoption} is a nice convenience macro for new (valued) option
-types that you define ``from scratch'' (we have even seen a more
-contrived example where an additional super-class is used). However, you
-might not want to use it all the time. For example, if one of the
-built-in options is almost what you need, you can perfectly subclass it
-instead of using @code{defoption}, and only change what's needed, as
-long as you follow the 3 other steps correctly. After all, it's Lisp.
-Lisp is a world of mess@t{^D^D^D^D}freedom.
+If one of the built-in options is almost what you need, you may be
+tempted to subclass it directly instead of using @code{defoption}, and
+only change what's needed, After all, it's Lisp. Lisp is a world of
+mess@t{^D^D^D^D}freedom.
+
+Wrong.
+
+@findex defsynopsis
+@findex defgroup
+@code{defoption} is not @emph{only} a convenience wrapper around
+@code{defclass}. It also arranges for @code{defsynopsis} and
+@code{defgroup} to recognize your new option type. So please, do use it
+systematically.
 
 @node Lisp Option Abuse, , Incremental Option Types, Extension Tips
 @subsection Lisp Option Abuse
@@ -1962,8 +1967,8 @@ typo?
 
 Not very friendly, right? In other words, you need to think in terms of
 what the end-user of your application will expect. In that particular
-situation, you might want to subclass @code{lispobj} only to provide
-friendlier error messages.
+situation, you might want to subclass @code{lispobj} (with
+@code{defoption}!) only to provide friendlier error messages.
 
 
 
