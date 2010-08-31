@@ -75,7 +75,7 @@ gen:
 .DEFAULT:
 	$(MAKE) gen TARGET=$@
 
-.PHONY: all install uninstall clean gen local.mak
+.PHONY: all install uninstall clean gen update-version
 
 
 ### Makefile ends here
