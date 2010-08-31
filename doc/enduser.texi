@@ -1133,6 +1133,10 @@ Displays a full help string occupying more space than the @t{raw} theme.
 Option descriptions don't start @emph{after} the option's name, but
 @emph{under} it. As a result, they occupy more horizontal space. Also,
 sub-groups are indented to the right.
+@item dvl
+@cindex Standard Themes, files, @file{dvl.cth}
+@cindex Themes, files, standard, @file{dvl.cth}
+This is my personal theme that I personally use myself in person.
 @item christmas
 @cindex Standard Themes, files, @file{christmas.cth}
 @cindex Themes, files, standard, @file{christmas.cth}
