@@ -47,14 +47,11 @@
 		  make-internal-lispobj
 		  make-internal-path
 		  make-internal-enum
-		  make-internal-xswitch
-		  within-group))
+		  make-internal-xswitch))
   (put symbol 'common-lisp-indent-function 2))
 
 (dolist (symbol '(push-retrieved-option replace-in-keys))
   (put symbol 'common-lisp-indent-function 3))
-
-(put 'do-options 'common-lisp-indent-function '((&whole 4 2 1) &body))
 
 
 ;;; clon-indent.el ends here
