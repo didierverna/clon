@@ -50,7 +50,9 @@ clean:
 distclean: clean
 	-rm -fr demo
 
-.PHONY: all install uninstall clean distclean
+update-version:
+
+.PHONY: all install uninstall clean distclean update-version
 
 
 ### Makefile ends here

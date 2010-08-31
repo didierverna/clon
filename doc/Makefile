@@ -103,10 +103,16 @@ distclean: clean
 		$(HTML_DIRS)						\
 		$(ALL_INFO_FILES) $(PDF_FILES) $(DVI_FILES) $(PS_FILES)
 
+update-version:
+	for f in $(TEXI_FILES); do					   \
+	  $(PERL) -pi -e 's/@set VERSION .*/@set VERSION $(VERSION)/' $$f; \
+	done
+
 .PHONY: all all-formats			\
 	install uninstall		\
 	info pdf dvi ps html		\
-	clean distclean
+	clean distclean			\
+	update-version
 
 
 ### Makefile ends here

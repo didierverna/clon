@@ -44,8 +44,9 @@ clean:
 distclean: clean
 	-rm -fr constants.lisp-temp sbcl-*
 
+update-version:
 
-.PHONY: all install uninstall clean distclean
+.PHONY: all install uninstall clean distclean update-version
 
 
 ### Makefile ends here

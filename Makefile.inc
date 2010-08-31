@@ -30,7 +30,17 @@
 
 ### Code:
 
+PERL := perl
+
 SHARE := $(PREFIX)/share
+
+VERSION := $(shell if test -f ./demo/demo; then	\
+		     ./demo/demo --clon-version=long;	\
+		   elif test -f ../demo/demo; then	\
+		     ../demo/demo --clon-version=long;	\
+		   else					\
+		     echo "unknown";			\
+		   fi)
 
 
 ### Makefile.inc ends here

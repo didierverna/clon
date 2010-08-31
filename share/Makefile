@@ -49,8 +49,9 @@ uninstall:
 clean:
 	-rm *~ **/*~
 
+update-version:
 
-.PHONY: all install uninstall clean
+.PHONY: all install uninstall clean update-version
 
 
 ### Makefile ends here

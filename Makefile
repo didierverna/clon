@@ -63,6 +63,9 @@ distclean:
 	-rm -fr sbcl-* **/sbcl-*
 	$(MAKE) gen TARGET=clean
 
+update-version:
+	$(MAKE) gen TARGET=update-version
+
 gen:
 	@for i in $(SUBDIRS) ; do                 \
 	   echo "making $(TARGET) in $${i} ..." ; \
