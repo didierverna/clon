@@ -50,14 +50,21 @@ all: info pdf html
 
 all-formats: all dvi ps
 
-install: $(INFO_FILES) $(PDF_FILES) $(HTML_DIRS)
+install-at: $(PDF_FILES) $(HTML_DIRS)
+	install -d $(LOCATION)
+	install -m 644 $(PDF_FILES) $(LOCATION)/
+	install -d -m 755 $(LOCATION)/user
+	install -m 644 user/* $(LOCATION)/user
+	install -d -m 755 $(LOCATION)/enduser
+	install -m 644 enduser/* $(LOCATION)/enduser
+
+install: $(INFO_FILES)
 	install -d $(INFO_DIR)
 	install -m 644 $(ALL_INFO_FILES) $(INFO_DIR)/
 	for i in $(INFO_FILES); do			\
 	  install-info --info-dir=$(INFO_DIR) $$i;	\
 	done
-	install -d $(CLON_DOC_DIR)
-	install -m 644 $(PDF_FILES) $(HTML_DIRS) $(CLON_DOC_DIR)/
+	$(MAKE) install-at LOCATION=$(CLON_DOC_DIR)
 
 uninstall:
 	-rm -fr $(CLON_DOC_DIR)
@@ -109,16 +116,12 @@ update-version:
 	    $$f;							   \
 	done
 
-install-www: all
-	install -m 644 $(PDF_FILES) $(W3DIR)/
-	install -d -m 755 $(W3DIR)/user
-	install -m 644 user/* $(W3DIR)/user
-	install -d -m 755 $(W3DIR)/enduser
-	install -m 644 enduser/* $(W3DIR)/enduser
+install-www:
+	$(MAKE) install-at LOCATION=$(W3DIR)
 
 
 .PHONY: all all-formats			\
-	install uninstall		\
+	install-at install uninstall	\
 	info pdf dvi ps html		\
 	clean distclean			\
 	update-version install-www
