@@ -366,7 +366,7 @@ approved by the Free Software Foundation.
 @c ====================================================================
 @titlepage
 @title The Clon User Manual
-@subtitle The @CmdLine{} Option Nuker, Version @value{VERSION}
+@subtitle The @CmdLine{} Options Nuker, Version @value{VERSION}
 @vskip 2cm
 @image{clon,16cm}
 @author Didier Verna <@email{didier@@lrde.epita.fr}>
@@ -452,7 +452,7 @@ strings, with support for highlighting on @tty{}'s through ISO/IEC 6429
 SGR. This formatting is customizable through @emph{themes}.
 
 Depending on the target audience, @clon{} stands for either ``The
-@CmdLine{} Option Nuker'' or ``The @cl{} Option Nuker''. @clon{} also
+@CmdLine{} Options Nuker'' or ``The @cl{} Options Nuker''. @clon{} also
 has a recursive acronym: ``@clon{} Likes Options Nuking'', and a reverse
 one: ``Never Omit to Link with @clon{}''. Other possible expansions of
 the acronym are still being investigated.

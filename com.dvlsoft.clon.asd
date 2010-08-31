@@ -133,7 +133,7 @@ version, a patchlevel of 0 is ignored in the output."
 	    +release-name+))
 
 (asdf:defsystem :com.dvlsoft.clon
-  :description "The Command Line Option Nuker."
+  :description "The Command-Line Options Nuker."
   :long-description "Clon is a library for command-line option management.
 It is intended to ease the creation of standalone Common Lisp applications by
 providing a powerful and uniform command-line option interface.
