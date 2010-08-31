@@ -34,10 +34,18 @@ PERL := perl
 
 SHARE := $(PREFIX)/share
 
-VERSION := $(shell if test -f ./demo/demo; then	\
+LONG_VERSION := $(shell if test -f ./demo/demo; then	\
 		     ./demo/demo --clon-version=long;	\
 		   elif test -f ../demo/demo; then	\
 		     ../demo/demo --clon-version=long;	\
+		   else					\
+		     echo "unknown";			\
+		   fi)
+
+SHORT_VERSION := $(shell if test -f ./demo/demo; then	\
+		     ./demo/demo --clon-version=short;	\
+		   elif test -f ../demo/demo; then	\
+		     ../demo/demo --clon-version=short;	\
 		   else					\
 		     echo "unknown";			\
 		   fi)

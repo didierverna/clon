@@ -105,7 +105,8 @@ distclean: clean
 
 update-version:
 	for f in $(TEXI_FILES); do					   \
-	  $(PERL) -pi -e 's/@set VERSION .*/@set VERSION $(VERSION)/' $$f; \
+	  $(PERL) -pi -e 's/@set VERSION .*/@set VERSION $(LONG_VERSION)/' \
+	    $$f;							   \
 	done
 
 .PHONY: all all-formats			\
