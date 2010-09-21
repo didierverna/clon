@@ -36,20 +36,16 @@ SHARE := $(PREFIX)/share
 
 W3DIR := $(HOME)/www/software/lisp/clon
 
-LONG_VERSION := $(shell if test -f ./demo/demo; then	\
-		     ./demo/demo --clon-version=long;	\
-		   elif test -f ../demo/demo; then	\
-		     ../demo/demo --clon-version=long;	\
-		   else					\
-		     echo "unknown";			\
+LONG_VERSION := $(shell if test -f $(TOP_DIR)/demo/demo; then	\
+		     $(TOP_DIR)/demo/demo --clon-version=long;	\
+		   else						\
+		     echo "unknown";				\
 		   fi)
 
-SHORT_VERSION := $(shell if test -f ./demo/demo; then	\
-		     ./demo/demo --clon-version=short;	\
-		   elif test -f ../demo/demo; then	\
-		     ../demo/demo --clon-version=short;	\
-		   else					\
-		     echo "unknown";			\
+SHORT_VERSION := $(shell if test -f $(TOP_DIR)/demo/demo; then	\
+		     $(TOP_DIR)/demo/demo --clon-version=short;	\
+		   else						\
+		     echo "unknown";				\
 		   fi)
 
 

@@ -30,6 +30,8 @@
 
 ### Code:
 
+TOP_DIR := ..
+
 include ../Makefile.cnf
 include ../Makefile.inc
 

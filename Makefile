@@ -5,7 +5,7 @@
 ## Author:        Didier Verna <didier@lrde.epita.fr>
 ## Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ## Created:       Sun May 31 17:13:07 2009
-## Last Revision: Tue Aug 31 15:54:23 2010
+## Last Revision: Tue Sep 21 15:05:46 2010
 
 ## This file is part of CLon
 
@@ -32,13 +32,14 @@
 
 ### Code:
 
-SUBDIRS := src sbcl  \
-	   share doc \
-	   demo
+TOP_DIR := .
 
 include Makefile.cnf
 include Makefile.inc
 
+SUBDIRS     := src sbcl  \
+	       share doc \
+	       demo
 SYSTEMS_DIR := $(SHARE)/common-lisp/systems
 ASDF_FILE   := com.dvlsoft.clon.asd
 

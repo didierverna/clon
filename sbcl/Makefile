@@ -5,7 +5,7 @@
 ## Author:        Didier Verna <didier@lrde.epita.fr>
 ## Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ## Created:       Sun May 31 17:24:02 2009
-## Last Revision: Sat Jun 12 18:13:04 2010
+## Last Revision: Tue Sep 21 15:06:05 2010
 
 ## This file is part of Clon.
 
@@ -29,6 +29,8 @@
 
 
 ### Code:
+
+TOP_DIR := ..
 
 include ../Makefile.cnf
 include ../Makefile.inc
