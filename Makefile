@@ -61,7 +61,7 @@ clean:
 
 distclean:
 	$(MAKE) clean
-	-rm -fr sbcl-* **/sbcl-*
+	-rm -fr sbcl-* **/sbcl-* *.tar.gz
 	$(MAKE) gen TARGET=distclean
 
 tag:
