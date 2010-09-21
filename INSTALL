@@ -45,11 +45,16 @@ make ref
 
 As for the rest of the documentation, this compiles the reference manual in
 info, PDF and HTML formats. If you want other formats (DVI and PostScript are
-available), type "make all-formats-ref" in the doc directory. You can also
-type individually "make dvi-ref" and/or "make ps-ref" in order to get the
-corresponding format.
+available), type "make all-formats-ref" in the doc/ directory. You can also
+individually type "make dvi-ref" and/or "make ps-ref" in order to get the
+corresponding format only.
 
 To install the reference manual, type "make install-ref".
+
+Incidentally, a web-specific version of the reference manual is generated
+under the name webreference.texi (See *link-files* in the Declt library for an
+explanation). You can also format this version by using the "make webref", or
+just the 'pdf-webref' / 'html-webref' sub-targets.
 
 
 * Uninstalling

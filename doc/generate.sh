@@ -133,8 +133,8 @@ and extend the library with your own option types.
 			 :introduction +introduction+)
 (com.dvlsoft.declt:declt :com.dvlsoft.clon
 			 :library-name "Clon"
-			 :texi-file "web-reference.texi"
-			 :info-file "clon-web-reference"
+			 :texi-file "webreference.texi"
+			 :info-file "clon-webreference" ;; but we don't care
 			 :introduction +introduction+
 			 :link-files nil)
 

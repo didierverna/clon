@@ -16,7 +16,10 @@ doc/enduser.ps
 doc/enduser/
 
 doc/reference.texi
-doc/web-reference.texi
 doc/reference.pdf
 doc/reference.ps
 doc/reference/
+
+doc/webreference.texi
+doc/webreference.pdf
+doc/webreference/

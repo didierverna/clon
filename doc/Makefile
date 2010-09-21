@@ -52,6 +52,8 @@ all: info pdf html
 
 ref: info-ref pdf-ref html-ref
 
+webref: pdf-webref html-webref
+
 all-formats: all dvi ps
 
 all-formats-ref: ref dvi-ref ps-ref
@@ -89,26 +91,23 @@ uninstall:
 	cd $(INFO_DIR) && rm -f $(ALL_INFO_FILES)
 
 info: $(INFO_FILES)
-
 info-ref: clon-reference.info
 
 pdf: clon.jpg $(PDF_FILES)
-
 pdf-ref: clon.jpg reference.pdf
+pdf-webref: clon.jpg webreference.pdf
 
 html: $(HTML_DIRS)
-
 html-ref: reference
+html-webref: webreference
 
 dvi: clon.eps $(DVI_FILES)
-
 dvi-ref: clon.eps reference.dvi
 
 ps: clon.eps $(PS_FILES)
-
 ps-ref: clon.eps reference.ps
 
-reference.texi web-reference.texi: generate.sh
+reference.texi webreference.texi: generate.sh
 	./generate.sh
 	$(PERL) -pi -e 's/^\@author/\@vskip 2cm\n\@image\{clon,16cm\}\n\@author/' $@
 
@@ -118,7 +117,7 @@ clon-%.info: %.texi
 %.pdf: %.texi
 	$(TEXI2DVI) -p $<
 
-$(HTML_DIRS) reference: %: %.texi
+$(HTML_DIRS) reference webreference: %: %.texi
 	$(MAKEINFO) --html -o $@ $<
 	touch $@
 
@@ -135,7 +134,7 @@ clean:
 	-rm *.tmp *.fn* *.vr* *.ky* *.tp* *.cp* *.pg *.toc *.aux *.log *~
 
 distclean: clean
-	-rm -fr clon.eps web-reference* clon-reference* reference*	\
+	-rm -fr clon.eps webreference* clon-reference* reference*	\
 		$(HTML_DIRS)						\
 		$(ALL_INFO_FILES) $(PDF_FILES) $(DVI_FILES) $(PS_FILES)
 
@@ -145,8 +144,11 @@ update-version:
 	    $$f;							   \
 	done
 
-install-www:
+install-www: webref
 	$(MAKE) install-at LOCATION=$(W3DIR)
+	install -m 644 webreference.pdf $(W3DIR)/reference.pdf
+	install -d -m 755 $(W3DIR)/reference
+	install -m 644 webreference/* $(W3DIR)/reference
 
 
 .PHONY: all all-formats			\
