@@ -62,7 +62,7 @@ clean:
 distclean:
 	$(MAKE) clean
 	-rm -fr sbcl-* **/sbcl-*
-	$(MAKE) gen TARGET=clean
+	$(MAKE) gen TARGET=distclean
 
 tag:
 	git tag -a -m 'Version $(LONG_VERSION)' 'version-$(SHORT_VERSION)'
