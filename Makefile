@@ -5,7 +5,7 @@
 ## Author:        Didier Verna <didier@lrde.epita.fr>
 ## Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ## Created:       Sun May 31 17:13:07 2009
-## Last Revision: Tue Sep 21 15:05:46 2010
+## Last Revision: Tue Sep 21 16:38:42 2010
 
 ## This file is part of CLon
 

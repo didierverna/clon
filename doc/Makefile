@@ -38,7 +38,7 @@ include ../Makefile.inc
 INFO_DIR     := $(PREFIX)/share/info
 DOC_DIR	     := $(SHARE)/doc
 CLON_DOC_DIR := $(DOC_DIR)/clon
-TEXI_FILES   := $(wildcard *.texi)
+TEXI_FILES   := user.texi enduser.texi
 
 INFO_FILES     := $(TEXI_FILES:%.texi=clon-%.info)
 PDF_FILES      := $(TEXI_FILES:%.texi=%.pdf)
@@ -50,7 +50,11 @@ HTML_DIRS      := $(TEXI_FILES:%.texi=%)
 
 all: info pdf html
 
+ref: info-ref pdf-ref html-ref
+
 all-formats: all dvi ps
+
+all-formats-ref: ref dvi-ref ps-ref
 
 install-at: $(PDF_FILES) $(HTML_DIRS)
 	install -d $(LOCATION)
@@ -68,6 +72,15 @@ install: $(INFO_FILES)
 	done
 	$(MAKE) install-at LOCATION=$(CLON_DOC_DIR)
 
+install-ref: clon-reference.info reference.pdf reference
+	install -d $(INFO_DIR)
+	install -m 644 clon-reference.info* $(INFO_DIR)/
+	install-info --info-dir=$(INFO_DIR) clon-reference.info
+	install -d $(CLON_DOC_DIR)
+	install -m 644 reference.pdf $(CLON_DOC_DIR)/
+	install -d -m 755 $(CLON_DOC_DIR)/reference
+	install -m 644 reference/* $(CLON_DOC_DIR)/reference
+
 uninstall:
 	-rm -fr $(CLON_DOC_DIR)
 	for i in $(INFO_FILES); do				\
@@ -77,13 +90,27 @@ uninstall:
 
 info: $(INFO_FILES)
 
+info-ref: clon-reference.info
+
 pdf: clon.jpg $(PDF_FILES)
+
+pdf-ref: clon.jpg reference.pdf
 
 html: $(HTML_DIRS)
 
+html-ref: reference
+
 dvi: clon.eps $(DVI_FILES)
 
+dvi-ref: clon.eps reference.dvi
+
 ps: clon.eps $(PS_FILES)
+
+ps-ref: clon.eps reference.ps
+
+reference.texi web-reference.texi: generate.sh
+	./generate.sh
+	$(PERL) -pi -e 's/^\@author/\@vskip 2cm\n\@image\{clon,16cm\}\n\@author/' $@
 
 clon-%.info: %.texi
 	$(MAKEINFO) $<
@@ -91,7 +118,7 @@ clon-%.info: %.texi
 %.pdf: %.texi
 	$(TEXI2DVI) -p $<
 
-$(HTML_DIRS): %: %.texi
+$(HTML_DIRS) reference: %: %.texi
 	$(MAKEINFO) --html -o $@ $<
 	touch $@
 
@@ -105,10 +132,10 @@ $(HTML_DIRS): %: %.texi
 	$(CONVERT) $< $@
 
 clean:
-	-rm *.tmp *.fn* *.vr* *.ky* *.tp *.cp* *.pg *.toc *.aux *.log *~
+	-rm *.tmp *.fn* *.vr* *.ky* *.tp* *.cp* *.pg *.toc *.aux *.log *~
 
 distclean: clean
-	-rm -fr clon.eps						\
+	-rm -fr clon.eps web-reference* clon-reference* reference*	\
 		$(HTML_DIRS)						\
 		$(ALL_INFO_FILES) $(PDF_FILES) $(DVI_FILES) $(PS_FILES)
 

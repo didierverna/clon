@@ -6,9 +6,17 @@ sbcl/foo.c
 sbcl/constants.lisp-temp
 
 doc/clon.eps
+
 doc/user.pdf
 doc/user.ps
 doc/user/
+
 doc/enduser.pdf
 doc/enduser.ps
 doc/enduser/
+
+doc/reference.texi
+doc/web-reference.texi
+doc/reference.pdf
+doc/reference.ps
+doc/reference/
