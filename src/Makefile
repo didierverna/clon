@@ -44,7 +44,7 @@ clean:
 	-rm *~
 
 distclean: clean
-	-rm -fr sbcl-* **/sbcl-*
+	-rm -fr sbcl-* */sbcl-* */*/sbcl-* # for ASDF Binary Locations
 
 update-version:
 install-www:

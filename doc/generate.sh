@@ -116,14 +116,21 @@ and extend the library with your own option types.
 @end itemize"
   "The reference manual's introductory text.")
 
-(setf asdf:*central-registry*
-      (list* (merge-pathnames "share/common-lisp/systems/"
-			      (user-homedir-pathname))
-	     #p"/usr/local/share/common-lisp/systems/"
-	     #p"/usr/share/common-lisp/systems/"
-	     asdf:*central-registry*))
+#-asdf2 (setf asdf:*central-registry*
+	      (list* (merge-pathnames "share/common-lisp/systems/"
+				      (user-homedir-pathname))
+		     #p"/usr/local/share/common-lisp/systems/"
+		     #p"/usr/share/common-lisp/systems/"
+		     asdf:*central-registry*))
+#+asdf2 (asdf:initialize-source-registry
+	 `(:source-registry
+	   (:directory ,(merge-pathnames "share/common-lisp/systems/"
+					 (user-homedir-pathname)))
+	   (:directory "/usr/local/share/common-lisp/systems")
+	   (:directory "/usr/share/common-lisp/systems")
+	   :inherit-configuration))
 
-(ignore-errors (asdf:operate 'asdf:load-op :asdf-binary-locations))
+#-asdf2 (ignore-errors (asdf:operate 'asdf:load-op :asdf-binary-locations))
 
 (asdf:operate 'asdf:load-op :com.dvlsoft.declt)
 (com.dvlsoft.declt:declt :com.dvlsoft.clon

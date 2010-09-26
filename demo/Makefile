@@ -50,6 +50,7 @@ clean:
 	-rm *~
 
 distclean: clean
+	-rm -fr sbcl-* # for ASDF Binary Locations
 	-rm -fr demo
 
 update-version:

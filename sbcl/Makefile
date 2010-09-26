@@ -44,7 +44,8 @@ clean:
 	-rm *~ a.out foo.c
 
 distclean: clean
-	-rm -fr constants.lisp-temp sbcl-*
+	-rm -fr constants.lisp-temp
+	-rm -fr sbcl-* # for ASDF Binary Locations
 
 update-version:
 install-www:

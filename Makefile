@@ -59,10 +59,11 @@ clean:
 	-rm *~
 	$(MAKE) gen TARGET=clean
 
-distclean:
-	$(MAKE) clean
-	-rm -fr sbcl-* **/sbcl-* *.tar.gz
+distclean: clean
 	$(MAKE) gen TARGET=distclean
+	-rm -fr sbcl-* # for ASDF Binary Locations
+	-rm -fr "${HOME}"/.cache/common-lisp/sbcl-*"`pwd`" # for ASDF 2
+	-rm *.tar.gz
 
 tag:
 	git tag -a -m 'Version $(LONG_VERSION)' 'version-$(SHORT_VERSION)'
