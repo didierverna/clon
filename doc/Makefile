@@ -59,36 +59,36 @@ all-formats: all dvi ps
 all-formats-ref: ref dvi-ref ps-ref
 
 install-at: $(PDF_FILES) $(HTML_DIRS)
-	install -d $(LOCATION)
-	install -m 644 $(PDF_FILES) $(LOCATION)/
-	install -d -m 755 $(LOCATION)/user
-	install -m 644 user/* $(LOCATION)/user
-	install -d -m 755 $(LOCATION)/enduser
-	install -m 644 enduser/* $(LOCATION)/enduser
+	install -d "$(LOCATION)"
+	install -m 644 $(PDF_FILES) "$(LOCATION)/"
+	install -d -m 755 "$(LOCATION)/user"
+	install -m 644 user/* "$(LOCATION)/user/"
+	install -d -m 755 "$(LOCATION)/enduser"
+	install -m 644 enduser/* "$(LOCATION)/enduser/"
 
 install: $(INFO_FILES)
-	install -d $(INFO_DIR)
-	install -m 644 $(ALL_INFO_FILES) $(INFO_DIR)/
+	install -d "$(INFO_DIR)"
+	install -m 644 $(ALL_INFO_FILES) "$(INFO_DIR)/"
 	for i in $(INFO_FILES); do			\
-	  install-info --info-dir=$(INFO_DIR) $$i;	\
+	  install-info --info-dir="$(INFO_DIR)" $$i;	\
 	done
-	$(MAKE) install-at LOCATION=$(CLON_DOC_DIR)
+	$(MAKE) install-at LOCATION="$(CLON_DOC_DIR)"
 
 install-ref: clon-reference.info reference.pdf reference
-	install -d $(INFO_DIR)
-	install -m 644 clon-reference.info* $(INFO_DIR)/
-	install-info --info-dir=$(INFO_DIR) clon-reference.info
-	install -d $(CLON_DOC_DIR)
-	install -m 644 reference.pdf $(CLON_DOC_DIR)/
-	install -d -m 755 $(CLON_DOC_DIR)/reference
-	install -m 644 reference/* $(CLON_DOC_DIR)/reference
+	install -d "$(INFO_DIR)"
+	install -m 644 clon-reference.info* "$(INFO_DIR)/"
+	install-info --info-dir="$(INFO_DIR)" clon-reference.info
+	install -d "$(CLON_DOC_DIR)"
+	install -m 644 reference.pdf "$(CLON_DOC_DIR)/"
+	install -d -m 755 "$(CLON_DOC_DIR)/reference"
+	install -m 644 reference/* "$(CLON_DOC_DIR)/reference/"
 
 uninstall:
-	-rm -fr $(CLON_DOC_DIR)
+	-rm -fr "$(CLON_DOC_DIR)"
 	for i in $(INFO_FILES); do				\
-	  install-info --remove --info-dir=$(INFO_DIR) $$i;	\
+	  install-info --remove --info-dir="$(INFO_DIR)" $$i;	\
 	done
-	cd $(INFO_DIR) && rm -f $(ALL_INFO_FILES)
+	cd "$(INFO_DIR)" && rm -f $(ALL_INFO_FILES)
 
 info: $(INFO_FILES)
 info-ref: clon-reference.info
@@ -145,10 +145,10 @@ update-version:
 	done
 
 install-www: webref
-	$(MAKE) install-at LOCATION=$(W3DIR)
-	install -m 644 webreference.pdf $(W3DIR)/reference.pdf
-	install -d -m 755 $(W3DIR)/reference
-	install -m 644 webreference/* $(W3DIR)/reference
+	$(MAKE) install-at LOCATION="$(W3DIR)"
+	install -m 644 webreference.pdf "$(W3DIR)/reference.pdf"
+	install -d -m 755 "$(W3DIR)/reference"
+	install -m 644 webreference/* "$(W3DIR)/reference/"
 
 
 .PHONY: all all-formats			\

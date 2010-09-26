@@ -49,7 +49,7 @@ uninstall:
 	-rm -fr "$(CLON_SHARE)"
 
 clean:
-	-rm *~ **/*~
+	-rm *~ */*~ */*/*~
 
 update-version:
 install-www:
