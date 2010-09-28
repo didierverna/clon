@@ -87,6 +87,7 @@ install-www: dist
 	 contents (\"Signature GPG\", \"GPG Signature\")); ?>" \
 	  > "$(W3DIR)/latest.txt"
 	chmod 644 "$(W3DIR)/latest.txt"
+	git push --mirror "$(W3DIR)/clon.git"
 	$(MAKE) gen TARGET=install-www
 	cd "$(W3DIR)"					\
 	  && ln -fs attic/$(TARBALL) latest.tar.gz	\
