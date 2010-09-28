@@ -43,6 +43,10 @@ SUBDIRS     := src sbcl  \
 SYSTEMS_DIR := $(SHARE)/common-lisp/systems
 ASDF_FILE   := com.dvlsoft.clon.asd
 
+DIST_NAME := clon-$(SHORT_VERSION)
+TARBALL   := $(DIST_NAME).tar.gz
+SIGNATURE := $(TARBALL).asc
+
 
 all:
 	$(MAKE) gen TARGET=all
@@ -63,23 +67,30 @@ distclean: clean
 	$(MAKE) gen TARGET=distclean
 	-rm -fr sbcl-* # for ASDF Binary Locations
 	-rm -fr "${HOME}"/.cache/common-lisp/sbcl-*"`pwd`" # for ASDF 2
-	-rm *.tar.gz
+	-rm *.tar.gz *.asc
 
 tag:
 	git tag -a -m 'Version $(LONG_VERSION)' 'version-$(SHORT_VERSION)'
 
-dist:
-	git archive --format=tar --prefix=clon-$(SHORT_VERSION)/	\
-	    --worktree-attributes HEAD					\
-	  | gzip -c > clon-$(SHORT_VERSION).tar.gz
+tar: $(TARBALL)
+gpg: $(SIGNATURE)
+dist: tar gpg
 
-install-www:
-	-install -m 644 *.tar.gz "$(W3DIR)/attic/"
-	echo '$(LONG_VERSION)' > "$(W3DIR)/version.txt"
-	chmod 644 "$(W3DIR)/version.txt"
-	echo '<? lref ("clon/attic/clon-$(SHORT_VERSION).tar.gz", contents ("ici", "here")); ?>'\
-	  > "$(W3DIR)/current.txt"
+install-www: dist
+	-install -m 644 $(TARBALL)   "$(W3DIR)/attic/"
+	-install -m 644 $(SIGNATURE) "$(W3DIR)/attic/"
+	echo "\
+<? lref (\"clon/attic/clon-$(SHORT_VERSION).tar.gz\", \
+	 contents (\"Dernière version\", \"Latest version\")); ?> \
+| \
+<? lref (\"clon/attic/clon-$(SHORT_VERSION).tar.gz.asc\", \
+	 contents (\"Signature GPG\", \"GPG Signature\")); ?>" \
+	  > "$(W3DIR)/latest.txt"
+	chmod 644 "$(W3DIR)/latest.txt"
 	$(MAKE) gen TARGET=install-www
+	cd "$(W3DIR)"					\
+	  && ln -fs attic/$(TARBALL) latest.tar.gz	\
+	  && ln -fs attic/$(SIGNATURE) latest.tar.gz.asc
 
 gen:
 	@for i in $(SUBDIRS) ; do                 \
@@ -87,10 +98,22 @@ gen:
 	   ( cd $${i} && $(MAKE) $(TARGET) ) ;    \
 	 done
 
+$(TARBALL):
+	git archive --format=tar --prefix=$(DIST_NAME)/	\
+	    --worktree-attributes HEAD			\
+	  | gzip -c > $@
+
+$(SIGNATURE): $(TARBALL)
+	gpg -b -a $<
+
 .DEFAULT:
 	$(MAKE) gen TARGET=$@
 
-.PHONY: all install uninstall clean tag dist install-www gen
+.PHONY: all install uninstall	\
+	clean distclean		\
+	tag tar gpg dist	\
+	install-www		\
+	gen
 
 
 ### Makefile ends here
