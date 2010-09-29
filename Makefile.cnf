@@ -5,7 +5,7 @@
 ## Author:        Didier Verna <didier@lrde.epita.fr>
 ## Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ## Created:       Sun May 31 17:18:34 2009
-## Last Revision: Sat Jun 12 17:51:39 2010
+## Last Revision: Wed Sep 29 17:38:20 2010
 
 ## This file is part of Clon.
 
@@ -30,11 +30,10 @@
 
 ### Code:
 
-# Installation prefix.
-# - ASDF file will be symlinked in $(PREFIX)/share/common-lisp/systems
-# - Data will end up in $(PREFIX)/share/clon/
-# - Documentation will end up in $(PREFIX)/share/doc/clon/
-#                            and $(PREFIX)/share/info/
+# Installation prefix. This is used for installing Clon as follows:
+# - $(PREFIX)/share/common-lisp/systems/ for the system file (ASDF 1)
+# - $(PREFIX)/share/doc/clon/ for the PDF documentation
+# - $(PREFIX)/share/info/ for the info documentation
 # If any of these are unsatisfactory, you will need to edit the Makefiles, or
 # do the installation by hand.
 PREFIX := /usr/local
