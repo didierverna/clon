@@ -32,8 +32,8 @@
 
 TOP_DIR := ..
 
-include ../Makefile.cnf
-include ../Makefile.inc
+include $(TOP_DIR)/Makefile.cnf
+include $(TOP_DIR)/Makefile.inc
 
 # #### NOTE: at least for the demo program, we do want the debugger enabled,
 # (to demonstrate the restarts) so I can't use the --script option here.
@@ -43,9 +43,6 @@ all:
 	--noinform --disable-ldb --lose-on-corruption --end-runtime-options \
 	--no-userinit --no-sysinit --load demo.lisp
 
-install:
-uninstall:
-
 clean:
 	-rm *~
 
@@ -53,10 +50,7 @@ distclean: clean
 	-rm -fr sbcl-* # for ASDF Binary Locations
 	-rm -fr demo
 
-update-version:
-install-www:
-
-.PHONY: all install uninstall clean distclean update-version install-www
+.PHONY: all clean distclean
 
 
 ### Makefile ends here

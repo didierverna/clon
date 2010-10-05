@@ -32,8 +32,8 @@
 
 TOP_DIR := ..
 
-include ../Makefile.cnf
-include ../Makefile.inc
+include $(TOP_DIR)/Makefile.cnf
+include $(TOP_DIR)/Makefile.inc
 
 INFO_DIR     := $(PREFIX)/share/info
 DOC_DIR	     := $(SHARE)/doc

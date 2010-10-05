@@ -32,8 +32,8 @@
 
 TOP_DIR := ..
 
-include ../Makefile.cnf
-include ../Makefile.inc
+include $(TOP_DIR)/Makefile.cnf
+include $(TOP_DIR)/Makefile.inc
 
 CLON_SHARE := $(SHARE)/clon
 THEMES_DIR := $(CLON_SHARE)/themes
@@ -51,10 +51,7 @@ uninstall:
 clean:
 	-rm *~ */*~ */*/*~
 
-update-version:
-install-www:
-
-.PHONY: all install uninstall clean update-version install-www
+.PHONY: all install uninstall clean
 
 
 ### Makefile ends here

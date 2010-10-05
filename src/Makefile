@@ -32,13 +32,10 @@
 
 TOP_DIR := ..
 
-include ../Makefile.cnf
-include ../Makefile.inc
+include $(TOP_DIR)/Makefile.cnf
+include $(TOP_DIR)/Makefile.inc
 
 all:
-
-install:
-uninstall:
 
 clean:
 	-rm *~
@@ -46,10 +43,7 @@ clean:
 distclean: clean
 	-rm -fr sbcl-* */sbcl-* */*/sbcl-* # for ASDF Binary Locations
 
-update-version:
-install-www:
-
-.PHONY: all install uninstall clean distclean update-version install-www
+.PHONY: all clean distclean
 
 
 ### Makefile ends here
