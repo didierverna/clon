@@ -36,17 +36,8 @@ SHARE := $(PREFIX)/share
 
 W3DIR := $(HOME)/www/software/lisp/clon
 
-LONG_VERSION := $(shell if test -f $(TOP_DIR)/demo/demo; then	\
-		     $(TOP_DIR)/demo/demo --clon-version=long;	\
-		   else						\
-		     echo "unknown";				\
-		   fi)
-
-SHORT_VERSION := $(shell if test -f $(TOP_DIR)/demo/demo; then	\
-		     $(TOP_DIR)/demo/demo --clon-version=short;	\
-		   else						\
-		     echo "unknown";				\
-		   fi)
+$(TOP_DIR)/version.inc: $(TOP_DIR)/version.sh $(TOP_DIR)/com.dvlsoft.clon.asd
+	CC=$(CC) $(TOP_DIR)/version.sh | tail -2 > $@
 
 
 ### Makefile.inc ends here

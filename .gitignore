@@ -1,5 +1,7 @@
 sbcl-*/
 
+version.inc
+
 demo/demo
 
 sbcl/foo.c
