@@ -51,9 +51,11 @@ SIGNATURE := $(TARBALL).asc
 all:
 	$(MAKE) gen TARGET=all
 
-install:
+demo: # needed because we have a demo/ directory which fucks up the target.
+	cd demo && $(MAKE) demo
+
+install-system:
 	ln -fs "`pwd`/$(ASDF_FILE)" "$(SYSTEMS_DIR)/"
-	$(MAKE) gen TARGET=install
 
 uninstall:
 	-rm -f "$(SYSTEMS_DIR)/$(ASDF_FILE)"
@@ -110,7 +112,9 @@ $(SIGNATURE): $(TARBALL)
 .DEFAULT:
 	$(MAKE) gen TARGET=$@
 
-.PHONY: all install uninstall	\
+.PHONY: all demo		\
+	install-system		\
+	uninstall		\
 	clean distclean		\
 	tag tar gpg dist	\
 	install-www		\

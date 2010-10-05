@@ -35,13 +35,15 @@ TOP_DIR := ..
 include $(TOP_DIR)/Makefile.cnf
 include $(TOP_DIR)/Makefile.inc
 
+all:
+
 # #### NOTE: at least for the demo program, we do want the debugger enabled,
 # (to demonstrate the restarts) so I can't use the --script option here.
 # #### PORTME:
-all:
+demo: demo.lisp
 	CC=$(CC) sbcl \
 	--noinform --disable-ldb --lose-on-corruption --end-runtime-options \
-	--no-userinit --no-sysinit --load demo.lisp
+	--no-userinit --no-sysinit --load $<
 
 clean:
 	-rm *~

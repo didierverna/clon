@@ -108,7 +108,7 @@ ps: clon.eps $(PS_FILES)
 ps-ref: clon.eps reference.ps
 
 reference.texi webreference.texi: generate.sh
-	./generate.sh
+	CC=$(CC) ./generate.sh
 	$(PERL) -pi -e 's/^\@author/\@vskip 2cm\n\@image\{clon,16cm\}\n\@author/' reference.texi webreference.texi
 
 clon-%.info: %.texi

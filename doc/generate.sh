@@ -122,13 +122,6 @@ and extend the library with your own option types.
 		     #p"/usr/local/share/common-lisp/systems/"
 		     #p"/usr/share/common-lisp/systems/"
 		     asdf:*central-registry*))
-#+asdf2 (asdf:initialize-source-registry
-	 `(:source-registry
-	   (:tree ,(merge-pathnames "science/src/common-lisp/"
-				    (user-homedir-pathname)))
-	   (:tree "/usr/local/src/common-lisp/")
-	   (:tree "/usr/share/common-lisp/source/")
-	   :inherit-configuration))
 
 #-asdf2 (ignore-errors (asdf:operate 'asdf:load-op :asdf-binary-locations))
 
