@@ -126,17 +126,21 @@ and extend the library with your own option types.
 #-asdf2 (ignore-errors (asdf:operate 'asdf:load-op :asdf-binary-locations))
 
 (asdf:operate 'asdf:load-op :com.dvlsoft.declt)
-(com.dvlsoft.declt:declt :com.dvlsoft.clon
-			 :library-name "Clon"
-			 :texi-file "reference.texi"
-			 :info-file "clon-reference"
-			 :introduction +introduction+)
-(com.dvlsoft.declt:declt :com.dvlsoft.clon
-			 :library-name "Clon"
-			 :texi-file "webreference.texi"
-			 :info-file "clon-webreference" ;; but we don't care
-			 :introduction +introduction+
-			 :link-files nil)
+
+(if (and (second sb-ext:*posix-argv*)
+	 (string= (second sb-ext:*posix-argv*) "--web"))
+    (com.dvlsoft.declt:declt :com.dvlsoft.clon
+			     :library-name "Clon"
+			     :texi-file "webreference.texi"
+			     ;; but we don't care
+			     :info-file "clon-webreference"
+			     :introduction +introduction+
+			     :link-files nil)
+  (com.dvlsoft.declt:declt :com.dvlsoft.clon
+			   :library-name "Clon"
+			   :texi-file "reference.texi"
+			   :info-file "clon-reference"
+			   :introduction +introduction+))
 
 
 

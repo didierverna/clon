@@ -107,9 +107,13 @@ dvi-ref: clon.eps reference.dvi
 ps: clon.eps $(PS_FILES)
 ps-ref: clon.eps reference.ps
 
-reference.texi webreference.texi: generate.sh
+reference.texi: generate.sh
 	CC=$(CC) ./generate.sh
-	$(PERL) -pi -e 's/^\@author/\@vskip 2cm\n\@image\{clon,16cm\}\n\@author/' reference.texi webreference.texi
+	$(PERL) -pi -e 's/^\@author/\@vskip 2cm\n\@image\{clon,16cm\}\n\@author/' $@
+
+webreference.texi: generate.sh
+	CC=$(CC) ./generate.sh --web
+	$(PERL) -pi -e 's/^\@author/\@vskip 2cm\n\@image\{clon,16cm\}\n\@author/' $@
 
 clon-%.info: %.texi
 	$(MAKEINFO) $<

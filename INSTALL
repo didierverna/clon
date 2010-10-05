@@ -49,10 +49,9 @@ are available), type "make all-formats-ref". You can also individually type
 "make dvi-ref" and/or "make ps-ref" in order to get the corresponding format
 only.
 
-Incidentally, a web-specific version of the reference manual is generated
-under the name webreference.texi (See *link-files* in the Declt library for an
-explanation). You can also format this version by using the "make webref", or
-just the 'pdf-webref' / 'html-webref' sub-targets.
+You may also generate a "web", unlinked version of the reference manual (see
+the variable *link-files* for an explanation) by typing "make webref" or "make
+pdf-webref" and "make html-webref" individually.
 
 
 * Uninstalling
