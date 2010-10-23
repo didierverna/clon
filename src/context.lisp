@@ -5,7 +5,7 @@
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Tue Jul  1 16:08:02 2008
-;; Last Revision: Sat Oct 23 04:19:28 2010
+;; Last Revision: Sat Oct 23 05:19:47 2010
 
 ;; This file is part of Clon.
 
@@ -124,15 +124,13 @@
 	     :initform *default-synopsis*)
    (progname :documentation ~"The program name "
 			    ~"as it appears on the command-line."
-	     :type string
-	     :reader progname)
+	     :type string) ;; see below for reader
    (cmdline-options :documentation "The options from the command-line."
 	  :type list ;; of cmdline-option objects
 	  :initform nil  ;; see the warning in initialize-instance
 	  :accessor cmdline-options)
    (remainder :documentation "The non-Clon part of the command-line."
-	      :type list
-	      :reader remainder)
+	      :type list) ;; see below for reader
    (search-path :documentation "The search path for Clon files."
 		:reader search-path)
    (theme :documentation "The theme filename."
@@ -152,6 +150,14 @@
   (:documentation "The CONTEXT class.
 This class represents the associatiion of a synopsis and a set of command-line
 options based on it."))
+
+(defun progname (&key (context *current-context*))
+  "Return CONTEXT's program name."
+  (slot-value context 'progname))
+
+(defun remainder (&key (context *current-context*))
+  "Return CONTEXT's remainder."
+  (slot-value context 'remainder))
 
 
 ;; --------------------------------------------
@@ -218,7 +224,7 @@ options based on it."))
 			   :highlight highlight)))
     (print-help sheet
 		(help-spec item
-			   :program (pathname-name (progname context))
+			   :program (pathname-name (progname :context context))
 			   :unhide t))
     (flush-sheet sheet)))
 
@@ -682,7 +688,7 @@ Copyright (C) 2010 Didier Verna.
 Clon is released under the terms of the GNU General Public License, version 3.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.~%"
-      (pathname-name (progname context))
+      (pathname-name (progname :context context))
       (version :long))
     (exit))
   (let ((version-format (getopt :context context :long-name "clon-version")))
