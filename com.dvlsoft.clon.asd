@@ -173,12 +173,12 @@ The most important features of Clon are:
 					     (:file "valued"
 						    :depends-on ("option"))
 					     (:file "negatable"
-						    :depends-on ("option"))
+						    :depends-on ("valued"))
 					     (:file "switch-base"
 						    :depends-on ("negatable"))
 					     (:file "switch"
 						    :depends-on
-						    ("valued" "switch-base"))
+						    ("switch-base"))
 					     (:file "stropt"
 						    :depends-on ("valued"))
 					     (:file "lispobj"
