@@ -5,7 +5,7 @@
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Wed Oct 22 09:20:48 2008
-;; Last Revision: Sat Jun 12 18:27:27 2010
+;; Last Revision: Sat Oct 23 04:08:38 2010
 
 ;; This file is part of Clon.
 
@@ -40,8 +40,9 @@
 
 (defun option-call-p (str)
   "Return true if STR looks like an option call."
-  (or (eq (elt str 0) #\-)
-      (eq (elt str 0) #\+)))
+  (unless (zerop (length str))
+    (or (eq (elt str 0) #\-)
+	(eq (elt str 0) #\+))))
 
 (defun argument-popable-p (cmdline)
   "Return true if the first CMDLINE item is an argument."
