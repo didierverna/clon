@@ -104,16 +104,16 @@ Possible values are yes, no or try. If try, no errors are reported."
 
 (defun main ()
   "Entry point for the standalone application."
-  (let ((ctx (clon:make-context)))
-    (when (clon:getopt :short-name "h")
-      (clon:help)
-      (clon:exit))
-    (format t "Program name: ~A~%~%" (clon:progname ctx))
-    (format t "Options:")
-    (clon:do-cmdline-options (option name value source)
-      (print (list option name value source)))
-    (terpri)
-    (format t "Remainder: ~A~%" (clon:remainder ctx)))
+  (clon:make-context)
+  (cond ((clon:getopt :short-name "h")
+	 (clon:help))
+	(t
+	 (format t "Program name: ~A~%~%" (clon:progname))
+	 (format t "Options:")
+	 (clon:do-cmdline-options (option name value source)
+	   (print (list option name value source)))
+	 (terpri)
+	 (format t "Remainder: ~A~%" (clon:remainder))))
   (clon:exit))
 
 ;; #### PORTME.
