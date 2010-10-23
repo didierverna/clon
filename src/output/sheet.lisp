@@ -374,11 +374,18 @@ output reaches the rightmost bound."
 			;; output the word right now. This will be handled by
 			;; the next LOOP iteration.
 			(open-next-line sheet))
+		       ;; The chunk wouldn't even fit on a line of its own, so
+		       ;; we have no other choice than splitting it at a
+		       ;; non-space position. When we do, we also insert an
+		       ;; hyphenation mark at the end of the chunk. We know
+		       ;; from open-sface that every frame has is least two
+		       ;; characters wide (in other words, we know here that
+		       ;; full-width >= 2). However, available-with might
+		       ;; already be too small. If that is the case, we must
+		       ;; go next-line first.
+		       ((< available-width 2)
+			(open-next-line sheet))
 		       (t
-			;; The chunk wouldn't even fit on a line of its own,
-			;; so we have no other choice than splitting it at a
-			;; non-space position. Also, insert an hyphenation
-			;; mark at the end of the chunk.
 			(setq end (+ i available-width -1))
 			(princ-string sheet (subseq string i end))
 			(princ-char sheet #\-)
@@ -419,17 +426,17 @@ instead, and make a copy of it."
   "Return either MARGIN or a safe value instead.
 To be safe, margin must be greater than the current left margin and smaller
 than the currently available margin."
-  (or (when (< margin (current-left-margin sheet))
+  (or (when (or (< margin (current-left-margin sheet))
+		(>= margin (available-right-margin sheet)))
 	(current-left-margin sheet))
-      (when (> margin (available-right-margin sheet))
-	(available-right-margin sheet))
       margin))
 
 (defun safe-right-margin (sheet left-margin margin)
   "Return either MARGIN or a safe value instead.
 To be safe, margin must be greater than LEFT-MARGIN and smaller
 than the currently available right margin."
-  (or (when (or (<= margin left-margin) (> margin (available-right-margin sheet)))
+  (or (when (or (<= margin left-margin)
+		(> margin (available-right-margin sheet)))
 	(available-right-margin sheet))
       margin))
 
@@ -438,30 +445,32 @@ than the currently available right margin."
   (assert (visiblep sface))
   ;; Create the new frame:
   (let* ((left-margin
-	  (let ((padding-spec (left-padding sface)))
-	    (econd
-	     ((eq padding-spec 'self)
-	      (column sheet))
-	     ((numberp padding-spec)
-	      (safe-left-margin sheet
-				(+ (current-left-margin sheet) padding-spec)))
-	     ((listp padding-spec)
-	      (destructuring-bind (padding relative-to &optional face-name)
-		  padding-spec
-		;; #### FIXME: should provide better error handling
-		(econd ((and (eq relative-to 'absolute)
-			     (null face-name))
-			(safe-left-margin sheet padding))
-		       ((and (eq relative-to :relative-to) (symbolp face-name))
-			(let* ((generation (parent-generation sface face-name))
-			       (left-margin
-				(frame-left-margin
-				 ;; #### WARNING: we have not open the new
-				 ;; frame yet, so decrement the generation
-				 ;; level !!
-				 (nth (1- generation) (frames sheet)))))
-			  (safe-left-margin sheet
-					    (+ left-margin padding))))))))))
+	  (safe-left-margin
+	   sheet
+	   (let ((padding-spec (left-padding sface)))
+	     (econd
+	       ((eq padding-spec 'self)
+		(column sheet))
+	       ((numberp padding-spec)
+		(+ (current-left-margin sheet) padding-spec))
+	       ((listp padding-spec)
+		(destructuring-bind (padding relative-to &optional face-name)
+		    padding-spec
+		  ;; #### FIXME: should provide better error handling
+		  (econd ((and (eq relative-to 'absolute)
+			       (null face-name))
+			  padding)
+			 ((and (eq relative-to :relative-to)
+			       (symbolp face-name))
+			  (let* ((generation (parent-generation sface
+								face-name))
+				 (left-margin
+				  (frame-left-margin
+				   ;; #### WARNING: we have not open the new
+				   ;; frame yet, so decrement the generation
+				   ;; level !!
+				   (nth (1- generation) (frames sheet)))))
+			    (+ left-margin padding))))))))))
 	 (right-margin
 	  (let ((padding-spec (right-padding sface)))
 	    (econd
@@ -495,6 +504,17 @@ than the currently available right margin."
 			      (safe-right-margin sheet left-margin
 						 (- right-margin padding))
 	      (error "Can't be :relative-to a self right margin.")))))))))))
+    ;; Despite the "safe" computations above, we still need to check that our
+    ;; new left and right margins let us actually display something.
+    ;; Otherwise, we don't move at all because the layout is too fucked up. A
+    ;; strict minimum is room for 2 characters, so that we can at least
+    ;; display one character and an hyphen. But really, 2 characters wide is
+    ;; already cmpletely insane...
+    (let ((actual-right-margin
+	   (or right-margin (available-right-margin sheet))))
+      (unless (>= (- actual-right-margin left-margin) 2)
+	(setq left-margin (current-left-margin sheet)
+	      right-margin (current-right-margin sheet))))
     (push-frame sheet
 		(if (highlightp sheet)
 		    (let ((highlight-property-instances
