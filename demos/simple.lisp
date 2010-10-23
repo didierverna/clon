@@ -34,8 +34,7 @@
 
 (require :asdf)
 #-asdf2 (setf asdf:*central-registry*
-	      (list* #p"../"
-		     (merge-pathnames "share/common-lisp/systems/"
+	      (list* (merge-pathnames "share/common-lisp/systems/"
 				      (user-homedir-pathname))
 		     #p"/usr/local/share/common-lisp/systems/"
 		     #p"/usr/share/common-lisp/systems/"
