@@ -33,13 +33,14 @@
 TOP_DIR := ..
 
 include $(TOP_DIR)/Makefile.cnf
+
+all:
+
 include $(TOP_DIR)/Makefile.inc
 
 CLON_SHARE := $(SHARE)/clon
 THEMES_DIR := $(CLON_SHARE)/themes
 
-
-all:
 
 install:
 	install -d -m 755 "$(THEMES_DIR)"

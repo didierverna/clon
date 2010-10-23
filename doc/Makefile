@@ -33,6 +33,9 @@
 TOP_DIR := ..
 
 include $(TOP_DIR)/Makefile.cnf
+
+all: info pdf html
+
 include $(TOP_DIR)/Makefile.inc
 include $(TOP_DIR)/version.inc
 
@@ -48,8 +51,6 @@ DVI_FILES      := $(TEXI_FILES:%.texi=%.dvi)
 PS_FILES       := $(TEXI_FILES:%.texi=%.ps)
 HTML_DIRS      := $(TEXI_FILES:%.texi=%)
 
-
-all: info pdf html
 
 ref: info-ref pdf-ref html-ref
 

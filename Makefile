@@ -35,6 +35,10 @@
 TOP_DIR := .
 
 include Makefile.cnf
+
+all:
+	$(MAKE) gen TARGET=all
+
 include Makefile.inc
 include version.inc
 
@@ -48,9 +52,6 @@ DIST_NAME := clon-$(SHORT_VERSION)
 TARBALL   := $(DIST_NAME).tar.gz
 SIGNATURE := $(TARBALL).asc
 
-
-all:
-	$(MAKE) gen TARGET=all
 
 demo: # needed because we have a demo/ directory which fucks up the target.
 	cd demo && $(MAKE) demo

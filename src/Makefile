@@ -33,9 +33,10 @@
 TOP_DIR := ..
 
 include $(TOP_DIR)/Makefile.cnf
-include $(TOP_DIR)/Makefile.inc
 
 all:
+
+include $(TOP_DIR)/Makefile.inc
 
 clean:
 	-rm *~

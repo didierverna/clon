@@ -33,14 +33,19 @@
 TOP_DIR := ..
 
 include $(TOP_DIR)/Makefile.cnf
-include $(TOP_DIR)/Makefile.inc
 
 all:
 
-# #### NOTE: at least for the demo program, we do want the debugger enabled,
+include $(TOP_DIR)/Makefile.inc
+
+DEMOS := demo advanced
+
+demos: $(DEMOS)
+
+# #### NOTE: at least for the demo programs, we do want the debugger enabled,
 # (to demonstrate the restarts) so I can't use the --script option here.
-# #### PORTME:
-demo: demo.lisp
+# #### PORTME.
+$(DEMOS): %: %.lisp
 	CC=$(CC) sbcl \
 	--noinform --disable-ldb --lose-on-corruption --end-runtime-options \
 	--no-userinit --no-sysinit --load $<
@@ -50,7 +55,7 @@ clean:
 
 distclean: clean
 	-rm -fr sbcl-* # for ASDF Binary Locations
-	-rm -fr demo
+	-rm -fr $(DEMOS)
 
 .PHONY: all clean distclean
 
