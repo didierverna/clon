@@ -5,7 +5,7 @@
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Tue Jul  1 16:08:02 2008
-;; Last Revision: Sat Jun 12 18:19:00 2010
+;; Last Revision: Sat Oct 23 04:19:28 2010
 
 ;; This file is part of Clon.
 
@@ -657,24 +657,19 @@ CONTEXT is where to look for the options."
 					       "+" new-cmdline-name))
 				   (go figure-this-negated-call)))))))))
 		(t
-		 ;; Not an option call. If there's no more option on the
-		 ;; cmdline, consider this as an implicit remainder. However,
-		 ;; contrary to the case of an explicit one (separated from
-		 ;; the rest of the cmdline by --), trigger an error if a
-		 ;; remainder is not expected. If there's still another option
-		 ;; somewhere, then this is real junk.
-		 (cond ((notany #'option-call-p cmdline)
-			(cond ((null (postfix context))
-			       (setq arg (cons arg cmdline))
-			       (setq cmdline nil)
-			       ;; Note that here, the whole remainder of the
-			       ;; cmdline might be discraded at once.
-			       (restartable-cmdline-junk-error arg))
-			      (t
-			       (setq remainder (cons arg cmdline))
-			       (setq cmdline nil))))
+		 ;; Not an option call. Consider this as an implicit remainder
+		 ;; if one is expected. Contrary to the case of an explicit
+		 ;; one however (separated from the rest of the cmdline by
+		 ;; --), trigger an error if a remainder is not expected.
+		 (cond ((null (postfix context))
+			(setq arg (cons arg cmdline))
+			(setq cmdline nil)
+			;; Note that here, the whole remainder of the
+			;; cmdline might be discraded at once.
+			(restartable-cmdline-junk-error arg))
 		       (t
-			(restartable-cmdline-junk-error arg)))))))
+			(setq remainder (cons arg cmdline))
+			(setq cmdline nil)))))))
       (setf (cmdline-options context) (nreverse cmdline-options))
       (setf (slot-value context 'remainder) remainder)))
   ;; Step two: handle internal options ======================================
