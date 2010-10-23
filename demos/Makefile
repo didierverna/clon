@@ -38,7 +38,7 @@ all:
 
 include $(TOP_DIR)/Makefile.inc
 
-DEMOS := demo advanced
+DEMOS := simple advanced
 
 demos: $(DEMOS)
 

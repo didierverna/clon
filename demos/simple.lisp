@@ -117,7 +117,7 @@ Possible values are yes, no or try. If try, no errors are reported."
   (clon:exit))
 
 ;; #### PORTME.
-(save-lisp-and-die "demo"
+(save-lisp-and-die "simple"
   :toplevel #'main :executable t :save-runtime-options t)
 
 

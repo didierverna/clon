@@ -2,8 +2,8 @@ sbcl-*/
 
 version.inc
 
-demo/demo
-demo/advanced
+demos/simple
+demos/advanced
 
 sbcl/foo.c
 sbcl/constants.lisp-temp

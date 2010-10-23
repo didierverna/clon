@@ -8,12 +8,12 @@ The Clon distribution has the following shape:
 ./sbcl/	        ;; SBCL grovel module
 ./share/	;; data files
 ./doc/		;; documentation
-./demo/         ;; demo program
+./demos/        ;; demo programs
 
 
 * Configuration
-You may need to edit Makefile.cnf, demo/demo.lisp and doc/generate.sh in order
-to tweak some installation parameters.
+You may need to edit Makefile.cnf, demos/simple.lisp, demos/advanced.lisp and
+doc/generate.sh in order to tweak some installation parameters.
 
 
 * Building and installing
@@ -28,8 +28,8 @@ Typing "make install" will install both the documentation and the data files.
 If you're using ASDF 1, you will want to "make install-system" in order to
 create the system file symlink where appropriate.
 
-If you want to compile the demo program, type "make demo". This program is not
-installed anywhere.
+If you want to compile the demo programs, type "make demos". These programs
+are not installed anywhere.
 
 
 * Building and installing the reference manual

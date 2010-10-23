@@ -44,7 +44,7 @@ include version.inc
 
 SUBDIRS     := src sbcl  \
 	       share doc \
-	       demo
+	       demos
 SYSTEMS_DIR := $(SHARE)/common-lisp/systems
 ASDF_FILE   := com.dvlsoft.clon.asd
 
@@ -53,8 +53,8 @@ TARBALL   := $(DIST_NAME).tar.gz
 SIGNATURE := $(TARBALL).asc
 
 
-demo: # needed because we have a demo/ directory which fucks up the target.
-	cd demo && $(MAKE) demo
+demos: # needed because we have a demos/ directory which fucks up the target.
+	cd demos && $(MAKE) demos
 
 install-system:
 	ln -fs "`pwd`/$(ASDF_FILE)" "$(SYSTEMS_DIR)/"
@@ -117,7 +117,7 @@ $(SIGNATURE): $(TARBALL)
 .DEFAULT:
 	$(MAKE) gen TARGET=$@
 
-.PHONY: all demo		\
+.PHONY: all demos		\
 	install-system		\
 	uninstall		\
 	clean distclean		\
