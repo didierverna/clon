@@ -1189,11 +1189,11 @@ of your program, for example (and most notably) with an actual
 @cmdline{} as the user typed it.
 
 @menu
-* Making A Context::    The Constructor function
-* Context Readers::     Interesting context slots
+* Making A Context::            The Constructor function
+* Contextual Information::      Interesting context slots
 @end menu
 
-@node Making A Context, Context Readers, Context Creation, Context Creation
+@node Making A Context, Contextual Information, Context Creation, Context Creation
 @subsection Making A Context
 
 @cfindex{make-context}
@@ -1204,29 +1204,28 @@ You create a context with the @code{make-context} function.
 Create a new context. That's it.
 @end defun
 
-@node Context Readers, , Making A Context, Context Creation
-@subsection Context Readers
+@node Contextual Information, , Making A Context, Context Creation
+@subsection Contextual Information
 
-Once a context object is created, you have access to two interesting
-slots in it.
+Once a context object is created, you have access to some interesting
+contextual information.
 
 @menu
 * Program Name::                As it appear on the command-line
 * Command-Line Remainder::      The non-options part
 @end menu
 
-@node Program Name, Command-Line Remainder, Context Readers, Context Readers
+@node Program Name, Command-Line Remainder, Contextual Information, Contextual Information
 @subsubsection Program Name
 The application's program name, as it appears on the @cmdline{}, may be
-accessed from @clon{} via the context object. You may find it easier to
-do this way, as @clon{} wraps around implementation-dependent access
-methods to @code{argv[0]}.
+accessed from @clon{}. You may find it easier to do this way, as @clon{}
+wraps around implementation-dependent access methods to @code{argv[0]}.
 
-@rfindex{progname}
-In order to retrieve @code{argv[0]}, use the @code{progname} reader on
-the context object like this: @code{(progname context)}.
+@findex progname
+In order to retrieve @code{argv[0]}, use the @code{progname} function
+like this: @code{(progname)}.
 
-@node Command-Line Remainder, , Program Name, Context Readers
+@node Command-Line Remainder, , Program Name, Contextual Information
 @subsubsection Command-Line Remainder
 @cindex Remainder, of command-line
 @cindex Command-Line Remainder
@@ -1236,11 +1235,10 @@ may need to access it in order to process it independently from @clon{}.
 Since @clon{} is responsible for parsing the @cmdline{}, it is also in
 charge of figuring out where the remainder of the @cmdline{} begins.
 
-@rfindex{remainder}
+@findex remainder
 The @cmdline{} remainder is known to @clon{} as soon as a context is
-created. You can retrieve it by using the @code{remainder} reader on the
-context object like this: @code{(remainder context)}. The remainder is
-provided as a list of strings.
+created. You can retrieve it by using the @code{remainder} function like
+this: @code{(remainder)}. The remainder is provided as a list of strings.
 
 
 
@@ -2077,17 +2075,19 @@ the@dots{} current context, yeah. When you create a context with
 the @code{:make-current} initarg with a value of @code{nil}.
 
 @cindex Runtime Phase
+@findex progname
+@findex remainder
 @findex getopt
 @findex getopt-cmdline
 @findex multiple-value-getopt-cmdline
 @findex do-cmdline-options
 @findex help
 The whole runtime phase API of @clon{} uses a context implicitely. This
-involves @code{getopt}, @code{getopt-cmdline},
-@code{multiple-value-getopt-cmdline}, @code{do-cmdline-options} and
-@code{help}. As a consequence, it is possible to use @clon{} with
-multiple contexts at the same time. There are in fact three ways to
-achieve this.
+involves @code{progname}, @code{remainder}, @code{getopt},
+@code{getopt-cmdline}, @code{multiple-value-getopt-cmdline},
+@code{do-cmdline-options} and @code{help}. As a consequence, it is
+possible to use @clon{} with multiple contexts at the same time. There
+are in fact three ways to achieve this.
 
 @enumerate
 @item
@@ -2101,6 +2101,8 @@ will hence use this other context.
 Execute @var{BODY} with @code{*current-context*} bound to @var{CONTEXT}.
 @end defun
 @item
+@fkindex{progname,:context}@c
+@fkindex{remainder,:context}@c
 @fkindex{getopt,:context}@c
 @fkindex{getopt-cmdline,:context}@c
 @fkindex{help,:context}@c
@@ -2477,6 +2479,16 @@ Different Command-Lines}.
 
 @defun with-context CONTEXT &body BODY
 @xref{Using Multiple Contexts}.
+@end defun
+
+@defun progname &key (CONTEXT *current-context*)
+@fkindex{progname,:context}
+See @ref{Contextual Information} and @ref{Using Multiple Contexts}.
+@end defun
+
+@defun remainder &key (CONTEXT *current-context*)
+@fkindex{remainder,:context}
+See @ref{Contextual Information} and @ref{Using Multiple Contexts}.
 @end defun
 
 @defun getopt &key (CONTEXT *current-context*) SHORT-NAME LONG-NAME @
