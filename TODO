@@ -1,6 +1,17 @@
 							-*- mode: outline -*-
 
 
+* Provide a do-cmdline-option (without the s) macro
+for repeatedly getting one specific option (and doing BODY on it) until none
+is left on the command-line. This could be useful for processing options
+appearing several times (for instance, some programs like to have several
+calls to -v in order to increase the verbosity level).
+
+Maybe also provide a getopt-last, or a key to getopt that would trigger
+warnings if an option is used several times but it's not supposed to. In such
+a case, the key would let the programmer decide on whether to discard the
+first or last ones.
+
 * Support for option aliases
 An option could have several names instead of just one.
 
