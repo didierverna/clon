@@ -2160,7 +2160,13 @@ and command-specific ones from the second one.
 
 @cindex Help String, display
 @findex help
-@fkindex{help,:item}
+What's even cooler is that you can display the command-specific options
+on demand quite easily as well (like what @file{git} does when you call
+it like this: @code{git commit --help} for instance): calling the
+@code{help} function on the original context gives you the global
+options's help string while calling it on the command-specific one will
+display the command-specific usage.
+
 @bioindex{search-path}
 @evindex{CLON_SEARCH_PATH}
 @bioindex{highlight}
@@ -2169,17 +2175,23 @@ and command-specific ones from the second one.
 @evindex{CLON_THEME}
 @bioindex{line-width}
 @evindex{CLON_LINE_WIDTH}
-What is even cooler is that you can display the command-specific options
-on demand quite easily as well (like what @file{git} does when you call
-it like this: @code{git commit --help} for instance). Just call the
-@code{help} function with the original context (in order to preserve the
-end-user choices with respect to highlighting @etc{}), but use the
-@code{:item} key and give it the command-specific synopsis as its value.
+One thing to remember here is that every context/synopsis duet you
+create gets its own set of built-in @clon{} options. As a consequence,
+there is currently no simple way to have a single set of built-in
+options apply to the whole application, for instance, to both a global
+and a command-specific context. Let me make this clearer: if your
+end-user calls @code{prog --clon-theme=foo command -h}, then the theme
+option will have no effect because it would only affect the global help
+option. In order to actually use the expected theme, your end-user would
+need to use @code{prog command --clon-theme=foo -h}. Depending on which
+cerebral emisphere (s)he prefers to use, this may seem logical or not.
 
 Finally, note that you can use the virtual @cmdline{} / specific
 synopsis technique recursively to manage complicated @cmdline{} syntax,
-for instance alternating options and non-options parts several times. In
-the future, @clon{} may provide a simpler way to achieve this.
+for instance alternating options and non-options parts several times.
+
+In the future, @clon{} may provide better ways to achieve this kind of
+things (a notion of ``sub-context'' may be in order).
 
 
 
