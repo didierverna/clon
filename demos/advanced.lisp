@@ -5,7 +5,7 @@
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Wed Oct 20 15:40:18 2010
-;; Last Revision: Wed Oct 20 16:31:06 2010
+;; Last Revision: Sat Oct 30 15:08:30 2010
 
 ;; This file is part of Clon.
 
@@ -26,6 +26,11 @@
 ;;; Commentary:
 
 ;; Contents management by FCM version 0.1.
+
+;; This demonstration program shows how to use multiple synopsis, contexts and
+;; (virtual) command-lines in the same application in order to manage more
+;; complex command-line syntax where options and non-options parts can be
+;; freely intermixed. See section 5 "Advanced Usage" in the Clon User Manual.
 
 
 ;;; Code:
@@ -117,4 +122,4 @@ Use 'cmd --help' to get command-specific help.")
   :toplevel #'main :executable t :save-runtime-options t)
 
 
-;;; demo.lisp ends here
+;;; advanced.lisp ends here

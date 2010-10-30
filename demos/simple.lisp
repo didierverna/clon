@@ -1,11 +1,11 @@
-;;; demo.lisp --- Demonstration program
+;;; simple.lisp --- Basic usage demonstration program
 
 ;; Copyright (C) 2010 Didier Verna
 
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Fri Aug  1 14:45:48 2008
-;; Last Revision: Sat Jun 12 17:59:07 2010
+;; Last Revision: Sat Oct 30 15:03:13 2010
 
 ;; This file is part of Clon.
 
@@ -26,6 +26,10 @@
 ;;; Commentary:
 
 ;; Contents management by FCM version 0.1.
+
+;; This demonstration program shows how to define your application's
+;; command-line syntax, initialize the library, retrieve option values and
+;; generate help strings.
 
 
 ;;; Code:
@@ -120,4 +124,4 @@ Possible values are yes, no or try. If try, no errors are reported."
   :toplevel #'main :executable t :save-runtime-options t)
 
 
-;;; demo.lisp ends here
+;;; simple.lisp ends here
