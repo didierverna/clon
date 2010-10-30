@@ -1,5 +1,8 @@
 							-*- mode: outline -*-
 
+* Provide an initialize function
+that wraps around defsynopsis and make-context for very simple uses of the
+library.
 
 * Provide a do-cmdline-option (without the s) macro
 for repeatedly getting one specific option (and doing BODY on it) until none
