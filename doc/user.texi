@@ -489,14 +489,14 @@ started. We assume that you have properly installed @clon{} for ASDF.
 Since several bits are compiler-specific, we also assume that SBCL is
 used in this example. If you want to try this program for real, the full
 listing is available for cut'n paste in @ref{Quick Start Program}. For a
-slightly longer example, have a look at the @t{demo} program provided in
-the distribution.
+slightly longer example, have a look at the demonstration program called
+@file{simple} in the distribution.
 
 @pkgindex{com.dvlsoft.clon}
 Let's put us in the @cl{} user package, and load @clon{} first. @clon{}
-lives in a package named @samp{com.dvlsoft.clon}. The @t{demo} program
-from the distribution shows how to create a nickname if you find this
-too long, or if you don't want to @t{use-package} it.
+lives in a package named @samp{com.dvlsoft.clon}. The demonstration
+programs in the distribution show how to create a nickname if you find
+this too long, or if you don't want to @t{use-package} it.
 
 @cartouche
 @verbatim
@@ -2143,11 +2143,12 @@ prog [global options] command [command-specific options]
 @cindex Postfix
 @cindex Command-Line Remainder
 @cindex Remainder, of command-line
-You can achieve this with @clon{} quite easily I think (untested).
-First, define a synopsis which only handles the global options, and
-provide a postfix of @code{"command [command-specific option]"} or
-something. This will authorize a @cmdline{} remainder which will start
-with the command name.
+You can achieve this with @clon{} quite easily. In fact, the
+demonstration program called @file{advanced} in the distribution shows
+you how to do it. First, define a synopsis which only handles the global
+options, and provide a postfix of @code{"command [command-specific
+option]"} or something like that. This will authorize a @cmdline{}
+remainder which will start with the command name.
 
 Now, for every command in your program, define a specific synopsis with
 only the command-specific options. Get the remainder of the original
