@@ -54,11 +54,16 @@ option is supposed to accept empty strings.
 computed at run-time from a lambda expression for instance. But is this
 different from supporting post-processing ?
 
-* Support for a complete cmdline syntax description
-Currently, there's just the notion of non-Clon remainder, but some programs
-might want to alternate options and non-option stuff, while still managing
-those parts with Clon. In fact, I'm not sure this is useful since I guess you
-can do that with multiple synopsis/contexts/cmdlines.
+* Improve advanced usage support
+Maybe we need a way to support declarative definition of a synopsis *tree* for
+applications wanting to do things like "prog [options] cmd [options]" or even
+more complicated stuff.
+
+There is also the problem that built-in options are duplicated every time we
+create new contexts (see section 5 "Advanced Usage" in the Clon User Manual).
+We would like those built-in options to apply on all sub-contexts (hint: we
+need a true notion of sub-context), but also with the ability to be overridden
+in those sub-contexts. This could also be extended to non built-in options.
 
 * Extend abbreviated option matching to dash-parts
 e.g. --f-n == --family-name.
