@@ -5,7 +5,7 @@
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Wed Oct 20 15:40:18 2010
-;; Last Revision: Sat Oct 30 15:08:30 2010
+;; Last Revision: Sun Oct 31 14:21:29 2010
 
 ;; This file is part of Clon.
 
@@ -48,10 +48,7 @@
 #-asdf2 (ignore-errors (asdf:operate 'asdf:load-op :asdf-binary-locations))
 
 (asdf:operate 'asdf:load-op :com.dvlsoft.clon)
-(rename-package :com.dvlsoft.clon
-		(package-name :com.dvlsoft.clon)
-		(adjoin :clon (package-nicknames :com.dvlsoft.clon)
-			:test #'string-equal))
+(com.dvlsoft.clon:nickname-package)
 
 (clon:defsynopsis (:postfix "cmd [OPTIONS]")
   (text :contents "Available commands: push pull.

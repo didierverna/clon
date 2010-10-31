@@ -494,9 +494,7 @@ slightly longer example, have a look at the demonstration program called
 
 @pkgindex{com.dvlsoft.clon}
 Let's put us in the @cl{} user package, and load @clon{} first. @clon{}
-lives in a package named @samp{com.dvlsoft.clon}. The demonstration
-programs in the distribution show how to create a nickname if you find
-this too long, or if you don't want to @t{use-package} it.
+lives in a package named @samp{com.dvlsoft.clon}.
 
 @cartouche
 @verbatim
@@ -507,6 +505,17 @@ this too long, or if you don't want to @t{use-package} it.
 (use-package :com.dvlsoft.clon)
 @end verbatim
 @end cartouche
+
+In fact, using the @clon{} package directly is done here for simplicity,
+but is not recommended. In case you find the package name too long to
+prefix every symbol with, @clon{} provides a utility function that
+allows you to add (and use) a shorter nickname instead (the
+demonstration programs in the distribution show how to use it):
+
+@cindex Package, nicknames
+@defun nickname-package &optional NICKNAME
+Add NICKNAME (:CLON by default) to the :COM.DVLSOFT.CLON package.
+@end defun
 
 @cindex Synopsis
 @findex defsynopsis
@@ -2416,6 +2425,11 @@ See @ref{Quick Start}.
 @cindex Command-Line
 @defun cmdline
 See @ref{Option Retrieval}.
+@end defun
+
+@cindex Package, nicknames
+@defun nickname-package &optional NICKNAME
+See @ref{Quick Start}.
 @end defun
 
 

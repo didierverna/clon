@@ -51,6 +51,8 @@
    :+release-status-level+
    :+release-name+
    :version
+   ;; From package.lisp:
+   :nickname-package
    ;; From src/util.lisp:
    :exit
    :cmdline
@@ -89,6 +91,23 @@
 
 
 (in-package :com.dvlsoft.clon)
+
+
+;; -------------------
+;; External utilities:
+;; -------------------
+
+(defun nickname-package (&optional (nickname :clon))
+  "Add NICKNAME (:CLON by default) to the :COM.DVLSOFT.CLON package."
+  (rename-package :com.dvlsoft.clon
+		  (package-name :com.dvlsoft.clon)
+		  (adjoin nickname (package-nicknames :com.dvlsoft.clon)
+			  :test #'string-equal)))
+
+
+;; -------------------
+;; Internal utilities:
+;; -------------------
 
 (defvar *readtable* (copy-readtable nil)
   "The Clon readtable.")
