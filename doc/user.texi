@@ -698,7 +698,7 @@ The following @var{OPTIONS} are currently available.
 @item :postfix
 @cindex Postfix
 @foindex{defsynopsis,:postfix}@c
-@cindex Command-Line Remainder
+@cindex Command-Line, remainder
 @cindex Remainder, of command-line
 A string which will appear at the end of the synopsis line in the help
 string. When you provide a postfix, you also implicitely tell @clon{}
@@ -1228,7 +1228,7 @@ like this: @code{(progname)}.
 @node Command-Line Remainder, , Program Name, Contextual Information
 @subsubsection Command-Line Remainder
 @cindex Remainder, of command-line
-@cindex Command-Line Remainder
+@cindex Command-Line, remainder
 In the case your @cmdline{} has a remainder (that is, a non-options
 part; see @enduserref{Option Separator} and @ref{Synopsis Items}), you
 may need to access it in order to process it independently from @clon{}.
@@ -1258,6 +1258,7 @@ retrieving options: you can request the value for a specific option
 directly, or you can process the @cmdline{} sequentially, which is the
 more traditional approach.
 
+@cindex Command-Line
 @findex cmdline
 Both of these techniques can be freely combined together at any time,
 because @clon{} keeps track of the current status of the @cmdline{}. In
@@ -2141,7 +2142,7 @@ prog [global options] command [command-specific options]
 @end verbatim
 
 @cindex Postfix
-@cindex Command-Line Remainder
+@cindex Command-Line, remainder
 @cindex Remainder, of command-line
 You can achieve this with @clon{} quite easily. In fact, the
 demonstration program called @file{advanced} in the distribution shows
@@ -2409,11 +2410,12 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
 @section Utilities
 
 @defun exit &optional (status 0)
-Quit the current application with STATUS.
+See @ref{Quick Start}.
 @end defun
 
+@cindex Command-Line
 @defun cmdline
-Get the current application's command-line.
+See @ref{Option Retrieval}.
 @end defun
 
 
