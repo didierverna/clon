@@ -678,35 +678,53 @@ than the currently available right margin."
 ;; ==========================================================================
 
 ;; #### NOTE: I need to bind output-stream here (which is early) because it is
-;; required to do the TIOCGWINSZ business.
+;; required to do the TIOCGWINSZ ioctl business.
 (defmethod initialize-instance :around
     ((sheet sheet) &rest keys &key (output-stream *standard-output*)
 				  line-width
 				  (highlight :auto))
   "Handle unset line width and AUTO highlight according to OUTPUT-STREAM."
   #+sbcl (declare (sb-ext:muffle-conditions sb-ext:compiler-note))
+  ;; In both of the cases below, we must know whether we're printing to a
+  ;; terminal or a simple file.
   (when (or (not line-width) (eq highlight :auto))
-    ;; #### NOTE: it is somewhat abusive to TIOCGWINSZ even if LINE-WIDTH is
-    ;; specified, but this allows us to handle the ENOTTY error, and possibly
-    ;; turn highlighting off if is it set to :AUTO.
-    ;; #### PORTME: this whole handler depends on sb-grovel.
-    (handler-case
-	(with-winsize winsize ()
-	  (sb-posix:ioctl (stream-file-stream output-stream :output)
-			  +tiocgwinsz+
-			  winsize)
-	  (unless line-width
-	    (setq line-width (winsize-ws-col winsize)))
-	  (when (eq highlight :auto)
-	    (setq highlight t)))
-      (sb-posix:syscall-error (error)
-	;; ENOTTY error should remain silent, but no the others.
-	(unless (= (sb-posix:syscall-errno error) sb-posix:enotty)
-	  (let (*print-escape*) (print-object error *error-output*)))
-	(unless line-width
-	  (setq line-width 80))
-	(when (eq highlight :auto)
-	  (setq highlight nil)))))
+    ;; First, detect a terminal.
+    ;; #### NOTE: doing a TIOCGWINSZ ioctl here is a convenient way to both
+    ;; know wether we're connected to a tty (otherwise, we would get an ENOTTY
+    ;; error), and getting the terminal width at the same time, in case it
+    ;; would be needed as a fallback value.
+    (let ((tty-line-width
+	   ;; #### PORTME.
+	   (handler-case
+	       (with-winsize winsize ()
+		   (sb-posix:ioctl (stream-file-stream output-stream :output)
+				   +tiocgwinsz+
+				   winsize)
+		   (winsize-ws-col winsize))
+	     (sb-posix:syscall-error (error)
+	       ;; ENOTTY error should remain silent, but no the others.
+	       (unless (= (sb-posix:syscall-errno error) sb-posix:enotty)
+		 ;; #### FIXME: a better error printing would be nice.
+		 (let (*print-escape*)
+		   (print-object error *error-output*)))
+	       nil))))
+      ;; Next, set highlighting.
+      (when (eq highlight :auto)
+	(setq highlight tty-line-width))
+      ;; Finally, set line width.
+      (unless line-width
+	(setq line-width
+	      (let ((columns (getenv "COLUMNS")))
+		(if columns
+		    (handler-case
+			(coerce (read-from-string columns) '(integer 1))
+		      (error (error)
+			;; #### FIXME: a better error printing would be nice.
+			(let (*print-escape*)
+			  (print-object error *error-output*))
+			(or tty-line-width 80)))
+		  ;; Yuck. Code duplication.
+		  (or tty-line-width 80)))))))
   (apply #'call-next-method sheet
 	 :output-stream output-stream
 	 :line-width line-width

@@ -212,8 +212,8 @@ If you don't want any theme at all, use this option with no argument. "
 		       :env-var "THEME")
 		 (lispobj "line-width"
 			  ~"Set Clon's output line width.
-If not given, the terminal size will be used when possible. Otherwise, 80 "
-			  ~"columns will be assumed."
+If not given, the value of the COLUMNS environment variable, the terminal "
+			  ~"size, or a default of 80 columns will be used."
 			  :argument-name "WIDTH"
 			  :env-var "LINE_WIDTH"
 			  :typespec '(integer 1))

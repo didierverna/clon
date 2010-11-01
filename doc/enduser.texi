@@ -1266,10 +1266,13 @@ situations.
 @cindex Options, built-in, @t{--clon-line-width}
 @cindex CLON_LINE_WIDTH
 @cindex Environment Variables, CLON_LINE_WIDTH
+@cindex COLUMNS
+@cindex Environment Variables, COLUMNS
 @verbatim
   --clon-line-width=WIDTH     Set Clon's output line width.
-                              If not given, the terminal size will be used when
-                              possible. Otherwise, 80 columns will be assumed.
+                              If not given, the value of the COLUMNS
+                              environment variable, the terminal size,
+                              or a default of 80 columns will be used.
                               Environment: CLON_LINE_WIDTH
 @end verbatim
 
@@ -1288,8 +1291,8 @@ automatically, but you might want more control on that.
   --clon-highlight[=ARG]      Set Clon's output highlighting to on/off/auto.
                               Auto (the default) means on for tty output and
                               off otherwise.
-                              Fallback: T
-                              Default: AUTO
+                              Fallback: yes
+                              Default: auto
                               Environment: CLON_HIGHLIGHT
 @end verbatim
 
