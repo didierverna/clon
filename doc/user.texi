@@ -7,7 +7,7 @@
 @c Author:        Didier Verna <didier@lrde.epita.fr>
 @c Maintainer:    Didier Verna <didier@lrde.epita.fr>
 @c Created:       Fri Jul  2 02:24:49 2010
-@c Last Revision: Fri Jul  2 02:24:55 2010
+@c Last Revision: Mon Nov  1 16:08:21 2010
 
 @c This file is part of Clon.
 
@@ -651,6 +651,7 @@ phase}.
 @menu
 * Synopsis Definition:: Describing your command-line
 * Context Creation::    Instantiating your command-line
+* Integrity Checks::    Verifying the Clon semantics
 * Option Retrieval::    Getting the options values
 * Help::                Generating the help string
 @end menu
@@ -1186,7 +1187,7 @@ declarative forms, constructor calls or any kind of Lisp code.
 @c ----------------
 @c Context Creation
 @c ----------------
-@node Context Creation, Option Retrieval, Synopsis Definition, Using Clon
+@node Context Creation, Integrity Checks, Synopsis Definition, Using Clon
 @section Context Creation
 
 @cindex Initialization Phase
@@ -1252,9 +1253,57 @@ this: @code{(remainder)}. The remainder is provided as a list of strings.
 
 
 @c ----------------
+@c Integrity Checks
+@c ----------------
+@node Integrity Checks, Option Retrieval, Context Creation, Using Clon
+@section Integrity Checks
+@findex defsynopsis
+@cfindex{make-context}
+At this point, you know about the two necessary steps to initialize
+@clon{}: defining a synopsis and creating a context. If you paid
+attention to the quick start application (@pxref{Quick Start}), you may
+have noticed that @code{defsynopsis} was called as a top-level form
+whereas @code{make-context} was called from the function @code{main}. So
+why the difference?
+
+First, I hope that you see why a context cannot be created as a toplevel
+form. If you do that, you will end-up creating a context relevant to the
+Lisp environment from which the application is created, not run.
+
+The synopsis, on the other hand, could be defined either as a toplevel
+form, as done in the quick start and the demo programs, or in the
+function @code{main}, just before making a context. There is a very good
+reason to prefer a toplevel form however: that reason is called
+``integrity checks''.
+
+When you define a synopsis (or any synopsis item, for that matter),
+@clon{} performs a number of checks to make sure that you're making a
+sensible use of the library. In fact, the number of semantic mistakes
+that you can make is quite puzzling. You could for instance define
+several options with identical names, forget to provide a fallback or
+default value when it is required, provide invalid fallback or default
+values, and the list goes on and on. These are just a few examples but
+there are many more, and @clon{} checks all of those (I think).
+
+Since those mistakes relate to the definition of the application itself,
+they do not depend on a particular execution of it. Consequently, the
+sooner @clon{} catches them, the better. If you define your
+application's synopsis as a toplevel form, @clon{} will be able to
+perform its integrity checks when the application is created, not only
+when it is used. In other words, you won't be able to get a working
+application until your use of @clon{} is semantically correct.
+
+This is why it is strongly recommended to create synopsis from toplevel
+forms, and this also explains why @clon{} chooses @emph{not} to provide
+an @code{initialize} function that would wrap around @code{defsynopsis}
+and @code{make-context} together.
+
+
+
+@c ----------------
 @c Option Retrieval
 @c ----------------
-@node Option Retrieval, Help, Context Creation, Using Clon
+@node Option Retrieval, Help, Integrity Checks, Using Clon
 @section Option Retrieval
 @cindex Runtime Phase
 @cindex Phase, runtime
