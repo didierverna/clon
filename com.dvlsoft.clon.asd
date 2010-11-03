@@ -36,8 +36,7 @@
 (require :sb-grovel)
 
 (defpackage :com.dvlsoft.clon.asdf
-    ;; #### PORTME.
-    (:use :cl :sb-grovel :sb-alien)
+    (:use :cl)
   (:export :define-constant
 	   :+release-major-level+
 	   :+release-minor-level+
@@ -157,7 +156,7 @@ The most important features of Clon are:
 	       ;; #### PORTME.
 	       (:module "sbcl"
 		 :depends-on ("package")
-		 :components ((grovel-constants-file "constants"
+		 :components ((sb-grovel:grovel-constants-file "constants"
 				 :package :com.dvlsoft.clon)))
 	       (module "src"
 		 ;; #### PORTME.
