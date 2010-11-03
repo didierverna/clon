@@ -695,19 +695,36 @@ than the currently available right margin."
     ;; would be needed as a fallback value.
     (let ((tty-line-width
 	   ;; #### PORTME.
-	   (handler-case
-	       (with-winsize winsize ()
-		   (sb-posix:ioctl (stream-file-stream output-stream :output)
-				   +tiocgwinsz+
-				   winsize)
-		   (winsize-ws-col winsize))
-	     (sb-posix:syscall-error (error)
-	       ;; ENOTTY error should remain silent, but no the others.
-	       (unless (= (sb-posix:syscall-errno error) sb-posix:enotty)
-		 ;; #### FIXME: a better error printing would be nice.
-		 (let (*print-escape*)
-		   (print-object error *error-output*)))
-	       nil))))
+	   #+sbcl
+	    (handler-case
+		(with-winsize winsize ()
+		  (sb-posix:ioctl (stream-file-stream output-stream :output)
+				  +tiocgwinsz+ winsize)
+		  (winsize-ws-col winsize))
+	      (sb-posix:syscall-error (error)
+		;; ENOTTY error should remain silent, but no the others.
+		(unless (= (sb-posix:syscall-errno error) sb-posix:enotty)
+		  ;; #### FIXME: a better error printing would be nice.
+		  (let (*print-escape*)
+		    (print-object error *error-output*)))
+		nil))
+	    #+cmu
+	    (alien:with-alien ((winsize (alien:struct unix:winsize)))
+	      (multiple-value-bind (success error-number)
+		  (unix:unix-ioctl
+		   (system:fd-stream-fd
+		    (stream-file-stream *standard-output*))
+		   unix:tiocgwinsz winsize)
+		(cond (success
+		       (alien:slot winsize 'unix:ws-col))
+		      (t
+		       ;; ENOTTY error should remain silent, but no the
+		       ;; others.
+		       (unless (= error-number unix:enotty)
+			 ;; #### FIXME: a better error printing would be nice.
+			 (format t "Error ~A: ~A~%" error-number
+				 (unix:get-unix-error-msg error-number)))
+		       nil))))))
       ;; Next, set highlighting.
       (when (eq highlight :auto)
 	(setq highlight tty-line-width))

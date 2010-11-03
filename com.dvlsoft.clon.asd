@@ -32,8 +32,7 @@
 
 (in-package :cl-user)
 
-;; #### PORTME.
-(require :sb-grovel)
+#+sbcl (require :sb-grovel)
 
 (defpackage :com.dvlsoft.clon.asdf
     (:use :cl)
@@ -150,17 +149,15 @@ The most important features of Clon are:
   :maintainer "Didier Verna <didier@lrde.epita.fr>"
   :license "GNU GPL"
   :version #.(version :long)
-  ;; #### PORTME.
-  :depends-on (:sb-posix :sb-grovel)
+  :depends-on (#+sbcl :sb-posix #+sbcl :sb-grovel)
   :components ((:file "package")
-	       ;; #### PORTME.
-	       (:module "sbcl"
-		 :depends-on ("package")
-		 :components ((sb-grovel:grovel-constants-file "constants"
-				 :package :com.dvlsoft.clon)))
+	       #+sbcl (:module "sbcl"
+			:depends-on ("package")
+			:components ((sb-grovel:grovel-constants-file
+				      "constants" :package :com.dvlsoft.clon)))
 	       (module "src"
-		 ;; #### PORTME.
-		 :depends-on ("sbcl" "package")
+		 :depends-on (#+sbcl "sbcl"
+			      "package")
 		 :components ((:file "util")
 			      (:file "item" :depends-on ("util"))
 			      (:file "text" :depends-on ("item"))

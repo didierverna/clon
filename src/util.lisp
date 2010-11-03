@@ -235,14 +235,18 @@ This is the meta-class for abstract classes."))
   (error "Instanciating class ~S: is abstract." (class-name class)))
 
 ;; #### PORTME.
-(defmethod sb-mop:validate-superclass
+(defmethod
+    #+sbcl sb-mop:validate-superclass
+    #+cmu  mop:validate-superclass
     ((class abstract-class) (superclass standard-class))
-  t)
+    t)
 
 ;; #### PORTME.
-(defmethod sb-mop:validate-superclass
+(defmethod
+    #+sbcl sb-mop:validate-superclass
+    #+cmu  mop:validate-superclass
     ((class standard-class) (superclass abstract-class))
-  t)
+    t)
 
 
 ;; ----------------
@@ -257,16 +261,26 @@ Copy is either an object of INSTANCE's class, or INSTANCE's SUBCLASS if given.")
 Both instances share the same slot values."
     (let* ((class (class-of instance))
 	   ;; #### PORTME.
-	   (slots (sb-mop:class-slots class))
+	   (slots (#+sbcl sb-mop:class-slots
+		   #+cmu  mop:class-slots
+		   class))
 	   (new-instance (make-instance (or subclass class))))
       (loop :for slot :in slots
-	    :when (slot-boundp instance (sb-mop:slot-definition-name slot))
+	    :when (slot-boundp instance
+			       ;; #### PORTME.
+			       (#+sbcl sb-mop:slot-definition-name
+				#+cmu  mop:slot-definition-name
+				slot))
 	    :do (setf (slot-value new-instance
 				  ;; #### PORTME.
-				  (sb-mop:slot-definition-name slot))
+				  (#+sbcl sb-mop:slot-definition-name
+				   #+cmu  mop:slot-definition-name
+				   slot))
 		      (slot-value instance
 				  ;; #### PORTME.
-				  (sb-mop:slot-definition-name slot))))
+				  (#+sbcl sb-mop:slot-definition-name
+				   #+cmu  mop:slot-definition-name
+				   slot))))
       new-instance)))
 
 
@@ -313,28 +327,39 @@ invalid direction: ~S"
 (defun exit (&optional (status 0))
   "Quit the current application with STATUS."
   ;; #### PORTME.
-  (sb-ext:quit :unix-status status))
+  #+sbcl (sb-ext:quit :unix-status status)
+  #+cmu  (unix:unix-exit status))
 
 (defun cmdline ()
   "Get the current application's command-line."
   ;; #### PORTME.
-  sb-ext:*posix-argv*)
+  #+sbcl sb-ext:*posix-argv*
+  #+cmu  lisp::lisp-command-line-list)
 
 (defun getenv (variable)
   "Get environment VARIABLE's value. VARIABLE may be null."
   ;; #### PORTME.
-  (when variable (sb-posix:getenv variable)))
+  (when variable
+    (#+sbcl sb-posix:getenv
+     #+cmu  unix:unix-getenv
+     variable)))
 
 (defun putenv (variable value)
   "Set environment VARIABLE to VALUE."
-  ;; #### PORTME:
-  (sb-posix:putenv (concatenate 'string variable "=" value)))
+  ;; #### PORTME.
+  (#+sbcl sb-posix:putenv
+   #+cmu  unix:unix-putenv
+   (concatenate 'string variable "=" value)))
 
 (defun dump (name function)
   "Dump a standalone executable named NAME starting with FUNCTION."
   ;; #### PORTME.
-  (sb-ext:save-lisp-and-die name :toplevel function :executable t
-			    :save-runtime-options t))
+  #+sbcl (sb-ext:save-lisp-and-die name :toplevel function :executable t
+				   :save-runtime-options t)
+  #+cmu  (ext:save-lisp name :init-function function :executable t
+			:load-init-file nil :site-init nil
+			:print-herald nil :batch-mode t
+			:process-command-line nil))
 
 
 ;;; util.lisp ends here
