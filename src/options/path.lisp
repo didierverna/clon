@@ -195,7 +195,7 @@ useful to specify which part of ARGUMENT is concerned when it is a list."
 			 :directory
 			 (list* :relative (cddr (pathname-directory pathname)))
 			 :defaults pathname)
-			(user-homedir-pathname))))
+			(home-directory))))
 	       pathname)))
       (ecase (path-type path)
 	(:file

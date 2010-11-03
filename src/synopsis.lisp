@@ -194,7 +194,7 @@ If you don't want any search path at all, use this option with no argument."
 			  (mapcar
 			   (lambda (subdir)
 			     (merge-pathnames subdir
-					      (user-homedir-pathname)))
+					      (home-directory)))
 			   local-path)
 			  global-path))
 		       :env-var "SEARCH_PATH")
