@@ -330,5 +330,11 @@ invalid direction: ~S"
   ;; #### PORTME:
   (sb-posix:putenv (concatenate 'string variable "=" value)))
 
+(defun dump (name function)
+  "Dump a standalone executable named NAME starting with FUNCTION."
+  ;; #### PORTME.
+  (sb-ext:save-lisp-and-die name :toplevel function :executable t
+			    :save-runtime-options t))
+
 
 ;;; util.lisp ends here

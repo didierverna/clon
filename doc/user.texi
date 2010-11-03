@@ -615,10 +615,15 @@ Finally, time to save the Lisp image.
 
 @cartouche
 @verbatim
-(save-lisp-and-die "test"
-  :toplevel #'main :executable t :save-runtime-options t)
+(dump "test" #'main)
 @end verbatim
 @end cartouche
+
+@findex dump
+The @code{dump} function is a wrapper around an implementation-dependent
+way of creating standalone executables. The first argument is the name
+of the executable to produce, and the second argument is the function to
+call at startup.
 
 We're now ready to compile this industrial-scale application and deliver
 it to the world:
@@ -2439,8 +2444,7 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
   (terpri)
   (exit))
 
-(save-lisp-and-die "test"
-  :toplevel #'main :executable t :save-runtime-options t)
+(dump "test" #'main)
 @end verbatim
 @end cartouche
 
@@ -2466,6 +2470,10 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
 @c ---------
 @node Utilities, Initialization Phase API, API Quick Reference, API Quick Reference
 @section Utilities
+
+@defun dump NAME FUNCTION
+See @ref{Quick Start}.
+@end defun
 
 @defun exit &optional (status 0)
 See @ref{Quick Start}.

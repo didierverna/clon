@@ -116,9 +116,7 @@ Possible values are yes, no or try. If try, no errors are reported."
 	 (format t "Remainder: ~A~%" (clon:remainder))))
   (clon:exit))
 
-;; #### PORTME.
-(save-lisp-and-die "simple"
-  :toplevel #'main :executable t :save-runtime-options t)
+(clon:dump "simple" #'main)
 
 
 ;;; simple.lisp ends here

@@ -114,9 +114,7 @@ Use 'cmd --help' to get command-specific help.")
 		(format t "Remainder: ~A~%" (clon:remainder))))))
   (clon:exit))
 
-;; #### PORTME.
-(save-lisp-and-die "advanced"
-  :toplevel #'main :executable t :save-runtime-options t)
+(clon:dump "advanced" #'main)
 
 
 ;;; advanced.lisp ends here
