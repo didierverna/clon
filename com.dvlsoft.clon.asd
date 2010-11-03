@@ -80,7 +80,7 @@
 		 ~[~
 		   a~*~S~;~
 		   b~*~S~;~
-		   -pre~*~S~;~
+		   rc~*~S~;~
 		   ~:[.~S~;~*~]~
 		 ~]"
        major
@@ -88,7 +88,7 @@
        (ecase status
 	 (:alpha 0)
 	 (:beta 1)
-	 (:pre 2)
+	 (:rc 2)
 	 (:patchlevel 3))
        (zerop level)
        level))
@@ -97,7 +97,7 @@
 		 ~[~
 		   alpha ~*~S ~;~
 		   beta ~*~S ~;~
-		   pre ~*~S ~;~
+		   release candidate ~*~S ~;~
 		   ~:[patchlevel ~S ~;~*~]~
 		 ~]~
 		 ~S"
@@ -106,7 +106,7 @@
        (ecase status
 	 (:alpha 0)
 	 (:beta 1)
-	 (:pre 2)
+	 (:rc 2)
 	 (:patchlevel 3))
        (zerop level)
        level
@@ -117,16 +117,16 @@
 TYPE can be one of :number, :short or :long.
 
 A version number is computed as major*10000 + minor*100 + patchlevel, leaving
-two digits for each level. Alpha, beta and pre status are ignored in version
+two digits for each level. Alpha, beta and rc status are ignored in version
 numbers.
 
-A short version is something like 1.3{a,b,-pre}4, or 1.3.4 for patchlevel.
-Alpha, beta or pre levels start at 1. Patchlevels start at 0 but are ignored
+A short version is something like 1.3{a,b,rc}4, or 1.3.4 for patchlevel.
+Alpha, beta or rc levels start at 1. Patchlevels start at 0 but are ignored
 in the output, so that 1.3.0 appears as just 1.3.
 
 A long version is something like
-1.3 {alpha,beta,pre, patchlevel} 4 \"Michael Brecker\". As for the short
-version, a patchlevel of 0 is ignored in the output."
+1.3 {alpha,beta,release candidate,patchlevel} 4 \"Michael Brecker\". As for
+the short version, a patchlevel of 0 is ignored in the output."
   (%version type +release-major-level+ +release-minor-level+
 	    +release-status+ +release-status-level+
 	    +release-name+))
