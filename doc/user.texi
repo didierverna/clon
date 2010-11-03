@@ -2475,7 +2475,7 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
 See @ref{Quick Start}.
 @end defun
 
-@defun exit &optional (status 0)
+@defun exit &optional (STATUS 0)
 See @ref{Quick Start}.
 @end defun
 
