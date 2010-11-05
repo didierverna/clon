@@ -213,6 +213,32 @@ See REPLACE-KEY for more information on the replacement syntax."
 ;; CLOS Utility Routines
 ;; ==========================================================================
 
+;; --------------------
+;; Portability wrappers
+;; --------------------
+
+(defmacro validate-superclass (class superclass)
+  "Validate SUPERCLASS classes for CLASS classes."
+  ;; #### PORTME.
+  `(defmethod #+sbcl sb-mop:validate-superclass
+	      #+cmu  mop:validate-superclass
+    ((class ,class) (superclass ,superclass))
+    t))
+
+(defun class-slots (class)
+  "Return CLASS slots."
+  ;; #### PORTME.
+  (#+sbcl sb-mop:class-slots
+   #+cmu  mop:class-slots
+   class))
+
+(defun slot-definition-name (slot)
+  "Return SLOT's definition name."
+  ;; #### PORTME.
+  (#+sbcl sb-mop:slot-definition-name
+   #+cmu  mop:slot-definition-name
+   slot))
+
 
 ;; ----------------
 ;; Abstract classes
@@ -234,19 +260,8 @@ This is the meta-class for abstract classes."))
   (declare (ignore initargs))
   (error "Instanciating class ~S: is abstract." (class-name class)))
 
-;; #### PORTME.
-(defmethod
-    #+sbcl sb-mop:validate-superclass
-    #+cmu  mop:validate-superclass
-    ((class abstract-class) (superclass standard-class))
-    t)
-
-;; #### PORTME.
-(defmethod
-    #+sbcl sb-mop:validate-superclass
-    #+cmu  mop:validate-superclass
-    ((class standard-class) (superclass abstract-class))
-    t)
+(validate-superclass abstract-class standard-class)
+(validate-superclass standard-class abstract-class)
 
 
 ;; ----------------
@@ -260,27 +275,12 @@ Copy is either an object of INSTANCE's class, or INSTANCE's SUBCLASS if given.")
     "Return a copy of INSTANCE.
 Both instances share the same slot values."
     (let* ((class (class-of instance))
-	   ;; #### PORTME.
-	   (slots (#+sbcl sb-mop:class-slots
-		   #+cmu  mop:class-slots
-		   class))
+	   (slots (class-slots class))
 	   (new-instance (make-instance (or subclass class))))
       (loop :for slot :in slots
-	    :when (slot-boundp instance
-			       ;; #### PORTME.
-			       (#+sbcl sb-mop:slot-definition-name
-				#+cmu  mop:slot-definition-name
-				slot))
-	    :do (setf (slot-value new-instance
-				  ;; #### PORTME.
-				  (#+sbcl sb-mop:slot-definition-name
-				   #+cmu  mop:slot-definition-name
-				   slot))
-		      (slot-value instance
-				  ;; #### PORTME.
-				  (#+sbcl sb-mop:slot-definition-name
-				   #+cmu  mop:slot-definition-name
-				   slot))))
+	    :when (slot-boundp instance (slot-definition-name slot))
+	    :do (setf (slot-value new-instance (slot-definition-name slot))
+		      (slot-value instance (slot-definition-name slot))))
       new-instance)))
 
 

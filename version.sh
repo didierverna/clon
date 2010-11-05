@@ -30,8 +30,6 @@
 
 ;; Contents management by FCM version 0.1.
 
-;; #### PORTME.
-
 
 ;;; Code:
 
@@ -49,7 +47,9 @@
 (handler-case (asdf:operate 'asdf:load-op :com.dvlsoft.clon)
   (error ()
      (format t "LONG_VERSION := unknown~%SHORT_VERSION := unknown~%")
-     (sb-ext:quit)))
+     ;; #### PORTME.
+     #+sbcl (sb-ext:quit)
+     #+cmu  (unix:unix-exit)))
 
 (format t "LONG_VERSION  := ~A~%~
 	   SHORT_VERSION := ~A~%"
