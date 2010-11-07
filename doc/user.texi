@@ -484,13 +484,26 @@ extend @clon{} with your own option types.
 @node Quick Start, Using Clon, Introduction, Top
 @chapter Quick Start
 
-In this chapter, we quickly build a very short program to get you
-started. We assume that you have properly installed @clon{} for ASDF.
-Since several bits are compiler-specific, we also assume that SBCL is
-used in this example. If you want to try this program for real, the full
-listing is available for cut'n paste in @ref{Quick Start Program}. For a
-slightly longer example, have a look at the demonstration program called
-@file{simple} in the distribution.
+In this chapter, we assume that you have properly installed @clon{} for
+ASDF, and we build a very short program to get you started.
+
+@menu
+* Quick Start Writing:: Hello World!
+* Quick Start Dumping:: Save the World!
+@end menu
+
+
+@c -------------------
+@c Quick Start Writing
+@c -------------------
+@node Quick Start Writing, Quick Start Dumping, , Quick Start
+@section Quick Start Writing
+This section gives you a step-by-step introduction to writing a
+clonified application (let's call it @file{quickstart.lisp}). If you
+want to try this program for real, the full listing is available for
+cut'n paste in @ref{Quick Start Program}. For a slightly longer example,
+have a look at the demonstration program called @file{simple} in the
+distribution.
 
 @pkgindex{com.dvlsoft.clon}
 Let's put us in the @cl{} user package, and load @clon{} first. @clon{}
@@ -625,17 +638,45 @@ way of creating standalone executables. The first argument is the name
 of the executable to produce, and the second argument is the function to
 call at startup.
 
-We're now ready to compile this industrial-scale application and deliver
-it to the world:
 
+@c -------------------
+@c Quick Start Dumping
+@c -------------------
+@node Quick Start Dumping, , Quick Start Writing, Quick Start
+@section Quick Start Dumping
+@findex dump
+The final step required to use this industrial-scale application is to
+create a standalone executable for it. Unfortunately, there is no
+standard way to do so. This section provides ready-to-use @cmdline{}
+samples for the compilers currently supported. They work well in
+conjunction with the @code{dump} function mentionned in the previous
+section.
+
+If a compiler does not appear below, it means that @clon{} has no
+official support for it yet.
+
+@table @strong
+@item SBCL
+The simplest way to dump the executable with SBCL is to do:
 @verbatim
-CC=gcc sbcl --script test.lisp
+CC=gcc sbcl --script quickstart.lisp
 @end verbatim
-
-and voila!
-
-Err, by the way, you shoudn't use @option{--script} because it disables
-the debugger, which is not recommended (@pxref{Error Management}).
+The @code{CC=gcc} bit is needed by the @code{sb-grovel} contrib module
+that @clon{} uses. However, using @code{--script} like this is in fact
+not recommended because it disables the debugger (@pxref{Error
+Management}). Instead, you might be better off doing:
+@verbatim
+CC=gcc sbcl \
+  --noinform --disable-ldb --lose-on-corruption --end-runtime-options \
+  --no-userinit --no-sysinit --load quickstart.lisp
+@end verbatim
+@item CMU-CL
+CMU-CL is supported starting at version 20b. You can dump an executable
+like this:
+@verbatim
+lisp -quiet -noinit -nositeinit -load quickstart.lisp
+@end verbatim
+@end table
 
 
 
