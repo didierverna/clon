@@ -358,8 +358,7 @@ invalid direction: ~S"
 				   :save-runtime-options t)
   #+cmu  (ext:save-lisp name :init-function function :executable t
 			:load-init-file nil :site-init nil
-			:print-herald nil :batch-mode t
-			:process-command-line nil))
+			:print-herald nil :process-command-line nil))
 
 
 ;;; util.lisp ends here
