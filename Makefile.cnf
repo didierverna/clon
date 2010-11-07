@@ -39,7 +39,16 @@
 PREFIX := /usr/local
 
 # CC variable for sb-grovel:
-CC = gcc
+CC := gcc
+
+# Lisp implementation to use:
+# Choices are SBCL and CMUCL
+LISP := SBCL
+
+# Implementation paths:
+SBCL_PATH := CC=$(CC) sbcl
+CMUCL_PATH := lisp
+
 
 # Programs for generating the documentation:
 MAKEINFO = makeinfo

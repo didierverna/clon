@@ -42,19 +42,15 @@ DEMOS := simple advanced
 
 demos: $(DEMOS)
 
-# #### NOTE: at least for the demo programs, we do want the debugger enabled,
-# (to demonstrate the restarts) so I can't use the --script option here.
 # #### PORTME.
 $(DEMOS): %: %.lisp
-	CC=$(CC) sbcl \
-	--noinform --disable-ldb --lose-on-corruption --end-runtime-options \
-	--no-userinit --no-sysinit --load $<
+	$($(LISP)_PATH) $($(LISP)_DUMP) $($(LISP)_LOAD) $<
 
 clean:
 	-rm *~
 
 distclean: clean
-	-rm -fr sbcl-* # for ASDF Binary Locations
+	-rm -fr $($(LISP)_CACHE)-* # for ASDF Binary Locations
 	-rm -fr $(DEMOS)
 
 .PHONY: all clean distclean

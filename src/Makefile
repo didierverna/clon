@@ -42,7 +42,9 @@ clean:
 	-rm *~
 
 distclean: clean
-	-rm -fr sbcl-* */sbcl-* */*/sbcl-* # for ASDF Binary Locations
+	-rm -fr $($(LISP)_CACHE)-*	\
+		*/$($(LISP)_CACHE)-*	\
+		*/*/$($(LISP)_CACHE)-* # for ASDF Binary Locations
 
 .PHONY: all clean distclean
 
