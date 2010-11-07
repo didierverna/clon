@@ -1,13 +1,13 @@
 #! /usr/local/bin/sbcl --script
 
-;;; generate.sh --- Clon version extractor script
+;;; version.sh --- Clon version extractor script
 
 ;; Copyright (C) 2010 Didier Verna
 
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Sun Sep 19 21:32:07 2010
-;; Last Revision: Tue Oct  5 16:00:08 2010
+;; Last Revision: Sun Nov  7 19:06:53 2010
 
 ;; This file is part of Clon.
 
@@ -62,4 +62,4 @@
 ;;; mode: lisp
 ;;; End:
 
-;;; generate.sh ends here
+;;; version.sh ends here
