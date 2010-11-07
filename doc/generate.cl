@@ -1,13 +1,11 @@
-#! /usr/local/bin/sbcl --script
-
-;;; generate.sh --- Clon reference manual generation script
+;;; generate.cl --- Clon reference manual generation script
 
 ;; Copyright (C) 2010 Didier Verna
 
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Tue Sep 21 15:26:35 2010
-;; Last Revision: Tue Sep 21 15:26:35 2010
+;; Last Revision: Sun Nov  7 21:07:47 2010
 
 ;; This file is part of Clon.
 
@@ -116,15 +114,6 @@ and extend the library with your own option types.
 @end itemize"
   "The reference manual's introductory text.")
 
-#-asdf2 (setf asdf:*central-registry*
-	      (list* (merge-pathnames "share/common-lisp/systems/"
-				      (user-homedir-pathname))
-		     #p"/usr/local/share/common-lisp/systems/"
-		     #p"/usr/share/common-lisp/systems/"
-		     asdf:*central-registry*))
-
-#-asdf2 (ignore-errors (asdf:operate 'asdf:load-op :asdf-binary-locations))
-
 (asdf:operate 'asdf:load-op :com.dvlsoft.declt)
 
 (if (and (second sb-ext:*posix-argv*)
@@ -142,10 +131,7 @@ and extend the library with your own option types.
 			   :info-file "clon-reference"
 			   :introduction +introduction+))
 
+(sb-ext:quit)
 
-
-;;; Local Variables:
-;;; mode: lisp
-;;; End:
 
-;;; generate.sh ends here
+;;; generate.cl ends here

@@ -40,15 +40,13 @@ SBCL_CACHE  := sbcl
 SBCL_DUMP   := --noinform --disable-ldb --lose-on-corruption	\
 	       --end-runtime-options --no-userinit --no-sysinit
 SBCL_LOAD   := --load
-SBCL_SCRIPT := --script
 
 CMUCL_CACHE  := cmu
 CMUCL_DUMP   := -quiet -noinit -nositeinit
 CMUCL_LOAD   := -load
-CMUCL_SCRIPT := -batch $(CMUCL_DUMP) $(CMUCL_LOAD)
 
-$(TOP_DIR)/version.inc: $(TOP_DIR)/version.sh $(TOP_DIR)/com.dvlsoft.clon.asd
-	CC=$(CC) $(TOP_DIR)/version.sh | tail -2 > $@
+$(TOP_DIR)/version.inc: $(TOP_DIR)/version.cl $(TOP_DIR)/com.dvlsoft.clon.asd
+	$($(LISP)_PATH) $($(LISP)_LOAD) $(TOP_DIR)/version.cl | tail -2 > $@
 
 
 ### Makefile.inc ends here

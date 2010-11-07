@@ -12,21 +12,23 @@ The Clon distribution has the following shape:
 
 
 * Configuration
-You may need to edit Makefile.cnf, demos/simple.lisp, demos/advanced.lisp and
-doc/generate.sh in order to tweak some installation parameters.
+Edit Makefile.cnf to your specific needs. For ASDF 1, the demo programs
+demos/simple.lisp and demos/advanced.lisp might also need some tweaking.
 
 
 * Building and installing
 
-Typing "make" will compile the documentation (end-user and user manuals). By
+If you're using ASDF 1, you need to "make install-system" before anything else
+in order to create the system file symlink where appropriate. Otherwise (ASDF
+2), we assume that you have unpacked somewhere in the source registry.
+
+Type "make" to compile the documentation (end-user and user manuals). By
 default, the documentation is built in info, PDF and HTML formats. If you want
 other formats (DVI and PostScript are available), type "make all-formats". You
 can also type individually "make dvi" and/or "make ps" in order to get the
 corresponding format.
 
-Typing "make install" will install both the documentation and the data files. 
-If you're using ASDF 1, you will want to "make install-system" in order to
-create the system file symlink where appropriate.
+Type "make install" to install both the documentation and the data files.
 
 If you want to compile the demo programs, type "make demos". These programs
 are not installed anywhere.
@@ -35,10 +37,9 @@ are not installed anywhere.
 * Building and installing the reference manual
 In addition to the end-user and user manuals, you can generate a reference
 manual for Clon. In order to do that, you need to have Declt installed (see
-http://www.lrde.epita.fr/~didier/software/lisp/misc.php#declt).
-
-If you're using ASDF 1, you need to have typed "make install-system" first
-(that is why the reference manual is not built by default).
+http://www.lrde.epita.fr/~didier/software/lisp/misc.php#declt), and SBCL since
+Declt is currently an SBCL-only library. This dependency is why the reference
+manual is not built by default.
 
 To generate the reference manual, type "make ref".
 To install it, type "make install-ref".

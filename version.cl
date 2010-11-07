@@ -1,6 +1,4 @@
-#! /usr/local/bin/sbcl --script
-
-;;; version.sh --- Clon version extractor script
+;;; version.cl --- Clon version extractor script
 
 ;; Copyright (C) 2010 Didier Verna
 
@@ -33,33 +31,19 @@
 
 ;;; Code:
 
-(require :asdf)
-#-asdf2 (setf asdf:*central-registry*
-	      (list* #p"./"
-		     #p"../"
-		     (merge-pathnames "share/common-lisp/systems/"
-				      (user-homedir-pathname))
-		     #p"/usr/local/share/common-lisp/systems/"
-		     #p"/usr/share/common-lisp/systems/"
-		     asdf:*central-registry*))
-#-asdf2 (ignore-errors (asdf:operate 'asdf:load-op :asdf-binary-locations))
+(in-package :cl-user)
 
-(handler-case (asdf:operate 'asdf:load-op :com.dvlsoft.clon)
-  (error ()
-     (format t "LONG_VERSION := unknown~%SHORT_VERSION := unknown~%")
-     ;; #### PORTME.
-     #+sbcl (sb-ext:quit)
-     #+cmu  (unix:unix-exit)))
+(require :asdf)
+
+(asdf:operate 'asdf:load-op :com.dvlsoft.clon)
+(com.dvlsoft.clon:nickname-package)
 
 (format t "LONG_VERSION  := ~A~%~
 	   SHORT_VERSION := ~A~%"
-  (com.dvlsoft.clon:version :long)
-  (com.dvlsoft.clon:version :short))
+  (clon:version :long)
+  (clon:version :short))
+
+(clon:exit)
 
 
-
-;;; Local Variables:
-;;; mode: lisp
-;;; End:
-
-;;; version.sh ends here
+;;; version.cl ends here
