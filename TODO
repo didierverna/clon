@@ -1,5 +1,9 @@
 							-*- mode: outline -*-
 
+* Have a look at CMUCL
+It has built-in search-lists and wildcard match that could be useful for the
+path options.
+
 * Provide a do-cmdline-option (without the s) macro
 for repeatedly getting one specific option (and doing BODY on it) until none
 is left on the command-line. This could be useful for processing options
