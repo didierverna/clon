@@ -59,7 +59,7 @@
 (defconstant +release-status+ :beta
   "The status of this release.")
 
-(defconstant +release-status-level+ 11
+(defconstant +release-status-level+ 12
   "The status level of this release.")
 
 (define-constant +release-name+ "Michael Brecker"
