@@ -45,6 +45,10 @@ CMUCL_CACHE  := cmu
 CMUCL_DUMP   := -quiet -noinit -nositeinit
 CMUCL_LOAD   := -load
 
+CCL_CACHE := ccl
+CCL_DUMP  := --quiet --no-init
+CCL_LOAD  := --load
+
 $(TOP_DIR)/version.inc: $(TOP_DIR)/version.cl $(TOP_DIR)/com.dvlsoft.clon.asd
 	$($(LISP)_PATH) $($(LISP)_LOAD) $(TOP_DIR)/version.cl | tail -2 > $@
 

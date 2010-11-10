@@ -222,6 +222,7 @@ See REPLACE-KEY for more information on the replacement syntax."
   ;; #### PORTME.
   `(defmethod #+sbcl sb-mop:validate-superclass
 	      #+cmu  mop:validate-superclass
+	      #+ccl  ccl:validate-superclass
     ((class ,class) (superclass ,superclass))
     t))
 
@@ -230,6 +231,7 @@ See REPLACE-KEY for more information on the replacement syntax."
   ;; #### PORTME.
   (#+sbcl sb-mop:class-slots
    #+cmu  mop:class-slots
+   #+ccl  ccl:class-slots
    class))
 
 (defun slot-definition-name (slot)
@@ -237,6 +239,7 @@ See REPLACE-KEY for more information on the replacement syntax."
   ;; #### PORTME.
   (#+sbcl sb-mop:slot-definition-name
    #+cmu  mop:slot-definition-name
+   #+ccl  ccl:slot-definition-name
    slot))
 
 
@@ -328,13 +331,15 @@ invalid direction: ~S"
   "Quit the current application with STATUS."
   ;; #### PORTME.
   #+sbcl (sb-ext:quit :unix-status status)
-  #+cmu  (unix:unix-exit status))
+  #+cmu  (unix:unix-exit status)
+  #+ccl  (ccl:quit status))
 
 (defun cmdline ()
   "Get the current application's command-line."
   ;; #### PORTME.
   #+sbcl sb-ext:*posix-argv*
-  #+cmu  lisp::lisp-command-line-list)
+  #+cmu  lisp::lisp-command-line-list
+  #+ccl  ccl::*command-line-argument-list*)
 
 (defun getenv (variable)
   "Get environment VARIABLE's value. VARIABLE may be null."
@@ -342,14 +347,15 @@ invalid direction: ~S"
   (when variable
     (#+sbcl sb-posix:getenv
      #+cmu  unix:unix-getenv
+     #+ccl  ccl:getenv
      variable)))
 
 (defun putenv (variable value)
   "Set environment VARIABLE to VALUE."
   ;; #### PORTME.
-  (#+sbcl sb-posix:putenv
-   #+cmu  unix:unix-putenv
-   (concatenate 'string variable "=" value)))
+  #+sbcl (sb-posix:putenv  (concatenate 'string variable "=" value))
+  #+cmu  (unix:unix-putenv (concatenate 'string variable "=" value))
+  #+ccl  (ccl:setenv variable value))
 
 (defun dump (name function)
   "Dump a standalone executable named NAME starting with FUNCTION."
@@ -358,7 +364,10 @@ invalid direction: ~S"
 				   :save-runtime-options t)
   #+cmu  (ext:save-lisp name :init-function function :executable t
 			:load-init-file nil :site-init nil
-			:print-herald nil :process-command-line nil))
+			:print-herald nil :process-command-line nil)
+  #+ccl  (ccl:save-application name :toplevel-function function
+			       :init-file nil :error-handler :quit
+			       :prepend-kernel t))
 
 
 ;;; util.lisp ends here

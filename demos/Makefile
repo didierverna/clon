@@ -42,7 +42,6 @@ DEMOS := simple advanced
 
 demos: $(DEMOS)
 
-# #### PORTME.
 $(DEMOS): %: %.lisp
 	$($(LISP)_PATH) $($(LISP)_DUMP) $($(LISP)_LOAD) $<
 
