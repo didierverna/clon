@@ -42,7 +42,7 @@ clean:
 
 distclean: clean
 	-rm -fr constants.lisp-temp
-	-rm -fr $(SBCL_CACHE)-* # for ASDF Binary Locations
+	-rm -fr $(SBCL_BINLOC)-*
 
 .PHONY: all clean distclean
 

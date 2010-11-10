@@ -49,7 +49,6 @@ clean:
 	-rm *~
 
 distclean: clean
-	-rm -fr $($(LISP)_CACHE)-* # for ASDF Binary Locations
 	-rm -fr $(DEMOS)
 
 .PHONY: all clean distclean
