@@ -2414,7 +2414,7 @@ on sight.
 Here is how the @code{version} function computes its value.
 @itemize
 @item
-A version @code{:number} is computed as @emph{major . 10000 + minor . 
+A version @code{:number} is computed as @emph{major . 10000 + minor .
 100 + patchlevel}, effectively leaving two digits for each level. Note
 that alpha, beta and release candidate status are ignored in version
 numbers (this is as if the corresponding status level was considered to
