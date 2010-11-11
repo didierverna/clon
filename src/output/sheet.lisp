@@ -713,7 +713,7 @@ than the currently available right margin."
 	      (multiple-value-bind (success error-number)
 		  (unix:unix-ioctl
 		   (system:fd-stream-fd
-		    (stream-file-stream *standard-output*))
+		    (stream-file-stream output-stream :output))
 		   unix:tiocgwinsz winsize)
 		(cond (success
 		       (alien:slot winsize 'unix:ws-col))
