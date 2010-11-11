@@ -110,7 +110,7 @@
 ;; Internal utilities:
 ;; -------------------
 
-(defvar *readtable* (copy-readtable nil)
+(defvar *readtable* (copy-readtable)
   "The Clon readtable.")
 
 (defun tilde-reader (stream char)

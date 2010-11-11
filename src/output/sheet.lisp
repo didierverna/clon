@@ -724,7 +724,20 @@ than the currently available right margin."
 			 ;; #### FIXME: a better error printing would be nice.
 			 (format t "Error ~A: ~A~%" error-number
 				 (unix:get-unix-error-msg error-number)))
-		       nil))))))
+		       nil))))
+	    #+ccl
+	    (ccl:rlet ((winsize :winsize))
+	      (let ((result
+		     (ccl::int-errno-call
+		      (#_ioctl (ccl::stream-device output-stream :output)
+			       #$TIOCGWINSZ :address winsize))))
+		(if (zerop result)
+		    (ccl:pref winsize :winsize.ws_col)
+		  ;; ENOTTY error should remain silent, but no the others.
+		  (unless (= result #$ENOTTY)
+		    ;; #### FIXME: a better error printing would be nice.
+		    (format t "Error ~A: ~A~%"
+		      result (ccl::%strerror result))))))))
       ;; Next, set highlighting.
       (when (eq highlight :auto)
 	(setq highlight tty-line-width))
