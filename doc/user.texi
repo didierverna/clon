@@ -676,6 +676,12 @@ like this:
 @verbatim
 lisp -quiet -noinit -nositeinit -load quickstart.lisp
 @end verbatim
+@item CCL
+You can dump an executable from CCL (formerly known as OpenMCL) like
+this:
+@verbatim
+ccl --quiet --no-init --load quickstart.lisp
+@end verbatim
 @end table
 
 
