@@ -670,8 +670,8 @@ CC=gcc sbcl \
   --noinform --disable-ldb --lose-on-corruption --end-runtime-options \
   --no-userinit --no-sysinit --load quickstart.lisp
 @end verbatim
-@item CMU-CL
-CMU-CL is supported starting at version 20b. You can dump an executable
+@item CMUCL
+CMUCL is supported starting at version 20b. You can dump an executable
 like this:
 @verbatim
 lisp -quiet -noinit -nositeinit -load quickstart.lisp
