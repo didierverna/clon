@@ -1,5 +1,6 @@
 sbcl-*/
 cmu-*/
+openmcl-*/
 
 version.inc
 

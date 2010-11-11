@@ -37,13 +37,20 @@ SHARE := $(PREFIX)/share
 W3DIR := $(HOME)/www/software/lisp/clon
 
 SBCL_CACHE  := sbcl
+SBCL_BINLOC := sbcl
 SBCL_DUMP   := --noinform --disable-ldb --lose-on-corruption	\
 	       --end-runtime-options --no-userinit --no-sysinit
 SBCL_LOAD   := --load
 
 CMUCL_CACHE  := cmu
+CMUCL_BINLOC := cmu
 CMUCL_DUMP   := -quiet -noinit -nositeinit
 CMUCL_LOAD   := -load
+
+CCL_CACHE  := clozure
+CCL_BINLOC := openmcl
+CCL_DUMP   := --quiet --no-init
+CCL_LOAD   := --load
 
 $(TOP_DIR)/version.inc: $(TOP_DIR)/version.cl $(TOP_DIR)/com.dvlsoft.clon.asd
 	$($(LISP)_PATH) $($(LISP)_LOAD) $(TOP_DIR)/version.cl | tail -2 > $@

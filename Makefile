@@ -73,8 +73,8 @@ distclean: clean
 	$(MAKE) gen TARGET=distclean
 	-rm *.tar.gz *.tar.gz.asc
 	-rm -fr version.inc
-	-rm -fr $($(LISP)_CACHE)-* # ASDF Binary Locations
-	-rm -fr "${HOME}"/.cache/common-lisp/$($(LISP)_CACHE)-*"`pwd`" # ASDF 2
+	-rm -fr $($(LISP)_BINLOC)-*
+	-rm -fr "${HOME}"/.cache/common-lisp/$($(LISP)_CACHE)-*"`pwd`"
 
 tag:
 	git tag -a -m 'Version $(LONG_VERSION)' 'version-$(SHORT_VERSION)'
