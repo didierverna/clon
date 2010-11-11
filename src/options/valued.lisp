@@ -110,7 +110,7 @@ If OPTION matches, return its short name's length; otherwise 0."
 	      (short-name option))))
 	(accumulate (argument)
 	  (when (and (short-name option) (not (long-name option)))
-	    (format nil "~:[[~A]~:;~A~]"
+	    (format nil "~:[[~A]~;~A~]"
 	      (argument-required-p option)
 	      (argument-name option)))))
       (accumulate (long)
@@ -119,7 +119,7 @@ If OPTION matches, return its short name's length; otherwise 0."
 	    (format nil "--~A" (long-name option))))
 	(accumulate (argument)
 	  (when (long-name option)
-	    (format nil "~:[[=~A]~:;=~A~]"
+	    (format nil "~:[[=~A]~;=~A~]"
 	      (argument-required-p option)
 	      (argument-name option))))))
     (accumulate (usage)
