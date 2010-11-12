@@ -51,7 +51,7 @@ clean:
 distclean: clean
 	-rm -fr $(DEMOS)
 
-.PHONY: all clean distclean
+.PHONY: all demos clean distclean
 
 
 ### Makefile ends here

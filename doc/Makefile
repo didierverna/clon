@@ -157,11 +157,16 @@ install-www: webref
 	install -m 644 webreference/* "$(W3DIR)/reference/"
 
 
-.PHONY: all all-formats			\
-	install-at install uninstall	\
-	info pdf dvi ps html		\
-	clean distclean			\
-	update-version install-www
+.PHONY: all ref webref all-formats all-formats-ref	\
+	install-at install install-ref uninstall	\
+	info info-ref					\
+	pdf pdf-ref pdf-webref				\
+	html html-ref html-webref			\
+	dvi dvi-ref					\
+	ps ps-ref					\
+	clean distclean					\
+	update-version					\
+	install-www
 
 
 ### Makefile ends here

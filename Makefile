@@ -52,8 +52,8 @@ DIST_NAME := clon-$(SHORT_VERSION)
 TARBALL   := $(DIST_NAME).tar.gz
 SIGNATURE := $(TARBALL).asc
 
-
-demos: # needed because we have a demos/ directory which fucks up the target.
+# Needed because we have a demos/ directory which fucks up the gen mechanism.
+demos:
 	cd demos && $(MAKE) demos
 
 install-system:
@@ -117,12 +117,10 @@ $(SIGNATURE): $(TARBALL)
 .DEFAULT:
 	$(MAKE) gen TARGET=$@
 
-.PHONY: all demos		\
-	install-system		\
-	uninstall		\
-	clean distclean		\
-	tag tar gpg dist	\
-	install-www		\
+.PHONY: all demos			\
+	install-system uninstall	\
+	clean distclean			\
+	tag tar gpg dist install-www	\
 	gen
 
 
