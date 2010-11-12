@@ -78,19 +78,21 @@ install: $(INFO_FILES)
 	  install-info --info-dir="$(INFO_DIR)" $$i;	\
 	done
 	$(MAKE) install-at LOCATION="$(CLON_DOC_DIR)"
-	for i in $(DVI_FILES) $(PS_FILES); do			\
+	-for i in $(DVI_FILES) $(PS_FILES); do			\
 	  test -f $$i && install -m 644 $$i "$(CLON_DOC_DIR)";	\
 	done
-
-install-ref: clon-reference.info reference.pdf reference
-	install -d "$(INFO_DIR)"
-	install -m 644 clon-reference.info* "$(INFO_DIR)/"
-	install-info --info-dir="$(INFO_DIR)" clon-reference.info
-	install -d "$(CLON_DOC_DIR)"
-	install -m 644 reference.pdf "$(CLON_DOC_DIR)/"
-	install -d -m 755 "$(CLON_DOC_DIR)/reference"
-	install -m 644 reference/* "$(CLON_DOC_DIR)/reference/"
-	for i in reference.dvi reference.ps; do			\
+	-if test -f clon-reference.info; then				\
+	  install -m 644 clon-reference.info* "$(INFO_DIR)/" ;		\
+	  install-info --info-dir="$(INFO_DIR)" clon-reference.info ;	\
+	fi
+	-if test -f reference.pdf ; then				\
+	  install -m 644 reference.pdf "$(CLON_DOC_DIR)/" ;	\
+	fi
+	-if test -f reference ; then					\
+	  install -d -m 755 "$(CLON_DOC_DIR)/reference" ;		\
+	  install -m 644 reference/* "$(CLON_DOC_DIR)/reference/" ;	\
+	fi
+	-for i in reference.dvi reference.ps; do			\
 	  test -f $$i && install -m 644 $$i "$(CLON_DOC_DIR)";	\
 	done
 
@@ -167,7 +169,7 @@ install-www: webref
 
 
 .PHONY: all ref webref all-formats all-formats-ref	\
-	install-at install install-ref uninstall	\
+	install-at install uninstall			\
 	info info-ref					\
 	pdf pdf-ref pdf-webref				\
 	html html-ref html-webref			\

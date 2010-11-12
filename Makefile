@@ -63,9 +63,6 @@ all-formats dvi ps ref all-formats-ref dvi-ref ps-ref:
 install:
 	$(MAKE) gen TARGET=install
 
-install-ref:
-	cd doc && $(MAKE) $@
-
 uninstall:
 	-rm -f "$(SYSTEMS_DIR)/$(ASDF_FILE)"
 	$(MAKE) gen TARGET=uninstall
