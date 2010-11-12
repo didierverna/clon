@@ -34,9 +34,12 @@ TOP_DIR := ..
 
 include $(TOP_DIR)/Makefile.cnf
 
-all:
+hack: all
 
 include $(TOP_DIR)/Makefile.inc
+
+
+all:
 
 clean:
 	-rm *~
@@ -45,11 +48,11 @@ distclean: clean
 	-rm -fr $($(LISP)_BINLOC)-*	\
 		*/$($(LISP)_BINLOC)-*	\
 		*/*/$($(LISP)_BINLOC)-*
-
+install:
 uninstall:
 install-www:
 
-.PHONY: all clean distclean uninstall install-www
+.PHONY: hack all clean distclean install uninstall install-www
 
 
 ### Makefile ends here

@@ -34,10 +34,11 @@ TOP_DIR := ..
 
 include $(TOP_DIR)/Makefile.cnf
 
-all: info pdf html
+hack: all
 
 include $(TOP_DIR)/Makefile.inc
 include $(TOP_DIR)/version.inc
+
 
 INFO_DIR     := $(PREFIX)/share/info
 DOC_DIR	     := $(SHARE)/doc
@@ -51,6 +52,8 @@ DVI_FILES      := $(TEXI_FILES:%.texi=%.dvi)
 PS_FILES       := $(TEXI_FILES:%.texi=%.ps)
 HTML_DIRS      := $(TEXI_FILES:%.texi=%)
 
+
+all: info pdf html
 
 ref: info-ref pdf-ref html-ref
 
@@ -75,6 +78,9 @@ install: $(INFO_FILES)
 	  install-info --info-dir="$(INFO_DIR)" $$i;	\
 	done
 	$(MAKE) install-at LOCATION="$(CLON_DOC_DIR)"
+	for i in $(DVI_FILES) $(PS_FILES); do			\
+	  test -f $$i && install -m 644 $$i "$(CLON_DOC_DIR)";	\
+	done
 
 install-ref: clon-reference.info reference.pdf reference
 	install -d "$(INFO_DIR)"
@@ -84,13 +90,16 @@ install-ref: clon-reference.info reference.pdf reference
 	install -m 644 reference.pdf "$(CLON_DOC_DIR)/"
 	install -d -m 755 "$(CLON_DOC_DIR)/reference"
 	install -m 644 reference/* "$(CLON_DOC_DIR)/reference/"
+	for i in reference.dvi reference.ps; do			\
+	  test -f $$i && install -m 644 $$i "$(CLON_DOC_DIR)";	\
+	done
 
 uninstall:
 	-rm -fr "$(CLON_DOC_DIR)"
-	for i in $(INFO_FILES); do				\
+	for i in $(INFO_FILES) clon-reference.info; do		\
 	  install-info --remove --info-dir="$(INFO_DIR)" $$i;	\
 	done
-	cd "$(INFO_DIR)" && rm -f $(ALL_INFO_FILES)
+	cd "$(INFO_DIR)" && rm -f $(ALL_INFO_FILES) clon-reference.info*
 
 info: $(INFO_FILES)
 info-ref: clon-reference.info

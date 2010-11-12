@@ -33,7 +33,11 @@
 TOP_DIR := ..
 
 include $(TOP_DIR)/Makefile.cnf
+
+hack: all
+
 include $(TOP_DIR)/Makefile.inc
+
 
 all:
 
@@ -44,10 +48,11 @@ distclean: clean
 	-rm -fr constants.lisp-temp
 	-rm -fr $(SBCL_BINLOC)-*
 
+install:
 uninstall:
 install-www:
 
-.PHONY: all clean distclean uninstall install-www
+.PHONY: hack all clean distclean install uninstall install-www
 
 
 ### Makefile ends here

@@ -34,13 +34,15 @@ TOP_DIR := ..
 
 include $(TOP_DIR)/Makefile.cnf
 
-all:
+hack: all
 
 include $(TOP_DIR)/Makefile.inc
+
 
 CLON_SHARE := $(SHARE)/clon
 THEMES_DIR := $(CLON_SHARE)/themes
 
+all:
 
 install:
 	install -d -m 755 "$(THEMES_DIR)"
@@ -55,7 +57,7 @@ clean:
 distclean:
 install-www:
 
-.PHONY: all install uninstall clean distclean install-www
+.PHONY: hack all install uninstall clean distclean install-www
 
 
 ### Makefile ends here

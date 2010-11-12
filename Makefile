@@ -36,11 +36,11 @@ TOP_DIR := .
 
 include Makefile.cnf
 
-all:
-	$(MAKE) gen TARGET=all
+hack: all
 
 include Makefile.inc
 include version.inc
+
 
 SUBDIRS     := src sbcl  \
 	       share doc \
@@ -52,12 +52,19 @@ DIST_NAME := clon-$(SHORT_VERSION)
 TARBALL   := $(DIST_NAME).tar.gz
 SIGNATURE := $(TARBALL).asc
 
-# Needed because we have a demos/ directory which fucks up the gen mechanism.
-demos:
-	cd demos && $(MAKE) demos
-
 install-system:
 	ln -fs "`pwd`/$(ASDF_FILE)" "$(SYSTEMS_DIR)/"
+
+all-formats dvi ps ref all-formats-ref dvi-ref ps-ref:
+	cd doc && $(MAKE) $@
+
+# Needed because we have an INSTALL file which fucks up the gen mechanism
+# (remember that Mac OSX is case-insensitive).
+install:
+	$(MAKE) gen TARGET=install
+
+install-ref:
+	cd doc && $(MAKE) $@
 
 uninstall:
 	-rm -f "$(SYSTEMS_DIR)/$(ASDF_FILE)"
@@ -100,6 +107,9 @@ install-www: dist
 	  && ln -fs attic/$(TARBALL) latest.tar.gz	\
 	  && ln -fs attic/$(SIGNATURE) latest.tar.gz.asc
 
+update-version:
+	cd doc && $(MAKE) $@
+
 gen:
 	@for i in $(SUBDIRS) ; do                 \
 	   echo "making $(TARGET) in $${i} ..." ; \
@@ -117,10 +127,12 @@ $(SIGNATURE): $(TARBALL)
 .DEFAULT:
 	$(MAKE) gen TARGET=$@
 
-.PHONY: all demos			\
-	install-system uninstall	\
-	clean distclean			\
-	tag tar gpg dist install-www	\
+.PHONY: hack							\
+	all-formats dvi ps ref all-formats-ref dvi-ref ps-ref	\
+	install-system install install-ref uninstall		\
+	clean distclean						\
+	tag tar gpg dist install-www				\
+	update-version						\
 	gen
 
 

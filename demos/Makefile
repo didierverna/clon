@@ -34,13 +34,14 @@ TOP_DIR := ..
 
 include $(TOP_DIR)/Makefile.cnf
 
-all:
+hack: all
 
 include $(TOP_DIR)/Makefile.inc
 
+
 DEMOS := simple advanced
 
-demos: $(DEMOS)
+all: $(DEMOS)
 
 $(DEMOS): %: %.lisp
 	$($(LISP)_PATH) $($(LISP)_DUMP) $($(LISP)_LOAD) $<
@@ -51,10 +52,11 @@ clean:
 distclean: clean
 	-rm -fr $(DEMOS)
 
+install:
 uninstall:
 install-www:
 
-.PHONY: all demos clean distclean uninstall install-www
+.PHONY: hack all clean distclean install uninstall install-www
 
 
 ### Makefile ends here
