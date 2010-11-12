@@ -46,7 +46,10 @@ distclean: clean
 		*/$($(LISP)_BINLOC)-*	\
 		*/*/$($(LISP)_BINLOC)-*
 
-.PHONY: all clean distclean
+uninstall:
+install-www:
+
+.PHONY: all clean distclean uninstall install-www
 
 
 ### Makefile ends here

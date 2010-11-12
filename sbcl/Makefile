@@ -44,7 +44,10 @@ distclean: clean
 	-rm -fr constants.lisp-temp
 	-rm -fr $(SBCL_BINLOC)-*
 
-.PHONY: all clean distclean
+uninstall:
+install-www:
+
+.PHONY: all clean distclean uninstall install-www
 
 
 ### Makefile ends here

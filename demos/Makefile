@@ -51,7 +51,10 @@ clean:
 distclean: clean
 	-rm -fr $(DEMOS)
 
-.PHONY: all demos clean distclean
+uninstall:
+install-www:
+
+.PHONY: all demos clean distclean uninstall install-www
 
 
 ### Makefile ends here

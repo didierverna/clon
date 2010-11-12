@@ -52,7 +52,10 @@ uninstall:
 clean:
 	-rm *~ */*~ */*/*~
 
-.PHONY: all install uninstall clean
+distclean:
+install-www:
+
+.PHONY: all install uninstall clean distclean install-www
 
 
 ### Makefile ends here
