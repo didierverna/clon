@@ -234,7 +234,7 @@ If ERROR-ME, trigger an error if no face is found; otherwise, return nil."
 				      :do (push (name parent) names)
 				      :finally (return names))
 		 :for found := (search-branch (parent face) names)
-		 :if found
+		 :when found
 		 :return (attach-face-tree face found)))
       (when error-me (error "Face ~A not found." name))))
 
