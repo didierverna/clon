@@ -1893,6 +1893,28 @@ Management} and you will know). For that reason, you are encouraged to
 @emph{not} disable the debugger in your standalone program, at least
 when you're executing @clon{} code.
 
+The way error handling is done in @cl{} standalone executables is
+implementation-dependent, so please refer to your favorite compiler's
+documentation.
+
+More generally, the behavior of @cl{} standalone executables may depend
+on:
+
+@itemize @bullet
+@item
+the state of the Lisp environment when the application is dumped, which
+may in turn depend on command-line options passed to the Lisp itself
+(@pxref{Quick Start Dumping}),
+@item
+@findex dump
+the arguments passed to the dumping function (look at @clon{}'s
+@code{dump} function to see what it does),
+@item
+worse: @emph{both}.
+@end itemize
+
+No, really, @cl{} is no fun at all.
+
 @node Value Stringification Protocol, Constructor Functions, Error Management, New Option Types
 @subsection Value Stringification Protocol
 Okay, back to implementing our new option type.
