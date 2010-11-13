@@ -1,5 +1,7 @@
 							-*- mode: outline -*-
 
+* I18N
+
 * Have a look at CMUCL
 It has built-in search-lists and wildcard match that could be useful for the
 path options.
