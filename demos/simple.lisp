@@ -36,7 +36,10 @@
 
 (in-package :cl-user)
 
-(require :asdf)
+(require :asdf
+	 #-(or sbcl cmu ccl)
+	 '(#p"/usr/local/share/common-lisp/source/asdf/asdf.lisp"))
+
 #-asdf2 (setf asdf:*central-registry*
 	      (list* (merge-pathnames "share/common-lisp/systems/"
 				      (user-homedir-pathname))
