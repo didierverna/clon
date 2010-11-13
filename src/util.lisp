@@ -318,10 +318,8 @@ invalid direction: ~S"
 ;; ==========================================================================
 
 (defun home-directory ()
-  "Return user's home directory."
-  ;; user-homedir-pathname's value is implementation-dependant, so we probe
-  ;; the result in order to have a real directory.
-  (probe-file (user-homedir-pathname)))
+  "Return user's home directory in canonical form."
+  (truename (user-homedir-pathname)))
 
 (defun macosp ()
   "Return t if running on Mac OS."
