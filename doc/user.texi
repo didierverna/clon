@@ -667,20 +667,20 @@ not recommended because it disables the debugger (@pxref{Error
 Management}). Instead, you might be better off doing:
 @verbatim
 CC=gcc sbcl \
-  --noinform --disable-ldb --lose-on-corruption --end-runtime-options \
+  --disable-ldb --lose-on-corruption --end-runtime-options \
   --no-userinit --no-sysinit --load quickstart.lisp
 @end verbatim
 @item CMUCL
 CMUCL is supported starting at version 20b. You can dump an executable
 like this:
 @verbatim
-lisp -quiet -noinit -nositeinit -load quickstart.lisp
+lisp -noinit -nositeinit -load quickstart.lisp
 @end verbatim
 @item CCL
 You can dump an executable from CCL (formerly known as OpenMCL) like
 this:
 @verbatim
-ccl --quiet --no-init --load quickstart.lisp
+ccl --no-init --load quickstart.lisp
 @end verbatim
 @end table
 
