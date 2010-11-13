@@ -216,9 +216,8 @@ If a branch is found, return its leaf face. Otherwise return nil."
   (or (subface face names)
       (loop :for parent := (parent face) :then (parent parent)
 	    :while parent
-	    :for found := (subface parent names)
-	    :when found
-	    :return found
+	    :when (subface parent names)
+	    :return :it
 	    :finally (return nil))))
 
 (defun search-face (face name &optional error-me)
