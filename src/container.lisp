@@ -88,9 +88,8 @@ command-line hierarchy."))
 (defmethod help-spec ((container container) &key)
   "Return CONTAINER's help specification."
   (loop :for item :in (items container)
-	:for spec := (help-spec item)
-	:when spec
-	:collect spec))
+	:when (help-spec item)
+	:collect :it))
 
 
 
