@@ -47,6 +47,11 @@ CMUCL_BINLOC := cmu
 CMUCL_DUMP   := -noinit -nositeinit
 CMUCL_LOAD   := -load
 
+CLISP_CACHE  := clisp
+CLISP_BINLOC := clisp
+CLISP_DUMP   :=
+CLISP_LOAD   :=
+
 CCL_CACHE  := clozure
 CCL_BINLOC := openmcl
 CCL_DUMP   := --no-init

@@ -125,6 +125,22 @@
 
 (set-macro-character #\~ #'tilde-reader nil *readtable*)
 
+;; CLISP does not like to see undefined reader macros in expressions that
+;; belong to other compilers. For instance this will break:
+;; #+ccl (#_ccl-only-function)
+;; It seems to be a correct behavior (see *read-suppress* in CLHS), although
+;; other implementations like SBCL and CMUCL are more gentle. The solution I
+;; use is to define those reader macros to simply return nil.
+#+clisp
+(progn
+  (defun dummy-reader (stream subchar args)
+    "Return nil."
+    (declare (ignore stream subchar args))
+    nil)
+
+  (set-dispatch-macro-character #\# #\_ #'dummy-reader *readtable*)
+  (set-dispatch-macro-character #\# #\$ #'dummy-reader *readtable*))
+
 (defmacro in-readtable (name)
   "Set the current readtable to the value of NAME::*READTABLE*."
   `(eval-when (:compile-toplevel :load-toplevel :execute)

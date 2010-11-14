@@ -220,26 +220,29 @@ See REPLACE-KEY for more information on the replacement syntax."
 (defmacro validate-superclass (class superclass)
   "Validate SUPERCLASS classes for CLASS classes."
   ;; #### PORTME.
-  `(defmethod #+sbcl sb-mop:validate-superclass
-	      #+cmu  mop:validate-superclass
-	      #+ccl  ccl:validate-superclass
+  `(defmethod #+sbcl  sb-mop:validate-superclass
+	      #+cmu   mop:validate-superclass
+	      #+clisp clos:validate-superclass
+	      #+ccl   ccl:validate-superclass
     ((class ,class) (superclass ,superclass))
     t))
 
 (defun class-slots (class)
   "Return CLASS slots."
   ;; #### PORTME.
-  (#+sbcl sb-mop:class-slots
-   #+cmu  mop:class-slots
-   #+ccl  ccl:class-slots
+  (#+sbcl  sb-mop:class-slots
+   #+cmu   mop:class-slots
+   #+clisp clos:class-slots
+   #+ccl   ccl:class-slots
    class))
 
 (defun slot-definition-name (slot)
   "Return SLOT's definition name."
   ;; #### PORTME.
-  (#+sbcl sb-mop:slot-definition-name
-   #+cmu  mop:slot-definition-name
-   #+ccl  ccl:slot-definition-name
+  (#+sbcl  sb-mop:slot-definition-name
+   #+cmu   mop:slot-definition-name
+   #+clisp clos:slot-definition-name
+   #+ccl   ccl:slot-definition-name
    slot))
 
 
@@ -328,44 +331,49 @@ invalid direction: ~S"
 (defun exit (&optional (status 0))
   "Quit the current application with STATUS."
   ;; #### PORTME.
-  #+sbcl (sb-ext:quit :unix-status status)
-  #+cmu  (unix:unix-exit status)
-  #+ccl  (ccl:quit status))
+  #+sbcl  (sb-ext:quit :unix-status status)
+  #+cmu   (unix:unix-exit status)
+  #+clisp (ext:exit status)
+  #+ccl   (ccl:quit status))
 
 (defun cmdline ()
   "Get the current application's command-line."
   ;; #### PORTME.
-  #+sbcl sb-ext:*posix-argv*
-  #+cmu  lisp::lisp-command-line-list
-  #+ccl  ccl::*command-line-argument-list*)
+  #+sbcl  sb-ext:*posix-argv*
+  #+cmu   lisp::lisp-command-line-list
+  #+clisp (cons (aref (ext:argv) 0) ext:*args*)
+  #+ccl   ccl::*command-line-argument-list*)
 
 (defun getenv (variable)
   "Get environment VARIABLE's value. VARIABLE may be null."
   ;; #### PORTME.
   (when variable
-    (#+sbcl sb-posix:getenv
-     #+cmu  unix:unix-getenv
-     #+ccl  ccl:getenv
+    (#+sbcl  sb-posix:getenv
+     #+cmu   unix:unix-getenv
+     #+clisp ext:getenv
+     #+ccl   ccl:getenv
      variable)))
 
 (defun putenv (variable value)
   "Set environment VARIABLE to VALUE."
   ;; #### PORTME.
-  #+sbcl (sb-posix:putenv  (concatenate 'string variable "=" value))
-  #+cmu  (unix:unix-putenv (concatenate 'string variable "=" value))
-  #+ccl  (ccl:setenv variable value))
+  #+sbcl  (sb-posix:putenv  (concatenate 'string variable "=" value))
+  #+cmu   (unix:unix-putenv (concatenate 'string variable "=" value))
+  #+clisp (setf (ext:getenv variable) value)
+  #+ccl   (ccl:setenv variable value))
 
 (defun dump (name function)
   "Dump a standalone executable named NAME starting with FUNCTION."
   ;; #### PORTME.
-  #+sbcl (sb-ext:save-lisp-and-die name :toplevel function :executable t
-				   :save-runtime-options t)
-  #+cmu  (ext:save-lisp name :init-function function :executable t
-			:load-init-file nil :site-init nil
-			:print-herald nil :process-command-line nil)
-  #+ccl  (ccl:save-application name :toplevel-function function
-			       :init-file nil :error-handler :quit
-			       :prepend-kernel t))
+  #+sbcl  (sb-ext:save-lisp-and-die name :toplevel function :executable t
+				    :save-runtime-options t)
+  #+cmu   (ext:save-lisp name :init-function function :executable t
+			 :load-init-file nil :site-init nil
+			 :print-herald nil :process-command-line nil)
+  #+clisp (ext:saveinitmem name :init-function function :executable 0
+			   :quiet t :norc t)
+  #+ccl   (ccl:save-application name :toplevel-function function
+				:init-file nil :prepend-kernel t))
 
 
 ;;; util.lisp ends here

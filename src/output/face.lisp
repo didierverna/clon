@@ -158,7 +158,7 @@ This property can take the following forms:
   "Look up SLOT's value in FACE's parent if it's a highlight property.
 If FACE has no parent, return nil.
 For other properties, trigger an error."
-  #+ccl (declare (ignore class))
+  #+(or ccl clisp) (declare (ignore class))
   (let ((property (member slot +highlight-properties+)))
     (if property
 	(when (parent face)

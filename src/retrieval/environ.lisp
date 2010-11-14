@@ -152,11 +152,11 @@ ENV-VAL is the value stored in the associated environment variable.")
     "Assert that ENV-VAL is not null."
     ;; That's because getopt is not supposed to call this function unless
     ;; there is actually something to retrieve.
-    #+ccl (declare (ignore option))
+    #+(or ccl clisp) (declare (ignore option))
     (assert env-val))
   ;; Method for flags:
   (:method ((flag flag) env-val)
-    #+ccl (declare (ignore env-val))
+    #+(or ccl clisp) (declare (ignore env-val))
     ;; #### NOTE: there's no way of providing an env var /without/ a value
     ;; (the value is at least the empty string). Consequently, we decide that
     ;; the presence of the env var, regardless of its value, stands for the
