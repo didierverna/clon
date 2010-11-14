@@ -741,7 +741,7 @@ than the currently available right margin."
 		      (t
 		       ;; ENOTTY error should remain silent, but no the
 		       ;; others.
-		       (unless (= result #$ENOTTY)
+		       (unless (= result (- #$ENOTTY))
 			 ;; #### FIXME: a better error printing would be nice.
 			 (format t "Error ~A: ~A~%"
 			   result (ccl::%strerror result)))
