@@ -689,7 +689,6 @@ than the currently available right margin."
 				  line-width
 				  (highlight :auto))
   "Handle unset line width and AUTO highlight according to OUTPUT-STREAM."
-  #+sbcl (declare (sb-ext:muffle-conditions sb-ext:compiler-note))
   ;; In both of the cases below, we must know whether we're printing to a
   ;; terminal or a simple file.
   (when (or (not line-width) (eq highlight :auto))
@@ -701,35 +700,38 @@ than the currently available right margin."
     (let ((tty-line-width
 	   ;; #### PORTME.
 	   #+sbcl
-	    (handler-case
-		(with-winsize winsize ()
-		  (sb-posix:ioctl (stream-file-stream output-stream :output)
-				  +tiocgwinsz+ winsize)
-		  (winsize-ws-col winsize))
-	      (sb-posix:syscall-error (error)
-		;; ENOTTY error should remain silent, but no the others.
-		(unless (= (sb-posix:syscall-errno error) sb-posix:enotty)
-		  ;; #### FIXME: a better error printing would be nice.
-		  (let (*print-escape*)
-		    (print-object error *error-output*)))
-		nil))
+	    (locally (declare (sb-ext:muffle-conditions sb-ext:compiler-note))
+	      (handler-case
+		  (with-winsize winsize ()
+		    (sb-posix:ioctl (stream-file-stream output-stream :output)
+				    +tiocgwinsz+ winsize)
+		    (winsize-ws-col winsize))
+		(sb-posix:syscall-error (error)
+		  ;; ENOTTY error should remain silent, but no the others.
+		  (unless (= (sb-posix:syscall-errno error) sb-posix:enotty)
+		    ;; #### FIXME: a better error printing would be nice.
+		    (let (*print-escape*)
+		      (print-object error *error-output*)))
+		  nil)))
 	    #+cmu
-	    (alien:with-alien ((winsize (alien:struct unix:winsize)))
-	      (multiple-value-bind (success error-number)
-		  (unix:unix-ioctl
-		   (system:fd-stream-fd
-		    (stream-file-stream output-stream :output))
-		   unix:tiocgwinsz winsize)
-		(cond (success
-		       (alien:slot winsize 'unix:ws-col))
-		      (t
-		       ;; ENOTTY error should remain silent, but no the
-		       ;; others.
-		       (unless (= error-number unix:enotty)
-			 ;; #### FIXME: a better error printing would be nice.
-			 (format t "Error ~A: ~A~%" error-number
-				 (unix:get-unix-error-msg error-number)))
-		       nil))))
+	    (locally (declare (optimize (ext:inhibit-warnings 3)))
+	      (alien:with-alien ((winsize (alien:struct unix:winsize)))
+		(multiple-value-bind (success error-number)
+		    (unix:unix-ioctl
+		     (system:fd-stream-fd
+		      (stream-file-stream output-stream :output))
+		     unix:tiocgwinsz winsize)
+		  (cond (success
+			 (alien:slot winsize 'unix:ws-col))
+			(t
+			 ;; ENOTTY error should remain silent, but no the
+			 ;; others.
+			 (unless (= error-number unix:enotty)
+			   ;; #### FIXME: a better error printing would be
+			   ;; nice.
+			   (format t "Error ~A: ~A~%" error-number
+				   (unix:get-unix-error-msg error-number)))
+			 nil)))))
 	    #+ccl
 	    (ccl:rlet ((winsize :winsize))
 	      (let ((result
