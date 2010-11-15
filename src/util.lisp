@@ -223,6 +223,7 @@ See REPLACE-KEY for more information on the replacement syntax."
   `(defmethod #+sbcl sb-mop:validate-superclass
 	      #+cmu  mop:validate-superclass
 	      #+ccl  ccl:validate-superclass
+	      #+ecl  clos:validate-superclass
     ((class ,class) (superclass ,superclass))
     t))
 
@@ -232,6 +233,7 @@ See REPLACE-KEY for more information on the replacement syntax."
   (#+sbcl sb-mop:class-slots
    #+cmu  mop:class-slots
    #+ccl  ccl:class-slots
+   #+ecl  clos:class-slots
    class))
 
 (defun slot-definition-name (slot)
@@ -240,6 +242,7 @@ See REPLACE-KEY for more information on the replacement syntax."
   (#+sbcl sb-mop:slot-definition-name
    #+cmu  mop:slot-definition-name
    #+ccl  ccl:slot-definition-name
+   #+ecl  clos:slot-definition-name
    slot))
 
 
@@ -330,7 +333,8 @@ invalid direction: ~S"
   ;; #### PORTME.
   #+sbcl (sb-ext:quit :unix-status status)
   #+cmu  (unix:unix-exit status)
-  #+ccl  (ccl:quit status))
+  #+ccl  (ccl:quit status)
+  #+ecl  (si:exit status))
 
 (defun cmdline ()
   "Get the current application's command-line."
@@ -346,6 +350,7 @@ invalid direction: ~S"
     (#+sbcl sb-posix:getenv
      #+cmu  unix:unix-getenv
      #+ccl  ccl:getenv
+     #+ecl  si:getenv
      variable)))
 
 (defun putenv (variable value)
@@ -353,7 +358,8 @@ invalid direction: ~S"
   ;; #### PORTME.
   #+sbcl (sb-posix:putenv  (concatenate 'string variable "=" value))
   #+cmu  (unix:unix-putenv (concatenate 'string variable "=" value))
-  #+ccl  (ccl:setenv variable value))
+  #+ccl  (ccl:setenv variable value)
+  #+ecl  (si:setenv variable value))
 
 (defun dump (name function)
   "Dump a standalone executable named NAME starting with FUNCTION."
