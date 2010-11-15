@@ -341,7 +341,8 @@ invalid direction: ~S"
   ;; #### PORTME.
   #+sbcl sb-ext:*posix-argv*
   #+cmu  lisp::lisp-command-line-list
-  #+ccl  ccl::*command-line-argument-list*)
+  #+ccl  ccl::*command-line-argument-list*
+  #+ecl (si:command-args))
 
 (defun getenv (variable)
   "Get environment VARIABLE's value. VARIABLE may be null."
@@ -371,7 +372,8 @@ invalid direction: ~S"
 			:print-herald nil :process-command-line nil)
   #+ccl  (ccl:save-application name :toplevel-function function
 			       :init-file nil :error-handler :quit
-			       :prepend-kernel t))
+			       :prepend-kernel t)
+  #+ecl (values))
 
 
 ;;; util.lisp ends here
