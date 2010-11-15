@@ -49,6 +49,7 @@ LISP := SBCL
 SBCL_PATH  := CC=$(CC) sbcl
 CMUCL_PATH := lisp
 CCL_PATH   := ccl
+ECL_PATH   := ecl
 
 
 # Programs for generating the documentation:
