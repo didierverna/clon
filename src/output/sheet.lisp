@@ -653,7 +653,8 @@ than the currently available right margin."
   (:method (sheet (char character))
     "Print CHAR on SHEET with the current face."
     (print-help-spec sheet (make-string 1 :initial-element char)))
-  (:method (sheet (char-vector simple-vector))
+  ;; ECL doesn't have a SIMPLE-VECTOR class, so we use just VECTOR instead.
+  (:method (sheet (char-vector #+ecl vector #-ecl simple-vector))
     "Print CHAR-VECTOR on SHEET with the current face."
     (print-help-spec sheet (coerce char-vector 'string)))
   (:method (sheet (string string))
