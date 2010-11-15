@@ -143,9 +143,10 @@ is a shortcut for: (PROPERTY-NAME ((on t) YES) ((off nil) NO))."
   "Princ highlight proeprty INSTANCES on SHEET's stream."
   (when instances
     (format (output-stream sheet) "~C[~A~{;~A~}m"
-      ;; #### PORTME: #\esc is not a standard name (see CLHS 13.1.7). I can't
-      ;; even remember where I got it from. However, it seems to work in some
-      ;; implementations that I tried.
+      ;; #### NOTE: #\esc is not EBCDIC (it's ANSI), and CLHS 13.1.7 doesn't
+      ;; mention ANSI (thanks Pascal Bourguignon for spotting this), so
+      ;; technically, #\esc is not a standard Common Lisp character. All the
+      ;; lisp implementations supported by Clon seem to understand it however.
       #\esc
       (highlight-property-instance-escape-sequence (car instances))
       (mapcar #'highlight-property-instance-escape-sequence
