@@ -37,7 +37,7 @@
 (in-package :cl-user)
 
 (require :asdf
-	 #-(or sbcl cmu ccl)
+	 #-(or sbcl cmu ccl ecl)
 	 '(#p"/usr/local/share/common-lisp/source/asdf/asdf.lisp"))
 
 #-asdf2 (setf asdf:*central-registry*
