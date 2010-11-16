@@ -362,18 +362,21 @@ invalid direction: ~S"
   #+ccl  (ccl:setenv variable value)
   #+ecl  (si:setenv variable value))
 
-(defun dump (name function)
+(defmacro dump (name function)
   "Dump a standalone executable named NAME starting with FUNCTION."
   ;; #### PORTME.
-  #+sbcl (sb-ext:save-lisp-and-die name :toplevel function :executable t
-				   :save-runtime-options t)
-  #+cmu  (ext:save-lisp name :init-function function :executable t
-			:load-init-file nil :site-init nil
-			:print-herald nil :process-command-line nil)
-  #+ccl  (ccl:save-application name :toplevel-function function
-			       :init-file nil :error-handler :quit
-			       :prepend-kernel t)
-  #+ecl (values))
+  #+sbcl `(sb-ext:save-lisp-and-die ,name :toplevel #',function :executable t
+				    :save-runtime-options t)
+  #+cmu  `(ext:save-lisp ,name :init-function #',function :executable t
+			 :load-init-file nil :site-init nil
+			 :print-herald nil :process-command-line nil)
+  #+ccl  `(ccl:save-application ,name :toplevel-function #',function
+				:init-file nil :error-handler :quit
+				:prepend-kernel t)
+  ;; #### NOTE: ECL works differently: it needs an entry point (i.e. actual
+  ;; code to execute) instead of a main function. So we expand DUMP to just
+  ;; call that function.
+  #+ecl (list function))
 
 
 ;;; util.lisp ends here

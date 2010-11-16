@@ -118,7 +118,7 @@ Use 'cmd --help' to get command-specific help.")
 		(format t "Remainder: ~A~%" (clon:remainder))))))
   (clon:exit))
 
-(clon:dump "advanced" #'main)
+(clon:dump "advanced" main)
 
 
 ;;; advanced.lisp ends here

@@ -120,7 +120,7 @@ Possible values are yes, no or try. If try, no errors are reported."
 	 (format t "Remainder: ~A~%" (clon:remainder))))
   (clon:exit))
 
-(clon:dump "simple" #'main)
+(clon:dump "simple" main)
 
 
 ;;; simple.lisp ends here
