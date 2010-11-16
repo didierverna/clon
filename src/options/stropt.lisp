@@ -51,6 +51,7 @@ This class implements options the values of which are strings."))
 
 (defmethod stringify ((stropt stropt) value)
   "Transform STROPT's VALUE into an argument."
+  #+ecl (declare (ignore stropt))
   value)
 
 
@@ -74,6 +75,7 @@ This class implements options the values of which are strings."))
 
 (defmethod convert ((stropt stropt) argument)
   "Convert ARGUMENT to an STROPT value."
+  #+ecl (declare (ignore stropt))
   argument)
 
 

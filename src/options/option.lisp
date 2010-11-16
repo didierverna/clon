@@ -122,11 +122,13 @@ This is the base class for all options."))
 		  ~"and ITEM2's options.")
   (:method (item1 (text text))
     "Do nothing (no name clash with a text object."
-    #+ccl (declare (ignore item1))
+    #+(or ccl ecl) (declare (ignore item1))
+    #+ecl          (declare (ignore text))
     (values))
   (:method ((text text) item2)
     "Do nothing (no name clash with a text object."
-    #+ccl (declare (ignore item2))
+    #+(or ccl ecl) (declare (ignore item2))
+    #+ecl          (declare (ignore text))
     (values))
   ;; #### NOTE: currently, name clashes are considered on short and long names
   ;; independently. That is, it is possible to have a short name identical to
@@ -179,7 +181,8 @@ If OPTION matches, return the length of OPTION's short name; otherwise 0.")
     ;; #### NOTE: the consequence of this method returning 0 is that
     ;; non-valued options (i.e. flags) won't ever get a cmdline-argument in
     ;; retrieve-from-short-call, hence the assertion there.
-    (declare (ignore namearg))
+    #+(or ccl ecl) (declare (ignore namearg))
+    #+ecl          (declare (ignore option))
     0))
 
 
@@ -220,6 +223,7 @@ If AS-STRING, return a string of that character.")
   (:method ((option option) &optional as-string)
     "Return nil (only the switch hierarchy is negated-pack'able)."
     (declare (ignore as-string))
+    #+ecl (declare (ignore option))
     nil))
 
 

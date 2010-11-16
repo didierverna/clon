@@ -96,6 +96,7 @@ If OPTION matches, return its short name's length; otherwise 0."
 (defgeneric short-syntax-help-spec-prefix (option)
   (:documentation "Return the help specification prefix for OPTION's short call.")
   (:method ((option valued-option))
+    #+ecl (declare (ignore option))
     "-"))
 
 (defmethod help-spec ((option valued-option) &key)

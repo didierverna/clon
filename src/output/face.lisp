@@ -158,7 +158,7 @@ This property can take the following forms:
   "Look up SLOT's value in FACE's parent if it's a highlight property.
 If FACE has no parent, return nil.
 For other properties, trigger an error."
-  #+ccl (declare (ignore class))
+  #+(or ccl ecl) (declare (ignore class))
   (let ((property (member slot +highlight-properties+)))
     (if property
 	(when (parent face)
@@ -279,6 +279,7 @@ This involves:
 ;; hence FACE name has not been initialized yet.
 (defmethod initialize-instance :before ((face face) &key name subfaces)
   "Check for unicity of FACE subfaces."
+  #+ecl (declare (ignore face))
   (loop :for faces :on subfaces
 	:while (cdr faces)
 	:when (member (name (car faces))

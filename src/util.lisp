@@ -225,6 +225,7 @@ See REPLACE-KEY for more information on the replacement syntax."
 	      #+ccl  ccl:validate-superclass
 	      #+ecl  clos:validate-superclass
     ((class ,class) (superclass ,superclass))
+    #+ecl (declare (ignore class superclass))
     t))
 
 (defun class-slots (class)
@@ -365,6 +366,7 @@ invalid direction: ~S"
 (defmacro dump (name function)
   "Dump a standalone executable named NAME starting with FUNCTION."
   ;; #### PORTME.
+  #+ecl (declare (ignore name))
   #+sbcl `(sb-ext:save-lisp-and-die ,name :toplevel #',function :executable t
 				    :save-runtime-options t)
   #+cmu  `(ext:save-lisp ,name :init-function #',function :executable t

@@ -54,6 +54,7 @@ This class implements the negated syntax for the switch-based hierarchy."))
 ;; ---------------------------
 
 (defmethod short-syntax-help-spec-prefix ((option negatable))
+  #+ecl (declare (ignore option))
   "-(+)")
 
 

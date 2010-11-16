@@ -51,6 +51,7 @@ This class implements options whose values belong to a set of keywords."))
 
 (defmethod stringify ((enum enum) value)
   "Transform ENUM's VALUE into an argument."
+  #+ecl (declare (ignore enum))
   (string-downcase (symbol-name value)))
 
 
