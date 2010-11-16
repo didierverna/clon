@@ -33,6 +33,35 @@
 (in-package :com.dvlsoft.clon)
 (in-readtable :com.dvlsoft.clon)
 
+#+ecl (ffi:clines "#include <stdio.h>
+#include <errno.h>
+#include <sys/ioctl.h>
+
+int getttycols (int fd)
+{
+  struct winsize window;
+
+  if (ioctl (fd, TIOCGWINSZ, &window) == -1)
+    return - errno;
+
+  return (int) window.ws_col;
+}
+
+char *geterrmsg (errnum)
+{
+  if (errnum == ENOTTY)
+    return NULL;
+  else
+    return strerror (errnum);
+}")
+
+(defun getttycols (fd)
+  (ffi:c-inline (fd) (:int) :int "getttycols(#0)" :one-liner t))
+
+(defun geterrmsg (errnum)
+  (ffi:c-inline (errnum) (:int) :cstring "geterrmsg(#0)" :one-liner t))
+
+
 
 ;; ==========================================================================
 ;; The Sheet Class
@@ -748,7 +777,16 @@ than the currently available right margin."
 			 ;; #### FIXME: a better error printing would be nice.
 			 (format t "Error ~A: ~A~%"
 			   result (ccl::%strerror result)))
-		       nil))))))
+		       nil))))
+	    #+ecl (let ((result
+			 (getttycols (ext:file-stream-fd output-stream))))
+		    (if (> result 0)
+			result
+		      (let ((msg (geterrmsg (- result))))
+			(when msg
+			  ;; #### FIXME: a better error printing would be nice.
+			  (format t "Error ~A: ~A~%" result msg))
+			nil)))))
       ;; Next, set highlighting.
       (when (eq highlight :auto)
 	(setq highlight tty-line-width))
