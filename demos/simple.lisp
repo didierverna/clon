@@ -31,10 +31,20 @@
 ;; command-line syntax, initialize the library, retrieve option values and
 ;; generate help strings.
 
+;; #### NOTE: some trickery is needed below in order to make this code
+;; ECL-compliant, due to ECL's specific way of generating executables. This
+;; includes:
+;; - setting *load-verbose* to nil,
+;; - passing a nil :verbose flag to asdf:operate,
+;; - wrapping nickname-package in an eval-when form.
+;; None of these tweaks are needed for the other compilers.
+
 
 ;;; Code:
 
 (in-package :cl-user)
+
+(setq *load-verbose* nil)
 
 (require :asdf
 	 #-(or sbcl cmu ccl ecl)
@@ -49,8 +59,9 @@
 
 #-asdf2 (ignore-errors (asdf:operate 'asdf:load-op :asdf-binary-locations))
 
-(asdf:operate 'asdf:load-op :com.dvlsoft.clon)
-(eval-when (:execute :load-toplevel :compile-toplevel) ;; ECL needs this.
+(asdf:operate 'asdf:load-op :com.dvlsoft.clon :verbose nil)
+
+(eval-when (:execute :load-toplevel :compile-toplevel)
   (com.dvlsoft.clon:nickname-package))
 
 (clon:defsynopsis (:postfix "FILES...")
