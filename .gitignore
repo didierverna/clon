@@ -6,6 +6,7 @@ version.inc
 
 demos/simple
 demos/advanced
+demos/*.o
 
 sbcl/foo.c
 sbcl/constants.lisp-temp
