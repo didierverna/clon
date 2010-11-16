@@ -42,7 +42,7 @@ PREFIX := /usr/local
 CC := gcc
 
 # Lisp implementation to use (for some installation processing steps only):
-# Choices are SBCL, CMUCL and CCL.
+# Choices are SBCL, CMUCL, CCL and ECL.
 LISP := SBCL
 
 # Implementation paths:
