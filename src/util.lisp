@@ -334,7 +334,7 @@ invalid direction: ~S"
   #+sbcl (sb-ext:quit :unix-status status)
   #+cmu  (unix:unix-exit status)
   #+ccl  (ccl:quit status)
-  #+ecl  (si:exit status))
+  #+ecl  (ext:quit status))
 
 (defun cmdline ()
   "Get the current application's command-line."
@@ -342,7 +342,7 @@ invalid direction: ~S"
   #+sbcl sb-ext:*posix-argv*
   #+cmu  lisp::lisp-command-line-list
   #+ccl  ccl::*command-line-argument-list*
-  #+ecl (si:command-args))
+  #+ecl (ext:command-args))
 
 (defun getenv (variable)
   "Get environment VARIABLE's value. VARIABLE may be null."
@@ -351,7 +351,7 @@ invalid direction: ~S"
     (#+sbcl sb-posix:getenv
      #+cmu  unix:unix-getenv
      #+ccl  ccl:getenv
-     #+ecl  si:getenv
+     #+ecl  ext:getenv
      variable)))
 
 (defun putenv (variable value)
@@ -360,7 +360,7 @@ invalid direction: ~S"
   #+sbcl (sb-posix:putenv  (concatenate 'string variable "=" value))
   #+cmu  (unix:unix-putenv (concatenate 'string variable "=" value))
   #+ccl  (ccl:setenv variable value)
-  #+ecl  (si:setenv variable value))
+  #+ecl  (ext:setenv variable value))
 
 (defmacro dump (name function)
   "Dump a standalone executable named NAME starting with FUNCTION."
