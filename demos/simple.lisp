@@ -50,7 +50,8 @@
 #-asdf2 (ignore-errors (asdf:operate 'asdf:load-op :asdf-binary-locations))
 
 (asdf:operate 'asdf:load-op :com.dvlsoft.clon)
-(com.dvlsoft.clon:nickname-package)
+(eval-when (:load-toplevel :compile-toplevel) ;; ECL needs this.
+  (com.dvlsoft.clon:nickname-package))
 
 (clon:defsynopsis (:postfix "FILES...")
   (text :contents
