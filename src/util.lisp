@@ -364,7 +364,10 @@ invalid direction: ~S"
   #+ecl  (ext:setenv variable value))
 
 (defmacro dump (name function)
-  "Dump a standalone executable named NAME starting with FUNCTION."
+  "Dump a standalone executable named NAME starting with FUNCTION.
+ECL doesn't create executables by dumping a Lisp image, but relies on having
+toplevel code to execute instead, so this macro simply expands to a call to
+FUNCTION for ECL."
   ;; #### PORTME.
   #+ecl (declare (ignore name))
   #+sbcl `(sb-ext:save-lisp-and-die ,name :toplevel #',function :executable t
