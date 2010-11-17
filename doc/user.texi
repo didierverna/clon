@@ -628,7 +628,7 @@ Finally, time to save the Lisp image.
 
 @cartouche
 @verbatim
-(dump "test" main)
+(dump "quickstart" main)
 @end verbatim
 @end cartouche
 
@@ -2512,7 +2512,7 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
   (terpri)
   (exit))
 
-(dump "test" main)
+(dump "quickstart" main)
 @end verbatim
 @end cartouche
 
