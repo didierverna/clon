@@ -223,7 +223,9 @@ See REPLACE-KEY for more information on the replacement syntax."
   `(defmethod #+sbcl sb-mop:validate-superclass
 	      #+cmu  mop:validate-superclass
 	      #+ccl  ccl:validate-superclass
+	      #+ecl  clos:validate-superclass
     ((class ,class) (superclass ,superclass))
+    #+ecl (declare (ignore class superclass))
     t))
 
 (defun class-slots (class)
@@ -232,6 +234,7 @@ See REPLACE-KEY for more information on the replacement syntax."
   (#+sbcl sb-mop:class-slots
    #+cmu  mop:class-slots
    #+ccl  ccl:class-slots
+   #+ecl  clos:class-slots
    class))
 
 (defun slot-definition-name (slot)
@@ -240,6 +243,7 @@ See REPLACE-KEY for more information on the replacement syntax."
   (#+sbcl sb-mop:slot-definition-name
    #+cmu  mop:slot-definition-name
    #+ccl  ccl:slot-definition-name
+   #+ecl  clos:slot-definition-name
    slot))
 
 
@@ -330,14 +334,16 @@ invalid direction: ~S"
   ;; #### PORTME.
   #+sbcl (sb-ext:quit :unix-status status)
   #+cmu  (unix:unix-exit status)
-  #+ccl  (ccl:quit status))
+  #+ccl  (ccl:quit status)
+  #+ecl  (ext:quit status))
 
 (defun cmdline ()
   "Get the current application's command-line."
   ;; #### PORTME.
   #+sbcl sb-ext:*posix-argv*
   #+cmu  lisp::lisp-command-line-list
-  #+ccl  ccl::*command-line-argument-list*)
+  #+ccl  ccl::*command-line-argument-list*
+  #+ecl (ext:command-args))
 
 (defun getenv (variable)
   "Get environment VARIABLE's value. VARIABLE may be null."
@@ -346,6 +352,7 @@ invalid direction: ~S"
     (#+sbcl sb-posix:getenv
      #+cmu  unix:unix-getenv
      #+ccl  ccl:getenv
+     #+ecl  ext:getenv
      variable)))
 
 (defun putenv (variable value)
@@ -353,19 +360,25 @@ invalid direction: ~S"
   ;; #### PORTME.
   #+sbcl (sb-posix:putenv  (concatenate 'string variable "=" value))
   #+cmu  (unix:unix-putenv (concatenate 'string variable "=" value))
-  #+ccl  (ccl:setenv variable value))
+  #+ccl  (ccl:setenv variable value)
+  #+ecl  (ext:setenv variable value))
 
-(defun dump (name function)
+(defmacro dump (name function)
   "Dump a standalone executable named NAME starting with FUNCTION."
   ;; #### PORTME.
-  #+sbcl (sb-ext:save-lisp-and-die name :toplevel function :executable t
-				   :save-runtime-options t)
-  #+cmu  (ext:save-lisp name :init-function function :executable t
-			:load-init-file nil :site-init nil
-			:print-herald nil :process-command-line nil)
-  #+ccl  (ccl:save-application name :toplevel-function function
-			       :init-file nil :error-handler :quit
-			       :prepend-kernel t))
+  #+ecl (declare (ignore name))
+  #+sbcl `(sb-ext:save-lisp-and-die ,name :toplevel #',function :executable t
+				    :save-runtime-options t)
+  #+cmu  `(ext:save-lisp ,name :init-function #',function :executable t
+			 :load-init-file nil :site-init nil
+			 :print-herald nil :process-command-line nil)
+  #+ccl  `(ccl:save-application ,name :toplevel-function #',function
+				:init-file nil :error-handler :quit
+				:prepend-kernel t)
+  ;; #### NOTE: ECL works differently: it needs an entry point (i.e. actual
+  ;; code to execute) instead of a main function. So we expand DUMP to just
+  ;; call that function.
+  #+ecl (list function))
 
 
 ;;; util.lisp ends here

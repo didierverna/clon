@@ -55,6 +55,7 @@ This class implements read-from-string options."))
 
 (defmethod stringify ((lispobj lispobj) value)
   "Transform LISPOBJ's VALUE into an argument."
+  #+ecl (declare (ignore lispobj))
   (prin1-to-string value))
 
 

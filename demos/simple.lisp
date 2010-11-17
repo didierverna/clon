@@ -31,13 +31,23 @@
 ;; command-line syntax, initialize the library, retrieve option values and
 ;; generate help strings.
 
+;; #### NOTE: some trickery is needed below in order to make this code
+;; ECL-compliant, due to ECL's specific way of generating executables. This
+;; includes:
+;; - setting *load-verbose* to nil,
+;; - passing a nil :verbose flag to asdf:operate,
+;; - wrapping nickname-package in an eval-when form.
+;; None of these tweaks are needed for the other compilers.
+
 
 ;;; Code:
 
 (in-package :cl-user)
 
+(setq *load-verbose* nil)
+
 (require :asdf
-	 #-(or sbcl cmu ccl)
+	 #-(or sbcl cmu ccl ecl)
 	 '(#p"/usr/local/share/common-lisp/source/asdf/asdf.lisp"))
 
 #-asdf2 (setf asdf:*central-registry*
@@ -49,8 +59,10 @@
 
 #-asdf2 (ignore-errors (asdf:operate 'asdf:load-op :asdf-binary-locations))
 
-(asdf:operate 'asdf:load-op :com.dvlsoft.clon)
-(com.dvlsoft.clon:nickname-package)
+(asdf:operate 'asdf:load-op :com.dvlsoft.clon :verbose nil)
+
+(eval-when (:execute :load-toplevel :compile-toplevel)
+  (com.dvlsoft.clon:nickname-package))
 
 (clon:defsynopsis (:postfix "FILES...")
   (text :contents
@@ -119,7 +131,7 @@ Possible values are yes, no or try. If try, no errors are reported."
 	 (format t "Remainder: ~A~%" (clon:remainder))))
   (clon:exit))
 
-(clon:dump "simple" #'main)
+(clon:dump "simple" main)
 
 
 ;;; simple.lisp ends here

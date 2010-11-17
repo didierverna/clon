@@ -5,7 +5,7 @@
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 ;; Created:       Wed Oct 20 15:40:18 2010
-;; Last Revision: Sun Oct 31 14:21:29 2010
+;; Last Revision: Tue Nov 16 15:52:38 2010
 
 ;; This file is part of Clon.
 
@@ -32,13 +32,23 @@
 ;; complex command-line syntax where options and non-options parts can be
 ;; freely intermixed. See section 5 "Advanced Usage" in the Clon User Manual.
 
+;; #### NOTE: some trickery is needed below in order to make this code
+;; ECL-compliant, due to ECL's specific way of generating executables. This
+;; includes:
+;; - setting *load-verbose* to nil,
+;; - passing a nil :verbose flag to asdf:operate,
+;; - wrapping nickname-package in an eval-when form.
+;; None of these tweaks are needed for the other compilers.
+
 
 ;;; Code:
 
 (in-package :cl-user)
 
+(setq *load-verbose* nil)
+
 (require :asdf
-	 #-(or sbcl cmu ccl)
+	 #-(or sbcl cmu ccl ecl)
 	 '(#p"/usr/local/share/common-lisp/source/asdf/asdf.lisp"))
 
 #-asdf2 (setf asdf:*central-registry*
@@ -50,8 +60,10 @@
 
 #-asdf2 (ignore-errors (asdf:operate 'asdf:load-op :asdf-binary-locations))
 
-(asdf:operate 'asdf:load-op :com.dvlsoft.clon)
-(com.dvlsoft.clon:nickname-package)
+(asdf:operate 'asdf:load-op :com.dvlsoft.clon :verbose nil)
+
+(eval-when (:execute :load-toplevel :compile-toplevel)
+  (com.dvlsoft.clon:nickname-package))
 
 (clon:defsynopsis (:postfix "cmd [OPTIONS]")
   (text :contents "Available commands: push pull.
@@ -117,7 +129,7 @@ Use 'cmd --help' to get command-specific help.")
 		(format t "Remainder: ~A~%" (clon:remainder))))))
   (clon:exit))
 
-(clon:dump "advanced" #'main)
+(clon:dump "advanced" main)
 
 
 ;;; advanced.lisp ends here

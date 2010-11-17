@@ -52,6 +52,11 @@ CCL_BINLOC := openmcl
 CCL_DUMP   := --no-init
 CCL_LOAD   := --load
 
+ECL_CACHE  := ecl
+ECL_BINLOC := ecl
+ECL_DUMP   := -norc
+ECL_LOAD   := -load
+
 $(TOP_DIR)/version.inc: $(TOP_DIR)/version.cl $(TOP_DIR)/com.dvlsoft.clon.asd
 	$($(LISP)_PATH) $($(LISP)_LOAD) $(TOP_DIR)/version.cl | tail -2 > $@
 

@@ -263,6 +263,7 @@ This function returns three values:
   ;; Method for non-valued options (currently, only flags):
   (:method ((option option) &optional cmdline-argument cmdline)
     ;; See comment about this assertion in OPTION-STICKY-DISTANCE.
+    #+ecl (declare (ignore option))
     (assert (null cmdline-argument))
     (values t :cmdline cmdline))
   ;; Method for valued options:
@@ -285,6 +286,7 @@ This function returns three values:
       (retrieve-from-short-call option)))
   ;; Method for negatable options (currently, the switch-based ones):
   (:method ((negatable negatable))
+    #+ecl (declare (ignore negatable))
     (values nil :cmdline)))
 
 

@@ -33,6 +33,38 @@
 (in-package :com.dvlsoft.clon)
 (in-readtable :com.dvlsoft.clon)
 
+#+ecl
+(ffi:clines "#include <stdio.h>
+#include <errno.h>
+#include <sys/ioctl.h>
+
+int getttycols (int fd)
+{
+  struct winsize window;
+
+  if (ioctl (fd, TIOCGWINSZ, &window) == -1)
+    return - errno;
+
+  return (int) window.ws_col;
+}
+
+char *geterrmsg (errnum)
+{
+  if (errnum == ENOTTY)
+    return NULL;
+  else
+    return strerror (errnum);
+}")
+
+#+ecl
+(defun getttycols (fd)
+  (ffi:c-inline (fd) (:int) :int "getttycols(#0)" :one-liner t))
+
+#+ecl
+(defun geterrmsg (errnum)
+  (ffi:c-inline (errnum) (:int) :cstring "geterrmsg(#0)" :one-liner t))
+
+
 
 ;; ==========================================================================
 ;; The Sheet Class
@@ -559,11 +591,11 @@ than the currently available right margin."
 (defgeneric help-spec-will-print (sface help-spec)
   (:documentation "Return t if HELP-SPEC will print under FACE.")
   (:method :before (sface help-spec)
-    #+ccl (declare (ignore help-spec))
+    #+(or ccl ecl) (declare (ignore help-spec))
     (assert (visiblep sface)))
   (:method (sface help-spec)
     "Basic help specifications (chars, strings etc) do print."
-    #+ccl (declare (ignore sface help-spec))
+    #+(or ccl ecl) (declare (ignore sface help-spec))
     t)
   (:method (sface (help-spec list))
     "Return t if HELP-SPEC's items will print under HELP-SPEC's face."
@@ -574,7 +606,7 @@ than the currently available right margin."
 (defgeneric get-bottom-padding (sface help-spec)
   (:documentation "Get HELP-SPEC's bottom-padding under SFACE.")
   (:method (sface help-spec)
-    #+ccl (declare (ignore sface help-spec))
+    #+(or ccl ecl) (declare (ignore sface help-spec))
     "Basic help specifications (chars, strings etc) don't provide a bottom padding."
     nil)
   (:method (sface (help-spec list))
@@ -582,7 +614,7 @@ than the currently available right margin."
     (bottom-padding (find-sface sface (car help-spec)))))
 
 (defmethod top-padding (other)
-  #+ccl (declare (ignore other))
+  #+(or ccl ecl) (declare (ignore other))
   nil)
 
 (defmethod top-padding ((help-spec list))
@@ -649,12 +681,13 @@ than the currently available right margin."
 (defgeneric print-help-spec (sheet help-spec)
   (:documentation "Print HELP-SPEC on SHEET.")
   (:method :before (sheet help-spec)
-    #+ccl (declare (ignore help-spec))
+    #+(or ccl ecl) (declare (ignore help-spec))
     (assert (visiblep (current-sface sheet))))
   (:method (sheet (char character))
     "Print CHAR on SHEET with the current face."
     (print-help-spec sheet (make-string 1 :initial-element char)))
-  (:method (sheet (char-vector simple-vector))
+  ;; ECL doesn't have a SIMPLE-VECTOR class, so we use just VECTOR instead.
+  (:method (sheet (char-vector #+ecl vector #-ecl simple-vector))
     "Print CHAR-VECTOR on SHEET with the current face."
     (print-help-spec sheet (coerce char-vector 'string)))
   (:method (sheet (string string))
@@ -748,7 +781,16 @@ than the currently available right margin."
 			 ;; #### FIXME: a better error printing would be nice.
 			 (format t "Error ~A: ~A~%"
 			   result (ccl::%strerror result)))
-		       nil))))))
+		       nil))))
+	    #+ecl (let ((result
+			 (getttycols (ext:file-stream-fd output-stream))))
+		    (if (> result 0)
+			result
+		      (let ((msg (geterrmsg (- result))))
+			(when msg
+			  ;; #### FIXME: a better error printing would be nice.
+			  (format t "Error ~A: ~A~%" result msg))
+			nil)))))
       ;; Next, set highlighting.
       (when (eq highlight :auto)
 	(setq highlight tty-line-width))

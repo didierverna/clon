@@ -43,11 +43,17 @@ DEMOS := simple advanced
 
 all: $(DEMOS)
 
+ifeq ($(LISP),ECL)
+# #### NOTE: ECL has a different scheme for producing executables.
+$(DEMOS): %: %.lisp
+	$($(LISP)_PATH) $($(LISP)_DUMP) $($(LISP)_LOAD) dump.lisp -- $@
+else
 $(DEMOS): %: %.lisp
 	$($(LISP)_PATH) $($(LISP)_DUMP) $($(LISP)_LOAD) $<
+endif
 
 clean:
-	-rm *~
+	-rm *~ $(DEMOS:%=%.o) # this last bit is for ECL
 
 distclean: clean
 	-rm -fr $(DEMOS)

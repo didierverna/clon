@@ -70,6 +70,7 @@ pathnames."))
 
 (defmethod stringify ((path path) value)
   "Transform PATH's VALUE into an argument."
+  #+ecl (declare (ignore path))
   (typecase value
     (null "<none>")
     (list (list-to-string value :key #'namestring :separator ":"))
