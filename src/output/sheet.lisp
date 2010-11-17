@@ -33,7 +33,8 @@
 (in-package :com.dvlsoft.clon)
 (in-readtable :com.dvlsoft.clon)
 
-#+ecl (ffi:clines "#include <stdio.h>
+#+ecl
+(ffi:clines "#include <stdio.h>
 #include <errno.h>
 #include <sys/ioctl.h>
 
@@ -55,9 +56,11 @@ char *geterrmsg (errnum)
     return strerror (errnum);
 }")
 
+#+ecl
 (defun getttycols (fd)
   (ffi:c-inline (fd) (:int) :int "getttycols(#0)" :one-liner t))
 
+#+ecl
 (defun geterrmsg (errnum)
   (ffi:c-inline (errnum) (:int) :cstring "geterrmsg(#0)" :one-liner t))
 
