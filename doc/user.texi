@@ -681,6 +681,28 @@ You can dump a CCL (formerly known as OpenMCL) executable like this:
 @verbatim
 ccl --no-init --load quickstart.lisp
 @end verbatim
+@item ECL
+ECL is supported, but it doesn't work like the other Lisp compilers. In
+particular, creating an executable does not involve dumping a Lisp
+image, but compiling the source into separate object files and then
+linking them. The consequence is that there is no simple @cmdline{}
+recipe to show here. Instead, you might want to look at the file
+@file{demos/dump.lisp} in the distribution for an example.
+
+Because the dumping scheme is different with ECL, it is also less
+straightforward to write portable code for standalone applications. The
+demo programs in the distribution both contain comments that are worth
+reading at the top of them.
+
+@findex dump
+One specific difference between ECL and the other Lisp compilers is that
+it doesn't require you to specify a particular function as the entry
+point for your executable, but instead relies on having code to execute
+directly at the toplevel of some file. @clon{}'s @code{dump} macro helps
+you with this: it normally expands to a compiler-specific function which
+saves the current Lisp image, but for ECL, it simply expands to the
+``main'' function call, hence consituting the entry point to the code
+that ECL needs.
 @end table
 
 
