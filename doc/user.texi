@@ -628,15 +628,15 @@ Finally, time to save the Lisp image.
 
 @cartouche
 @verbatim
-(dump "test" #'main)
+(dump "test" main)
 @end verbatim
 @end cartouche
 
 @findex dump
-The @code{dump} function is a wrapper around an implementation-dependent
+The @code{dump} macro is a wrapper around an implementation-dependent
 way of creating standalone executables. The first argument is the name
-of the executable to produce, and the second argument is the function to
-call at startup.
+of the executable to produce, and the second argument is the name of the
+function to call at startup.
 
 
 @c -------------------
@@ -649,7 +649,7 @@ The final step required to use this industrial-scale application is to
 create a standalone executable for it. Unfortunately, there is no
 standard way to do so. This section provides ready-to-use @cmdline{}
 samples for the compilers currently supported. They work well in
-conjunction with the @code{dump} function mentionned in the previous
+conjunction with the @code{dump} macro mentionned in the previous
 section.
 
 If a compiler does not appear below, it means that @clon{} has no
@@ -1908,7 +1908,7 @@ may in turn depend on command-line options passed to the Lisp itself
 @item
 @findex dump
 the arguments passed to the dumping function (look at @clon{}'s
-@code{dump} function to see what it does),
+@code{dump} macro to see what it does),
 @item
 worse: @emph{both}.
 @end itemize
@@ -2512,7 +2512,7 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
   (terpri)
   (exit))
 
-(dump "test" #'main)
+(dump "test" main)
 @end verbatim
 @end cartouche
 
@@ -2539,9 +2539,9 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
 @node Utilities, Initialization Phase API, API Quick Reference, API Quick Reference
 @section Utilities
 
-@defun dump NAME FUNCTION
+@defmac dump NAME FUNCTION
 See @ref{Quick Start}.
-@end defun
+@end defmac
 
 @defun exit &optional (STATUS 0)
 See @ref{Quick Start}.
