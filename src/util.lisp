@@ -34,6 +34,32 @@
 (in-readtable :com.dvlsoft.clon)
 
 
+;; Preamble C code for ECL's version of STREAM-LINE-WIDTH.
+#+ecl
+(ffi:clines "#include <stdio.h>
+#include <errno.h>
+#include <sys/ioctl.h>
+
+int getttycols (int fd)
+{
+  struct winsize window;
+
+  if (ioctl (fd, TIOCGWINSZ, &window) == -1)
+    return - errno;
+
+  return (int) window.ws_col;
+}
+
+char *geterrmsg (errnum)
+{
+  if (errnum == ENOTTY)
+    return NULL;
+  else
+    return strerror (errnum);
+}")
+
+
+
 ;; ==========================================================================
 ;; Miscellaneous Auxiliary Routines
 ;; ==========================================================================
@@ -293,9 +319,24 @@ Both instances share the same slot values."
 
 
 ;; ==========================================================================
-;; Stream to file-stream conversion (thanks Nikodemus !)
+;; System-related utilities
 ;; ==========================================================================
 
+(defun home-directory ()
+  "Return user's home directory in canonical form."
+  (truename (user-homedir-pathname)))
+
+(defun macosp ()
+  "Return t if running on Mac OS."
+  (string= (software-type) "Darwin"))
+
+
+
+;; ==========================================================================
+;; Wrappers around non ANSI features
+;; ==========================================================================
+
+;; Thanks Nikodemus!
 (defgeneric stream-file-stream (stream &optional direction)
   (:documentation "Convert STREAM to a file-stream.")
   (:method ((stream file-stream) &optional direction)
@@ -315,19 +356,65 @@ invalid direction: ~S"
 		  stream direction)))
 	direction)))
 
+#+ecl
+(defun getttycols (fd)
+  (ffi:c-inline (fd) (:int) :int "getttycols(#0)" :one-liner t))
 
+#+ecl
+(defun geterrmsg (errnum)
+  (ffi:c-inline (errnum) (:int) :cstring "geterrmsg(#0)" :one-liner t))
 
-;; ==========================================================================
-;; Wrappers around non ANSI features and operating system stuff
-;; ==========================================================================
-
-(defun home-directory ()
-  "Return user's home directory in canonical form."
-  (truename (user-homedir-pathname)))
-
-(defun macosp ()
-  "Return t if running on Mac OS."
-  (string= (software-type) "Darwin"))
+(defun stream-line-width (stream)
+  "Get STREAM's line width.
+Return two values:
+- the stream's line width, or nil if it can't be computed
+  (typically when the stream does not denote a tty),
+- an error message if the operation failed."
+  ;; #### NOTE: doing a TIOCGWINSZ ioctl here is a convenient way to both know
+  ;; whether we're connected to a tty, and getting the terminal width at the
+  ;; same time. In case the ioctl fails, we need to distinguish between and
+  ;; ENOTTY error, which simply means that we're not connected to a terminal,
+  ;; and the other which are real errors and need to be reported.
+  ;; #### PORTME.
+  #+sbcl
+  (locally (declare (sb-ext:muffle-conditions sb-ext:compiler-note))
+    (handler-case
+	(with-winsize winsize ()
+	  (sb-posix:ioctl (stream-file-stream stream :output)
+			  +tiocgwinsz+
+			  winsize)
+	  (winsize-ws-col winsize))
+      (sb-posix:syscall-error (error)
+	(unless (= (sb-posix:syscall-errno error) sb-posix:enotty)
+	  (values nil error)))))
+  #+cmu
+  (locally (declare (optimize (ext:inhibit-warnings 3)))
+    (alien:with-alien ((winsize (alien:struct unix:winsize)))
+      (multiple-value-bind (success error-number)
+	  (unix:unix-ioctl
+	   (system:fd-stream-fd (stream-file-stream stream :output))
+	   unix:tiocgwinsz
+	   winsize)
+	(if success
+	    (alien:slot winsize 'unix:ws-col)
+	  (unless (= error-number unix:enotty)
+	    (values nil (unix:get-unix-error-msg error-number)))))))
+  #+ccl
+  (ccl:rlet ((winsize :winsize))
+    (let ((result
+	   (ccl::int-errno-call
+	    (#_ioctl (ccl::stream-device stream :output)
+		     #$TIOCGWINSZ
+		     :address winsize))))
+      (if (zerop result)
+	  (ccl:pref winsize :winsize.ws_col)
+	(unless (= result (- #$ENOTTY))
+	  (values nil (ccl::%strerror (- result)))))))
+  #+ecl
+  (let ((result (getttycols (ext:file-stream-fd stream))))
+    (if (> result 0)
+	result
+      (values nil (geterrmsg (- result))))))
 
 (defun exit (&optional (status 0))
   "Quit the current application with STATUS."

@@ -33,38 +33,6 @@
 (in-package :com.dvlsoft.clon)
 (in-readtable :com.dvlsoft.clon)
 
-#+ecl
-(ffi:clines "#include <stdio.h>
-#include <errno.h>
-#include <sys/ioctl.h>
-
-int getttycols (int fd)
-{
-  struct winsize window;
-
-  if (ioctl (fd, TIOCGWINSZ, &window) == -1)
-    return - errno;
-
-  return (int) window.ws_col;
-}
-
-char *geterrmsg (errnum)
-{
-  if (errnum == ENOTTY)
-    return NULL;
-  else
-    return strerror (errnum);
-}")
-
-#+ecl
-(defun getttycols (fd)
-  (ffi:c-inline (fd) (:int) :int "getttycols(#0)" :one-liner t))
-
-#+ecl
-(defun geterrmsg (errnum)
-  (ffi:c-inline (errnum) (:int) :cstring "geterrmsg(#0)" :one-liner t))
-
-
 
 ;; ==========================================================================
 ;; The Sheet Class
@@ -726,71 +694,12 @@ than the currently available right margin."
   ;; In both of the cases below, we must know whether we're printing to a
   ;; terminal or a simple file.
   (when (or (not line-width) (eq highlight :auto))
-    ;; First, detect a terminal.
-    ;; #### NOTE: doing a TIOCGWINSZ ioctl here is a convenient way to both
-    ;; know wether we're connected to a tty (otherwise, we would get an ENOTTY
-    ;; error), and getting the terminal width at the same time, in case it
-    ;; would be needed as a fallback value.
-    (let ((tty-line-width
-	   ;; #### PORTME.
-	   #+sbcl
-	    (locally (declare (sb-ext:muffle-conditions sb-ext:compiler-note))
-	      (handler-case
-		  (with-winsize winsize ()
-		    (sb-posix:ioctl (stream-file-stream output-stream :output)
-				    +tiocgwinsz+ winsize)
-		    (winsize-ws-col winsize))
-		(sb-posix:syscall-error (error)
-		  ;; ENOTTY error should remain silent, but no the others.
-		  (unless (= (sb-posix:syscall-errno error) sb-posix:enotty)
-		    ;; #### FIXME: a better error printing would be nice.
-		    (let (*print-escape*)
-		      (print-object error *error-output*)))
-		  nil)))
-	    #+cmu
-	    (locally (declare (optimize (ext:inhibit-warnings 3)))
-	      (alien:with-alien ((winsize (alien:struct unix:winsize)))
-		(multiple-value-bind (success error-number)
-		    (unix:unix-ioctl
-		     (system:fd-stream-fd
-		      (stream-file-stream output-stream :output))
-		     unix:tiocgwinsz winsize)
-		  (cond (success
-			 (alien:slot winsize 'unix:ws-col))
-			(t
-			 ;; ENOTTY error should remain silent, but no the
-			 ;; others.
-			 (unless (= error-number unix:enotty)
-			   ;; #### FIXME: a better error printing would be
-			   ;; nice.
-			   (format t "Error ~A: ~A~%" error-number
-				   (unix:get-unix-error-msg error-number)))
-			 nil)))))
-	    #+ccl
-	    (ccl:rlet ((winsize :winsize))
-	      (let ((result
-		     (ccl::int-errno-call
-		      (#_ioctl (ccl::stream-device output-stream :output)
-			       #$TIOCGWINSZ :address winsize))))
-		(cond ((zerop result)
-		       (ccl:pref winsize :winsize.ws_col))
-		      (t
-		       ;; ENOTTY error should remain silent, but no the
-		       ;; others.
-		       (unless (= result (- #$ENOTTY))
-			 ;; #### FIXME: a better error printing would be nice.
-			 (format t "Error ~A: ~A~%"
-			   result (ccl::%strerror result)))
-		       nil))))
-	    #+ecl (let ((result
-			 (getttycols (ext:file-stream-fd output-stream))))
-		    (if (> result 0)
-			result
-		      (let ((msg (geterrmsg (- result))))
-			(when msg
-			  ;; #### FIXME: a better error printing would be nice.
-			  (format t "Error ~A: ~A~%" result msg))
-			nil)))))
+    (multiple-value-bind (tty-line-width error-message)
+	(stream-line-width output-stream)
+      (when error-message
+	;; #### FIXME: a better error printing would be nice.
+	(let (*print-escape*)
+	  (format *error-output* "Error: ~A.~%" error-message)))
       ;; Next, set highlighting.
       (when (eq highlight :auto)
 	(setq highlight tty-line-width))
