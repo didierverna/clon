@@ -34,29 +34,11 @@
 (in-readtable :com.dvlsoft.clon)
 
 
-;; Preamble C code for ECL's version of STREAM-LINE-WIDTH.
-#+ecl
-(ffi:clines "#include <stdio.h>
+;; Preamble C code needed for ECL's FD-LINE-WIDTH function.
+#+ecl (ffi:clines "
+#include <stdio.h>
 #include <errno.h>
-#include <sys/ioctl.h>
-
-int getttycols (int fd)
-{
-  struct winsize window;
-
-  if (ioctl (fd, TIOCGWINSZ, &window) == -1)
-    return - errno;
-
-  return (int) window.ws_col;
-}
-
-char *geterrmsg (errnum)
-{
-  if (errnum == ENOTTY)
-    return NULL;
-  else
-    return strerror (errnum);
-}")
+#include <sys/ioctl.h>")
 
 
 
@@ -357,12 +339,30 @@ invalid direction: ~S"
 	direction)))
 
 #+ecl
-(defun getttycols (fd)
-  (ffi:c-inline (fd) (:int) :int "getttycols(#0)" :one-liner t))
+(defun fd-line-width (fd)
+  "Get the line width for FD (file descriptor).
+Return two values:
+- the line width, or -1 if it can't be computed
+  (typically when FD does not denote a tty),
+- an error message if the operation failed."
+  (ffi:c-inline (fd) (:int) (values :int :cstring) "{
+    int fd = #0;
 
-#+ecl
-(defun geterrmsg (errnum)
-  (ffi:c-inline (errnum) (:int) :cstring "geterrmsg(#0)" :one-liner t))
+    int cols = -1;
+    char *msg = NULL;
+
+    struct winsize window;
+    if (ioctl (fd, TIOCGWINSZ, &window) == -1)
+      {
+	if (errno != ENOTTY)
+	  msg = strerror (errno);
+      }
+    else
+      cols = (int) window.ws_col;
+
+    @(return 0) = cols;
+    @(return 1) = msg;
+}"))
 
 (defun stream-line-width (stream)
   "Get STREAM's line width.
@@ -411,10 +411,9 @@ Return two values:
 	(unless (= result (- #$ENOTTY))
 	  (values nil (ccl::%strerror (- result)))))))
   #+ecl
-  (let ((result (getttycols (ext:file-stream-fd stream))))
-    (if (> result 0)
-	result
-      (values nil (geterrmsg (- result))))))
+  (multiple-value-bind (cols msg)
+      (fd-line-width (ext:file-stream-fd stream))
+    (values (unless (= cols -1) cols) msg)))
 
 (defun exit (&optional (status 0))
   "Quit the current application with STATUS."
