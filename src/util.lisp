@@ -370,8 +370,11 @@ invalid direction: ~S"
   #+cmu   (ext:save-lisp name :init-function function :executable t
 			 :load-init-file nil :site-init nil
 			 :print-herald nil :process-command-line nil)
-  #+clisp (ext:saveinitmem name :init-function function :executable 0
-			   :quiet t :norc t)
+  ;; CLISP's saveinitmem function doesn't quit, so we need to do so here.
+  #+clisp (progn
+	    (ext:saveinitmem name
+	      :init-function function :executable 0 :quiet t :norc t)
+	    (exit))
   #+ccl   (ccl:save-application name :toplevel-function function
 				:init-file nil :prepend-kernel t))
 
