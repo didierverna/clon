@@ -49,8 +49,8 @@ CMUCL_LOAD   := -load
 
 CLISP_CACHE  := clisp
 CLISP_BINLOC := clisp
-CLISP_DUMP   :=
-CLISP_LOAD   :=
+CLISP_DUMP   := -norc
+CLISP_LOAD   := -i
 
 CCL_CACHE  := clozure
 CCL_BINLOC := openmcl
