@@ -746,7 +746,29 @@ than the currently available right margin."
 			 ;; #### FIXME: a better error printing would be nice.
 			 (format t "Error ~A: ~A~%"
 			   result (ccl::%strerror result)))
-		       nil))))))
+		       nil))))
+	    #+clisp
+	    (multiple-value-bind (input-fd output-fd)
+		(ext:stream-handles output-stream)
+	      (when output-fd
+		(cffi:with-foreign-object (winsize 'winsize)
+		  (let ((result (cffi:foreign-funcall "ioctl"
+						      :int output-fd
+						      :int +tiocgwinsz+
+						      :pointer winsize
+						      :int)))
+		    (cond ((= result -1)
+			   (unless (= +errno+ +enotty+)
+			     ;; #### FIXME: a better error printing would be
+			     ;; nice.
+			     (format t "Error ~A: ~A~%"
+			       +errno+
+			       (cffi:foreign-funcall "strerror"
+						     :int +errno+ :string)))
+			   nil)
+			  (t
+			   (cffi:with-foreign-slots ((ws-col) winsize winsize)
+			     ws-col)))))))))
       ;; Next, set highlighting.
       (when (eq highlight :auto)
 	(setq highlight tty-line-width))
