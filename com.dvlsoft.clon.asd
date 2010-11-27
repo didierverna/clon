@@ -32,7 +32,8 @@
 
 (in-package :cl-user)
 
-#+sbcl (require :sb-grovel)
+#+sbcl  (require :sb-grovel)
+#+clisp (asdf:operate 'asdf:load-op :cffi-grovel)
 
 (defpackage :com.dvlsoft.clon.asdf
     (:use :cl)
@@ -149,14 +150,19 @@ The most important features of Clon are:
   :maintainer "Didier Verna <didier@lrde.epita.fr>"
   :license "GNU GPL"
   :version #.(version :long)
-  :depends-on (#+sbcl :sb-posix #+sbcl :sb-grovel)
+  :depends-on (#+sbcl :sb-posix #+sbcl :sb-grovel
+	       #+clisp :cffi #+clisp :cffi-grovel)
   :components ((:file "package")
 	       #+sbcl (:module "sbcl"
 			:depends-on ("package")
 			:components ((sb-grovel:grovel-constants-file
 				      "constants" :package :com.dvlsoft.clon)))
+	       #+clisp (:module "clisp"
+			 :depends-on ("package")
+			 :components ((cffi-grovel:grovel-file "constants")))
 	       (module "src"
 		 :depends-on (#+sbcl "sbcl"
+			      #+clisp "clisp"
 			      "package")
 		 :components ((:file "util")
 			      (:file "item" :depends-on ("util"))

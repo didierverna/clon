@@ -42,8 +42,8 @@ include Makefile.inc
 include version.inc
 
 
-SUBDIRS     := src sbcl  \
-	       share doc \
+SUBDIRS     := src sbcl clisp	\
+	       share doc	\
 	       demos
 SYSTEMS_DIR := $(SHARE)/common-lisp/systems
 ASDF_FILE   := com.dvlsoft.clon.asd
