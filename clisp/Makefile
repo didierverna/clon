@@ -42,11 +42,11 @@ include $(TOP_DIR)/Makefile.inc
 all:
 
 clean:
-	-rm *~ a.out foo.c
+	-rm *~ constants constants.c
 
 distclean: clean
-	-rm -fr constants.lisp-temp
-	-rm -fr $(SBCL_BINLOC)-*
+	-rm -fr constants.grovel-tmp.lisp constants.fas constants.lib
+	-rm -fr $(CLISP_BINLOC)-*
 
 install:
 uninstall:
