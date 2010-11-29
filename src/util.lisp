@@ -228,10 +228,11 @@ See REPLACE-KEY for more information on the replacement syntax."
 (defmacro validate-superclass (class superclass)
   "Validate SUPERCLASS classes for CLASS classes."
   ;; #### PORTME.
-  `(defmethod #+sbcl sb-mop:validate-superclass
-	      #+cmu  mop:validate-superclass
-	      #+ccl  ccl:validate-superclass
-	      #+ecl  clos:validate-superclass
+  `(defmethod #+sbcl  sb-mop:validate-superclass
+	      #+cmu   mop:validate-superclass
+	      #+ccl   ccl:validate-superclass
+	      #+ecl   clos:validate-superclass
+	      #+clisp clos:validate-superclass
     ((class ,class) (superclass ,superclass))
     #+ecl (declare (ignore class superclass))
     t))
@@ -239,19 +240,21 @@ See REPLACE-KEY for more information on the replacement syntax."
 (defun class-slots (class)
   "Return CLASS slots."
   ;; #### PORTME.
-  (#+sbcl sb-mop:class-slots
-   #+cmu  mop:class-slots
-   #+ccl  ccl:class-slots
-   #+ecl  clos:class-slots
+  (#+sbcl  sb-mop:class-slots
+   #+cmu   mop:class-slots
+   #+ccl   ccl:class-slots
+   #+ecl   clos:class-slots
+   #+clisp clos:class-slots
    class))
 
 (defun slot-definition-name (slot)
   "Return SLOT's definition name."
   ;; #### PORTME.
-  (#+sbcl sb-mop:slot-definition-name
-   #+cmu  mop:slot-definition-name
-   #+ccl  ccl:slot-definition-name
-   #+ecl  clos:slot-definition-name
+  (#+sbcl  sb-mop:slot-definition-name
+   #+cmu   mop:slot-definition-name
+   #+ccl   ccl:slot-definition-name
+   #+ecl   clos:slot-definition-name
+   #+clisp clos:slot-definition-name
    slot))
 
 
@@ -413,41 +416,62 @@ Return two values:
   #+ecl
   (multiple-value-bind (cols msg)
       (fd-line-width (ext:file-stream-fd stream))
-    (values (unless (= cols -1) cols) msg)))
+    (values (unless (= cols -1) cols) msg))
+  #+clisp
+  (multiple-value-bind (input-fd output-fd)
+      (ext:stream-handles stream)
+    (when output-fd
+      (cffi:with-foreign-object (winsize 'winsize)
+	(let ((result (cffi:foreign-funcall "ioctl"
+					    :int output-fd
+					    :int +tiocgwinsz+
+					    :pointer winsize
+					    :int)))
+	  (if (= result -1)
+	      (unless (= +errno+ +enotty+)
+		(values nil
+			(cffi:foreign-funcall "strerror"
+					      :int +errno+ :string)))
+	    (cffi:with-foreign-slots ((ws-col) winsize winsize)
+	      ws-col)))))))
 
 (defun exit (&optional (status 0))
   "Quit the current application with STATUS."
   ;; #### PORTME.
-  #+sbcl (sb-ext:quit :unix-status status)
-  #+cmu  (unix:unix-exit status)
-  #+ccl  (ccl:quit status)
-  #+ecl  (ext:quit status))
+  #+sbcl  (sb-ext:quit :unix-status status)
+  #+cmu   (unix:unix-exit status)
+  #+ccl   (ccl:quit status)
+  #+ecl   (ext:quit status)
+  #+clisp (ext:exit status))
 
 (defun cmdline ()
   "Get the current application's command-line."
   ;; #### PORTME.
-  #+sbcl sb-ext:*posix-argv*
-  #+cmu  lisp::lisp-command-line-list
-  #+ccl  ccl::*command-line-argument-list*
-  #+ecl (ext:command-args))
+  #+sbcl  sb-ext:*posix-argv*
+  #+cmu   lisp::lisp-command-line-list
+  #+ccl   ccl::*command-line-argument-list*
+  #+ecl   (ext:command-args)
+  #+clisp (cons (aref (ext:argv) 0) ext:*args*))
 
 (defun getenv (variable)
   "Get environment VARIABLE's value. VARIABLE may be null."
   ;; #### PORTME.
   (when variable
-    (#+sbcl sb-posix:getenv
-     #+cmu  unix:unix-getenv
-     #+ccl  ccl:getenv
-     #+ecl  ext:getenv
+    (#+sbcl  sb-posix:getenv
+     #+cmu   unix:unix-getenv
+     #+ccl   ccl:getenv
+     #+ecl   ext:getenv
+     #+clisp ext:getenv
      variable)))
 
 (defun putenv (variable value)
   "Set environment VARIABLE to VALUE."
   ;; #### PORTME.
-  #+sbcl (sb-posix:putenv  (concatenate 'string variable "=" value))
-  #+cmu  (unix:unix-putenv (concatenate 'string variable "=" value))
-  #+ccl  (ccl:setenv variable value)
-  #+ecl  (ext:setenv variable value))
+  #+sbcl  (sb-posix:putenv  (concatenate 'string variable "=" value))
+  #+cmu   (unix:unix-putenv (concatenate 'string variable "=" value))
+  #+ccl   (ccl:setenv variable value)
+  #+ecl   (ext:setenv variable value)
+  #+clisp (setf (ext:getenv variable) value))
 
 (defmacro dump (name function)
   "Dump a standalone executable named NAME starting with FUNCTION.
@@ -456,18 +480,34 @@ toplevel code to execute instead, so this macro simply expands to a call to
 FUNCTION for ECL."
   ;; #### PORTME.
   #+ecl (declare (ignore name))
-  #+sbcl `(sb-ext:save-lisp-and-die ,name :toplevel #',function :executable t
-				    :save-runtime-options t)
-  #+cmu  `(ext:save-lisp ,name :init-function #',function :executable t
-			 :load-init-file nil :site-init nil
-			 :print-herald nil :process-command-line nil)
-  #+ccl  `(ccl:save-application ,name :toplevel-function #',function
-				:init-file nil :error-handler :quit
-				:prepend-kernel t)
+  #+sbcl  `(sb-ext:save-lisp-and-die ,name
+	    :toplevel #',function
+	    :executable t
+	    :save-runtime-options t)
+  #+cmu   `(ext:save-lisp ,name
+	    :init-function #',function
+	    :executable t
+	    :load-init-file nil
+	    :site-init nil
+	    :print-herald nil
+	    :process-command-line nil)
+  #+ccl   `(ccl:save-application ,name
+	    :toplevel-function #',function
+	    :init-file nil
+	    :error-handler :quit
+	    :prepend-kernel t)
   ;; #### NOTE: ECL works differently: it needs an entry point (i.e. actual
   ;; code to execute) instead of a main function. So we expand DUMP to just
   ;; call that function.
-  #+ecl (list function))
+  #+ecl   (list function)
+  ;; CLISP's saveinitmem function doesn't quit, so we need to do so here.
+  #+clisp `(progn
+	    (ext:saveinitmem ,name
+	     :init-function #',function
+	     :executable 0
+	     :quiet t
+	     :norc t)
+	    (exit)))
 
 
 ;;; util.lisp ends here

@@ -38,11 +38,11 @@
 # do the installation by hand.
 PREFIX := /usr/local
 
-# CC variable for sb-grovel:
+# C compiler configuration for sb-grovel and cffi-grovel:
 CC := gcc
 
 # Lisp implementation to use (for some installation processing steps only):
-# Choices are SBCL, CMUCL, CCL and ECL.
+# Choices are SBCL, CMUCL, CCL, ECL and CLISP.
 LISP := SBCL
 
 # Implementation paths:
@@ -50,6 +50,8 @@ SBCL_PATH  := CC=$(CC) sbcl
 CMUCL_PATH := lisp
 CCL_PATH   := ccl
 ECL_PATH   := ecl
+# -q is needed to remove 'bye' for version.cl to work properly.
+CLISP_PATH := CC=$(CC) clisp -q
 
 
 # Programs for generating the documentation:

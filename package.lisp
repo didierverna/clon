@@ -125,14 +125,15 @@
 
 (set-macro-character #\~ #'tilde-reader nil *readtable*)
 
-;; ECL does not like to see undefined reader macros in expressions that
-;; belong to other compilers. For instance this will break:
+;; ECL and CLISP do not like to see undefined reader macros in expressions
+;; that belong to other compilers. For instance this will break:
 ;; #+ccl (#_ccl-only-function)
 ;; It seems to be a correct behavior (see *read-suppress* in CLHS), although
 ;; other implementations like SBCL and CMUCL are more gentle. The solution I
 ;; use is to define those reader macros to simply return nil.
-#+ecl
+#+(or ecl clisp)
 (progn
+
   (defun dummy-reader (stream subchar args)
     "Return nil."
     (declare (ignore stream subchar args))

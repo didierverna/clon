@@ -676,6 +676,15 @@ like this:
 @verbatim
 lisp -noinit -nositeinit -load quickstart.lisp
 @end verbatim
+@item CLISP
+You can dump an executable from CLISP like this:
+@verbatim
+clisp quickstart.lisp
+@end verbatim
+Please note that executables dumped (the @clon{} way) by CLISP still
+understand lisp-specific command-line options when they are prefixed
+with @code{--clisp-}, so you should obviously avoid defining options by
+those names.
 @item CCL
 You can dump a CCL (formerly known as OpenMCL) executable like this:
 @verbatim

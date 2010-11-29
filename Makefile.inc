@@ -47,7 +47,7 @@ CMUCL_BINLOC := cmu
 CMUCL_DUMP   := -noinit -nositeinit
 CMUCL_LOAD   := -load
 
-CCL_CACHE  := clozure
+CCL_CACHE  := ccl
 CCL_BINLOC := openmcl
 CCL_DUMP   := --no-init
 CCL_LOAD   := --load
@@ -56,6 +56,11 @@ ECL_CACHE  := ecl
 ECL_BINLOC := ecl
 ECL_DUMP   := -norc
 ECL_LOAD   := -load
+
+CLISP_CACHE  := clisp
+CLISP_BINLOC := clisp
+CLISP_DUMP   := -norc
+CLISP_LOAD   := -i
 
 $(TOP_DIR)/version.inc: $(TOP_DIR)/version.cl $(TOP_DIR)/com.dvlsoft.clon.asd
 	$($(LISP)_PATH) $($(LISP)_LOAD) $(TOP_DIR)/version.cl | tail -2 > $@

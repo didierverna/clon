@@ -559,11 +559,11 @@ than the currently available right margin."
 (defgeneric help-spec-will-print (sface help-spec)
   (:documentation "Return t if HELP-SPEC will print under FACE.")
   (:method :before (sface help-spec)
-    #+(or ccl ecl) (declare (ignore help-spec))
+    #+(or ccl ecl clisp) (declare (ignore help-spec))
     (assert (visiblep sface)))
   (:method (sface help-spec)
     "Basic help specifications (chars, strings etc) do print."
-    #+(or ccl ecl) (declare (ignore sface help-spec))
+    #+(or ccl ecl clisp) (declare (ignore sface help-spec))
     t)
   (:method (sface (help-spec list))
     "Return t if HELP-SPEC's items will print under HELP-SPEC's face."
@@ -574,7 +574,7 @@ than the currently available right margin."
 (defgeneric get-bottom-padding (sface help-spec)
   (:documentation "Get HELP-SPEC's bottom-padding under SFACE.")
   (:method (sface help-spec)
-    #+(or ccl ecl) (declare (ignore sface help-spec))
+    #+(or ccl ecl clisp) (declare (ignore sface help-spec))
     "Basic help specifications (chars, strings etc) don't provide a bottom padding."
     nil)
   (:method (sface (help-spec list))
@@ -582,7 +582,7 @@ than the currently available right margin."
     (bottom-padding (find-sface sface (car help-spec)))))
 
 (defmethod top-padding (other)
-  #+(or ccl ecl) (declare (ignore other))
+  #+(or ccl ecl clisp) (declare (ignore other))
   nil)
 
 (defmethod top-padding ((help-spec list))
@@ -649,13 +649,15 @@ than the currently available right margin."
 (defgeneric print-help-spec (sheet help-spec)
   (:documentation "Print HELP-SPEC on SHEET.")
   (:method :before (sheet help-spec)
-    #+(or ccl ecl) (declare (ignore help-spec))
+    #+(or ccl ecl clisp) (declare (ignore help-spec))
     (assert (visiblep (current-sface sheet))))
   (:method (sheet (char character))
     "Print CHAR on SHEET with the current face."
     (print-help-spec sheet (make-string 1 :initial-element char)))
-  ;; ECL doesn't have a SIMPLE-VECTOR class, so we use just VECTOR instead.
-  (:method (sheet (char-vector #+ecl vector #-ecl simple-vector))
+  ;; ECL and CLISP don't have a SIMPLE-VECTOR class, so we use just VECTOR
+  ;; instead.
+  (:method (sheet (char-vector #+(or ecl clisp) vector
+			       #-(or ecl clisp) simple-vector))
     "Print CHAR-VECTOR on SHEET with the current face."
     (print-help-spec sheet (coerce char-vector 'string)))
   (:method (sheet (string string))

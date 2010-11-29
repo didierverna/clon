@@ -122,13 +122,13 @@ This is the base class for all options."))
 		  ~"and ITEM2's options.")
   (:method (item1 (text text))
     "Do nothing (no name clash with a text object."
-    #+(or ccl ecl) (declare (ignore item1))
-    #+ecl          (declare (ignore text))
+    #+(or ccl ecl clisp) (declare (ignore item1))
+    #+ecl                (declare (ignore text))
     (values))
   (:method ((text text) item2)
     "Do nothing (no name clash with a text object."
-    #+(or ccl ecl) (declare (ignore item2))
-    #+ecl          (declare (ignore text))
+    #+(or ccl ecl clisp) (declare (ignore item2))
+    #+ecl                (declare (ignore text))
     (values))
   ;; #### NOTE: currently, name clashes are considered on short and long names
   ;; independently. That is, it is possible to have a short name identical to
