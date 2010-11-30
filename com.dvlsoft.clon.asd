@@ -150,8 +150,8 @@ The most important features of Clon are:
   :maintainer "Didier Verna <didier@lrde.epita.fr>"
   :license "GNU GPL"
   :version #.(version :long)
-  :depends-on (#+sbcl :sb-posix #+sbcl :sb-grovel
-	       #+clisp :cffi #+clisp :cffi-grovel)
+  :depends-on (#+sbcl  :sb-posix
+	       #+clisp :cffi)
   :components ((:file "package")
 	       #+sbcl (:module "sbcl"
 			:depends-on ("package")
