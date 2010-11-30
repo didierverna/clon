@@ -397,16 +397,16 @@ This is the @clon{} User Manual for @clon{} version @value{VERSION}:
 it explains how to use @clon{} in your application.
 
 @menu
-* Copying::             The GNU General Public License
-* Introduction::        What Clon is all about
-* Quick Start::         For the brave and the impatient
-* Using Clon::          Clonificating your application
-* Extending Clon::      Creating your own option types
-* Advanced Usage::      Things rarely needed
-* Conclusion::          That's all folks
-* Quick Start Program:: The complete listing
-* API Quick Reference:: The Complete protocols
-* Indexes::             Concept, Function and Variable
+* Copying::                 The GNU General Public License
+* Introduction::            What Clon is all about
+* Quick Start::             For the brave and the impatient
+* Using Clon::              Clonificating your application
+* Extending Clon::          Creating your own option types
+* Advanced Usage::          Things rarely needed
+* Conclusion::              That's all folks
+* Quick Start Source Code:: The complete listing
+* API Quick Reference::     The Complete protocols
+* Indexes::                 Concept, Function and Variable
 @end menu
 
 @insertcopying
@@ -484,26 +484,27 @@ extend @clon{} with your own option types.
 @node Quick Start, Using Clon, Introduction, Top
 @chapter Quick Start
 
-In this chapter, we assume that you have properly installed @clon{} for
-ASDF, and we build a very short program to get you started.
+In this chapter, we assume that you have properly installed @clon{} (see
+the @file{ISNTALL} file in the distribution), and we build a very short
+program to get you started.
 
 @menu
-* Quick Start Writing:: Hello World!
-* Quick Start Dumping:: Save the World!
+* Quick Start Program:: Hello World!
+* Dumping Executables:: Save the World!
 @end menu
 
 
 @c -------------------
 @c Quick Start Writing
 @c -------------------
-@node Quick Start Writing, Quick Start Dumping, , Quick Start
-@section Quick Start Writing
+@node Quick Start Program, Dumping Executables, , Quick Start
+@section Quick Start Program
 This section gives you a step-by-step introduction to writing a
 clonified application (let's call it @file{quickstart.lisp}). If you
 want to try this program for real, the full listing is available for
-cut'n paste in @ref{Quick Start Program}. For a slightly longer example,
-have a look at the demonstration program called @file{simple} in the
-distribution.
+cut'n paste in @ref{Quick Start Source Code}. For a slightly longer
+example, have a look at the demonstration program called @file{simple}
+in the distribution.
 
 @pkgindex{com.dvlsoft.clon}
 Let's put us in the @cl{} user package, and load @clon{} first. @clon{}
@@ -640,17 +641,24 @@ function to call at startup.
 
 
 @c -------------------
-@c Quick Start Dumping
+@c Dumping Executables
 @c -------------------
-@node Quick Start Dumping, , Quick Start Writing, Quick Start
-@section Quick Start Dumping
+@node Dumping Executables, , Quick Start Program, Quick Start
+@section Dumping Executables
+Dumping executables from Lisp is admitedly orthogonal to @clon{}. 
+@clon{} is just a library that you might want to use, and in fact, it is
+also possible to use @clon{} without dumping a standalone executable.
+
+@findex exit
 @findex dump
-The final step required to use this industrial-scale application is to
-create a standalone executable for it. Unfortunately, there is no
-standard way to do so. This section provides ready-to-use @cmdline{}
-samples for the compilers currently supported. They work well in
-conjunction with the @code{dump} macro mentionned in the previous
-section.
+Unfortunately, there is no standard way to dump executables from Lisp. 
+We're entering the portability mine field here. @clon{}, however, wants
+to help. We've already seen that it provides utilities like @code{exit}
+and @code{dump} to make your life easier (I mean, more portable).
+
+This section provides ready-to-use @cmdline{} samples for the compilers
+currently supported, in order to create standalone executables. They
+work well in conjunction with the @code{dump} macro mentionned above.
 
 If a compiler does not appear below, it means that @clon{} has no
 official support for it yet.
@@ -676,15 +684,6 @@ like this:
 @verbatim
 lisp -noinit -nositeinit -load quickstart.lisp
 @end verbatim
-@item CLISP
-You can dump an executable from CLISP like this:
-@verbatim
-clisp quickstart.lisp
-@end verbatim
-Please note that executables dumped (the @clon{} way) by CLISP still
-understand lisp-specific command-line options when they are prefixed
-with @code{--clisp-}, so you should obviously avoid defining options by
-those names.
 @item CCL
 You can dump a CCL (formerly known as OpenMCL) executable like this:
 @verbatim
@@ -712,6 +711,17 @@ you with this: it normally expands to a compiler-specific function which
 saves the current Lisp image, but for ECL, it simply expands to the
 ``main'' function call, hence consituting the entry point to the code
 that ECL needs.
+@item CLISP
+CLISP is supported at the expense of a dependency on @code{cffi}. You
+can dump an executable from CLISP like this:
+@verbatim
+CC=gcc clisp -norc -i quickstart.lisp
+@end verbatim
+The @code{CC=gcc} bit lets you choose your preferred C compiler for
+@code{cffi}. Please note that executables dumped (the @clon{} way) by
+CLISP still understand lisp-specific command-line options when they are
+prefixed with @code{--clisp-}, so you should obviously avoid defining
+options by those names.
 @end table
 
 
@@ -1934,7 +1944,7 @@ on:
 @item
 the state of the Lisp environment when the application is dumped, which
 may in turn depend on command-line options passed to the Lisp itself
-(@pxref{Quick Start Dumping}),
+(@pxref{Dumping Executables}),
 @item
 @findex dump
 the arguments passed to the dumping function (look at @clon{}'s
@@ -2496,7 +2506,7 @@ output: 1.3 "Bill Evans".
 @c ====================================================================
 @c Conclusion
 @c ====================================================================
-@node Conclusion, Quick Start Program, Advanced Usage, Top
+@node Conclusion, Quick Start Source Code, Advanced Usage, Top
 @chapter Conclusion
 
 So that's it I guess. You know all about @clon{} now. The next step is
@@ -2510,10 +2520,10 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
 
 
 @c ====================================================================
-@c Quick Start Program
+@c Quick Start Source Code
 @c ====================================================================
-@node Quick Start Program, API Quick Reference, Conclusion, Top
-@appendix Quick Start Program
+@node Quick Start Source Code, API Quick Reference, Conclusion, Top
+@appendix Quick Start Source Code
 
 @cartouche
 @verbatim
@@ -2551,7 +2561,7 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
 @c ====================================================================
 @c Indexes
 @c ====================================================================
-@node API Quick Reference, Indexes, Quick Start Program, Top
+@node API Quick Reference, Indexes, Quick Start Source Code, Top
 @appendix API Quick Reference
 
 @menu
