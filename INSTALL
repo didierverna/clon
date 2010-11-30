@@ -10,6 +10,10 @@ The Clon distribution has the following shape:
 ./doc/		;; documentation
 ./demos/        ;; demo programs
 
+* Portability
+Clon currently works with SBCL, CMUCL, CCL, ECL and CLISP.
+Clon has no dependency, except with CLISP in which case CFFI is needed.
+
 
 * Configuration
 Edit Makefile.cnf to your specific needs. For ASDF 1, the demo programs
