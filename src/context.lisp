@@ -103,6 +103,19 @@
 	       (argument error))))
   (:documentation "An error related to an unknown command-line option."))
 
+(defmacro with-context-error-handler (context condition &body body)
+  "Execute BODY with CONTEXT's error handler bound for CONDITION."
+  `(handler-bind ((,condition
+		   (lambda (error)
+		     (ecase (error-handler ,context)
+		       (:quit
+			(let (*print-escape*)
+			  (print-object error t))
+			(terpri)
+			(exit 1))
+		       (:none)))))
+    ,@body))
+
 
 
 ;; ==========================================================================
@@ -336,14 +349,7 @@ Return two values:
 	     (push cmdline-option cmdline-options))))
     (setf (cmdline-options context) (nreverse cmdline-options)))
   ;; Try an environment variable:
-  (handler-bind ((environment-error
-		  (lambda (error)
-		    (ecase (error-handler context)
-		      (:quit
-		       (let (*print-escape*) (print-object error t))
-		       (terpri)
-		       (exit 1))
-		      (:none)))))
+  (with-context-error-handler context environment-error
     (let* ((env-var (env-var option))
 	   (env-val (getenv env-var)))
       (when env-val
@@ -485,15 +491,7 @@ CONTEXT is where to look for the options."
 					   :short-name ,name)))
 			   (assert ,option)
 			   ,@body)))))
-      (handler-bind ((cmdline-error
-		      (lambda (error)
-			(ecase (error-handler context)
-			  (:quit
-			   (let (*print-escape*)
-			     (print-object error t))
-			   (terpri)
-			   (exit 1))
-			  (:none)))))
+      (with-context-error-handler context cmdline-error
 	(do ((arg (pop cmdline) (pop cmdline)))
 	    ((null arg))
 	  (cond ((string= arg "--")
