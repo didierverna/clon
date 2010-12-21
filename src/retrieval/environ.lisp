@@ -132,6 +132,11 @@ Available restarts are:
       :report "Use the conversion of an argument."
       :interactive read-argument
       (restartable-environment-convert valued-option argument))
+    ;; #### NOTE: JAVA doesn't provide a way to set an environment variable.
+    ;; I've seen tricks around to modify the startup environment memory
+    ;; mapping instead of doing a real putenv, but I'll just disable this
+    ;; restart for now.
+    #-abcl
     (modify-environment (env-val)
       :report "Modify the environment variable's value."
       :interactive (lambda () (read-env-val (env-var valued-option)))
