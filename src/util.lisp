@@ -462,6 +462,7 @@ Return two values:
      #+ccl   ccl:getenv
      #+ecl   ext:getenv
      #+clisp ext:getenv
+     #+abcl  extensions:getenv
      variable)))
 
 ;; #### NOTE: JAVA doesn't provide a way to set an environment variable. I've
