@@ -464,6 +464,11 @@ Return two values:
      #+clisp ext:getenv
      variable)))
 
+;; #### NOTE: JAVA doesn't provide a way to set an environment variable. I've
+;; seen tricks around to modify the startup environment memory mapping instead
+;; of doing a real putenv, but I'll just disable the "modify-environment"
+;; restart in environ.lisp for now.
+#-abcl
 (defun putenv (variable value)
   "Set environment VARIABLE to VALUE."
   ;; #### PORTME.
