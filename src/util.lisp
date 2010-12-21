@@ -442,7 +442,8 @@ Return two values:
   #+cmu   (unix:unix-exit status)
   #+ccl   (ccl:quit status)
   #+ecl   (ext:quit status)
-  #+clisp (ext:exit status))
+  #+clisp (ext:exit status)
+  #+abcl  (extensions:exit :status status))
 
 (defun cmdline ()
   "Get the current application's command-line."
