@@ -143,11 +143,12 @@ is a shortcut for: (PROPERTY-NAME ((on t) YES) ((off nil) NO))."
   "Princ highlight proeprty INSTANCES on SHEET's stream."
   (when instances
     (format (output-stream sheet) "~C[~A~{;~A~}m"
-      ;; #### NOTE: #\esc is not EBCDIC (it's ANSI), and CLHS 13.1.7 doesn't
-      ;; mention ANSI (thanks Pascal Bourguignon for spotting this), so
-      ;; technically, #\esc is not a standard Common Lisp character. All the
-      ;; lisp implementations supported by Clon seem to understand it however.
-      #\esc
+      ;; #### NOTE: #\escape is not EBCDIC (it's ANSI), and CLHS 13.1.7
+      ;; doesn't mention ANSI (thanks Pascal Bourguignon for spotting this),
+      ;; so technically, #\escape is not a standard Common Lisp character. All
+      ;; the lisp implementations supported by Clon seem to understand it
+      ;; however (previously, I used #\esc but ABCL doesn't like it).
+      #\escape
       (highlight-property-instance-escape-sequence (car instances))
       (mapcar #'highlight-property-instance-escape-sequence
 	      (cdr instances)))))
