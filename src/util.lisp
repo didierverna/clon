@@ -228,6 +228,8 @@ See REPLACE-KEY for more information on the replacement syntax."
 (defmacro validate-superclass (class superclass)
   "Validate SUPERCLASS classes for CLASS classes."
   ;; #### PORTME.
+  #+abcl '(progn)
+  #-abcl
   `(defmethod #+sbcl  sb-mop:validate-superclass
 	      #+cmu   mop:validate-superclass
 	      #+ccl   ccl:validate-superclass
@@ -245,6 +247,7 @@ See REPLACE-KEY for more information on the replacement syntax."
    #+ccl   ccl:class-slots
    #+ecl   clos:class-slots
    #+clisp clos:class-slots
+   #+abcl  mop:class-slots
    class))
 
 (defun slot-definition-name (slot)
@@ -255,6 +258,7 @@ See REPLACE-KEY for more information on the replacement syntax."
    #+ccl   ccl:slot-definition-name
    #+ecl   clos:slot-definition-name
    #+clisp clos:slot-definition-name
+   #+abcl  mop:slot-definition-name
    slot))
 
 
