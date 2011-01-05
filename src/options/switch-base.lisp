@@ -38,24 +38,26 @@
 ;; The SWITCH-BASE Class
 ;; ==========================================================================
 
+;; #### NOTE: previously, the argument-styles, yes-values and no-values slots
+;; were implemented as shared slots. I changed this when porting to ABCL
+;; because contrary to the other supported implementations, ABCL initialized
+;; shared slot when the first instance is created instead of when the class is
+;; finalized. As a consequence, this breaks the :before method below in which
+;; the argument-styles slot would be unbound.
 (defabstract switch-base (negatable)
   ((argument-styles :documentation "The possible argument styles.
 The position of every argument style in the list must correspond to the
 position of the associated strings in the yes-values and no-values slots."
-		    :allocation :class
 		    :type list
-		    :initform '(:yes/no :on/off :true/false :yup/nope
-				:yeah/nah)
+		    :initarg :argument-styles
 		    :accessor argument-styles)
    (yes-values :documentation "The possible 'yes' values."
-	       :allocation :class
 	       :type list
-	       :initform '("yes" "on" "true" "yup" "yeah")
+	       :initarg :yes-values
 	       :accessor yes-values)
    (no-values :documentation "The possible 'no' values."
-	      :allocation :class
 	      :type list
-	      :initform '("no" "off" "false" "nope" "nah")
+	      :initarg :no-values
 	      :accessor no-values)
    (argument-style :documentation "The selected argument style."
 		   :type keyword
@@ -63,16 +65,19 @@ position of the associated strings in the yes-values and no-values slots."
 		   :initarg :argument-style
 		   :reader argument-style))
   (:default-initargs
-      :argument-type :optional)
+    :argument-type :optional
+    :argument-styles '(:yes/no :on/off :true/false :yup/nope :yeah/nah)
+    :yes-values '("yes" "on" "true" "yup" "yeah")
+    :no-values '("no" "off" "false" "nope" "nah"))
   (:documentation "The SWITCH-BASE abstract class.
 This class provides support for options including boolean values."))
 
 (defmethod initialize-instance :before
     ((switch-base switch-base)
-     &key (argument-style :yes/no argument-style-supplied-p))
+     &key (argument-style :yes/no argument-style-supplied-p) argument-styles)
   "Check for validity of the :ARGUMENT-STYLE initarg."
   (when argument-style-supplied-p
-    (unless (member argument-style (argument-styles switch-base))
+    (unless (member argument-style argument-styles)
       (error "Invalid argument style initarg: ~S." argument-style))))
 
 ;; #### NOTE: ideally, I would like to do this in an :after method. But I
