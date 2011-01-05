@@ -438,7 +438,9 @@ Return two values:
 			(cffi:foreign-funcall "strerror"
 					      :int +errno+ :string)))
 	    (cffi:with-foreign-slots ((ws-col) winsize winsize)
-	      ws-col)))))))
+	      ws-col))))))
+  #+abcl
+  nil)
 
 (defun exit (&optional (status 0))
   "Quit the current application with STATUS."
