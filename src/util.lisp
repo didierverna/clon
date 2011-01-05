@@ -459,7 +459,8 @@ Return two values:
   #+cmu   lisp::lisp-command-line-list
   #+ccl   ccl::*command-line-argument-list*
   #+ecl   (ext:command-args)
-  #+clisp (cons (aref (ext:argv) 0) ext:*args*))
+  #+clisp (cons (aref (ext:argv) 0) ext:*args*)
+  #+abcl  (cons "abcl" extensions:*command-line-argument-list*))
 
 (defun getenv (variable)
   "Get environment VARIABLE's value. VARIABLE may be null."
