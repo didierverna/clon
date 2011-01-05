@@ -488,11 +488,46 @@ Return two values:
   #+ecl   (ext:setenv variable value)
   #+clisp (setf (ext:getenv variable) value))
 
+#+abcl
+(defconstant +abcl-main-class-template+
+  "import org.armedbear.lisp.*;
+
+public class ~A
+{
+    public static void main (String[] argv)
+    {
+	try
+	    {
+		LispObject cmdline = Lisp.NIL;
+		for (String arg : argv)
+		    cmdline = new Cons (arg, cmdline);
+		cmdline.nreverse ();
+		Lisp._COMMAND_LINE_ARGUMENT_LIST_.setSymbolValue (cmdline);
+
+		Interpreter interpreter = Interpreter.createInstance ();
+		interpreter.eval (\"(progn (load \\\"~A\\\") (~A))\");
+	    }
+	catch (Throwable t)
+	    {
+		t.printStackTrace ();
+	    }
+    }
+}~%"
+  "Main class template for ABCL.")
+
 (defmacro dump (name function)
   "Dump a standalone executable named NAME starting with FUNCTION.
-ECL doesn't create executables by dumping a Lisp image, but relies on having
-toplevel code to execute instead, so this macro simply expands to a call to
-FUNCTION for ECL."
+
+Since executable dumping is not available in all supported implementations,
+this function behaves differently in some cases, as described below.
+
+- ECL doesn't create executables by dumping a Lisp image, but relies on having
+  toplevel code to execute instead, so this macro simply expands to a call to
+  FUNCTION.
+- ABCL can't dump executables at all because of the underlying Java
+  implementation, so this macro expands to just (PROGN) but creates a Java
+  class file with a main function that creates an interpreter, loads
+  the file in which this macro call appears and calls FUNCTION."
   ;; #### PORTME.
   #+ecl (declare (ignore name))
   #+sbcl  `(sb-ext:save-lisp-and-die ,name
@@ -522,7 +557,21 @@ FUNCTION for ECL."
 	     :executable 0
 	     :quiet t
 	     :norc t)
-	    (exit)))
+	    (exit))
+  #+abcl (progn
+	   (let ((source-pathname (or *compile-file-pathname*
+				      *load-pathname*))
+		 (class-name (copy-seq name)))
+	     (setf (aref class-name 0) (char-upcase (aref class-name 0)))
+	     (with-open-file
+		 (*standard-output*
+		  (merge-pathnames
+		   (make-pathname :name class-name :type "java")
+		   source-pathname)
+		  :direction :output :if-exists :supersede)
+	       (format t +abcl-main-class-template+
+		 class-name (namestring source-pathname) function)))
+	   '(progn)))
 
 
 ;;; util.lisp ends here
