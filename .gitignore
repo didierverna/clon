@@ -7,6 +7,9 @@ version.inc
 demos/simple
 demos/advanced
 demos/*.o
+demos/*.jar
+demos/Simple.*
+demos/Advanced.*
 
 sbcl/foo.c
 sbcl/constants.lisp-temp

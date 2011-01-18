@@ -62,6 +62,11 @@ CLISP_BINLOC := clisp
 CLISP_DUMP   := -norc
 CLISP_LOAD   := -i
 
+ABCL_CACHE  := abcl
+ABCL_BINLOC := abcl
+ABCL_DUMP   := --batch
+ABCL_LOAD   := --load
+
 $(TOP_DIR)/version.inc: $(TOP_DIR)/version.cl $(TOP_DIR)/com.dvlsoft.clon.asd
 	$($(LISP)_PATH) $($(LISP)_LOAD) $(TOP_DIR)/version.cl | tail -2 > $@
 

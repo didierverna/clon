@@ -42,7 +42,7 @@ PREFIX := /usr/local
 CC := gcc
 
 # Lisp implementation to use (for some installation processing steps only):
-# Choices are SBCL, CMUCL, CCL, ECL and CLISP.
+# Choices are SBCL, CMUCL, CCL, ECL, CLISP and ABCL.
 LISP := SBCL
 
 # Implementation paths:
@@ -52,6 +52,14 @@ CCL_PATH   := ccl
 ECL_PATH   := ecl
 # -q is needed to remove 'bye' for version.cl to work properly.
 CLISP_PATH := CC=$(CC) clisp -q
+
+# For ABCL, we need something slightly different.
+ABCL_JAR   := /usr/local/pkg/common-lisp/abcl/abcl.jar
+JAVA       := java
+JAVAC      := javac
+JAR        := jar
+SED        := sed
+ABCL_PATH  := $(JAVA) -jar $(ABCL_JAR)
 
 
 # Programs for generating the documentation:
