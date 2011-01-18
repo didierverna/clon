@@ -384,6 +384,7 @@ Return two values:
   ;; ENOTTY error, which simply means that we're not connected to a terminal,
   ;; and the other which are real errors and need to be reported.
   ;; #### PORTME.
+  #+abcl (declare (ignore stream))
   #+sbcl
   (locally (declare (sb-ext:muffle-conditions sb-ext:compiler-note))
     (handler-case
