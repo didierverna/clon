@@ -733,6 +733,22 @@ abcl --noinit --noinform --load quickstart.lisp
 @end verbatim
 Note that for this to work, the @code{dump} macro expands to the
 ``main'' function call for ABCL, just as for ECL.
+
+There's more to it than that though. It is possible to get closer to
+standalone executables with ABCL by 1/ providing your whole application
+in a @code{jar} file directly, and 2/ overriding ABCL's entry point by
+providing your own interpreter which runs your main function
+automatically.
+
+@vindex com.dvlsoft.clon.dump
+@clon{} helps you to do this to some extend. If the variable
+@code{com.dvlsoft.clon.dump} is bound in the @code{cl-user} package,
+then the @code{dump} macro doesn't expand to a call to the ``main''
+function, but instead dumps a Java file containing an alternate ABCL
+interpreter that you can compile and add to the original ABCL @code{jar}
+file, along with @file{quickstart.lisp}. If you want more details on
+this, you will need to look at the @file{Makefile} in the @code{demo}
+directory.
 @end table
 
 
