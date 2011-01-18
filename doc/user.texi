@@ -722,6 +722,17 @@ The @code{CC=gcc} bit lets you choose your preferred C compiler for
 CLISP still understand lisp-specific command-line options when they are
 prefixed with @code{--clisp-}, so you should obviously avoid defining
 options by those names.
+@item ABCL
+ABCL is a totally different beast because it's a Java-based @cl{}
+implementation. Most notably, you don't create standalone executables in
+Java, so the normal way of running ABCL is by telling it to load some
+lisp code. If you want to run the quickstart program in the usual way,
+you will typically type this:
+@verbatim
+abcl --noinit --noinform --load quickstart.lisp
+@end verbatim
+Note that for this to work, the @code{dump} macro expands to the
+``main'' function call for ABCL, just as for ECL.
 @end table
 
 
