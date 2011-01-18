@@ -510,9 +510,8 @@ public class ~A
 			    Lisp._COMMAND_LINE_ARGUMENT_LIST_.setSymbolValue
 				(cmdline);
 
-			    Interpreter interpreter
-				= Interpreter.createInstance ();
-			    interpreter.eval (\"(load \\\"~A\\\"))\");
+			    Interpreter.createInstance ();
+			    Load.loadSystemFile (\"/~A\", false, false, false);
 			}
 		    catch (ProcessingTerminated e)
 			{
