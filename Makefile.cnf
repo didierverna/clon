@@ -54,12 +54,12 @@ ECL_PATH   := ecl
 CLISP_PATH := CC=$(CC) clisp -q
 
 # For ABCL, we need something slightly different.
-ABCL_JAR   := /usr/local/pkg/common-lisp/abcl/abcl.jar
+ABCL_JAR   := /usr/local/src/common-lisp/abcl/dist/abcl.jar
 JAVA       := java
 JAVAC      := javac
 JAR        := jar
 SED        := sed
-ABCL_PATH  := $(JAVA) -jar $(ABCL_JAR)
+ABCL_PATH  := abcl
 
 
 # Programs for generating the documentation:

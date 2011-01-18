@@ -67,11 +67,12 @@ endif
 # This upcases the first letter of $(1):
 java_name = $(shell echo $(1) | $(SED) 's/\([a-z]\)\([a-zA-Z0-9]*\)/\u\1\2/')
 # This defines how to create foo.jar from its dependencies Foo.txt and
-# Foo.class:
+# Foo.class. Note the additional dependency ending in $1.class. That's because
+# of the Runnable inner class defined by the dumping macro.
 define jar_rule
-$(1).jar: $(call java_name,$(1).txt) $(call java_name,$(1).class)
+$(1).jar: $(call java_name,$(1)).txt $(call java_name,$(1)).class
 	cp $(ABCL_JAR) $$@
-	$(JAR) -ufm $$@ $$^
+	$(JAR) -ufm $$@ $$^ $(call java_name,$(1))\$$$$1.class
 endef
 # This defines how to create Foo.java from foo.lisp:
 define java_rule
@@ -102,9 +103,9 @@ install:
 uninstall:
 install-www:
 
-.INTERMEDIATE: $(foreach demo,$(DEMOS), $(call java_name,$(demo).txt))	\
-	       $(foreach demo,$(DEMOS), $(call java_name,$(demo).java))	\
-	       $(foreach demo,$(DEMOS), $(call java_name,$(demo).class))
+.INTERMEDIATE: $(foreach demo,$(DEMOS), $(call java_name,$(demo)).txt)	\
+	       $(foreach demo,$(DEMOS), $(call java_name,$(demo)).java)	\
+	       $(foreach demo,$(DEMOS), $(call java_name,$(demo)).class)
 
 .PHONY: hack all clean distclean install uninstall install-www
 

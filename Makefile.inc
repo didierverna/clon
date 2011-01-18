@@ -64,7 +64,7 @@ CLISP_LOAD   := -i
 
 ABCL_CACHE  := abcl
 ABCL_BINLOC := abcl
-ABCL_DUMP   := --batch
+ABCL_DUMP   := --batch --eval '(defvar cl-user::com.dvlsoft.clon.dump t)'
 ABCL_LOAD   := --load
 
 $(TOP_DIR)/version.inc: $(TOP_DIR)/version.cl $(TOP_DIR)/com.dvlsoft.clon.asd

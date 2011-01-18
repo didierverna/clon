@@ -494,23 +494,33 @@ Return two values:
 
 public class ~A
 {
-    public static void main (String[] argv)
+    public static void main (final String[] argv)
     {
-	try
+	Runnable r = new Runnable ()
 	    {
-		LispObject cmdline = Lisp.NIL;
-		for (String arg : argv)
-		    cmdline = new Cons (arg, cmdline);
-		cmdline.nreverse ();
-		Lisp._COMMAND_LINE_ARGUMENT_LIST_.setSymbolValue (cmdline);
+		public void run()
+		{
+		    try
+			{
+			    LispObject cmdline = Lisp.NIL;
+			    for (String arg : argv)
+				cmdline = new Cons (arg, cmdline);
+			    cmdline.nreverse ();
+			    Lisp._COMMAND_LINE_ARGUMENT_LIST_.setSymbolValue
+				(cmdline);
 
-		Interpreter interpreter = Interpreter.createInstance ();
-		interpreter.eval (\"(progn (load \\\"~A\\\") (~A))\");
-	    }
-	catch (Throwable t)
-	    {
-		t.printStackTrace ();
-	    }
+			    Interpreter interpreter
+				= Interpreter.createInstance ();
+			    interpreter.eval (\"(load \\\"~A\\\"))\");
+			}
+		    catch (ProcessingTerminated e)
+			{
+			    System.exit (e.getStatus ());
+			}
+		}
+	    };
+
+	new Thread (null, r, \"interpreter\", 4194304L).start();
     }
 }~%"
   "Main class template for ABCL.")
@@ -558,20 +568,21 @@ this function behaves differently in some cases, as described below.
 	     :quiet t
 	     :norc t)
 	    (exit))
-  #+abcl (progn
-	   (let ((source-pathname (or *compile-file-pathname*
-				      *load-pathname*))
-		 (class-name (copy-seq name)))
-	     (setf (aref class-name 0) (char-upcase (aref class-name 0)))
-	     (with-open-file
-		 (*standard-output*
-		  (merge-pathnames
-		   (make-pathname :name class-name :type "java")
-		   source-pathname)
-		  :direction :output :if-exists :supersede)
-	       (format t +abcl-main-class-template+
-		 class-name (namestring source-pathname) function)))
-	   '(progn)))
+  #+abcl (if (boundp 'cl-user::com.dvlsoft.clon.dump)
+	     (let ((source-pathname (or *compile-file-pathname*
+					*load-pathname*))
+		   (class-name (copy-seq name)))
+	       (setf (aref class-name 0) (char-upcase (aref class-name 0)))
+	       (with-open-file
+		   (*standard-output*
+		    (merge-pathnames
+		     (make-pathname :name class-name :type "java")
+		     source-pathname)
+		    :direction :output :if-exists :supersede)
+		 (format t +abcl-main-class-template+
+		   class-name (namestring source-pathname)))
+	       '(progn))
+	   (list function)))
 
 
 ;;; util.lisp ends here
