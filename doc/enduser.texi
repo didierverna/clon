@@ -1257,10 +1257,7 @@ options are orthogonal to themes: all themes implicitly honor them.
 Since their description is pretty self-explanatory, they are given
 below.
 
-The first one allows you to control the output's line width. Normally,
-@clon{} detects it for you, but it may not be possible in some
-situations.
-
+The first one allows you to control the output's line width:
 @cindex @t{--clon-line-width}
 @cindex Built-in Options, @t{--clon-line-width}
 @cindex Options, built-in, @t{--clon-line-width}
@@ -1276,11 +1273,10 @@ situations.
                               Environment: CLON_LINE_WIDTH
 @end verbatim
 
-The second one deals with @emph{highlighting} (@pxref{Highlight}).
+The second one deals with @emph{highlighting} (@pxref{Highlight}). 
 @clon{} has the ability to highlight the output through ISO/IEC 6429 SGR
 escape sequences. The built-in raw theme doesn't do highlighting but
-other do. Normally, @clon{} detects when highlighting is appropriate
-automatically, but you might want more control on that.
+other do.
 @cindex @t{--clon-highlight}
 @cindex Built-in Options, @t{--clon-highlight}
 @cindex Options, built-in, @t{--clon-highlight}
@@ -1295,6 +1291,21 @@ automatically, but you might want more control on that.
                               Default: auto
                               Environment: CLON_HIGHLIGHT
 @end verbatim
+
+A word of caution is in order here. For technical reasons (in fact, the
+potential inability to detect a terminal properly), it is possible that
+the @code{auto} setting for @option{--clon-highlight}, which happens to
+be the default, doesn't work. In such a case, highlight is switched off,
+and you need to use @option{--clon-highlight=yes} explicitely to force
+it.
+
+For the same technical reason, it may be impossible to detect a terminal
+line width from time to time, in which case it would fall back to 80
+columns. This particular problem is much less likely to bite you because
+the @code{COLUMNS} environment variable should be set all the time.
+
+Both of these problems may or may not occur for specific applications,
+depending on their underlying implementation.
 
 
 @c ---------------

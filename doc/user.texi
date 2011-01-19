@@ -749,6 +749,25 @@ interpreter that you can compile and add to the original ABCL @code{jar}
 file, along with @file{quickstart.lisp}. If you want more details on
 this, you will need to look at the @file{Makefile} in the @code{demo}
 directory.
+
+@clon{}'s ABCL port currently has two limitations:
+@itemize @bullet
+@item
+@bioindex{highlight}
+@bioindex{line-width}
+@evindex{COLUMNS}
+@tty{} autodetection doesn't work. This means that
+@option{--clon-highlight=auto} fails as well, and that unless otherwise
+specified via either the @code{COLUMNS} environment variable or the
+@option{--clon-line-width} option, terminal output will be formatted for
+80 columns regardless of the actual width (@pxenduserref{Global
+Control}).
+@item
+Since Java doesn't have a @code{putenv} or @code{setenv} function (!!),
+the @code{modify-environment} restart, normally proposed when an
+environment variable is set to a bogus value, is unavailable
+(@pxenduserref{Error Management}).
+@end itemize
 @end table
 
 
