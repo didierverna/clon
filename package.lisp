@@ -33,7 +33,8 @@
 (in-package :cl-user)
 
 (defpackage :com.dvlsoft.clon
-    (:use :cl)
+  (:documentation "The Command-Line Options Nuker package.")
+  (:use :cl)
   (:shadow :*readtable*)
   (:import-from :com.dvlsoft.clon.asdf
     :define-constant

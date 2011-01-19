@@ -36,7 +36,8 @@
 #+clisp (asdf:operate 'asdf:load-op :cffi-grovel)
 
 (defpackage :com.dvlsoft.clon.asdf
-    (:use :cl)
+  (:documentation "The Command-Line Options Nuker package for ASDF.")
+  (:use :cl)
   (:export :define-constant
 	   :+release-major-level+
 	   :+release-minor-level+
