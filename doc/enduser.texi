@@ -94,6 +94,10 @@ command-line
 Command-Line
 @end macro
 
+@macro bioption{name}
+@option{--clon-\name\}
+@end macro
+
 
 @c The following 3 macros are here to circumvent the info filenames
 @c changes, when referencing the user manual:
@@ -123,6 +127,32 @@ Command-Line
 @ifnotinfo
 @ref{\node\, , , user, The Clon User Manual}
 @end ifnotinfo
+@end macro
+
+
+@c ---------------
+@c Indexing macros
+@c ---------------
+
+@c Concept index
+@c -------------
+
+@c Built-in options
+@macro bioindex{opt}
+@cindex @t{--clon-\opt\}
+@cindex Built-In Options, @t{--clon-\opt\}
+@cindex Options, built-in, @t{--clon-\opt\}
+@end macro
+
+@c Environment variables
+@macro evindex{name}
+@cindex @t{\name\}
+@cindex Environment, @t{\name\}
+@end macro
+
+@c Built-in environment variables
+@macro bievindex{var}
+@evindex{CLON_\var\}
 @end macro
 
 
@@ -291,18 +321,9 @@ output of @clon{}.
 @c ====================================================================
 @node Clonification, The Command Line, Introduction, Top
 @chapter Clonification
-@cindex @t{--clon-help}
-@cindex @t{--clon-banner}
-@cindex @t{--clon-version}
-@cindex Built-in Options
-@cindex Built-in Options, @t{--clon-help}
-@cindex Built-in Options, @t{--clon-banner}
-@cindex Built-in Options, @t{--clon-version}
-@cindex Options, built-in
-@cindex Options, built-in, @t{--clon-help}
-@cindex Options, built-in, @t{--clon-banner}
-@cindex Options, built-in, @t{--clon-version}
-
+@bioindex{help}
+@bioindex{banner}
+@bioindex{version}
 Given this wonderful standalone @cl{} application, how do I know if it
 uses @clon{} for handing the @cmdline{}? Perhaps the simplest way to
 know is to type
@@ -311,29 +332,31 @@ know is to type
 program --clon-help
 @end example
 
-and see what happens. If you get an error, then you are out of luck.
+@cindex Built-in Options
+@cindex Options, built-in
+and see what happens. If you get an error, then you are out of luck. 
 Otherwise, you will get a list of @clon{}-specific options. Every
 clonified application has these options built-in, and they are all
 called @t{--clon-}@i{something}. We will describe most of them when
 appropriate in this manual, but here's already the description for a
-couple of them (in addition to @option{--clon-help} that we've just
+couple of them (in addition to @bioption{help} that we've just
 mentioned).
 
-@table @option
-@item --clon-banner
+@table @bioption
+@item banner
 When given this option, the application outputs a whole bunch of
 information, including the version of @clon{} it is using, and
 @clon{}-specific copyright information.
 
-@item --clon-version
+@item version
 This option makes the application output the version of @clon{} it is
-using. By default (or by using it like this:
-@option{--clon-version=long}), this information is provided in
-@emph{long} form (release number, status and name; just try it). If you
-ask for @option{--clon-version=short}, you'll get a more compact version
-information, and if you try @option{--clon-version=number}, you will end
-up with a purely numerical version number. For more information on
-@clon{} version numbering, see @userref{Version Numbering}.
+using. By default (or by using it like this: @bioption{version=long}),
+this information is provided in @emph{long} form (release number, status
+and name; just try it). If you ask for @bioption{version=short}, you'll
+get a more compact version information, and if you try
+@bioption{version=number}, you will end up with a purely numerical
+version number. For more information on @clon{} version numbering, see
+@userref{Version Numbering}.
 @end table
 
 
@@ -764,7 +787,7 @@ Fallback values are used when an option exists on the @cmdline{} without
 a corresponding argument (so this applies only to options taking
 @emph{optional} arguments only).
 @item
-@cindex Environment variables
+@cindex Environment
 @cindex Retrieval, from environment
 @cindex Options, retrieval, from environment
 Applications may also associate an option with a specific environment
@@ -802,7 +825,7 @@ the @cmdline{} until there is none left.
 
 @cindex Flags
 @cindex Options, types, flags
-@cindex Environment variables
+@cindex Environment
 @cindex Retrieval, from environment
 @cindex Options, retrieval, from environment
 Finally, note that fallback or default values don't make any sense for
@@ -830,15 +853,12 @@ contrary to the traditional approach, @emph{you}, the end-user have
 control over it. Not the application. Error handling may occur when the
 @cmdline{} is parsed, but also when environment variables are used.
 
-@cindex @t{--clon-error-handler}
-@cindex Built-in Options, @t{--clon-error-handler}
-@cindex Options, built-in, @t{--clon-error-handler}
-@cindex CLON_ERROR_HANDLER
-@cindex Environment Variables, CLON_ERROR_HANDLER
+@bioindex{error-handler}
+@bievindex{ERROR_HANDLER}
 The error management behavior of @clon{} is controlled by a built-in
-option named @option{--clon-error-handler}, and its accompanying
-environment variable @code{CLON_ERROR_HANDLER}. Possibles values for it
-are currently the following.
+option named @bioption{error-handler}, and its accompanying environment
+variable @code{CLON_ERROR_HANDLER}. Possibles values for it are
+currently the following.
 
 @table @t
 @item quit
@@ -891,7 +911,7 @@ provide a value directly, in which case what you type in is in fact
 @cl{} code.
 @end table
 
-One last note about the @option{--clon-error-handler} option: we have a
+One last note about the @bioption{error-handler} option: we have a
 chicken-and-egg problem with it. The error handler must be known for
 parsing the @cmdline{}, but in order to get it, we need to retrieve the
 option which implies parsing the @cmdline{}@dots{} Whoops. Because of
@@ -1012,9 +1032,7 @@ arbitrary text or even sub-groups.
 
 @cindex Groups
 @cindex Groups, built-in
-@cindex @t{--clon-help}
-@cindex Built-in Options, @t{--clon-help}
-@cindex Options, built-in, @t{--clon-help}
+@bioindex{help}
 In addition to displaying the full help string, a clonified application
 may display a group's help string only (in such a case, you don't get to
 see the synopsis). This is what happens when you type @command{program
@@ -1055,7 +1073,7 @@ all the material that needs to be displayed.
 
 @cindex Fallback values
 @cindex Values, fallback
-@cindex Environment Variables
+@cindex Environment
 @cindex Default values
 @cindex Values, default
 Finally, you can see that potential fallback values, environment
@@ -1170,28 +1188,22 @@ directory in the search path. By default, the search path is as follows:
 @t{/usr/share/clon/}
 @end itemize
 
-@cindex @t{--clon-search-path}
-@cindex Built-in Options, @t{--clon-search-path}
-@cindex Options, built-in, @t{--clon-search-path}
-@cindex CLON_SEARCH_PATH
-@cindex Environment Variables, CLON_SEARCH_PATH
-The search path can be modified with the @option{--clon-search-path}
-built-in option or its accompanying @env{CLON_SEARCH_PATH} environment
-variable. It takes a list of colon-separated directories as argument.
-This argument is in fact optional. Not providing an argument is
-equivalent to providing an empty one, which basically reduces the search
-path to the application's current directory.
+@bioindex{search-path}
+@bievindex{SEARCH_PATH}
+The search path can be modified with the @bioption{search-path} built-in
+option or its accompanying @env{CLON_SEARCH_PATH} environment variable. 
+It takes a list of colon-separated directories as argument. This
+argument is in fact optional. Not providing an argument is equivalent to
+providing an empty one, which basically reduces the search path to the
+application's current directory.
 
 
 @node Theme Selection, , Search Path, Theme Mechanism
 @subsection Theme Selection
-@cindex @t{--clon-theme}
-@cindex Built-in Options, @t{--clon-theme}
-@cindex Options, built-in, @t{--clon-theme}
-@cindex CLON_THEME
-@cindex Environment Variables, CLON_THEME
+@bioindex{theme}
+@bievindex{THEME}
 In order to select a theme, you can use the built-in option
-@option{--clon-theme} or its accompanying environment variable
+@bioption{theme} or its accompanying environment variable
 @env{CLON_THEME}. Just provide it with the theme name, and the
 corresponding theme file will be looked up in the search path
 (@pxref{Search Path}), stopping at the first match.
@@ -1209,8 +1221,8 @@ search path. For instance, suppose that the following files exist:
 @item
 @t{/usr/share/clon/themes/foobar.cth}
 @end itemize
-Using @samp{--clon-theme=foobar} will match the first one while
-@samp{--clon-theme=foobar.cth} will match the second.
+Using @bioption{theme=foobar} will match the first one while
+@bioption{theme=foobar.cth} will match the second.
 
 Now suppose that the following files exist:
 @itemize @w{}
@@ -1219,12 +1231,12 @@ Now suppose that the following files exist:
 @item
 @t{/usr/share/clon/themes/foobar}
 @end itemize
-Using either @samp{--clon-theme=foobar} or
-@samp{--clon-theme=foobar.cth} will always match the first file. Which
-brings us to the next point (how clever).
+Using either @bioption{theme=foobar} or @bioption{theme=foobar.cth} will
+always match the first file. Which brings us to the next point (how
+clever).
 
 It is possible to bypass the search path when looking for a theme: just
-provide @option{--clon-theme} with a theme name starting with a path
+provide @bioption{theme} with a theme name starting with a path
 component (@ie{} @samp{/}, @samp{./} or @samp{../}). Even in that case,
 you can still omit the @samp{cth} extension.
 
@@ -1232,15 +1244,15 @@ you can still omit the @samp{cth} extension.
 @cindex Themes, built-in, @t{raw}
 @cindex Standard Themes, files, @file{raw.cth}
 @cindex Themes, files, standard, @file{raw.cth}
-Finally, here is an important precision about @option{--clon-theme}.
-This option has a fallback of @t{nil} and a default of @t{raw}. This
-means that if you don't use the option at all, a theme named @t{raw}
-will be looked up in the search path. This theme exists in the standard
+Finally, here is an important precision about @bioption{theme}. This
+option has a fallback of @t{nil} and a default of @t{raw}. This means
+that if you don't use the option at all, a theme named @t{raw} will be
+looked up in the search path. This theme exists in the standard
 distribution and you are free to modify it. On the other hand, since
 this option has a fallback, it means that its argument is optional. If
 you don't provide any argument (that is, if you just use
-@samp{--clon-theme}), then the @emph{built-in} raw theme will be used.
-This theme is originally identical to the one provided in the file
+@bioption{theme}), then the @emph{built-in} raw theme will be used. This
+theme is originally identical to the one provided in the file
 @file{raw.cth} but since it is built in every clonified application, you
 cannot change it.
 
@@ -1258,13 +1270,9 @@ Since their description is pretty self-explanatory, they are given
 below.
 
 The first one allows you to control the output's line width:
-@cindex @t{--clon-line-width}
-@cindex Built-in Options, @t{--clon-line-width}
-@cindex Options, built-in, @t{--clon-line-width}
-@cindex CLON_LINE_WIDTH
-@cindex Environment Variables, CLON_LINE_WIDTH
-@cindex COLUMNS
-@cindex Environment Variables, COLUMNS
+@bioindex{line-width}
+@bievindex{LINE_WIDTH}
+@evindex{COLUMNS}
 @verbatim
   --clon-line-width=WIDTH     Set Clon's output line width.
                               If not given, the value of the COLUMNS
@@ -1277,11 +1285,8 @@ The second one deals with @emph{highlighting} (@pxref{Highlight}).
 @clon{} has the ability to highlight the output through ISO/IEC 6429 SGR
 escape sequences. The built-in raw theme doesn't do highlighting but
 other do.
-@cindex @t{--clon-highlight}
-@cindex Built-in Options, @t{--clon-highlight}
-@cindex Options, built-in, @t{--clon-highlight}
-@cindex CLON_HIGHLIGHT
-@cindex Environment Variables, CLON_HIGHLIGHT
+@bioindex{highlight}
+@bievindex{HIGHLIGHT}
 
 @verbatim
   --clon-highlight[=ARG]      Set Clon's output highlighting to on/off/auto.
@@ -1294,10 +1299,9 @@ other do.
 
 A word of caution is in order here. For technical reasons (in fact, the
 potential inability to detect a terminal properly), it is possible that
-the @code{auto} setting for @option{--clon-highlight}, which happens to
-be the default, doesn't work. In such a case, highlight is switched off,
-and you need to use @option{--clon-highlight=yes} explicitely to force
-it.
+the @code{auto} setting for @bioption{highlight}, which happens to be
+the default, doesn't work. In such a case, highlight is switched off,
+and you need to use @bioption{highlight=yes} explicitely to force it.
 
 For the same technical reason, it may be impossible to detect a terminal
 line width from time to time, in which case it would fall back to 80

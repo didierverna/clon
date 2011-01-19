@@ -94,6 +94,10 @@ command-line
 Command-Line
 @end macro
 
+@macro bioption{name}
+@option{--clon-\name\}
+@end macro
+
 
 @c --------------------------------
 @c Manuals cross-referencing macros
@@ -262,6 +266,11 @@ Command-Line
 @macro evindex{var}
 @vindex \var\
 @vindex @r{Environment, }\var\
+@end macro
+
+@c Built-in environment variables
+@macro bievindex{var}
+@evindex{CLON_\var\}
 @end macro
 
 
@@ -757,11 +766,10 @@ directory.
 @bioindex{line-width}
 @evindex{COLUMNS}
 @tty{} autodetection doesn't work. This means that
-@option{--clon-highlight=auto} fails as well, and that unless otherwise
+@bioption{highlight=auto} fails as well, and that unless otherwise
 specified via either the @code{COLUMNS} environment variable or the
-@option{--clon-line-width} option, terminal output will be formatted for
-80 columns regardless of the actual width (@pxenduserref{Global
-Control}).
+@bioption{line-width} option, terminal output will be formatted for 80
+columns regardless of the actual width (@pxenduserref{Global Control}).
 @item
 Since Java doesn't have a @code{putenv} or @code{setenv} function (!!),
 the @code{modify-environment} restart, normally proposed when an
@@ -949,8 +957,7 @@ string. The same formatting recommendations as for arbitrary text apply
 When non-@code{nil}, the group won't appear in the help string. Hidden
 groups can still be displayed individually though (@pxref{Help}). For
 instance, the @clon{} built-in group is hidden in the regular help
-string, but the @option{--clon-help} option still displays it
-individually.
+string, but the @bioption{help} option still displays it individually.
 @end table
 
 @node Built-In Option Types, Advanced Synopsis Creation, Synopsis Items, Synopsis Definition
@@ -1077,7 +1084,7 @@ argument. @code{lispobj} options change their default argument name from
 @code{"ARG"} to @code{"OBJ"}. Also, they provide an additional property
 called @code{:typespec} which must be a @cl{} type specifier that the
 argument must satisfy. It defaults to @code{t}. Look at the
-@code{--clon-line-width} built-in option for an example.
+@bioption{line-width} built-in option for an example.
 @item enum
 @voindex{Enumerations,enum}@c
 @cvopindex{:argument-name}@c
@@ -1091,7 +1098,7 @@ possible values. The end-user does not use a colon when providing an
 argument to an @code{enum} option. Only the keyword's name. The end-user
 also has the ability to abbreviate the possible values. An empty
 argument is considered as an abbreviation for the first element in the
-set. Look at the @code{--clon-version} built-in option for an example.
+set. Look at the @bioption{version} built-in option for an example.
 @item path
 @bioindex{search-path}@c
 @bioindex{theme}@c
@@ -1105,8 +1112,8 @@ additional property called @code{:type} which specifies the kind of path
 which is expected. Possible values are: @code{:file}, @code{:directory},
 @code{:file-list}, @code{:directory-list} or @code{nil} (meaning that
 anything is allowed). Null paths are allowed, and may be provided by an
-empty argument. Look at the @code{--clon-search-path} and
-@code{--clon-theme} built-in options for examples.
+empty argument. Look at the @bioption{search-path} and
+@bioption{theme} built-in options for examples.
 @item switch
 @voindex{Switches,switch}@c
 @cvopindex{:argument-name}@c
@@ -1140,7 +1147,7 @@ automatically for optional arguments. They also provide the
 @code{:argument-style} property. Contrary to switches, however, this
 property does not affect the argument name. It only affects the way true
 or false values are displayed in help strings. Look at the
-@code{--clon-highlight} built-in option for an example.
+@bioption{highlight} built-in option for an example.
 @end table
 
 @node Advanced Synopsis Creation, , Built-In Option Types, Synopsis Definition
@@ -1613,13 +1620,13 @@ help string, use the @code{help} function.
 
 @defun help [@code{:item} ITEM]
 @bioindex{search-path}
-@evindex{CLON_SEARCH_PATH}
+@bievindex{SEARCH_PATH}
 @bioindex{highlight}
-@evindex{CLON_HIGHLIGHT}
+@bievindex{HIGHLIGHT}
 @bioindex{theme}
-@evindex{CLON_THEME}
+@bievindex{THEME}
 @bioindex{line-width}
-@evindex{CLON_LINE_WIDTH}
+@bievindex{LINE_WIDTH}
 Print the application's help string. Printing honors the search path,
 theme, line width and highlight settings provided by the corresponding
 built-in options (@pxenduserref{Theme Mechanism}).
@@ -1639,7 +1646,7 @@ discarded (but @emph{not} the ones of sub-items).
 @cindex Hidden Groups
 @cindex Groups, hidden
 For instance, the @clon{} built-in group is normally hidden, so it
-doesn't show up in the global help string, but the @option{--clon-help}
+doesn't show up in the global help string, but the @bioption{help}
 option uses the @code{help} function on it explicitely, so it discards
 its hidden state.
 
@@ -2387,13 +2394,13 @@ options's help string while calling it on the command-specific one will
 display the command-specific usage.
 
 @bioindex{search-path}
-@evindex{CLON_SEARCH_PATH}
+@bievindex{SEARCH_PATH}
 @bioindex{highlight}
-@evindex{CLON_HIGHLIGHT}
+@bievindex{HIGHLIGHT}
 @bioindex{theme}
-@evindex{CLON_THEME}
+@bievindex{THEME}
 @bioindex{line-width}
-@evindex{CLON_LINE_WIDTH}
+@bievindex{LINE_WIDTH}
 One thing to remember here is that every context/synopsis duet you
 create gets its own set of built-in @clon{} options. As a consequence,
 there is currently no simple way to have a single set of built-in
@@ -2436,20 +2443,20 @@ install} creates a @file{REFCARD} file in
 formatted with the @code{refcard} theme, @etc{}.
 
 @bioindex{theme}
-@evindex{CLON_THEME}
+@bievindex{THEME}
 @bioindex{search-path}
-@evindex{CLON_SEARCH_PATH}
+@bievindex{SEARCH_PATH}
 @bioindex{line-width}
-@evindex{CLON_LINE_WIDTH}
+@bievindex{LINE_WIDTH}
 @bioindex{highlight}
-@evindex{CLON_HIGHLIGHT}
+@bievindex{HIGHLIGHT}
 In such situations, calling the @code{help} function might not be
 directly associated with an end-user level option, or at least not
 @code{--help}, and you might not want to honor the end-user level
 settings for theme, search path, line-width, or highlighting either
 (remember that these settings might come from the environment variables
-associated with @option{--clon-theme}, @option{--clon-search-path},
-@option{--clon-line-width} and @option{--clon-highlight}).
+associated with @bioption{theme}, @bioption{search-path},
+@bioption{line-width} and @bioption{highlight}).
 
 @fkindex{help,:theme}
 @fkindex{help,:search-path}
@@ -2480,12 +2487,12 @@ As @clon{} evolves over time, you might one day feel the need for
 conditionalizing your code on the version of the library. While the
 end-user of your application has limited means to access the current
 version number of @clon{} (see @enduserref{Clonification} and the
-built-in option @code{--clon-version}), you, the application programmer
+built-in option @bioption{version}), you, the application programmer
 and @clon{} user, have a finer grained access to it.
 
 The first thing you can do to access the current version number of
 @clon{} is use the @code{version} function (this is in fact the function
-bound to the @code{--clon-version} option).
+bound to the @bioption{version} option).
 
 @defun version &optional (TYPE :number)
 Return the current version number of @clon{}. @var{TYPE} can be one of
