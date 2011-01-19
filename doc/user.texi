@@ -413,7 +413,7 @@ it explains how to use @clon{} in your application.
 * Extending Clon::          Creating your own option types
 * Advanced Usage::          Things rarely needed
 * Conclusion::              That's all folks
-* Quick Start Source Code:: The complete listing
+* Executable Dumping::      The portability nightmare
 * API Quick Reference::     The Complete protocols
 * Indexes::                 Concept, Function and Variable
 @end menu
@@ -492,32 +492,67 @@ extend @clon{} with your own option types.
 @c ====================================================================
 @node Quick Start, Using Clon, Introduction, Top
 @chapter Quick Start
-
 In this chapter, we assume that you have properly installed @clon{} (see
-the @file{ISNTALL} file in the distribution), and we build a very short
-program to get you started.
+the @file{INSTALL} file in the distribution), and we build a very short
+program to get you started (let's call it @file{quickstart.lisp}).
 
 @menu
-* Quick Start Program:: Hello World!
-* Dumping Executables:: Save the World!
+* Full Source::         The complete source code
+* Explanation::         Step-by-step code walking
 @end menu
 
 
-@c -------------------
-@c Quick Start Writing
-@c -------------------
-@node Quick Start Program, Dumping Executables, , Quick Start
-@section Quick Start Program
-This section gives you a step-by-step introduction to writing a
-clonified application (let's call it @file{quickstart.lisp}). If you
-want to try this program for real, the full listing is available for
-cut'n paste in @ref{Quick Start Source Code}. For a slightly longer
-example, have a look at the demonstration program called @file{simple}
-in the distribution.
+@c -----------
+@c Full Source
+@c -----------
+@node Full Source, Explanation, Quick Start, Quick Start
+@section Full Source
+For cut'n paste convenience, the complete source code is given below. 
+For a slightly longer example, have a look at the demonstration program
+called @file{simple} in the distribution.
+
+@cartouche
+@verbatim
+(in-package :cl-user)
+
+(require :asdf)
+(asdf:operate 'asdf:load-op :com.dvlsoft.clon)
+(use-package :com.dvlsoft.clon)
+
+(defsynopsis (:postfix "FILES...")
+  (text :contents "A very short program.")
+  (group (:header "Immediate exit options:")
+    (flag :short-name "h" :long-name "help"
+      :description "Print this help and exit.")
+    (flag :short-name "v" :long-name "version"
+	  :description "Print version number and exit.")))
+
+(defun main ()
+  "Entry point for our standalone application."
+  (make-context)
+  (when (getopt :short-name "h")
+    (help)
+    (exit))
+  (do-cmdline-options (option name value source)
+    (print (list option name value source)))
+  (terpri)
+  (exit))
+
+(dump "quickstart" main)
+@end verbatim
+@end cartouche
+
+
+@c -----------
+@c Explanation
+@c -----------
+@node Explanation, , Full Source, Quick Start
+@section Explanation
+Let's examine this program step-by-step now.
 
 @pkgindex{com.dvlsoft.clon}
-Let's put us in the @cl{} user package, and load @clon{} first. @clon{}
-lives in a package named @samp{com.dvlsoft.clon}.
+First, we put ourselves in the @cl{} user package, and load @clon{}.
+@clon{} lives in a package named @samp{com.dvlsoft.clon}.
 
 @cartouche
 @verbatim
@@ -636,147 +671,22 @@ retrieval method is said to be @dfn{sequential}). This is done with the
 
 Finally, time to save the Lisp image.
 
+@findex dump
 @cartouche
 @verbatim
 (dump "quickstart" main)
 @end verbatim
 @end cartouche
 
-@findex dump
-The @code{dump} macro is a wrapper around an implementation-dependent
-way of creating standalone executables. The first argument is the name
-of the executable to produce, and the second argument is the name of the
-function to call at startup.
+The first argument to @code{dump} is the name of the executable to
+produce, and the second argument is the name of the function to call
+automatically at startup.
 
-
-@c -------------------
-@c Dumping Executables
-@c -------------------
-@node Dumping Executables, , Quick Start Program, Quick Start
-@section Dumping Executables
-Dumping executables from Lisp is admitedly orthogonal to @clon{}. 
-@clon{} is just a library that you might want to use, and in fact, it is
-also possible to use @clon{} without dumping a standalone executable.
-
-@findex exit
-@findex dump
-Unfortunately, there is no standard way to dump executables from Lisp. 
-We're entering the portability mine field here. @clon{}, however, wants
-to help. We've already seen that it provides utilities like @code{exit}
-and @code{dump} to make your life easier (I mean, more portable).
-
-This section provides ready-to-use @cmdline{} samples for the compilers
-currently supported, in order to create standalone executables. They
-work well in conjunction with the @code{dump} macro mentionned above.
-
-If a compiler does not appear below, it means that @clon{} has no
-official support for it yet.
-
-@table @strong
-@item SBCL
-The simplest way to dump the executable with SBCL is to do:
-@verbatim
-CC=gcc sbcl --script quickstart.lisp
-@end verbatim
-The @code{CC=gcc} bit is needed by the @code{sb-grovel} contrib module
-that @clon{} uses. However, using @code{--script} like this is in fact
-not recommended because it disables the debugger (@pxref{Error
-Management}). Instead, you might be better off doing:
-@verbatim
-CC=gcc sbcl \
-  --disable-ldb --lose-on-corruption --end-runtime-options \
-  --no-userinit --no-sysinit --load quickstart.lisp
-@end verbatim
-@item CMUCL
-CMUCL is supported starting at version 20b. You can dump an executable
-like this:
-@verbatim
-lisp -noinit -nositeinit -load quickstart.lisp
-@end verbatim
-@item CCL
-You can dump a CCL (formerly known as OpenMCL) executable like this:
-@verbatim
-ccl --no-init --load quickstart.lisp
-@end verbatim
-@item ECL
-ECL is supported, but it doesn't work like the other Lisp compilers. In
-particular, creating an executable does not involve dumping a Lisp
-image, but compiling the source into separate object files and then
-linking them. The consequence is that there is no simple @cmdline{}
-recipe to show here. Instead, you might want to look at the file
-@file{demos/dump.lisp} in the distribution for an example.
-
-Because the dumping scheme is different with ECL, it is also less
-straightforward to write portable code for standalone applications. The
-demo programs in the distribution both contain comments that are worth
-reading at the top of them.
-
-@findex dump
-One specific difference between ECL and the other Lisp compilers is that
-it doesn't require you to specify a particular function as the entry
-point for your executable, but instead relies on having code to execute
-directly at the toplevel of some file. @clon{}'s @code{dump} macro helps
-you with this: it normally expands to a compiler-specific function which
-saves the current Lisp image, but for ECL, it simply expands to the
-``main'' function call, hence consituting the entry point to the code
-that ECL needs.
-@item CLISP
-CLISP is supported at the expense of a dependency on @code{cffi}. You
-can dump an executable from CLISP like this:
-@verbatim
-CC=gcc clisp -norc -i quickstart.lisp
-@end verbatim
-The @code{CC=gcc} bit lets you choose your preferred C compiler for
-@code{cffi}. Please note that executables dumped (the @clon{} way) by
-CLISP still understand lisp-specific command-line options when they are
-prefixed with @code{--clisp-}, so you should obviously avoid defining
-options by those names.
-@item ABCL
-ABCL is a totally different beast because it's a Java-based @cl{}
-implementation. Most notably, you don't create standalone executables in
-Java, so the normal way of running ABCL is by telling it to load some
-lisp code. If you want to run the quickstart program in the usual way,
-you will typically type this:
-@verbatim
-abcl --noinit --noinform --load quickstart.lisp
-@end verbatim
-Note that for this to work, the @code{dump} macro expands to the
-``main'' function call for ABCL, just as for ECL.
-
-There's more to it than that though. It is possible to get closer to
-standalone executables with ABCL by 1/ providing your whole application
-in a @code{jar} file directly, and 2/ overriding ABCL's entry point by
-providing your own interpreter which runs your main function
-automatically.
-
-@vindex com.dvlsoft.clon.dump
-@clon{} helps you to do this to some extend. If the variable
-@code{com.dvlsoft.clon.dump} is bound in the @code{cl-user} package,
-then the @code{dump} macro doesn't expand to a call to the ``main''
-function, but instead dumps a Java file containing an alternate ABCL
-interpreter that you can compile and add to the original ABCL @code{jar}
-file, along with @file{quickstart.lisp}. If you want more details on
-this, you will need to look at the @file{Makefile} in the @code{demo}
-directory.
-
-@clon{}'s ABCL port currently has two limitations:
-@itemize @bullet
-@item
-@bioindex{highlight}
-@bioindex{line-width}
-@evindex{COLUMNS}
-@tty{} autodetection doesn't work. This means that
-@bioption{highlight=auto} fails as well, and that unless otherwise
-specified via either the @code{COLUMNS} environment variable or the
-@bioption{line-width} option, terminal output will be formatted for 80
-columns regardless of the actual width (@pxenduserref{Global Control}).
-@item
-Since Java doesn't have a @code{putenv} or @code{setenv} function (!!),
-the @code{modify-environment} restart, normally proposed when an
-environment variable is set to a bogus value, is unavailable
-(@pxenduserref{Error Management}).
-@end itemize
-@end table
+In order to get a standalone executable from this program, all you need
+to do now is to type @samp{CC=gcc sbcl --script quickstart.lisp}. Note
+that the actual way of dumping executables is compiler-dependent. For
+more information on the proper way to do it and on the compilers
+currently supported, see @ref{Executable Dumping}.
 
 
 
@@ -1995,9 +1905,9 @@ on:
 
 @itemize @bullet
 @item
-the state of the Lisp environment when the application is dumped, which
+the state of the Lisp environment when the application was dumped, which
 may in turn depend on command-line options passed to the Lisp itself
-(@pxref{Dumping Executables}),
+(@pxref{Executable Dumping}),
 @item
 @findex dump
 the arguments passed to the dumping function (look at @clon{}'s
@@ -2559,7 +2469,7 @@ output: 1.3 "Bill Evans".
 @c ====================================================================
 @c Conclusion
 @c ====================================================================
-@node Conclusion, Quick Start Source Code, Advanced Usage, Top
+@node Conclusion, Executable Dumping, Advanced Usage, Top
 @chapter Conclusion
 
 So that's it I guess. You know all about @clon{} now. The next step is
@@ -2571,50 +2481,144 @@ option hacking.
 Now, go Luke. The Attack of the @clon{} is ready to begin.
 
 
-
 @c ====================================================================
-@c Quick Start Source Code
+@c Executable Dumping
 @c ====================================================================
-@node Quick Start Source Code, API Quick Reference, Conclusion, Top
-@appendix Quick Start Source Code
+@node Executable Dumping, API Quick Reference, Conclusion, Top
+@appendix Executable Dumping
+Creating standalone executables is orthogonal to @clon{}. @clon{} is
+just a library that you might want to use, and in fact, it is also
+possible to use it without dumping executables at all.
 
-@cartouche
+@findex exit
+@findex dump
+Unfortunately, there is no standard way to dump executables from Lisp. 
+We're entering the portability mine field here. @clon{}, however, wants
+to help. We've already seen that it provides utility wrappers like
+@code{exit} and @code{dump} to make your life easier (I mean, more
+portable) in @ref{Quick Start}. If you're not interested in portability
+or if you prefer to do it your own way, you don't @emph{need} to use
+those wrappers. If you do, however, please read on.
+
+This section provides ready-to-use @cmdline{} samples for the compilers
+currently supported, in order to create standalone executables. They
+work well in conjunction with the @code{dump} macro mentionned above.
+
+If a compiler does not appear below, it means that @clon{} has no
+official support for it yet.
+
+@table @strong
+@item SBCL
+The simplest way to dump the executable with SBCL is to do:
 @verbatim
-(in-package :cl-user)
-
-(require :asdf)
-(asdf:operate 'asdf:load-op :com.dvlsoft.clon)
-(use-package :com.dvlsoft.clon)
-
-(defsynopsis (:postfix "FILES...")
-  (text :contents "A very short program.")
-  (group (:header "Immediate exit options:")
-    (flag :short-name "h" :long-name "help"
-      :description "Print this help and exit.")
-    (flag :short-name "v" :long-name "version"
-	  :description "Print version number and exit.")))
-
-(defun main ()
-  "Entry point for our standalone application."
-  (make-context)
-  (when (getopt :short-name "h")
-    (help)
-    (exit))
-  (do-cmdline-options (option name value source)
-    (print (list option name value source)))
-  (terpri)
-  (exit))
-
-(dump "quickstart" main)
+CC=gcc sbcl --script quickstart.lisp
 @end verbatim
-@end cartouche
+The @code{CC=gcc} bit is needed by the @code{sb-grovel} contrib module
+that @clon{} uses. However, using @code{--script} like this is in fact
+not recommended because it disables the debugger (@pxref{Error
+Management}). Instead, you might be better off doing:
+@verbatim
+CC=gcc sbcl \
+  --disable-ldb --lose-on-corruption --end-runtime-options \
+  --no-userinit --no-sysinit --load quickstart.lisp
+@end verbatim
+@item CMUCL
+CMUCL is supported starting at version 20b. You can dump an executable
+like this:
+@verbatim
+lisp -noinit -nositeinit -load quickstart.lisp
+@end verbatim
+@item CCL
+You can dump a CCL (formerly known as OpenMCL) executable like this:
+@verbatim
+ccl --no-init --load quickstart.lisp
+@end verbatim
+@item ECL
+ECL is supported, but it doesn't work like the other Lisp compilers. In
+particular, creating an executable does not involve dumping a Lisp
+image, but compiling the source into separate object files and then
+linking them. The consequence is that there is no simple @cmdline{}
+recipe to show here. Instead, you might want to look at the file
+@file{demos/dump.lisp} in the distribution for an example.
+
+Because the dumping scheme is different with ECL, it is also less
+straightforward to write portable code for standalone applications. The
+demo programs in the distribution both contain comments that are worth
+reading at the top of them.
+
+@findex dump
+One specific difference between ECL and the other Lisp compilers is that
+it doesn't require you to specify a particular function as the entry
+point for your executable, but instead relies on having code to execute
+directly at the toplevel of some file. @clon{}'s @code{dump} macro helps
+you with this: it normally expands to a compiler-specific function which
+saves the current Lisp image, but for ECL, it simply expands to the
+``main'' function call, hence consituting the entry point to the code
+that ECL needs.
+@item CLISP
+CLISP is supported at the expense of a dependency on @code{cffi}. You
+can dump an executable from CLISP like this:
+@verbatim
+CC=gcc clisp -norc -i quickstart.lisp
+@end verbatim
+The @code{CC=gcc} bit lets you choose your preferred C compiler for
+@code{cffi}. Please note that executables dumped (the @clon{} way) by
+CLISP still understand lisp-specific command-line options when they are
+prefixed with @code{--clisp-}, so you should obviously avoid defining
+options by those names.
+@item ABCL
+ABCL is a totally different beast because it's a Java-based @cl{}
+implementation. Most notably, you don't create standalone executables in
+Java, so the normal way of running ABCL is by telling it to load some
+lisp code. If you want to run the quickstart program in the usual way,
+you will typically type this:
+@verbatim
+abcl --noinit --noinform --load quickstart.lisp
+@end verbatim
+Note that for this to work, the @code{dump} macro expands to the
+``main'' function call for ABCL, just as for ECL.
+
+There's more to it than that though. It is possible to get closer to
+standalone executables with ABCL by 1/ providing your whole application
+in a @code{jar} file directly, and 2/ overriding ABCL's entry point by
+providing your own interpreter which runs your main function
+automatically.
+
+@vindex com.dvlsoft.clon.dump
+@clon{} helps you to do this to some extend. If the variable
+@code{com.dvlsoft.clon.dump} is bound in the @code{cl-user} package,
+then the @code{dump} macro doesn't expand to a call to the ``main''
+function, but instead dumps a Java file containing an alternate ABCL
+interpreter that you can compile and add to the original ABCL @code{jar}
+file, along with @file{quickstart.lisp}. If you want more details on
+this, you will need to look at the @file{Makefile} in the @code{demo}
+directory.
+
+@clon{}'s ABCL port currently has two limitations:
+@itemize @bullet
+@item
+@bioindex{highlight}
+@bioindex{line-width}
+@evindex{COLUMNS}
+@tty{} autodetection doesn't work. This means that
+@bioption{highlight=auto} fails as well, and that unless otherwise
+specified via either the @code{COLUMNS} environment variable or the
+@bioption{line-width} option, terminal output will be formatted for 80
+columns regardless of the actual width (@pxenduserref{Global Control}).
+@item
+Since Java doesn't have a @code{putenv} or @code{setenv} function (!!),
+the @code{modify-environment} restart, normally proposed when an
+environment variable is set to a bogus value, is unavailable
+(@pxenduserref{Error Management}).
+@end itemize
+@end table
 
 
 
 @c ====================================================================
-@c Indexes
+@c API Quick Reference
 @c ====================================================================
-@node API Quick Reference, Indexes, Quick Start Source Code, Top
+@node API Quick Reference, Indexes, Executable Dumping, Top
 @appendix API Quick Reference
 
 @menu
