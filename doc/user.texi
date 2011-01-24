@@ -2510,22 +2510,22 @@ now. The following table lists the supported environments.
 @multitable @columnfractions .33 .33 .33
 @headitem Compiler @tab Minimum Version @tab Dependencies
 @item SBCL
-@tab ?
+@tab
 @tab
 @item CMU-CL
 @tab 20b
 @tab
 @item CCL
-@tab ?
+@tab
 @tab
 @item ECL
-@tab ?
+@tab
 @tab
 @item CLISP
-@tab ?
+@tab
 @tab @code{cffi}
 @item ABCL
-@tab svn rev. 13156
+@tab 0.24.0@footnote{more precisely, svn trunk revision 13156}
 @tab
 @end multitable
 
