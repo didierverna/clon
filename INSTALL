@@ -6,13 +6,16 @@ The Clon distribution has the following shape:
 
 ./src/		;; source directory
 ./sbcl/	        ;; SBCL grovel module
+./clisp/	;; cffi grovel module for CLISP
 ./share/	;; data files
 ./doc/		;; documentation
 ./demos/        ;; demo programs
+./emacs/        ;; Emacs edition utilities for Clon
 
 * Portability
-Clon currently works with SBCL, CMUCL, CCL, ECL and CLISP.
-Clon has no dependency, except with CLISP in which case CFFI is needed.
+Clon currently works with SBCL, CMUCL (20b), CCL, ECL, CLISP and ABCL
+(0.24.0). Clon has no dependency, except with CLISP in which case cffi is
+needed.
 
 
 * Configuration
