@@ -1,11 +1,9 @@
 ### Makefile.inc --- Inclusion part
 
-## Copyright (C) 2010 Didier Verna
+## Copyright (C) 2010, 2011 Didier Verna
 
 ## Author:        Didier Verna <didier@lrde.epita.fr>
 ## Maintainer:    Didier Verna <didier@lrde.epita.fr>
-## Created:       Tue Jun  2 17:48:53 2009
-## Last Revision: Sat Jun 12 17:53:10 2010
 
 ## This file is part of Clon.
 

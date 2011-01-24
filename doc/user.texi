@@ -2,12 +2,10 @@
 
 @c user.texi --- User manual
 
-@c Copyright (C) 2010 Didier Verna
+@c Copyright (C) 2010, 2011 Didier Verna
 
 @c Author:        Didier Verna <didier@lrde.epita.fr>
 @c Maintainer:    Didier Verna <didier@lrde.epita.fr>
-@c Created:       Fri Jul  2 02:24:49 2010
-@c Last Revision: Mon Nov  1 16:08:21 2010
 
 @c This file is part of Clon.
 
@@ -45,7 +43,7 @@
 @c Settings
 @c ====================================================================
 @set VERSION 1.0 beta 17 "Michael Brecker"
-@set COPYRIGHT_DATE 2010
+@set COPYRIGHT_DATE 2010, 2011
 @setchapternewpage odd
 @setcontentsaftertitlepage
 @documentdescription

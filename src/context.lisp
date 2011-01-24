@@ -1,11 +1,9 @@
 ;;; context.lisp --- Context management
 
-;; Copyright (C) 2010 Didier Verna
+;; Copyright (C) 2010, 2011 Didier Verna
 
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
-;; Created:       Tue Jul  1 16:08:02 2008
-;; Last Revision: Sat Oct 23 05:19:47 2010
 
 ;; This file is part of Clon.
 
@@ -682,7 +680,7 @@ CONTEXT is where to look for the options."
 the Command-Line Options Nuker library, version ~A,
 written by Didier Verna <didier@lrde.epita.fr>.
 
-Copyright (C) 2010 Didier Verna.
+Copyright (C) 2010, 2011 Didier Verna.
 Clon is released under the terms of the GNU General Public License, version 3.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.~%"

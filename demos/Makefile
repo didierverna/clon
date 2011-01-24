@@ -1,11 +1,9 @@
 ### Makefile --- Demo directory
 
-## Copyright (C) 2010 Didier Verna
+## Copyright (C) 2010, 2011 Didier Verna
 
 ## Author:        Didier Verna <didier@lrde.epita.fr>
 ## Maintainer:    Didier Verna <didier@lrde.epita.fr>
-## Created:       Sun May 31 17:24:02 2009
-## Last Revision: Sat Jun 12 17:56:14 2010
 
 ## This file is part of Clon.
 

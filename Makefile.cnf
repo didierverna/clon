@@ -1,11 +1,9 @@
 ### Makefile.cnf --- User level configuration
 
-## Copyright (C) 2010 Didier Verna
+## Copyright (C) 2010, 2011 Didier Verna
 
 ## Author:        Didier Verna <didier@lrde.epita.fr>
 ## Maintainer:    Didier Verna <didier@lrde.epita.fr>
-## Created:       Sun May 31 17:18:34 2009
-## Last Revision: Wed Sep 29 17:38:20 2010
 
 ## This file is part of Clon.
 

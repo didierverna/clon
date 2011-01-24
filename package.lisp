@@ -1,11 +1,9 @@
 ;;; package.lisp --- Common Lisp Package definition
 
-;; Copyright (C) 2010 Didier Verna
+;; Copyright (C) 2010, 2011 Didier Verna
 
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
-;; Created:       Wed Jun 18 08:49:39 2008
-;; Last Revision: Sat Jun 12 17:55:37 2010
 
 ;; This file is part of Clon.
 
