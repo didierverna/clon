@@ -1,11 +1,9 @@
-;;; constants.lisp --- SBCL operating system interface
+;;; constants.lisp --- CLISP / CFFI operating system interface
 
-;; Copyright (C) 2010 Didier Verna
+;; Copyright (C) 2010, 2011 Didier Verna
 
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
-;; Created:       Sat Dec  6 20:36:38 2008
-;; Last Revision: Sat Jun 12 18:14:00 2010
 
 ;; This file is part of Clon.
 
