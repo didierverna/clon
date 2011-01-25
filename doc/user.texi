@@ -2505,7 +2505,7 @@ direct concern for you.
 ported to 6 @cl{} implementations. I have no idea about Windows right
 now. The following table lists the supported environments.
 
-@multitable @columnfractions .33 .33 .33
+@multitable {Compiler} {Minimum Version} {@code{cffi} (optional)}
 @headitem Compiler @tab Minimum Version @tab Dependencies
 @item SBCL
 @tab
@@ -2521,19 +2521,20 @@ now. The following table lists the supported environments.
 @tab
 @item CLISP
 @tab
-@tab @code{cffi}
+@tab @code{cffi} (optional)
 @item ABCL
 @tab 0.24.0@footnote{more precisely, svn trunk revision 13156}
 @tab
 @end multitable
 
+@unnumberedsubsec ABCL specificities
 @clon{}'s ABCL port currently has two limitations:
 @itemize @bullet
 @item
 @bioindex{highlight}@c
 @bioindex{line-width}@c
 @evindex{COLUMNS}@c
-@tty{} autodetection is not supported. This means that
+Terminal autodetection is not supported. This means that
 @bioption{highlight=auto} doesn't work (highlighting is @emph{not}
 turned on automatically on a @tty{}). For the same reason, unless
 otherwise specified via either the @code{COLUMNS} environment variable
@@ -2546,6 +2547,14 @@ the @code{modify-environment} restart, normally proposed when an
 environment variable is set to a bogus value, is unavailable
 (@pxenduserref{Error Management}).
 @end itemize
+
+@unnumberedsubsec CLISP specificities
+As mentioned in the above table, CLISP's dependency on @code{cffi} is
+optional. CLISP needs @code{cffi} in order to implement terminal
+autodetection only. If @code{cffi} cannot be found when the ASDF system
+is loaded, you get a big red blinking light and a warning but that's
+all. @clon{} will still work, although exhibiting the same limitation as
+ABCL (see above).
 
 
 @c -------------------
