@@ -33,7 +33,14 @@
 (in-package :cl-user)
 
 #+sbcl  (require :sb-grovel)
-#+clisp (asdf:operate 'asdf:load-op :cffi-grovel)
+#+clisp (handler-case (asdf:operate 'asdf:load-op :cffi-grovel)
+	  (asdf:missing-component ()
+	    (format *error-output* "~
+*********************************************************************
+* WARNING: ASDF component CFFI-GROVEL cannot be loaded.             *
+* Clon will be compiled without support for terminal autodetection. *
+* See section A.1 of the user manual for more information.          *
+*********************************************************************")))
 
 (defpackage :com.dvlsoft.clon.asdf
   (:documentation "The Command-Line Options Nuker package for ASDF.")
@@ -154,21 +161,23 @@ The most important features of Clon are:
   :depends-on (#+sbcl  :sb-posix
 	       #+clisp :cffi)
   :components ((:file "package")
-	       #+sbcl (:module "sbcl"
-			:depends-on ("package")
-			:serial t
-			:components ((sb-grovel:grovel-constants-file
-				      "constants" :package :com.dvlsoft.clon)
-				     (:file "util")))
+	       #+sbcl
+	       (:module "sbcl"
+		 :depends-on ("package")
+		 :serial t
+		 :components ((sb-grovel:grovel-constants-file
+			       "constants" :package :com.dvlsoft.clon)
+			      (:file "util")))
 
-	       #+clisp (:module "clisp"
-			 :depends-on ("package")
-			 :serial t
-			 :components ((cffi-grovel:grovel-file "constants")
-				      (:file "util")))
+	       #+(and clisp cffi)
+	       (:module "clisp"
+		 :depends-on ("package")
+		 :serial t
+		 :components ((cffi-grovel:grovel-file "constants")
+			      (:file "util")))
 	       (module "src"
 		 :depends-on (#+sbcl "sbcl"
-			      #+clisp "clisp"
+			      #+(and clisp cffi) "clisp"
 			      "package")
 		 :components ((:file "util")
 			      (:file "item" :depends-on ("util"))

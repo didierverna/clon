@@ -416,7 +416,8 @@ Return two values:
       (fd-line-width (ext:file-stream-fd stream))
     (values (unless (= cols -1) cols) msg))
   #+clisp
-  (clisp/stream-line-width stream)
+  (when (fboundp 'clisp/stream-line-width)
+    (clisp/stream-line-width stream))
   #+abcl
   nil)
 
