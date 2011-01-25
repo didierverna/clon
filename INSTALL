@@ -13,9 +13,10 @@ The Clon distribution has the following shape:
 ./emacs/        ;; Emacs edition utilities for Clon
 
 * Portability
-Clon currently works with SBCL, CMUCL (20b), CCL, ECL, CLISP and ABCL
-(0.24.0). Clon has no dependency, except with CLISP in which case cffi is
-needed.
+Clon currently works on Unix systems (MacOS X included) with SBCL, CMUCL
+(20b), CCL, ECL, CLISP and ABCL (0.24.0). Clon has no mandatory dependency. 
+CFFI may optionally be used with CLISP. See section A.1 of the user manual for
+more information.
 
 
 * Configuration
