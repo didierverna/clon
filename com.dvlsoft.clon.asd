@@ -32,15 +32,16 @@
 
 (in-package :cl-user)
 
-#+sbcl  (require :sb-grovel)
-#+clisp (handler-case (asdf:operate 'asdf:load-op :cffi-grovel)
-	  (asdf:missing-component ()
-	    (format *error-output* "~
+(eval-when (:load-toplevel :execute)
+  #+sbcl  (require :sb-grovel)
+  #+clisp (handler-case (asdf:operate 'asdf:load-op :cffi-grovel)
+	    (asdf:missing-component ()
+	      (format *error-output* "~
 *********************************************************************
-* WARNING: ASDF component CFFI-GROVEL cannot be loaded.             *
-* Clon will be compiled without support for terminal autodetection. *
+* WARNING: ASDF component CFFI-GROVEL not found.                    *
+* Clon will be loaded without support for terminal autodetection.   *
 * See section A.1 of the user manual for more information.          *
-*********************************************************************")))
+*********************************************************************"))))
 
 (defpackage :com.dvlsoft.clon.asdf
   (:documentation "The Command-Line Options Nuker package for ASDF.")
@@ -158,8 +159,8 @@ The most important features of Clon are:
   :maintainer "Didier Verna <didier@lrde.epita.fr>"
   :license "GNU GPL"
   :version #.(version :long)
-  :depends-on (#+sbcl  :sb-posix
-	       #+clisp :cffi)
+  :depends-on (#+sbcl             :sb-posix
+	       #+(and clisp cffi) :cffi)
   :components ((:file "package")
 	       #+sbcl
 	       (:module "sbcl"
