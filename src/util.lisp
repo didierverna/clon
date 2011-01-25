@@ -370,6 +370,9 @@ Return two values:
     @(return 1) = msg;
 }"))
 
+;; #### NOTE: SBCL and CLISP have their specific, not "inlined" version of
+;; this function elsewhere because they both use a separate ASDF module. The
+;; SBCL one depends on SB-GROVEL and the CLISP one depends on CFFI.
 (defun stream-line-width (stream)
   "Get STREAM's line width.
 Return two values:
@@ -384,16 +387,7 @@ Return two values:
   ;; #### PORTME.
   #+abcl (declare (ignore stream))
   #+sbcl
-  (locally (declare (sb-ext:muffle-conditions sb-ext:compiler-note))
-    (handler-case
-	(with-winsize winsize ()
-	  (sb-posix:ioctl (stream-file-stream stream :output)
-			  +tiocgwinsz+
-			  winsize)
-	  (winsize-ws-col winsize))
-      (sb-posix:syscall-error (error)
-	(unless (= (sb-posix:syscall-errno error) sb-posix:enotty)
-	  (values nil error)))))
+  (sbcl/stream-line-width stream)
   #+cmu
   (locally (declare (optimize (ext:inhibit-warnings 3)))
     (alien:with-alien ((winsize (alien:struct unix:winsize)))
@@ -422,22 +416,7 @@ Return two values:
       (fd-line-width (ext:file-stream-fd stream))
     (values (unless (= cols -1) cols) msg))
   #+clisp
-  (multiple-value-bind (input-fd output-fd)
-      (ext:stream-handles stream)
-    (when output-fd
-      (cffi:with-foreign-object (winsize 'winsize)
-	(let ((result (cffi:foreign-funcall "ioctl"
-					    :int output-fd
-					    :int +tiocgwinsz+
-					    :pointer winsize
-					    :int)))
-	  (if (= result -1)
-	      (unless (= +errno+ +enotty+)
-		(values nil
-			(cffi:foreign-funcall "strerror"
-					      :int +errno+ :string)))
-	    (cffi:with-foreign-slots ((ws-col) winsize winsize)
-	      ws-col))))))
+  (clisp/stream-line-width stream)
   #+abcl
   nil)
 
