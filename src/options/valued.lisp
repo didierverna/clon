@@ -236,11 +236,11 @@ Available restarts are:
 		  (default-value valued-option)))
       (default-value valued-option))
     (use-value (value)
-      :report "Use another (already converted) value."
+      :report "Use an alternate value (already converted)."
       :interactive read-value
       (restartable-check valued-option value))
     (use-argument (argument)
-      :report "Use another (to be converted) argument."
+      :report "Use an alternate argument (subject to conversion)."
       :interactive read-argument
       (restartable-convert valued-option argument))))
 

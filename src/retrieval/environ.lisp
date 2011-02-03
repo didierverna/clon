@@ -125,11 +125,11 @@ Available restarts are:
 		  (default-value valued-option)))
       (default-value valued-option))
     (use-value (value)
-      :report "Use an already converted value."
+      :report "Use an alternate value (already converted)."
       :interactive read-value
       (restartable-check valued-option value))
     (use-argument (argument)
-      :report "Use the conversion of an argument."
+      :report "Use an alternate argument (subject to conversion)."
       :interactive read-argument
       (restartable-environment-convert valued-option argument))
     ;; #### NOTE: JAVA doesn't provide a way to set an environment variable.

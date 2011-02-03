@@ -215,11 +215,11 @@ The value source may be :cmdline, :fallback or :default."
 		  (default-value valued-option)))
       (values (default-value valued-option) :default))
     (use-value (value)
-      :report "Use an already converted value."
+      :report "Use an alternate value (already converted)."
       :interactive read-value
       (values (restartable-check valued-option value) :cmdline))
     (use-argument (cmdline-argument)
-      :report "Use the conversion of an argument."
+      :report "Use an alternate argument (subject to conversion)."
       :interactive read-argument
       (restartable-cmdline-convert
        valued-option cmdline-name cmdline-argument))))
