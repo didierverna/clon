@@ -108,8 +108,8 @@
 		     (ecase (error-handler ,context)
 		       (:quit
 			(let (*print-escape*)
-			  (print-object error t))
-			(terpri)
+			  (print-object error *error-output*))
+			(terpri *error-output*)
 			(exit 1))
 		       (:none)))))
     ,@body))
