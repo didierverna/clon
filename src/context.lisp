@@ -74,7 +74,8 @@
     :initarg :short-call
     :reader short-call))
   (:report (lambda (error stream)
-	     (format stream "Unrecognized short call: ~S." (short-call error))))
+	     (format stream "Unrecognized short call: ~S."
+	       (short-call error))))
   (:documentation "An error related to an unrecognized short call."))
 
 (define-condition unrecognized-negated-call-error (cmdline-error)
@@ -83,7 +84,8 @@
     :initarg :negated-call
     :reader negated-call))
   (:report (lambda (error stream)
-	     (format stream "Unrecognized negated call: ~S." (negated-call error))))
+	     (format stream "Unrecognized negated call: ~S."
+	       (negated-call error))))
   (:documentation "An error related to an unrecognized negated call."))
 
 (define-condition unknown-cmdline-option-error (cmdline-error)
@@ -276,7 +278,8 @@ When such an option exists, return two values:
 	      ;; he did something wrong.
 	      (complete-string partial-name (long-name closest-option))))))
 
-(defun search-option (context &rest keys &key short-name long-name partial-name)
+(defun search-option
+    (context &rest keys &key short-name long-name partial-name)
   "Search for an option in CONTEXT.
 The search is done with SHORT-NAME, LONG-NAME, or PARTIAL-NAME.
 In case of a PARTIAL-NAME search, look for an option the long name of which
@@ -618,13 +621,15 @@ CONTEXT is where to look for the options."
 			      :report "Discard the argument."
 			      (setq cmdline-value nil))
 			    (convert-to-short-and-stick ()
-			      :report "Convert to short call and stick argument."
+			      :report
+			      "Convert to short call and stick argument."
 			      (push (concatenate 'string
 				      "-" cmdline-name cmdline-value)
 				    cmdline)
 			      (return-from processing-negated-call))
 			    (convert-to-short-and-split ()
-			      :report "Convert to short call and split argument."
+			      :report
+			      "Convert to short call and split argument."
 			      (push cmdline-value cmdline)
 			      (push (concatenate 'string "-" cmdline-name)
 				    cmdline)
@@ -643,8 +648,8 @@ CONTEXT is where to look for the options."
 						      option))
 			      ((potential-pack-p cmdline-name context)
 			       (do-pack (option cmdline-name context)
-				 (push-retrieved-option cmdline-options :negated
-							option)))
+				 (push-retrieved-option cmdline-options
+							:negated option)))
 			      (t
 			       (restart-case
 				   (error 'unrecognized-negated-call-error
@@ -654,7 +659,8 @@ CONTEXT is where to look for the options."
 				   nil)
 				 (fix-negated-call (new-cmdline-name)
 				   :report "Fix this negated call."
-				   :interactive (lambda () (read-call :negated))
+				   :interactive (lambda ()
+						  (read-call :negated))
 				   (setq arg (concatenate 'string
 					       "+" new-cmdline-name))
 				   (go figure-this-negated-call)))))))))
