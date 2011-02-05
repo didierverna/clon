@@ -9,18 +9,31 @@
 
 @c This file is part of Clon.
 
-@c Clon is free software; you can redistribute it and/or modify
-@c it under the terms of the GNU General Public License version 3,
-@c as published by the Free Software Foundation.
+@c Redistribution and use in source or binary form, with or without
+@c modification, are permitted provided that the following conditions are met:
 
-@c Clon is distributed in the hope that it will be useful,
-@c but WITHOUT ANY WARRANTY; without even the implied warranty of
-@c MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-@c GNU General Public License for more details.
+@c Redistributions of source code must retain the above copyright notice, this
+@c list of conditions and the following disclaimer.
 
-@c You should have received a copy of the GNU General Public License
-@c along with this program; if not, write to the Free Software
-@c Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+@c Redistributions in binary form must reproduce the above copyright notice,
+@c this list of conditions and the following disclaimer in the documentation
+@c and/or other materials provided with the distribution.
+
+@c Neither the names of the authors or copyright holders, nor the names of any
+@c contributor or organization may be used to endorse or promote products
+@c derived from Clon without specific prior written permission.
+
+@c CLON IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+@c EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+@c WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+@c DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+@c LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+@c CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+@c SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+@c INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+@c CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+@c ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+@c POSSIBILITY OF SUCH DAMAGE.
 
 
 @c Commentary:
@@ -340,7 +353,7 @@ Command-Line
 @c ====================================================================
 @copying
 @quotation
-Copyright @copyright{} @value{COPYRIGHT_DATE} Didier Verna.
+Copyright @copyright{} @value{COPYRIGHT_DATE} Didier Verna
 
 Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -355,15 +368,11 @@ notice identical to this one except for the removal of this paragraph
 @end ignore
 Permission is granted to copy and distribute modified versions of this
 manual under the conditions for verbatim copying, provided also that the
-sections entitled ``Copying'' and ``GNU General Public License'' are
-included exactly as in the original, and provided that the entire
-resulting derived work is distributed under the terms of a permission
-notice identical to this one.
+section entitled ``Copying'' is included exactly as in the original.
 
 Permission is granted to copy and distribute translations of this manual
 into another language, under the above conditions for modified versions,
-except that this permission notice may be stated in a translation
-approved by the Free Software Foundation.
+except that this permission notice may be translated as well.
 @end quotation
 @end copying
 
@@ -430,18 +439,32 @@ it explains how to use @clon{} in your application.
 @unnumbered Copying
 
 @quotation
-@clon{} is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License version 3, as published by
-the Software Foundation.
+Redistribution and use in source or binary form, with or without
+modification, are permitted provided that the following conditions are
+met:
 
-@clon{} is distributed in the hope that it will be useful, but WITHOUT
-ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
-more details.
+Redistributions of source code must retain the above copyright notice,
+this list of conditions and the following disclaimer.
 
-You should have received a copy of the GNU General Public License along
-with this program; if not, write to the Free Software Foundation, Inc.,
-675 Mass Ave, Cambridge, MA 02139, USA.
+Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+
+Neither the names of the authors or copyright holders, nor the names of
+any contributor or organization may be used to endorse or promote
+products derived from @clon{} without specific prior written permission.
+
+CLON IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 @end quotation
 
 
