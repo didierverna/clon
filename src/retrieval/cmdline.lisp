@@ -162,7 +162,13 @@ to raise the higher level invalid-cmdline-argument error instead."
 	     :option valued-option
 	     :name cmdline-name
 	     :argument cmdline-argument
-	     :comment (comment error)))))
+	     :comment (comment error)))
+    ;; #### NOTE: by catching all other errors to just re-signal them here, we
+    ;; ensure that the lower-level restarts established by RESTARTABLE-CONVERT
+    ;; (see valued.lisp) are discarded. Otherwise, they would double those
+    ;; established in RESTARTABLE-CMDLINE-CONVERT below.
+    (error (error)
+      (error error))))
 
 (defun restartable-cmdline-convert (valued-option cmdline-name cmdline-argument)
   "Restartably convert CMDLINE-ARGUMENT to VALUED-OPTION's value.

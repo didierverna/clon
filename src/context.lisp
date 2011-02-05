@@ -103,9 +103,12 @@
 	       (argument error))))
   (:documentation "An error related to an unknown command-line option."))
 
-(defmacro with-context-error-handler (context condition &body body)
+;; #### NOTE: this macro used to bind only for Clon errors, but other kinds of
+;; errors may actually occur, for instance when retreiving a lispobj option's
+;; value.
+(defmacro with-context-error-handler (context &body body)
   "Execute BODY with CONTEXT's error handler bound for CONDITION."
-  `(handler-bind ((,condition
+  `(handler-bind ((error
 		   (lambda (error)
 		     (ecase (error-handler ,context)
 		       (:quit
@@ -350,7 +353,7 @@ Return two values:
 	     (push cmdline-option cmdline-options))))
     (setf (cmdline-options context) (nreverse cmdline-options)))
   ;; Try an environment variable:
-  (with-context-error-handler context environment-error
+  (with-context-error-handler context
     (let* ((env-var (env-var option))
 	   (env-val (getenv env-var)))
       (when env-val
@@ -492,7 +495,7 @@ CONTEXT is where to look for the options."
 					   :short-name ,name)))
 			   (assert ,option)
 			   ,@body)))))
-      (with-context-error-handler context cmdline-error
+      (with-context-error-handler context
 	(do ((arg (pop cmdline) (pop cmdline)))
 	    ((null arg))
 	  (cond ((string= arg "--")

@@ -94,7 +94,13 @@ to raise the higher level invalid-environment-value error instead."
 	     :option valued-option
 	     :env-var (env-var valued-option)
 	     :env-val env-val
-	     :comment (comment error)))))
+	     :comment (comment error)))
+    ;; #### NOTE: by catching all other errors to just re-signal them here, we
+    ;; ensure that the lower-level restarts established by RESTARTABLE-CONVERT
+    ;; (see valued.lisp) are discarded. Otherwise, they would double those
+    ;; established in RESTARTABLE-ENVIRONMENT-CONVERT below.
+    (error (error)
+      (error error))))
 
 (defun read-env-val (env-var)
   "Read ENV-VAR's new value from standard input."
