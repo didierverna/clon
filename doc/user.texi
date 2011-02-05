@@ -414,7 +414,7 @@ This is the @clon{} User Manual for @clon{} version @value{VERSION}:
 it explains how to use @clon{} in your application.
 
 @menu
-* Copying::                 The GNU General Public License
+* Copying::                 A BSD style license
 * Introduction::            What Clon is all about
 * Quick Start::             For the brave and the impatient
 * Using Clon::              Clonificating your application
