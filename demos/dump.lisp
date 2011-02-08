@@ -32,7 +32,7 @@
 (asdf:operate 'asdf:load-op :com.dvlsoft.clon)
 
 (compile-file +source+ :output-file +object+ :system-p t)
-(c::build-program +executable+ :lisp-files (list +object+))
+(c:build-program +executable+ :lisp-files (list +object+))
 
 (si:exit 0)
 
