@@ -1,7 +1,25 @@
 						             -*- outline -*-
 
-* Anatomy of the tarball
+* Copyright (C) 2010, 2011 Didier Verna
+Author:        Didier Verna <didier@lrde.epita.fr>
+Maintainer:    Didier Verna <didier@lrde.epita.fr>
 
+This file is part of Clon.
+
+Permission to use, copy, modify, and distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THIS SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+
+* Anatomy of the tarball
 The Clon distribution has the following shape:
 
 ./src/		;; source directory
@@ -11,6 +29,7 @@ The Clon distribution has the following shape:
 ./doc/		;; documentation
 ./demos/        ;; demo programs
 ./emacs/        ;; Emacs edition utilities for Clon
+
 
 * Portability
 Clon currently works on Unix systems (MacOS X included) with SBCL, CMUCL
@@ -25,14 +44,12 @@ demos/simple.lisp and demos/advanced.lisp might also need some tweaking.
 
 
 * Pre-installation
-
 If you're using ASDF 1, you need to "make install-system" before anything else
 in order to create the system file symlink where appropriate. Otherwise (ASDF
 2), we assume that you have unpacked somewhere in the source registry.
 
 
 * Build
-
 Type "make" to compile the demo programs and the documentation (end-user and
 user manuals). A side effect of this is to also compile the library for the
 Lisp implementation you chose. By default, the documentation is built in info,
@@ -56,7 +73,6 @@ formats. If you want other formats (DVI and PostScript are available), type
 
 
 * Installation
-
 Type "make install" to install both the documentation and the data files. If
 you have compiled the documentation in DVI and PostScript format, those will
 be installed as well. The same goes for the reference manual.
@@ -65,5 +81,4 @@ The demo programs are not installed anywhere.
 
 
 * Uninstallation
-
 Type "make uninstall".
