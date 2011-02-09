@@ -230,7 +230,7 @@ This is the @clon{} End-User Manual for @clon{} version @value{VERSION}:
 it describes the use of applications powered by @clon{}.
 
 @menu
-* Copying::             A BSD style license
+* Copying::             The BSD license
 * Introduction::        What Clon is all about
 * Clonification::       Determining whether a program is powered by Clon
 * The Command Line::    Making use of @clon{}'s @cmdline{} features

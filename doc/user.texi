@@ -400,7 +400,7 @@ This is the @clon{} User Manual for @clon{} version @value{VERSION}:
 it explains how to use @clon{} in your application.
 
 @menu
-* Copying::                 A BSD style license
+* Copying::                 The BSD license
 * Introduction::            What Clon is all about
 * Quick Start::             For the brave and the impatient
 * Using Clon::              Clonificating your application
