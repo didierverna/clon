@@ -1883,20 +1883,21 @@ between an argument and the possible values. Otherwise, an
 @cindex Debugger restarts
 Let's take a short break in our @clon{} extension process. We have seen
 that @clon{} may throw errors in different situations, including invalid
-arguments or values. The end-user manual advertises a set of debugger
-restarts that are available to fix those kinds of problems interactively
-(if you don't know what I'm talking about, please read @enduserref{Error
-Management} and you will know). For that reason, you are encouraged to
-@emph{not} disable the debugger in your standalone program, at least
-when you're executing @clon{} code.
+arguments or values. The end-user manual advertises that the interactive
+error handler offers a set of ``options to fix problems'' (if you don't
+know what I'm talking about, please read @enduserref{Error Management}
+and you will know). Well, you may have guessed that these options are
+simply ``restarts'' (of course, we don't use that term there, as we
+wouldn't want to frighten the casual user, or would we?).
 
-The way error handling is done in @cl{} standalone executables is
+When you ship your application, you are encouraged to disable the
+debugger in the standalone executable because that also might scare the
+casual user a little bit (the end-user manual only mentions the
+@code{none} error-handler to explain that people shouldn't use it). The
+way error handling is done in @cl{} standalone executables is
 implementation-dependent, so please refer to your favorite compiler's
-documentation.
-
-More generally, the behavior of @cl{} standalone executables may depend
-on:
-
+documentation. More generally, the behavior of @cl{} standalone
+executables may depend on:
 @itemize @bullet
 @item
 the state of the Lisp environment when the application was dumped, which
@@ -2582,14 +2583,7 @@ with the @code{dump} macro mentionned above.
 @item SBCL
 @code{CC=gcc sbcl --script quickstart.lisp}@*
 The @code{CC=gcc} bit is needed for the @code{sb-grovel} contrib module
-that @clon{} uses. However, using @code{--script} like this is in fact
-not recommended because it disables the debugger (@pxref{Error
-Management}). Instead, you might be better off doing:
-@verbatim
-CC=gcc sbcl \
-  --disable-ldb --lose-on-corruption --end-runtime-options \
-  --no-userinit --no-sysinit --load quickstart.lisp
-@end verbatim
+that @clon{} uses.
 @item CMUCL
 @code{lisp -noinit -nositeinit -load quickstart.lisp}
 @item CCL
