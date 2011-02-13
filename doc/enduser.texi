@@ -859,37 +859,12 @@ This is the default. It means that when @clon{} encounters an error
 related to option retrieval, it prints an informative message about the
 error and terminates the application immediately (with an exit status of
 1). This is the behavior of most programs out there I guess.
-@item none
-@cindex Debugger
-@cindex Error Management, interactive debugging
-A value of @code{none} literally means no particular error handler.
-Here, I must apologize because I need to go into some technical details
-about @cl{}, the language in which applications using @clon{} are
-written. @cl{} mandates the existence of a @dfn{debugger} in which you
-are dropped in when an unhandled error condition is thrown. However some
-@cl{} implementations may disable the debugger when creating standalone
-programs. So the situation when the @clon{} error handler is set to
-@code{none} depends on the application (application developers are
-encouraged @emph{not} to disable the debugger).
-@itemize @bullet
-@item
-If the debugger is disabled, you will get more or less the same error
-message as if the value were @code{quit}, only with an additional and
-cryptic stack trace that you may simply disregard.
-@item
-@cindex Debugger, restarts
-If on the other hand, you end up in the debugger, you're in luck.
-@clon{} provides a very comprehensive set of so-called @dfn{restarts}
-that will allow you to interactively fix the problem and proceed, as if
-nothing ever happened. Such restarts include notably the ability to
-modify an option's name or value (handy in case of @cmdline{} typo),
-discard the call altogether and many others, depending on the exact
-error.
-@end itemize
-Note that the debugger will also provide you with a cryptic stack trace
-and other information that you can probably just disregard. Don't be
-afraid, simply answer the question you are asked for and follow the
-instructions.
+@item interactive
+When interactive error handling is selected and an error is signaled,
+you are presented with a list of possible options to ``fix'' the
+problem. Such options include notably the ability to modify an option's
+name or value (handy in case of @cmdline{} typo), discard the call
+altogether and many others, depending on the exact error.
 
 When the error implies a bad value for a particular option, you will
 notice that some of the choices that @clon{} proposes in order to fix
@@ -898,9 +873,21 @@ the problem involve providing another @emph{value} or another
 (@pxref{Valued Options}). The argument is what you provide on the
 @cmdline{}, and the value is the conversion of the argument to the
 proper type. This means that most of the time, you will want to use the
-``argument'' choice. If you know the @cl{} language, you can also
-provide a value directly, in which case what you type in is in fact
+``argument'' choice. If you know the @cl{} language (see below), you can
+also provide a value directly, in which case what you type in is in fact
 @cl{} code.
+@item none
+@cindex Debugger
+@cindex Error Management, interactive debugging
+@i{Using this option is not encouraged, unless you are the author of the
+application and you are debugging it.} A value of @code{none} literally
+means no particular error handler. Here, I must apologize because I need
+to go into some technical details about @cl{}, the language in which
+applications using @clon{} are written. @cl{} mandates the existence of
+a @dfn{debugger} in which you are dropped in when an unhandled error
+condition is thrown. However some @cl{} implementations may disable the
+debugger when creating standalone programs. So the situation when the
+@clon{} error handler is set to @code{none} depends on the application.
 @end table
 
 One last note about the @bioption{error-handler} option: we have a
