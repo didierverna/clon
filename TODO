@@ -12,10 +12,6 @@ notice and this notice are preserved.
 * Competition
 Look at the alternative and provide a comparative chart.
 
-* --clon-error-handler=debug
-Emulate the Lisp debugger by computing restarts. THe real debugger is too much
-for the casual user.
-
 * I18N
 
 * Have a look at CMUCL

@@ -102,6 +102,34 @@
 	       (argument error))))
   (:documentation "An error related to an unknown command-line option."))
 
+
+(defun print-error (error)
+  "Print ERROR."
+  (let (*print-escape*)
+    (print-object error *error-output*))
+  (terpri *error-output*))
+
+(defun exit-abnormally (error)
+  "Exit after ERROR occurred."
+  (print-error error)
+  (exit 1))
+
+;; Adapted from the Hyperspec
+(defun restart-on-error (error)
+  "Print ERROR and offer available restarts."
+  (print-error error)
+  (format t "Available options:~%")
+  (let ((restarts (compute-restarts)))
+    (do ((i 0 (+ i 1)) (r restarts (cdr r))) ((null r))
+      (format t "~&~D: ~A~%" i (car r)))
+    (loop :with k := (length restarts) :and n := nil
+	  :until (and (typep n 'integer) (>= n 0) (< n k))
+	  :do (progn (format t "~&Option [0-~A]: " (1- k))
+		     (finish-output)
+		     (setq n (read))
+		     (fresh-line))
+	  :finally (invoke-restart-interactively (nth n restarts)))))
+
 ;; #### NOTE: this macro used to bind only for Clon errors, but other kinds of
 ;; errors may actually occur, for instance when retreiving a lispobj option's
 ;; value.
@@ -110,11 +138,10 @@
   `(handler-bind ((error
 		   (lambda (error)
 		     (ecase (error-handler ,context)
+		       (:interactive
+			(restart-on-error error))
 		       (:quit
-			(let (*print-escape*)
-			  (print-object error *error-output*))
-			(terpri *error-output*)
-			(exit 1))
+			(exit-abnormally error))
 		       (:none)))))
     ,@body))
 
