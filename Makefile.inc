@@ -35,34 +35,34 @@ W3DIR := $(HOME)/www/software/lisp/clon
 
 SBCL_CACHE  := sbcl
 SBCL_BINLOC := sbcl
-SBCL_DUMP   := --disable-ldb --lose-on-corruption	\
-	       --end-runtime-options --no-userinit --no-sysinit
 SBCL_LOAD   := --load
+SBCL_DUMP   := --script
 
 CMUCL_CACHE  := cmu
 CMUCL_BINLOC := cmu
-CMUCL_DUMP   := -noinit -nositeinit
 CMUCL_LOAD   := -load
+CMUCL_DUMP   := -noinit -nositeinit $(CMUCL_LOAD)
 
 CCL_CACHE  := ccl
 CCL_BINLOC := openmcl
-CCL_DUMP   := --no-init
 CCL_LOAD   := --load
+CCL_DUMP   := --no-init $(CCL_LOAD)
 
 ECL_CACHE  := ecl
 ECL_BINLOC := ecl
-ECL_DUMP   := -norc
 ECL_LOAD   := -load
+ECL_DUMP   := -norc $(ECL_LOAD)
 
 CLISP_CACHE  := clisp
 CLISP_BINLOC := clisp
-CLISP_DUMP   := -norc
 CLISP_LOAD   := -i
+CLISP_DUMP   := -norc $(CLISP_LOAD)
 
 ABCL_CACHE  := abcl
 ABCL_BINLOC := abcl
-ABCL_DUMP   := --batch --eval '(defvar cl-user::com.dvlsoft.clon.dump t)'
 ABCL_LOAD   := --load
+ABCL_DUMP   := --batch --eval '(defvar cl-user::com.dvlsoft.clon.dump t)' \
+	       $(ABCL_LOAD)
 
 $(TOP_DIR)/version.inc: $(TOP_DIR)/version.cl $(TOP_DIR)/com.dvlsoft.clon.asd
 	$($(LISP)_PATH) $($(LISP)_LOAD) $(TOP_DIR)/version.cl | tail -2 > $@

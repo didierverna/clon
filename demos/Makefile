@@ -49,11 +49,11 @@ $(DEMOS): %: %.jar
 else ifeq ($(LISP),ECL)
 # ECL also has a different scheme for producing executables.
 $(DEMOS): %: %.lisp
-	$($(LISP)_PATH) $($(LISP)_DUMP) $($(LISP)_LOAD) dump.lisp -- $@
+	$($(LISP)_PATH) $($(LISP)_DUMP) dump.lisp -- $@
 else
 # The default way of doing things in pure lisp:
 $(DEMOS): %: %.lisp
-	$($(LISP)_PATH) $($(LISP)_DUMP) $($(LISP)_LOAD) $<
+	$($(LISP)_PATH) $($(LISP)_DUMP) $<
 endif
 
 
@@ -77,7 +77,7 @@ endef
 # This defines how to create Foo.java from foo.lisp:
 define java_rule
 $(call java_name,$(1).java): $(1).lisp
-	$(ABCL_PATH) $(ABCL_DUMP) $(ABCL_LOAD) $$<
+	$(ABCL_PATH) $(ABCL_DUMP) $$<
 endef
 
 $(foreach demo,$(DEMOS),$(eval $(call jar_rule,$(demo))))
