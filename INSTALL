@@ -18,7 +18,7 @@ The Clon distribution has the following shape:
 ./share/	;; data files
 ./doc/		;; documentation
 ./demos/        ;; demo programs
-./emacs/        ;; Emacs edition utilities for Clon
+./emacs/        ;; Emacs edition utilities
 
 
 * Portability
