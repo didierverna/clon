@@ -154,7 +154,7 @@ The most important features of Clon are:
   possibly abbreviated option calls and short/long syntax."
   :author "Didier Verna <didier@lrde.epita.fr>"
   :maintainer "Didier Verna <didier@lrde.epita.fr>"
-  :license "BSD style"
+  :license "BSD"
   :version #.(version :long)
   :depends-on (#+sbcl             :sb-posix
 	       #+(and clisp cffi) :cffi)
