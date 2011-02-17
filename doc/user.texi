@@ -322,6 +322,12 @@ Command-Line
 @tpindex @r{Packages, }\name\
 @end macro
 
+@c Systems
+@macro sysindex{name}
+@tpindex \name\
+@tpindex @r{Systems, }\name\
+@end macro
+
 
 
 @c ====================================================================
@@ -545,8 +551,10 @@ called @file{simple} in the distribution.
 Let's examine this program step-by-step now.
 
 @pkgindex{com.dvlsoft.clon}
-First, we put ourselves in the @cl{} user package, and load @clon{}.
-@clon{} lives in a package named @samp{com.dvlsoft.clon}.
+@sysindex{com.dvlsoft.clon}
+First, we put ourselves in the @cl{} user package, and load @clon{} from
+its ASDF system @samp{com.dvlsoft.clon}. Next, we use the @clon{}
+package, also named @samp{com.dvlsoft.clon}.
 
 @cartouche
 @verbatim
