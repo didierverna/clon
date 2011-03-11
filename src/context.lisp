@@ -201,6 +201,15 @@ options based on it."))
   "Return CONTEXT's remainder."
   (slot-value context 'remainder))
 
+(defun cmdline-options-p (&key (context *current-context*))
+  "Return T if CONTEXT has any unprocessed options left."
+  (if (cmdline-options context) t nil))
+
+(defun cmdline-p (&key (context *current-context*))
+  "Return T if CONTEXT has anything on its command-line."
+  (or (cmdline-options-p :context context)
+      (remainder :context context)))
+
 
 ;; --------------------------------------------
 ;; Convenience wrappers around context synopsis

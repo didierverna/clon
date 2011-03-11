@@ -82,6 +82,8 @@
    :with-context
    :progname
    :remainder
+   :cmdline-options-p
+   :cmdline-p
    :getopt
    :getopt-cmdline
    :multiple-value-getopt-cmdline

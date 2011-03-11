@@ -100,7 +100,8 @@ Use 'cmd --help' to get command-specific help.")
 (defun main ()
   "Entry point for the standalone application."
   (clon:make-context)
-  (cond ((clon:getopt :short-name "h")
+  (cond ((or (clon:getopt :short-name "h")
+	     (not (clon:cmdline-p)))
 	 (clon:help))
 	(t
 	 (unless (clon:remainder)
