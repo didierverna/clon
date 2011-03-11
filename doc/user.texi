@@ -1280,6 +1280,7 @@ contextual information.
 @menu
 * Program Name::                As it appear on the command-line
 * Command-Line Remainder::      The non-options part
+* Command-Line Polling::        Whether something is left
 @end menu
 
 @node Program Name, Command-Line Remainder, Contextual Information, Contextual Information
@@ -1292,7 +1293,7 @@ wraps around implementation-dependent access methods to @code{argv[0]}.
 In order to retrieve @code{argv[0]}, use the @code{progname} function
 like this: @code{(progname)}.
 
-@node Command-Line Remainder, , Program Name, Contextual Information
+@node Command-Line Remainder, Command-Line Polling, Program Name, Contextual Information
 @subsubsection Command-Line Remainder
 @cindex Remainder, of command-line
 @cindex Command-Line, remainder
@@ -1307,6 +1308,23 @@ The @cmdline{} remainder is known to @clon{} as soon as a context is
 created. You can retrieve it by using the @code{remainder} function like
 this: @code{(remainder)}. The remainder is provided as a list of strings.
 
+@node Command-Line Polling, , Command-Line Remainder, Contextual Information
+@subsubsection Command-Line Polling
+@cindex Polling, of command-line
+@cindex Command-Line, polling
+
+@clon{} provides two utility functions to inquire on the current status
+of the @cmdline{}.
+
+@findex cmdline-options-p
+@findex cmdnline-p
+The function @code{cmdline-options-p} returns true if there are still
+unprocessed options on the @cmdline{}. The function @code{cmdline-p}
+returns true if there's @emph{anything} left on the @cmdline{}, that is,
+either unprocessed options, or a remainder. A potential use of
+@code{cmdline-p} at a very early stage of your application could be to
+automatically display a help string if the @cmdline{} is effectively
+empty.
 
 
 @c ----------------
@@ -2216,17 +2234,20 @@ the @code{:make-current} initarg with a value of @code{nil}.
 @cindex Runtime Phase
 @findex progname
 @findex remainder
+@findex cmdline-options-p
+@findex cmdline-p
 @findex getopt
 @findex getopt-cmdline
 @findex multiple-value-getopt-cmdline
 @findex do-cmdline-options
 @findex help
 The whole runtime phase API of @clon{} uses a context implicitely. This
-involves @code{progname}, @code{remainder}, @code{getopt},
-@code{getopt-cmdline}, @code{multiple-value-getopt-cmdline},
-@code{do-cmdline-options} and @code{help}. As a consequence, it is
-possible to use @clon{} with multiple contexts at the same time. There
-are in fact three ways to achieve this.
+involves @code{progname}, @code{remainder}, @code{cmdline-options-p},
+@code{cmdline-p}, @code{getopt}, @code{getopt-cmdline},
+@code{multiple-value-getopt-cmdline}, @code{do-cmdline-options} and
+@code{help}. As a consequence, it is possible to use @clon{} with
+multiple contexts at the same time. There are in fact three ways to
+achieve this.
 
 @enumerate
 @item
@@ -2242,6 +2263,8 @@ Execute @var{BODY} with @code{*current-context*} bound to @var{CONTEXT}.
 @item
 @fkindex{progname,:context}@c
 @fkindex{remainder,:context}@c
+@fkindex{cmdline-options-p,:context}@c
+@fkindex{cmdline-p,:context}@c
 @fkindex{getopt,:context}@c
 @fkindex{getopt-cmdline,:context}@c
 @fkindex{help,:context}@c
@@ -2783,6 +2806,16 @@ See @ref{Contextual Information} and @ref{Using Multiple Contexts}.
 See @ref{Contextual Information} and @ref{Using Multiple Contexts}.
 @end defun
 
+@defun cmdline-options-p &key (CONTEXT *current-context*)
+@fkindex{cmdline-options-p,:context}
+See @ref{Command-Line Polling} and @ref{Using Multiple Contexts}.
+@end defun
+
+@defun cmdline-p &key (CONTEXT *current-context*)
+@fkindex{cmdline-p,:context}
+See @ref{Command-Line Polling} and @ref{Using Multiple Contexts}.
+@end defun
+
 @defun getopt &key (CONTEXT *current-context*) SHORT-NAME LONG-NAME @
 OPTION
 @fkindex{getopt,:context}
@@ -2960,6 +2993,7 @@ compiler support or any other kind of help. You have my gratitude!
 @multitable @columnfractions .99
 Alessio Stalla@*
 Erik Huelsmann@*
+Erik Winkels@*
 François-René Rideau@*
 James Wright
 @end multitable
