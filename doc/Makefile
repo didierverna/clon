@@ -141,7 +141,7 @@ clean:
 	-rm *.tmp *.fn* *.vr* *.ky* *.tp* *.cp* *.pg *.toc *.aux *.log *~
 
 distclean: clean
-	-rm -fr declt.inc clon.eps webreference*			\
+	-rm -fr declt.inc clon.eps webreference* $(TEXI_REF)		\
 		$(HTML_DIRS)						\
 		$(ALL_INFO_FILES) $(PDF_FILES) $(DVI_FILES) $(PS_FILES)
 
