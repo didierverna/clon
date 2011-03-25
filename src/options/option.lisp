@@ -178,8 +178,8 @@ If OPTION matches, return the length of OPTION's short name; otherwise 0.")
     ;; #### NOTE: the consequence of this method returning 0 is that
     ;; non-valued options (i.e. flags) won't ever get a cmdline-argument in
     ;; retrieve-from-short-call, hence the assertion there.
-    #+(or ccl ecl) (declare (ignore namearg))
-    #+ecl          (declare (ignore option))
+    #+(or ccl ecl clisp) (declare (ignore namearg))
+    #+ecl                (declare (ignore option))
     0))
 
 

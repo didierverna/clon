@@ -34,6 +34,7 @@
 This function relies on CFFI."
   (multiple-value-bind (input-fd output-fd)
       (ext:stream-handles stream)
+    (declare (ignore input-fd))
     (when output-fd
       (cffi:with-foreign-object (winsize 'winsize)
 	(let ((result (cffi:foreign-funcall "ioctl"
