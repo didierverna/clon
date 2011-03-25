@@ -35,12 +35,14 @@ hack: all
 
 include $(TOP_DIR)/Makefile.inc
 include $(TOP_DIR)/version.inc
-
+ifneq ($(SBCL_PATH),)
+  include declt.inc
+endif
 
 INFO_DIR     := $(PREFIX)/share/info
 DOC_DIR	     := $(SHARE)/doc
 CLON_DOC_DIR := $(DOC_DIR)/clon
-TEXI_FILES   := user.texi enduser.texi
+TEXI_FILES   := user.texi enduser.texi $(TEXI_REF)
 
 INFO_FILES     := $(TEXI_FILES:%.texi=clon-%.info)
 PDF_FILES      := $(TEXI_FILES:%.texi=%.pdf)
@@ -52,13 +54,9 @@ HTML_DIRS      := $(TEXI_FILES:%.texi=%)
 
 all: info pdf html
 
-ref: info-ref pdf-ref html-ref
-
 webref: pdf-webref html-webref
 
 all-formats: all dvi ps
-
-all-formats-ref: ref dvi-ref ps-ref
 
 install-at: $(PDF_FILES) $(HTML_DIRS)
 	install -d "$(LOCATION)"
@@ -101,21 +99,16 @@ uninstall:
 	cd "$(INFO_DIR)" && rm -f $(ALL_INFO_FILES) clon-reference.info*
 
 info: $(INFO_FILES)
-info-ref: clon-reference.info
 
 pdf: clon.jpg $(PDF_FILES)
-pdf-ref: clon.jpg reference.pdf
 pdf-webref: clon.jpg webreference.pdf
 
 html: $(HTML_DIRS)
-html-ref: reference
 html-webref: webreference
 
 dvi: clon.eps $(DVI_FILES)
-dvi-ref: clon.eps reference.dvi
 
 ps: clon.eps $(PS_FILES)
-ps-ref: clon.eps reference.ps
 
 reference.texi: generate.cl
 	$(SBCL_PATH) $(SBCL_LOAD) ./generate.cl
@@ -131,7 +124,7 @@ clon-%.info: %.texi
 %.pdf: %.texi
 	$(TEXI2DVI) -p $<
 
-$(HTML_DIRS) reference webreference: %: %.texi
+$(HTML_DIRS) webreference: %: %.texi
 	$(MAKEINFO) --html -o $@ $<
 	touch $@
 
@@ -148,7 +141,7 @@ clean:
 	-rm *.tmp *.fn* *.vr* *.ky* *.tp* *.cp* *.pg *.toc *.aux *.log *~
 
 distclean: clean
-	-rm -fr clon.eps webreference* clon-reference* reference*	\
+	-rm -fr declt.inc clon.eps webreference*			\
 		$(HTML_DIRS)						\
 		$(ALL_INFO_FILES) $(PDF_FILES) $(DVI_FILES) $(PS_FILES)
 
@@ -164,16 +157,18 @@ install-www: webref
 	install -d -m 755 "$(W3DIR)/reference"
 	install -m 644 webreference/* "$(W3DIR)/reference/"
 
+declt.inc: $(TOP_DIR)/Makefile.cnf
+	$(SBCL_PATH) $(SBCL_LOAD) ./declt.cl
 
-.PHONY: all ref webref all-formats all-formats-ref	\
-	install-at install uninstall			\
-	info info-ref					\
-	pdf pdf-ref pdf-webref				\
-	html html-ref html-webref			\
-	dvi dvi-ref					\
-	ps ps-ref					\
-	clean distclean					\
-	update-version					\
+.PHONY: all webref all-formats		\
+	install-at install uninstall	\
+	info				\
+	pdf pdf-webref			\
+	html html-webref		\
+	dvi				\
+	ps				\
+	clean distclean			\
+	update-version			\
 	install-www
 
 
