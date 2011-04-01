@@ -152,3 +152,6 @@ Cool hey ?
 
 * Store all release names in a hashtable
 and provide a short bio, with option --clon-about=RELEASE
+
+* Pascal would like a simple way to declare options ala lambda list
+For instance define-main-function (&key opt1 opt2 ...), and be done with it.
