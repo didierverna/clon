@@ -222,42 +222,15 @@ See REPLACE-KEY for more information on the replacement syntax."
 ;; Portability wrappers
 ;; --------------------
 
-(defmacro validate-superclass (class superclass)
+(defmacro declare-valid-superclass (class superclass)
   "Validate SUPERCLASS classes for CLASS classes."
   ;; #### PORTME.
   #+abcl (declare (ignore class superclass))
   #+abcl '(progn)
   #-abcl
-  `(defmethod #+sbcl  sb-mop:validate-superclass
-	      #+cmu   mop:validate-superclass
-	      #+ccl   ccl:validate-superclass
-	      #+ecl   clos:validate-superclass
-	      #+clisp clos:validate-superclass
-    ((class ,class) (superclass ,superclass))
-    #+ecl (declare (ignore class superclass))
-    t))
-
-(defun class-slots (class)
-  "Return CLASS slots."
-  ;; #### PORTME.
-  (#+sbcl  sb-mop:class-slots
-   #+cmu   mop:class-slots
-   #+ccl   ccl:class-slots
-   #+ecl   clos:class-slots
-   #+clisp clos:class-slots
-   #+abcl  mop:class-slots
-   class))
-
-(defun slot-definition-name (slot)
-  "Return SLOT's definition name."
-  ;; #### PORTME.
-  (#+sbcl  sb-mop:slot-definition-name
-   #+cmu   mop:slot-definition-name
-   #+ccl   ccl:slot-definition-name
-   #+ecl   clos:slot-definition-name
-   #+clisp clos:slot-definition-name
-   #+abcl  mop:slot-definition-name
-   slot))
+  `(defmethod validate-superclass((class ,class) (superclass ,superclass))
+     #+ecl (declare (ignore class superclass))
+     t))
 
 
 ;; ----------------
@@ -280,8 +253,8 @@ This is the meta-class for abstract classes."))
   (declare (ignore initargs))
   (error "Instanciating class ~S: is abstract." (class-name class)))
 
-(validate-superclass abstract-class standard-class)
-(validate-superclass standard-class abstract-class)
+(declare-valid-superclass abstract-class standard-class)
+(declare-valid-superclass standard-class abstract-class)
 
 
 ;; ----------------
