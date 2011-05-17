@@ -725,7 +725,7 @@ the Command-Line Options Nuker library, version ~A,
 written by Didier Verna <didier@lrde.epita.fr>.
 
 Copyright (C) 2010, 2011 Didier Verna.
-Clon is released under the terms of a BSD style, open source license.
+Clon is released under the terms of the BSD license.
 See http://www.opensource.org/licenses/bsd-license for more information.
 Clon is provided with NO warranty; not even for MERCHANTABILITY
 or FITNESS FOR A PARTICULAR PURPOSE.~%"
