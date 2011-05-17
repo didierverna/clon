@@ -1,8 +1,8 @@
+version.inc
+
 sbcl-*/
 cmu-*/
 openmcl-*/
-
-version.inc
 
 demos/simple
 demos/advanced
@@ -13,6 +13,8 @@ demos/Advanced*
 
 sbcl/foo.c
 sbcl/constants.lisp-temp
+
+doc/declt.inc
 
 doc/clon.eps
 
