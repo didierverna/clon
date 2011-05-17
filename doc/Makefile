@@ -39,18 +39,19 @@ ifneq ($(SBCL_PATH),)
   include declt.inc
 endif
 
-INFO_DIR     := $(PREFIX)/share/info
-DOC_DIR	     := $(SHARE)/doc
-CLON_DOC_DIR := $(DOC_DIR)/clon
-TEXI_FILES   := user.texi enduser.texi $(TEXI_REF)
+INFO_DIR        := $(PREFIX)/share/info
+DOC_DIR	        := $(SHARE)/doc
+PROJECT_DOC_DIR := $(DOC_DIR)/$(PROJECT)
+TEXI_FILES      := user.texi enduser.texi $(TEXI_REF)
 
-INFO_FILES     := $(TEXI_FILES:%.texi=clon-%.info)
+INFO_FILES     := $(TEXI_FILES:%.texi=$(PROJECT)-%.info)
 PDF_FILES      := $(TEXI_FILES:%.texi=%.pdf)
 ALL_INFO_FILES := $(INFO_FILES:%.info=%.info*)
 DVI_FILES      := $(TEXI_FILES:%.texi=%.dvi)
 PS_FILES       := $(TEXI_FILES:%.texi=%.ps)
 HTML_DIRS      := $(TEXI_FILES:%.texi=%)
 
+INFO_REF       := $(PROJECT)-reference.info
 
 all: info pdf html
 
@@ -69,56 +70,58 @@ install-at: $(PDF_FILES) $(HTML_DIRS)
 install: $(INFO_FILES)
 	install -d "$(INFO_DIR)"
 	install -m 644 $(ALL_INFO_FILES) "$(INFO_DIR)/"
-	for i in $(INFO_FILES); do			\
-	  install-info --info-dir="$(INFO_DIR)" $$i;	\
+	for i in $(INFO_FILES); do					\
+	  install-info --info-dir="$(INFO_DIR)" $$i;			\
 	done
-	$(MAKE) install-at LOCATION="$(CLON_DOC_DIR)"
-	-for i in $(DVI_FILES) $(PS_FILES); do			\
-	  test -f $$i && install -m 644 $$i "$(CLON_DOC_DIR)";	\
+	$(MAKE) install-at LOCATION="$(PROJECT_DOC_DIR)"
+	-for i in $(DVI_FILES) $(PS_FILES); do				\
+	  test -f $$i && install -m 644 $$i "$(PROJECT_DOC_DIR)";	\
 	done
-	-if test -f clon-reference.info; then				\
-	  install -m 644 clon-reference.info* "$(INFO_DIR)/" ;		\
-	  install-info --info-dir="$(INFO_DIR)" clon-reference.info ;	\
+	-if test -f $(INFO_REF); then					\
+	  install -m 644 $(INFO_REF)* "$(INFO_DIR)/" ;			\
+	  install-info --info-dir="$(INFO_DIR)" $(INFO_REF) ;		\
 	fi
 	-if test -f reference.pdf ; then				\
-	  install -m 644 reference.pdf "$(CLON_DOC_DIR)/" ;	\
+	  install -m 644 reference.pdf "$(PROJECT_DOC_DIR)/" ;		\
 	fi
 	-if test -f reference ; then					\
-	  install -d -m 755 "$(CLON_DOC_DIR)/reference" ;		\
-	  install -m 644 reference/* "$(CLON_DOC_DIR)/reference/" ;	\
+	  install -d -m 755 "$(PROJECT_DOC_DIR)/reference" ;		\
+	  install -m 644 reference/* "$(PROJECT_DOC_DIR)/reference/" ;	\
 	fi
 	-for i in reference.dvi reference.ps; do			\
-	  test -f $$i && install -m 644 $$i "$(CLON_DOC_DIR)";	\
+	  test -f $$i && install -m 644 $$i "$(PROJECT_DOC_DIR)";	\
 	done
 
 uninstall:
-	-rm -fr "$(CLON_DOC_DIR)"
-	for i in $(INFO_FILES) clon-reference.info; do		\
-	  install-info --remove --info-dir="$(INFO_DIR)" $$i;	\
+	-rm -fr "$(PROJECT_DOC_DIR)"
+	for i in $(INFO_FILES) $(INFO_REF); do				\
+	  install-info --remove --info-dir="$(INFO_DIR)" $$i;		\
 	done
-	cd "$(INFO_DIR)" && rm -f $(ALL_INFO_FILES) clon-reference.info*
+	cd "$(INFO_DIR)" && rm -f $(ALL_INFO_FILES) $(INFO_REF)*
 
 info: $(INFO_FILES)
 
-pdf: clon.jpg $(PDF_FILES)
-pdf-webref: clon.jpg webreference.pdf
+pdf: splash.jpg $(PDF_FILES)
+pdf-webref: splash.jpg webreference.pdf
 
 html: $(HTML_DIRS)
 html-webref: webreference
 
-dvi: clon.eps $(DVI_FILES)
+dvi: splash.eps $(DVI_FILES)
 
-ps: clon.eps $(PS_FILES)
+ps: splash.eps $(PS_FILES)
+
+SPLASH_INSERT := 's/^\@author/\@vskip 2cm\n\@image\{splash,16cm\}\n\@author/'
 
 reference.texi: generate.cl
 	$(SBCL_PATH) $(SBCL_LOAD) ./generate.cl
-	$(PERL) -pi -e 's/^\@author/\@vskip 2cm\n\@image\{clon,16cm\}\n\@author/' $@
+	$(PERL) -pi -e $(SPLASH_INSERT) $@
 
 webreference.texi: generate.cl
 	$(SBCL_PATH) $(SBCL_LOAD) ./generate.cl --web
-	$(PERL) -pi -e 's/^\@author/\@vskip 2cm\n\@image\{clon,16cm\}\n\@author/' $@
+	$(PERL) -pi -e $(SPLASH_INSERT) $@
 
-clon-%.info: %.texi
+$(PROJECT)-%.info: %.texi
 	$(MAKEINFO) $<
 
 %.pdf: %.texi
@@ -141,7 +144,7 @@ clean:
 	-rm *.tmp *.fn* *.vr* *.ky* *.tp* *.cp* *.pg *.toc *.aux *.log *~
 
 distclean: clean
-	-rm -fr declt.inc clon.eps webreference* $(TEXI_REF)		\
+	-rm -fr declt.inc splash.eps webreference* $(TEXI_REF)		\
 		$(HTML_DIRS)						\
 		$(ALL_INFO_FILES) $(PDF_FILES) $(DVI_FILES) $(PS_FILES)
 

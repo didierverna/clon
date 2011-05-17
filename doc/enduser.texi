@@ -201,7 +201,7 @@ except that this permission notice may be translated as well.
 @title The Clon End-User Manual
 @subtitle The @CmdLine{} Options Nuker, Version @value{VERSION}
 @vskip 2cm
-@image{clon,16cm}
+@image{splash,16cm}
 @author Didier Verna <@email{didier@@lrde.epita.fr}>
 @page
 @vskip 0pt plus 1filll

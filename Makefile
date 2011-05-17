@@ -43,9 +43,8 @@ SUBDIRS     := src sbcl clisp	\
 	       share doc	\
 	       demos
 SYSTEMS_DIR := $(SHARE)/common-lisp/systems
-ASDF_FILE   := com.dvlsoft.clon.asd
 
-DIST_NAME := clon-$(SHORT_VERSION)
+DIST_NAME := $(PROJECT)-$(SHORT_VERSION)
 TARBALL   := $(DIST_NAME).tar.gz
 SIGNATURE := $(TARBALL).asc
 
@@ -88,14 +87,14 @@ install-www: dist
 	-install -m 644 $(TARBALL)   "$(W3DIR)/attic/"
 	-install -m 644 $(SIGNATURE) "$(W3DIR)/attic/"
 	echo "\
-<? lref (\"clon/attic/clon-$(SHORT_VERSION).tar.gz\", \
+<? lref (\"$(PROJECT)/attic/$(PROJECT)-$(SHORT_VERSION).tar.gz\", \
 	 contents (\"Dernière version\", \"Latest version\")); ?> \
 | \
-<? lref (\"clon/attic/clon-$(SHORT_VERSION).tar.gz.asc\", \
+<? lref (\"$(PROJECT)/attic/$(PROJECT)-$(SHORT_VERSION).tar.gz.asc\", \
 	 contents (\"Signature GPG\", \"GPG Signature\")); ?>" \
 	  > "$(W3DIR)/latest.txt"
 	chmod 644 "$(W3DIR)/latest.txt"
-	git push --tags "$(W3DIR)/clon.git" :
+	git push --tags "$(W3DIR)/$(PROJECT).git" :
 	$(MAKE) gen TARGET=install-www
 	cd "$(W3DIR)"					\
 	  && ln -fs attic/$(TARBALL) latest.tar.gz	\

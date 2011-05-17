@@ -27,11 +27,15 @@
 
 ### Code:
 
+PROJECT   := clon
+PACKAGE   := com.dvlsoft.$(PROJECT)
+ASDF_FILE := $(PACKAGE).asd
+
 PERL := perl
 
 SHARE := $(PREFIX)/share
 
-W3DIR := $(HOME)/www/software/lisp/clon
+W3DIR := $(HOME)/www/software/lisp/$(PROJECT)
 
 SBCL_CACHE  := sbcl
 SBCL_BINLOC := sbcl
@@ -61,10 +65,10 @@ CLISP_DUMP   := -norc $(CLISP_LOAD)
 ABCL_CACHE  := abcl
 ABCL_BINLOC := abcl
 ABCL_LOAD   := --load
-ABCL_DUMP   := --batch --eval '(defvar cl-user::com.dvlsoft.clon.dump t)' \
+ABCL_DUMP   := --batch --eval '(defvar cl-user::$(PACKAGE).dump t)' \
 	       $(ABCL_LOAD)
 
-$(TOP_DIR)/version.inc: $(TOP_DIR)/version.cl $(TOP_DIR)/com.dvlsoft.clon.asd
+$(TOP_DIR)/version.inc: $(TOP_DIR)/version.cl $(TOP_DIR)/$(ASDF_FILE)
 	$($(LISP)_PATH) $($(LISP)_LOAD) $(TOP_DIR)/version.cl | tail -2 > $@
 
 

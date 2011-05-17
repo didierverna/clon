@@ -36,8 +36,8 @@ hack: all
 include $(TOP_DIR)/Makefile.inc
 
 
-CLON_SHARE := $(SHARE)/clon
-THEMES_DIR := $(CLON_SHARE)/themes
+PROJECT_SHARE := $(SHARE)/$(PROJECT)
+THEMES_DIR    := $(PROJECT_SHARE)/themes
 
 all:
 
@@ -46,7 +46,7 @@ install:
 	install -m 644 themes/* "$(THEMES_DIR)/"
 
 uninstall:
-	-rm -fr "$(CLON_SHARE)"
+	-rm -fr "$(PROJECT_SHARE)"
 
 clean:
 	-rm *~ */*~ */*/*~
