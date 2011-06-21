@@ -122,14 +122,16 @@
   "The Clon readtable.")
 
 (defun tilde-reader (stream char)
-  "Read a series of ~\"strings\" to be concatenated together."
+  "Read a series of ~\"string\" to be concatenated together."
   (declare (ignore char))
-  (apply #'concatenate 'string
-	 (loop :for str := (read stream t nil t)
-	       :then (progn (read-char stream t nil t)
-			    (read stream t nil t))
-	       :collect str
-	       :while (eql (peek-char t stream nil nil t) #\~))))
+  (flet ((read-string (&aux (string (read stream t nil t)))
+	   (check-type string string "a string")
+	   string))
+    (apply #'concatenate 'string
+	   (read-string)
+	   (loop :while (char= (peek-char t stream nil nil t) #\~)
+		 :do (read-char stream t nil t)
+		 :collect (read-string)))))
 
 (set-macro-character #\~ #'tilde-reader nil *readtable*)
 
