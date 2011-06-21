@@ -43,7 +43,7 @@ CC := gcc
 LISP := SBCL
 
 # Implementation paths. Note that regardless of the above setting, SBCL is
-# required in order to generate the refernece manual, so you must set
+# required in order to generate the reference manual, so you must set
 # SBCL_PATH properly. If you don't have SBCL installed at all, set it to
 # nothing.
 SBCL_PATH  := CC=$(CC) sbcl
