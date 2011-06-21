@@ -411,7 +411,14 @@ Return two values:
   #+ccl   ccl::*command-line-argument-list*
   #+ecl   (ext:command-args)
   #+clisp (cons (aref (ext:argv) 0) ext:*args*)
-  #+abcl  (cons "abcl" extensions:*command-line-argument-list*))
+  ;; #### NOTE: the trickery below is here to make CMDLINE work even when Clon
+  ;; is loaded into ABCL without dumping the Clon way (see
+  ;; +ABCL-MAIN-CLASS-TEMPLATE+).
+  #+abcl  (cons (or (let ((symbol (find-symbol "*ARGV0*" 'extensions)))
+		      (when symbol
+			(symbol-value symbol)))
+		    "abcl")
+		extensions:*command-line-argument-list*))
 
 (defun getenv (variable)
   "Get environment VARIABLE's value. VARIABLE may be null."
@@ -460,7 +467,13 @@ public class ~A
 			    Lisp._COMMAND_LINE_ARGUMENT_LIST_.setSymbolValue
 				(cmdline);
 
-			    Interpreter.createInstance ();
+			    Interpreter interpreter =
+			      Interpreter.createInstance ();
+			    interpreter.eval
+			      (\"(defvar extensions::*argv0* \\\"~A\\\")\");
+			    interpreter.eval
+			      (\"(export 'extensions::*argv0* 'extensions)\");
+
 			    Load.loadSystemFile (\"/~A\", false, false, false);
 			}
 		    catch (ProcessingTerminated e)
@@ -530,7 +543,7 @@ this function behaves differently in some cases, as described below.
 		     source-pathname)
 		    :direction :output :if-exists :supersede)
 		 (format t +abcl-main-class-template+
-		   class-name (namestring source-pathname)))
+		   class-name name (namestring source-pathname)))
 	       '(progn))
 	   (list function)))
 
