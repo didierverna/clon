@@ -120,12 +120,16 @@ and extend the library with your own option types.
 			     ;; but we don't care
 			     :info-file "clon-webreference"
 			     :introduction +introduction+
+			     :license :bsd
+			     :copyright-date "2010, 2011"
 			     :link-files nil)
   (com.dvlsoft.declt:declt :com.dvlsoft.clon
 			   :library-name "Clon"
 			   :texi-file "reference.texi"
 			   :info-file "clon-reference"
-			   :introduction +introduction+))
+			   :introduction +introduction+
+			   :license :bsd
+			   :copyright-date "2010, 2011"))
 
 (sb-ext:quit)
 
