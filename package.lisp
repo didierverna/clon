@@ -121,6 +121,8 @@
 (defvar *readtable* (copy-readtable)
   "The Clon readtable.")
 
+;; String concatenation
+;; --------------------
 (defun tilde-reader (stream char)
   "Read a series of ~\"string\" to be concatenated together."
   (declare (ignore char))
@@ -134,6 +136,36 @@
 		 :collect (read-string)))))
 
 (set-macro-character #\~ #'tilde-reader nil *readtable*)
+
+;; Emacs indentation
+;; -----------------
+(defun clindent (symbol indent)
+  "Set SYMBOL's indentation to INDENT in (X)Emacs.
+This function sets SYMBOL's common-lisp-indent-function property.
+If INDENT is a symbol, use its indentation definition.
+Otherwise, INDENT is considered as an indentation definition."
+  (when (member :swank *features*)
+    (funcall (intern "EVAL-IN-EMACS" :swank)
+	     `(put ',symbol 'common-lisp-indent-function
+		   ,(if (symbolp indent)
+			`(get ',indent 'common-lisp-indent-function)
+		      `',indent))
+	     t)))
+
+(defmacro defindent (symbol indent)
+  "Set SYMBOL's indentation to INDENT in (X)Emacs.
+SYMBOL and INDENT need not be quoted.
+See CLINDENT for more information."
+  `(eval-when (:compile-toplevel :execute :load-toplevel)
+     (clindent ',symbol ',indent)))
+
+(defun i-reader (stream subchar arg)
+  "Read an argument list for the DEFINDENT macro."
+  (declare (ignore subchar arg))
+  (cons 'defindent (read stream)))
+
+(set-dispatch-macro-character #\# #\i #'i-reader *readtable*)
+
 
 ;; ECL and CLISP do not like to see undefined reader macros in expressions
 ;; that belong to other compilers. For instance this will break:

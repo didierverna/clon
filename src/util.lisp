@@ -38,15 +38,11 @@
 #include <sys/ioctl.h>")
 
 
-
 ;; ==========================================================================
 ;; Miscellaneous Auxiliary Routines
 ;; ==========================================================================
 
-#+swank (swank:eval-in-emacs
-	 '(put 'econd 'common-lisp-indent-function
-	   (get 'cond 'common-lisp-indent-function))
-	 t)
+#i(econd cond)
 (defmacro econd (&body clauses)
   "Like COND, but signal an error if no clause evaluates to t."
   `(cond ,@(append clauses
@@ -139,9 +135,7 @@ For instance, completing 'he' with 'help' will produce 'he(lp)'."
 	:unless (member key removed)
 	  :nconc (list key val)))
 
-#+swank (swank:eval-in-emacs
-	 '(put 'replace-in-keys 'common-lisp-indent-function 3)
-	 t)
+#i(replace-in-keys 3)
 (defmacro replace-in-keys ((key val) keys the-key form)
   "Replace every occurrence of THE-KEY in KEYS with FORM.
 At every KEYS round, KEY and VAL are bound to the current key-value pair.
@@ -212,8 +206,7 @@ REPLACEMENT can take the following forms:
 		    (cdr match)
 		  (list key val))))))))
 
-#+swank (swank:eval-in-emacs
-	 '(put 'replace-keys 'common-lisp-indent-function 1))
+#i(replace-keys 1)
 (defun replace-keys (keys &rest replacements &aux (new-keys keys))
   "Return a new property list from KEYS with REPLACEMENTS.
 See REPLACE-KEY for more information on the replacement syntax."
