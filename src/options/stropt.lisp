@@ -60,10 +60,10 @@ This class implements options the values of which are strings."))
   "Check that VALUE is valid for STROPT."
   (if (stringp value)
       value
-      (error 'invalid-value
-	     :option stropt
-	     :value value
-	     :comment "Value must be a string.")))
+    (error 'invalid-value
+	   :option stropt
+	   :value value
+	   :comment "Value must be a string.")))
 
 
 ;; ----------------------------
@@ -110,10 +110,10 @@ This class implements options the values of which are strings."))
   (apply #'make-instance 'stropt keys))
 
 (defun make-internal-stropt (long-name description
-			      &rest keys
-			      &key argument-name argument-type
-				   env-var fallback-value default-value
-				   hidden)
+			     &rest keys
+			     &key argument-name argument-type
+				  env-var fallback-value default-value
+				  hidden)
   "Make a new internal (Clon-specific) string option.
 - LONG-NAME is the option's long-name, sans the 'clon-' prefix.
   (Internal options don't have short names.)
