@@ -81,9 +81,9 @@ This class implements the notion of sheet for printing Clon help."))
   "Map FUNCTION over SHEET's frames.
 If REVERSE, map in reverse order."
   `(mapc ,function
-    ,(if reverse
-	 `(nreverse (copy-list (frames ,sheet)))
-	 `(frames ,sheet))))
+     ,(if reverse
+	  `(nreverse (copy-list (frames ,sheet)))
+	`(frames ,sheet))))
 
 
 
@@ -102,16 +102,16 @@ The value-matching part will itself be enclosed in an ECASE expression.
 In addition, the special clause syntax (BOOLEAN <PROPERTY-NAME> <YES> <NO>)
 is a shortcut for: (PROPERTY-NAME ((on t) YES) ((off nil) NO))."
   `(ecase ,property
-    ,@(mapcar (lambda (clause)
-		(if (eq (car clause) 'boolean)
-		    `(,(cadr clause)
-		      (ecase ,value
-			((on t)    ,(caddr  clause))
-			((off nil) ,(cadddr clause))))
-		    `(,(car clause)
-		      (ecase ,value
-			,@(cdr clause)))))
-	      clauses)))
+     ,@(mapcar (lambda (clause)
+		 (if (eq (car clause) 'boolean)
+		     `(,(cadr clause)
+		       (ecase ,value
+			 ((on t)    ,(caddr  clause))
+			 ((off nil) ,(cadddr clause))))
+		   `(,(car clause)
+		     (ecase ,value
+		       ,@(cdr clause)))))
+	clauses)))
 
 (defun highlight-property-instance-escape-sequence (instance)
   "Return highlight property INSTANCE's escape sequence."
@@ -198,15 +198,14 @@ tabs are forbidden here."
 An SFace is the association of a face and its raw sibling. The sibling is used
 to create subfaces which would be missing from the original, user defined one."))
 
-(defun make-raw-sface (sibling)
+(defun make-raw-sface (sibling &aux (sface (copy-instance sibling 'sface)))
   "Return a new SFace based on SIBLING.
-This function does not consider SIBLING as a face tree: only face properties are
-copied; the face parent and children are set to nil."
-  (let ((sface (copy-instance sibling 'sface)))
-    (setf (slot-value sface 'parent) nil)
-    (setf (slot-value sface 'subfaces) nil)
-    (setf (slot-value sface 'sibling) sibling)
-    sface))
+This function does not consider SIBLING as a face tree:
+only face properties are copied; the face parent and children are set to nil."
+  (setf (slot-value sface 'parent) nil)
+  (setf (slot-value sface 'subfaces) nil)
+  (setf (slot-value sface 'sibling) sibling)
+  sface)
 
 (defstruct frame
   "The FRAME structure.
@@ -235,13 +234,13 @@ This structure holds both layout and highlight properties used for printing."
   "Return SHEET's current left margin."
   (if (frames sheet)
       (frame-left-margin (current-frame sheet))
-      0))
+    0))
 
 (defun current-right-margin (sheet)
   "Return SHEET's current right margin."
   (if (frames sheet)
       (frame-right-margin (current-frame sheet))
-      (line-width sheet)))
+    (line-width sheet)))
 
 (defun available-right-margin (sheet)
   "Return SHEET's available right margin.
@@ -251,7 +250,7 @@ frames can potentially write until the available right margin."
 		(let ((right-margin (frame-right-margin frame)))
 		  (when (numberp right-margin)
 		    (return-from available-right-margin right-margin))))
-    (sheet))
+      (sheet))
   (line-width sheet))
 
 (defgeneric open-frame (sheet frame)
@@ -268,11 +267,11 @@ frames can potentially write until the available right margin."
 (defgeneric close-frame (sheet frame)
   (:documentation "Close FRAME on SHEET.")
   (:method-combination progn :most-specific-last)
-  (:method progn (sheet (frame frame))
+  (:method progn (sheet (frame frame)
+		  &aux (right-margin (frame-right-margin frame)))
     "Reach FRAME's right margin if it has one."
-    (let ((right-margin (frame-right-margin frame)))
-      (when (numberp right-margin)
-	(reach-column sheet right-margin))))
+    (when (numberp right-margin)
+      (reach-column sheet right-margin)))
   (:method progn (sheet (frame highlight-frame))
     "Restore the upper frame's highlight properties."
     (princ-highlight-property-instances
@@ -325,8 +324,8 @@ output reaches the rightmost bound."
 		   ;; If we're at the end of the line, turn the space into a
 		   ;; newline.
 		   (open-next-line sheet)
-		   ;; Otherwise, just output it.
-		   (princ-char sheet #\space))
+		 ;; Otherwise, just output it.
+		 (princ-char sheet #\space))
 	       (incf i))
 	      (#\tab
 	       ;; Here, we get the real number of spaces to insert in order to
@@ -396,26 +395,25 @@ output reaches the rightmost bound."
 ;; SFace management
 ;; ---------------
 
-(defun find-sface (sface name)
+(defun find-sface (sface name
+		   &aux (sibling (search-face (sibling sface) name :error-me))
+			(sub-sface (search-face sface name)))
   "Find an sface starting at SFACE named NAME.
 If the sface can't be found in SFACE's face tree, find one in SFACE's sibling
 instead, and make a copy of it."
-  (let* ((sibling (search-face (sibling sface) name :error-me))
-	 (sub-sface (search-face sface name)))
-    (cond (sub-sface
-	   ;; #### NOTE: this is a bit dirty. The sibling might already have
-	   ;; been set before. It might be better to turn the search
-	   ;; procdedure into a generic function, and specialized its
-	   ;; behavior.
-	   (setf (slot-value sub-sface 'sibling) sibling)
-	   sub-sface)
-	  (t
-	   ;; #### NOTE: here, we create the missing face *only*. That is, we
-	   ;; don't copy a whole raw face tree. Copying the whole raw face
-	   ;; tree would perhaps create (hence override) other faces
-	   ;; previously defined by the user upper in the face hierarchy, and
-	   ;; we want to avoid that.
-	   (add-subface sface (make-raw-sface sibling))))))
+  (cond (sub-sface
+	 ;; #### NOTE: this is a bit dirty. The sibling might already have
+	 ;; been set before. It might be better to turn the search procdedure
+	 ;; into a generic function, and specialized its behavior.
+	 (setf (slot-value sub-sface 'sibling) sibling)
+	 sub-sface)
+	(t
+	 ;; #### NOTE: here, we create the missing face *only*. That is, we
+	 ;; don't copy a whole raw face tree. Copying the whole raw face tree
+	 ;; would perhaps create (hence override) other faces previously
+	 ;; defined by the user upper in the face hierarchy, and we want to
+	 ;; avoid that.
+	 (add-subface sface (make-raw-sface sibling)))))
 
 ;; In practice, it could happen that the level of indentation exceeds the
 ;; line-width (either the theme has something crazy in it, or we just have too
@@ -444,65 +442,66 @@ than the currently available right margin."
   (assert (visiblep sface))
   ;; Create the new frame:
   (let* ((left-margin
-	  (safe-left-margin
-	   sheet
-	   (let ((padding-spec (left-padding sface)))
+	   (safe-left-margin
+	    sheet
+	    (let ((padding-spec (left-padding sface)))
+	      (econd
+		((eq padding-spec 'self)
+		 (column sheet))
+		((numberp padding-spec)
+		 (+ (current-left-margin sheet) padding-spec))
+		((listp padding-spec)
+		 (destructuring-bind (padding relative-to &optional face-name)
+		     padding-spec
+		   ;; #### FIXME: should provide better error handling
+		   (econd ((and (eq relative-to 'absolute)
+				(null face-name))
+			   padding)
+			  ((and (eq relative-to :relative-to)
+				(symbolp face-name))
+			   (let* ((generation (parent-generation sface
+								 face-name))
+				  (left-margin
+				    (frame-left-margin
+				   ;; #### WARNING: we have not open the new
+				   ;; frame yet, so decrement the generation
+				   ;; level !!
+				     (nth (1- generation) (frames sheet)))))
+			     (+ left-margin padding))))))))))
+	 (right-margin
+	   (let ((padding-spec (right-padding sface)))
 	     (econd
 	       ((eq padding-spec 'self)
-		(column sheet))
+		nil)
 	       ((numberp padding-spec)
-		(+ (current-left-margin sheet) padding-spec))
+		(if (numberp (current-right-margin sheet))
+		    (safe-right-margin sheet left-margin
+				       (- (current-right-margin sheet)
+					  padding-spec))
+		  (error "Right padding (face ~A) can't be :relative-to a self right margin (face ~A)."
+		   (name sface) (name (current-sface sheet)))))
 	       ((listp padding-spec)
 		(destructuring-bind (padding relative-to &optional face-name)
 		    padding-spec
 		  ;; #### FIXME: should provide better error handling
 		  (econd ((and (eq relative-to 'absolute)
 			       (null face-name))
-			  padding)
+			  (safe-right-margin sheet left-margin padding))
 			 ((and (eq relative-to :relative-to)
 			       (symbolp face-name))
-			  (let* ((generation (parent-generation sface
-								face-name))
-				 (left-margin
-				  (frame-left-margin
-				   ;; #### WARNING: we have not open the new
-				   ;; frame yet, so decrement the generation
-				   ;; level !!
-				   (nth (1- generation) (frames sheet)))))
-			    (+ left-margin padding))))))))))
-	 (right-margin
-	  (let ((padding-spec (right-padding sface)))
-	    (econd
-	     ((eq padding-spec 'self)
-	      nil)
-	     ((numberp padding-spec)
-	      (if (numberp (current-right-margin sheet))
-		  (safe-right-margin sheet left-margin
-				     (- (current-right-margin sheet)
-					padding-spec))
-		  (error
-"Right padding (face ~A) can't be :relative-to a self right margin (face ~A)."
-		   (name sface) (name (current-sface sheet)))))
-	     ((listp padding-spec)
-	      (destructuring-bind (padding relative-to &optional face-name)
-		  padding-spec
-		;; #### FIXME: should provide better error handling
-		(econd ((and (eq relative-to 'absolute)
-			     (null face-name))
-			(safe-right-margin sheet left-margin padding))
-		       ((and (eq relative-to :relative-to) (symbolp face-name))
-			(let* ((generation (parent-generation sface face-name))
-			       (right-margin
-				(frame-right-margin
+			  (let* ((generation
+				   (parent-generation sface face-name))
+				 (right-margin
+				   (frame-right-margin
 				 ;; #### WARNING: we have not
 				 ;; open the new frame yet, so
 				 ;; decrement the generation
 				 ;; level !!
-				 (nth (1- generation) (frames sheet)))))
-			  (if (numberp right-margin)
-			      (safe-right-margin sheet left-margin
-						 (- right-margin padding))
-	      (error "Can't be :relative-to a self right margin.")))))))))))
+				    (nth (1- generation) (frames sheet)))))
+			    (if (numberp right-margin)
+				(safe-right-margin sheet left-margin
+						   (- right-margin padding))
+			      (error "Can't be :relative-to a self right margin.")))))))))))
     ;; Despite the "safe" computations above, we still need to check that our
     ;; new left and right margins let us actually display something.
     ;; Otherwise, we don't move at all because the layout is too fucked up. A
@@ -510,29 +509,29 @@ than the currently available right margin."
     ;; display one character and an hyphen. But really, 2 characters wide is
     ;; already cmpletely insane...
     (let ((actual-right-margin
-	   (or right-margin (available-right-margin sheet))))
+	    (or right-margin (available-right-margin sheet))))
       (unless (>= (- actual-right-margin left-margin) 2)
 	(setq left-margin (current-left-margin sheet)
 	      right-margin (current-right-margin sheet))))
     (push-frame sheet
 		(if (highlightp sheet)
 		    (let ((highlight-property-instances
-			   (loop :for property :in +highlight-properties+
-				 :when (face-highlight-property-set-p
-					sface property)
-				 :collect (make-highlight-property-instance
-					   :name property
-					   :value
-					   (face-highlight-property-value
-					    sface property)))))
+			    (loop :for property :in +highlight-properties+
+				  :when (face-highlight-property-set-p
+					 sface property)
+				    :collect (make-highlight-property-instance
+					      :name property
+					      :value
+					      (face-highlight-property-value
+					       sface property)))))
 		      (make-highlight-frame :sface sface
 					    :left-margin left-margin
 					    :right-margin right-margin
 					    :highlight-property-instances
 					    highlight-property-instances))
-		    (make-frame :sface sface
-				:left-margin left-margin
-				:right-margin right-margin))))
+		  (make-frame :sface sface
+			      :left-margin left-margin
+			      :right-margin right-margin))))
   ;; Open the new frame:
   (open-frame sheet (current-frame sheet)))
 
@@ -611,8 +610,8 @@ than the currently available right margin."
   "Return top padding of the next item in ITEMS that will print under SFACE."
   (loop :for help-spec :in items
 	:when (help-spec-will-print sface help-spec)
-	:return (when (listp help-spec)
-		  (top-padding (find-sface sface (car help-spec))))))
+	  :return (when (listp help-spec)
+		    (top-padding (find-sface sface (car help-spec))))))
 
 ;; #### NOTE: this is where I would like a more expressive dispatch in CLOS.
 ;; This function should be part of print-help-spec, with two cases:
@@ -626,22 +625,24 @@ than the currently available right margin."
     (loop :for help-specs :on items
 	  :for help-spec := (car help-specs)
 	  :do
-	  (when (help-spec-will-print (current-sface sheet) help-spec)
-	    (print-help-spec sheet help-spec)
-	    (when (help-spec-items-will-print (current-sface sheet)
-					      (cdr help-specs))
-	      (let ((vertical-padding
-		     (max (or (get-bottom-padding (current-sface sheet) help-spec)
-			      -1)
-			  (or (get-top-padding (current-sface sheet)
-					       (cdr help-specs))
-			      -1))))
-		(cond ((>= vertical-padding 0)
-		       (print-help-spec sheet (make-string (1+ vertical-padding)
-						:initial-element #\newline)))
-		      ((item-separator (current-sface sheet))
-		       (print-help-spec sheet (item-separator
-					       (current-sface sheet)))))))))
+	     (when (help-spec-will-print (current-sface sheet) help-spec)
+	       (print-help-spec sheet help-spec)
+	       (when (help-spec-items-will-print (current-sface sheet)
+						 (cdr help-specs))
+		 (let ((vertical-padding
+			 (max (or (get-bottom-padding (current-sface sheet)
+						      help-spec)
+				  -1)
+			      (or (get-top-padding (current-sface sheet)
+						   (cdr help-specs))
+				  -1))))
+		   (cond ((>= vertical-padding 0)
+			  (print-help-spec sheet
+					   (make-string (1+ vertical-padding)
+					     :initial-element #\newline)))
+			 ((item-separator (current-sface sheet))
+			  (print-help-spec sheet (item-separator
+						  (current-sface sheet)))))))))
     (close-sface sheet)))
 
 (defgeneric print-help-spec (sheet help-spec)
@@ -669,13 +670,13 @@ than the currently available right margin."
 (defun print-help (sheet help)
   "Open the toplevel help face and print HELP on SHEET with it."
   (let ((items
-	 (if (and (listp help) (not (symbolp (car help))))
-	     ;; There's already an enclosing list when help for a container is
-	     ;; requested directly, or when the complete help is requested, in
-	     ;; which case we have the list of synopsis and all synopsis
-	     ;; items.
-	     help
-	     (list help))))
+	  (if (and (listp help) (not (symbolp (car help))))
+	      ;; There's already an enclosing list when help for a container
+	      ;; is requested directly, or when the complete help is
+	      ;; requested, in which case we have the list of synopsis and all
+	      ;; synopsis items.
+	      help
+	    (list help))))
     (print-faced-help-spec sheet (sface-tree sheet) items)))
 
 
@@ -688,8 +689,8 @@ than the currently available right margin."
 ;; required to do the TIOCGWINSZ ioctl business.
 (defmethod initialize-instance :around
     ((sheet sheet) &rest keys &key (output-stream *standard-output*)
-				  line-width
-				  (highlight :auto))
+				   line-width
+				   (highlight :auto))
   "Handle unset line width and AUTO highlight according to OUTPUT-STREAM."
   ;; In both of the cases below, we must know whether we're printing to a
   ;; terminal or a simple file.
@@ -735,9 +736,9 @@ than the currently available right margin."
 	    (let ((*package* (find-package :com.dvlsoft.clon)))
 	      (loop :for item := (read stream nil stream)
 		    :if (eql item stream)
-		    :return items
+		      :return items
 		    :else
-		    :collect item :into items))))
+		      :collect item :into items))))
    'sface))
 
 (defun try-read-sface-tree (pathname)
@@ -765,7 +766,8 @@ This involves:
 - computing SHEET's sface tree from THEME and SEARCH-PATH,
 - initializing SHEET's toplevel sface's sibling to a raw face tree."
   (setf (slot-value sheet 'sface-tree)
-	(or (cond ((and theme (or (not search-path) (pathname-directory theme)))
+	(or (cond ((and theme (or (not search-path)
+				  (pathname-directory theme)))
 		   (try-read-theme theme))
 		  (theme
 		   (setq theme
