@@ -99,12 +99,12 @@ ARGUMENT.
 BODY constitutes the body of the only restart available, discard-argument, and
 should act as if ARGUMENT had not been provided."
   `(restart-case (error 'spurious-cmdline-argument
-		  :option ,option
-		  :name ,name
-		  :argument ,argument)
-    (discard-argument ()
-     :report "Discard spurious argument."
-     ,@body)))
+			:option ,option
+			:name ,name
+			:argument ,argument)
+     (discard-argument ()
+       :report "Discard spurious argument."
+       ,@body)))
 
 (define-condition invalid-negated-syntax (cmdline-option-error)
   ()
@@ -120,11 +120,11 @@ BODY constitutes the body of the only restart available,
 use-short-call, and should act as if OPTION had been normally called by short
 name."
   `(restart-case (error 'invalid-negated-syntax
-		  :option ,option
-		  :name (short-name ,option))
-    (use-short-call ()
-     :report "Fake a normal call by short name."
-     ,@body)))
+			:option ,option
+			:name (short-name ,option))
+     (use-short-call ()
+       :report "Fake a normal call by short name."
+       ,@body)))
 
 (define-condition invalid-cmdline-argument (cmdline-option-error invalid-argument)
   ()
@@ -246,7 +246,7 @@ This function returns three values:
 	(restartable-spurious-cmdline-argument-error
 	    (option cmdline-name cmdline-argument)
 	  (values t :cmdline cmdline))
-	(values t :cmdline cmdline)))
+      (values t :cmdline cmdline)))
   ;; Method for all valued options:
   (:method ((option valued-option) cmdline-name &optional cmdline-argument cmdline)
     (maybe-pop-argument cmdline option cmdline-argument)
