@@ -55,7 +55,7 @@
 
 (defmacro define-constant (name value &optional doc)
   `(defconstant ,name (if (boundp ',name) (symbol-value ',name) ,value)
-    ,@(when doc (list doc))))
+     ,@(when doc (list doc))))
 
 (defconstant +release-major-level+ 1
   "The major level of this release.")
@@ -161,67 +161,69 @@ The most important features of Clon are:
   :components ((:file "package")
 	       #+sbcl
 	       (:module "sbcl"
-		 :depends-on ("package")
-		 :serial t
-		 :components ((sb-grovel:grovel-constants-file
-			       "constants" :package :com.dvlsoft.clon)
-			      (:file "util")))
+		:depends-on ("package")
+		:serial t
+		:components ((sb-grovel:grovel-constants-file
+			      "constants" :package :com.dvlsoft.clon)
+			     (:file "util")))
 
 	       #+(and clisp cffi)
 	       (:module "clisp"
-		 :depends-on ("package")
-		 :serial t
-		 :components ((cffi-grovel:grovel-file "constants")
-			      (:file "util")))
+		:depends-on ("package")
+		:serial t
+		:components ((cffi-grovel:grovel-file "constants")
+			     (:file "util")))
 	       (module "src"
-		 :depends-on (#+sbcl "sbcl"
-			      #+(and clisp cffi) "clisp"
-			      "package")
-		 :components ((:file "util")
-			      (:file "item" :depends-on ("util"))
-			      (:file "text" :depends-on ("item"))
-			      (:module "options"
-				:depends-on ("text")
-				:components ((:file "option")
-					     (:file "flag"
-						    :depends-on ("option"))
-					     (:file "valued"
-						    :depends-on ("option"))
-					     (:file "negatable"
-						    :depends-on ("valued"))
-					     (:file "switch-base"
-						    :depends-on ("negatable"))
-					     (:file "switch"
-						    :depends-on
-						    ("switch-base"))
-					     (:file "stropt"
-						    :depends-on ("valued"))
-					     (:file "lispobj"
-						    :depends-on ("valued"))
-					     (:file "path"
-						    :depends-on ("valued"))
-					     (:file "enum-base")
-					     (:file "enum"
-						    :depends-on
-						    ("valued" "enum-base"))
-					     (:file
-					      "xswitch"
-					      :depends-on ("valued"
-							   "switch-base"
-							   "enum-base"))))
-			      (:file "container" :depends-on ("options"))
-			      (:file "group" :depends-on ("container"))
-			      (:module "retrieval"
-				:depends-on ("options")
-				:components ((:file "cmdline")
-					     (:file "environ")))
-			      (:file "synopsis" :depends-on ("group"))
-			      (:module "output"
-				:depends-on ("synopsis" "retrieval")
-				:components ((:file "face")
-					     (:file "sheet"
-						    :depends-on ("face"))))
-			      (:file "context" :depends-on ("output"))))))
+		       :depends-on (#+sbcl "sbcl"
+				    #+(and clisp cffi) "clisp"
+					   "package")
+		       :components ((:file "util")
+				    (:file "item" :depends-on ("util"))
+				    (:file "text" :depends-on ("item"))
+				    (:module "options"
+				     :depends-on ("text")
+				     :components ((:file "option")
+						  (:file "flag"
+						   :depends-on ("option"))
+						  (:file "valued"
+						   :depends-on ("option"))
+						  (:file "negatable"
+						   :depends-on ("valued"))
+						  (:file "switch-base"
+						   :depends-on ("negatable"))
+						  (:file "switch"
+						   :depends-on
+							 ("switch-base"))
+						  (:file "stropt"
+						   :depends-on ("valued"))
+						  (:file "lispobj"
+						   :depends-on ("valued"))
+						  (:file "path"
+						   :depends-on ("valued"))
+						  (:file "enum-base")
+						  (:file "enum"
+						   :depends-on
+							 ("valued"
+							  "enum-base"))
+						  (:file
+						   "xswitch"
+						   :depends-on ("valued"
+								"switch-base"
+								"enum-base"))))
+				    (:file "container" :depends-on ("options"))
+				    (:file "group" :depends-on ("container"))
+				    (:module "retrieval"
+				     :depends-on ("options")
+				     :components ((:file "cmdline")
+						  (:file "environ")))
+				    (:file "synopsis" :depends-on ("group"))
+				    (:module "output"
+				     :depends-on ("synopsis" "retrieval")
+				     :components ((:file "face")
+						  (:file "sheet"
+						   :depends-on ("face"))))
+				    (:file "context"
+				     :depends-on ("output"))))))
 
 
 ;;; com.dvlsoft.clon.asd ends here
