@@ -38,10 +38,11 @@
 (defoption lispobj ()
   ((argument-name ;; inherited from the VALUED-OPTION class
     :initform "OBJ")
-   (typespec :documentation "A type specifier the option's value should satisfy."
-	     :initform t
-	     :initarg :typespec
-	     :reader typespec))
+   (typespec
+    :documentation "A type specifier the option's value should satisfy."
+    :initform t
+    :initarg :typespec
+    :reader typespec))
   (:documentation "The LISPOBJ class.
 This class implements read-from-string options."))
 
@@ -137,11 +138,11 @@ This class implements read-from-string options."))
   (apply #'make-instance 'lispobj keys))
 
 (defun make-internal-lispobj (long-name description
-			       &rest keys
-			       &key argument-name argument-type
-				    env-var
-				    typespec fallback-value default-value
-				    hidden)
+			      &rest keys
+			      &key argument-name argument-type
+				   env-var
+				   typespec fallback-value default-value
+				   hidden)
   "Make a new internal (Clon-specific) string option.
 - LONG-NAME is the option's long-name, sans the 'clon-' prefix.
   (Internal options don't have short names.)
