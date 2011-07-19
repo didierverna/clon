@@ -147,8 +147,8 @@ This property can take the following forms:
 ;; =========================================================================
 
 (define-constant +highlight-properties+
-  '(intensity italicp underline blink inversep concealedp crossed-out-p
-    framedp foreground background)
+    '(intensity italicp underline blink inversep concealedp crossed-out-p
+      framedp foreground background)
   "The highlight face properties.")
 
 (defmethod slot-unbound (class (face face) slot)
@@ -160,7 +160,7 @@ For other properties, trigger an error."
     (if property
 	(when (parent face)
 	  (slot-value (parent face) slot))
-	(call-next-method))))
+      (call-next-method))))
 
 (defun face-highlight-property-set-p (face property)
   "Return t if PROPERTY is set explicitely in FACE."
@@ -179,16 +179,16 @@ if PROPERTY is not et, return nil."
 ;; The Face Tree Copy Protocol
 ;; =========================================================================
 
-(defun attach-face-tree (face face-tree)
+(defun attach-face-tree (face face-tree
+			 &aux (new-tree (copy-instance face-tree)))
   "Create a copy of FACE-TREE, attach it to FACE and return it.
 Apart from the parenting information, the copied faces share slot values with
 the original ones."
-  (let ((new-tree (copy-instance face-tree)))
-    (setf (slot-value new-tree 'subfaces)
-	  (mapcar (lambda (subtree)
-		    (attach-face-tree new-tree subtree))
-		  (subfaces new-tree)))
-    (add-subface face new-tree)))
+  (setf (slot-value new-tree 'subfaces)
+	(mapcar (lambda (subtree)
+		  (attach-face-tree new-tree subtree))
+		(subfaces new-tree)))
+  (add-subface face new-tree))
 
 (defgeneric subface (face |name(s)|)
   (:documentation "Return subface of FACE named NAME(S) or nil.
@@ -197,13 +197,12 @@ branch matching those names to find the leaf face.")
   (:method (face (name symbol))
     "Return FACE'subface named NAME, or nil."
     (find name (subfaces face) :key #'name))
-  (:method (face (names list))
+  (:method (face (names list) &aux (branch (subface face (car names))))
     "Return the leaf face from FACE'subbranch matching NAMES, or nil."
-    (let ((branch (subface face (car names))))
-      (or (when (null (cdr names))
-	    branch)
-	  (when branch
-	    (subface branch (cdr names)))))))
+    (or (when (null (cdr names))
+	  branch)
+	(when branch
+	  (subface branch (cdr names))))))
 
 (defun search-branch (face names)
   "Search for a branch of faces named NAMES starting at FACE.
@@ -214,7 +213,7 @@ If a branch is found, return its leaf face. Otherwise return nil."
       (loop :for parent := (parent face) :then (parent parent)
 	    :while parent
 	    :when (subface parent names)
-	    :return :it
+	      :return :it
 	    :finally (return nil))))
 
 (defun search-face (face name &optional error-me)
@@ -232,7 +231,7 @@ If ERROR-ME, trigger an error if no face is found; otherwise, return nil."
 				      :finally (return names))
 		 :for found := (search-branch (parent face) names)
 		 :when found
-		 :return (attach-face-tree face found)))
+		   :return (attach-face-tree face found)))
       (when error-me (error "Face ~A not found." name))))
 
 (defun parent-generation (face parent-name)
@@ -243,7 +242,7 @@ etc. If PARENT-NAME does not name one of FACE's ancestors, trigger an error."
 	:for parent := (parent face) :then (parent parent)
 	:while parent
 	:when (eql (name parent) parent-name)
-	:return generation
+	  :return generation
 	:finally (error "Parent face ~A for face ~A not found."
 			parent-name (name face))))
 
@@ -281,8 +280,8 @@ This involves:
 	:while (cdr faces)
 	:when (member (name (car faces))
 		      (mapcar #'name (cdr faces)))
-	:do (error "Duplicate subface ~A for face ~A."
-		   (name (car faces)) name)))
+	  :do (error "Duplicate subface ~A for face ~A."
+		     (name (car faces)) name)))
 
 (defmethod initialize-instance :after ((face face) &key)
   "Fill in the parent slot of all subfaces."
@@ -299,9 +298,9 @@ This involves:
 	   (loop :for key :in (cdr definition) :by #'cddr
 		 :for val :in (cddr definition) :by #'cddr
 		 :if (eq key :face)
-		 :nconc (list :face (make-face-tree val face-class))
+		   :nconc (list :face (make-face-tree val face-class))
 		 :else
-		 :nconc (list key val))))
+		   :nconc (list key val))))
   (:method ((name symbol) &optional (face-class 'face))
     "Create a face named NAME."
     (funcall #'make-instance face-class :name name)))
