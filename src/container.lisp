@@ -86,7 +86,7 @@ command-line hierarchy."))
   "Return CONTAINER's help specification."
   (loop :for item :in (items container)
 	:when (help-spec item)
-	:collect :it))
+	  :collect :it))
 
 
 
