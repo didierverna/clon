@@ -40,10 +40,10 @@
 (cvar ("errno" +errno+ :read-only t) :int)
 
 (cstruct winsize "winsize_t"
-	 (ws-row "ws_row" :type :unsigned-short)
-	 (ws-col "ws_col" :type :unsigned-short)
-	 (ws-xpixel "ws_xpixel" :type :unsigned-short)
-	 (ws-ypixel "ws_ypixel" :type :unsigned-short))
+  (ws-row "ws_row" :type :unsigned-short)
+  (ws-col "ws_col" :type :unsigned-short)
+  (ws-xpixel "ws_xpixel" :type :unsigned-short)
+  (ws-ypixel "ws_ypixel" :type :unsigned-short))
 
 
 ;;; constants.lisp ends here
