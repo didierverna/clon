@@ -38,15 +38,15 @@ This function relies on CFFI."
     (when output-fd
       (cffi:with-foreign-object (winsize 'winsize)
 	(let ((result (cffi:foreign-funcall "ioctl"
-					    :int output-fd
-					    :int +tiocgwinsz+
-					    :pointer winsize
-					    :int)))
+			:int output-fd
+			:int +tiocgwinsz+
+			:pointer winsize
+			:int)))
 	  (if (= result -1)
 	      (unless (= +errno+ +enotty+)
 		(values nil
 			(cffi:foreign-funcall "strerror"
-					      :int +errno+ :string)))
+			  :int +errno+ :string)))
 	    (cffi:with-foreign-slots ((ws-col) winsize winsize)
 	      ws-col)))))))
 
