@@ -136,14 +136,14 @@
 (defmacro with-context-error-handler (context &body body)
   "Execute BODY with CONTEXT's error handler bound for CONDITION."
   `(handler-bind ((error
-		   (lambda (error)
-		     (ecase (error-handler ,context)
-		       (:interactive
-			(restart-on-error error))
-		       (:quit
-			(exit-abnormally error))
-		       (:none)))))
-    ,@body))
+		    (lambda (error)
+		      (ecase (error-handler ,context)
+			(:interactive
+			 (restart-on-error error))
+			(:quit
+			 (exit-abnormally error))
+			(:none)))))
+     ,@body))
 
 
 
@@ -188,7 +188,7 @@
 		  :initform :quit ;; see the warning in initialize-instance
 		  :reader error-handler))
   (:default-initargs
-      :cmdline (cmdline))
+   :cmdline (cmdline))
   (:documentation "The CONTEXT class.
 This class represents the associatiion of a synopsis and a set of command-line
 options based on it."))
@@ -316,6 +316,7 @@ When such an option exists, return two values:
 	      ;; he did something wrong.
 	      (complete-string partial-name (long-name closest-option))))))
 
+#i(search-option 1)
 (defun search-option
     (context &rest keys &key short-name long-name partial-name)
   "Search for an option in CONTEXT.
@@ -421,9 +422,9 @@ Otherwise, return four values:
 OPTION, NAME and VALUE are bound to the values returned by GETOPT-CMDLINE.
 BODY is executed only if there is a next command-line option."
   `(multiple-value-bind (,option ,name ,value ,source)
-    (getopt-cmdline :context (or ,context *current-context*))
-    (when ,option
-      ,@body)))
+       (getopt-cmdline :context (or ,context *current-context*))
+     (when ,option
+       ,@body)))
 
 (defmacro do-cmdline-options
     ((option name value source &key context) &body body)
@@ -432,10 +433,10 @@ OPTION, NAME and VALUE are bound to each option's object, name used on the
 command-line and retrieved value."
   (let ((ctx (gensym "context")))
     `(let ((,ctx (or ,context *current-context*)))
-      (do () ((null (cmdline-options ,ctx)))
-	(multiple-value-getopt-cmdline
-	    (,option ,name ,value ,source :context ,ctx)
-	  ,@body)))))
+       (do () ((null (cmdline-options ,ctx)))
+	 (multiple-value-getopt-cmdline
+	     (,option ,name ,value ,source :context ,ctx)
+	   ,@body)))))
 
 
 
@@ -448,8 +449,8 @@ command-line and retrieved value."
   (format t "Please type in the correct option's long name:~%")
   (let (line)
     (loop (setq line (read-line))
-	(if (position #\= line)
-	    (format t "Option names can't contain equal signs. Try again:~%")
+	  (if (position #\= line)
+	      (format t "Option names can't contain equal signs. Try again:~%")
 	    (return (list line))))))
 
 (defun read-call (&optional negated)
@@ -460,6 +461,7 @@ If NEGATED, read a negated call or pack. Otherwise, read a short call or pack."
     negated)
   (list (read-line)))
 
+#i(push-cmdline-option 1)
 (defmethod initialize-instance :after ((context context) &key cmdline)
   "Parse CMDLINE."
   (setf (slot-value context 'progname) (pop cmdline))
@@ -489,32 +491,33 @@ If NEGATED, read a negated call or pack. Otherwise, read a short call or pack."
 		 "Push a new CMDLINE-OPTION created with BODY onto PLACE."
 		 `(push (make-cmdline-option ,@body) ,place))
 	       (push-retrieved-option (place func option
-				       &optional cmdline-value cmdline)
-		   "Retrieve OPTION from a FUNC call and push it onto PLACE.
+					     &optional cmdline-value cmdline)
+		 "Retrieve OPTION from a FUNC call and push it onto PLACE.
 - FUNC must be either :short or :negated,
 - CMDLINE-VALUE is a potentially already parsed option argument,
 - CMDILNE is where to find a potentially required argument."
-		   (let* ((value (gensym "value"))
-			  (source (gensym "source"))
-			  (vars (list source value))
-			  (call (list option
-				      (find-symbol (concatenate 'string
-						     "RETRIEVE-FROM-"
-						     (symbol-name func)
-						     "-CALL")
-						   :com.dvlsoft.clon)))
-			  new-cmdline)
-		     (when cmdline-value
-		       (push cmdline-value call))
-		     (when cmdline
-		       (setq new-cmdline (gensym "new-cmdline"))
-		       (push new-cmdline vars)
-		       (unless cmdline-value
-			 (push nil call))
-		       (push cmdline call))
-		     `(multiple-value-bind ,(reverse vars) ,(reverse call)
-		       ,(when cmdline `(setq ,cmdline ,new-cmdline))
-		       (push-cmdline-option ,place
+		 (let* ((value (gensym "value"))
+			(source (gensym "source"))
+			(vars (list source value))
+			(call (list option
+				    (find-symbol (concatenate 'string
+							      "RETRIEVE-FROM-"
+							      (symbol-name
+							       func)
+							      "-CALL")
+						 :com.dvlsoft.clon)))
+			new-cmdline)
+		   (when cmdline-value
+		     (push cmdline-value call))
+		   (when cmdline
+		     (setq new-cmdline (gensym "new-cmdline"))
+		     (push new-cmdline vars)
+		     (unless cmdline-value
+		       (push nil call))
+		     (push cmdline call))
+		   `(multiple-value-bind ,(reverse vars) ,(reverse call)
+		      ,(when cmdline `(setq ,cmdline ,new-cmdline))
+		      (push-cmdline-option ,place
 			:name (short-name ,option)
 			:option ,option
 			:value ,value
@@ -525,11 +528,12 @@ CONTEXT is where to look for the options."
 		 (let ((char (gensym "char"))
 		       (name (gensym "name")))
 		   `(loop :for ,char :across ,pack
-		     :do (let* ((,name (make-string 1 :initial-element ,char))
-				(,option (search-option ,context
-					   :short-name ,name)))
-			   (assert ,option)
-			   ,@body)))))
+			  :do (let* ((,name (make-string 1
+					      :initial-element ,char))
+				     (,option (search-option ,context
+						:short-name ,name)))
+				(assert ,option)
+				,@body)))))
       (with-context-error-handler context
 	(do ((arg (pop cmdline) (pop cmdline)))
 	    ((null arg))
@@ -565,10 +569,10 @@ CONTEXT is where to look for the options."
 				(setf (slot-value context 'error-handler)
 				      value)
 			      (push-cmdline-option cmdline-options
-						   :name option-name
-						   :option option
-						   :value value
-						   :source source)))
+				:name option-name
+				:option option
+				:value value
+				:source source)))
 			(restart-case (error 'unknown-cmdline-option-error
 					     :name cmdline-name
 					     :argument cmdline-value)
@@ -596,13 +600,14 @@ CONTEXT is where to look for the options."
 			    (setq cmdline-value nil))
 			  (stick-argument ()
 			    :report "Stick argument to option name."
-			    (setq cmdline-name (concatenate 'string
-						 cmdline-name cmdline-value))
+			    (setq cmdline-name
+				  (concatenate 'string
+				    cmdline-name cmdline-value))
 			    (setq cmdline-value nil))
 			  (separate-argument ()
-			     :report "Separate option from its argument."
-			     (push cmdline-value cmdline)
-			     (setq cmdline-value nil))))
+			    :report "Separate option from its argument."
+			    (push cmdline-value cmdline)
+			    (setq cmdline-value nil))))
 		      (setq option
 			    (search-option context :short-name cmdline-name))
 		      (unless option
@@ -626,7 +631,7 @@ CONTEXT is where to look for the options."
 			     (let* ((name (subseq cmdline-name
 						  (1- (length cmdline-name))))
 				    (option (search-option context
-							   :short-name name)))
+					      :short-name name)))
 			       (assert option)
 			       (push-retrieved-option
 				cmdline-options :short option nil cmdline)))
@@ -771,7 +776,7 @@ or FITNESS FOR A PARTICULAR PURPOSE.~%"
 (defmacro with-context (context &body body)
   "Execute BODY with *current-context* bound to CONTEXT."
   `(let ((*current-context* ,context))
-    ,@body))
+     ,@body))
 
 
 ;;; context.lisp ends here
