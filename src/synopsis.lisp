@@ -71,7 +71,7 @@
 (defmacro do-options ((opt there) &body body)
   "Execute BODY with OPT bound to every option in THERE."
   `(mapoptions (lambda (,opt) ,@body)
-    (untraverse ,there)))
+	       (untraverse ,there)))
 
 
 
@@ -89,8 +89,8 @@
 	       :type (or null string)
 	       :reader short-pack)
    (negated-pack :documentation "The negated pack string."
-	      :type (or null string)
-	      :reader negated-pack)
+		 :type (or null string)
+		 :reader negated-pack)
    (potential-pack :documentation "The potential pack string."
 		   :type (or null string)
 		   :reader potential-pack)
@@ -226,23 +226,25 @@ Auto (the default) means on for tty output and off otherwise."
 	   :clon-options-group grp
 	   (nconc keys (list :item grp)))))
 
-(defmethod initialize-instance :after ((synopsis synopsis) &key)
+(defmethod initialize-instance :after
+    ((synopsis synopsis) &key &aux potential-pack short-pack negated-pack)
   "Compute SYNOSPSIS's short and negated packs."
-  (let (potential-pack short-pack negated-pack)
-    (do-options (option synopsis)
-      (let ((potential-pack-char (potential-pack-char option :as-string))
-	    (short-pack-char (short-pack-char option :as-string))
-	    (negated-pack-char (negated-pack-char option  :as-string)))
-	(when potential-pack-char
-	  (setq potential-pack
-		(concatenate 'string potential-pack potential-pack-char)))
-	(when short-pack-char
-	  (setq short-pack (concatenate 'string short-pack short-pack-char)))
-	(when negated-pack-char
-	  (setq negated-pack (concatenate 'string negated-pack negated-pack-char)))))
-    (setf (slot-value synopsis 'potential-pack) potential-pack)
-    (setf (slot-value synopsis 'short-pack) short-pack)
-    (setf (slot-value synopsis 'negated-pack) negated-pack)))
+  (do-options (option synopsis)
+    (let ((potential-pack-char (potential-pack-char option :as-string))
+	  (short-pack-char (short-pack-char option :as-string))
+	  (negated-pack-char (negated-pack-char option  :as-string)))
+      (when potential-pack-char
+	(setq potential-pack
+	      (concatenate 'string potential-pack potential-pack-char)))
+      (when short-pack-char
+	(setq short-pack
+	      (concatenate 'string short-pack short-pack-char)))
+      (when negated-pack-char
+	(setq negated-pack
+	      (concatenate 'string negated-pack negated-pack-char)))))
+  (setf (slot-value synopsis 'potential-pack) potential-pack)
+  (setf (slot-value synopsis 'short-pack) short-pack)
+  (setf (slot-value synopsis 'negated-pack) negated-pack))
 
 (defun make-synopsis (&rest keys &key postfix item (make-default t))
   "Make a new SYNOPSIS.
@@ -259,14 +261,15 @@ remainder.
 (defmacro defsynopsis ((&rest keys &key postfix make-default) &body forms)
   "Define a new synopsis."
   (declare (ignore postfix make-default))
-  `(make-synopsis ,@keys
+  `(make-synopsis
+    ,@keys
     ,@(loop :for form :in forms
 	    :nconc (list :item
 			 (let ((item-name
-				(when (consp form)
-				  (car (member (symbol-name (car form))
-					       *item-names*
-					       :test #'string=)))))
+				 (when (consp form)
+				   (car (member (symbol-name (car form))
+						*item-names*
+						:test #'string=)))))
 			   (if item-name
 			       (list* (intern
 				       (cond ((string= item-name "GROUP")
