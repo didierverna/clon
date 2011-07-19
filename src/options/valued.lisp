@@ -40,17 +40,18 @@
 		  :initarg :argument-name
 		  :initform "ARG"
 		  :reader argument-name)
-   (argument-required-p :documentation "Whether the option's argument is required."
-			;; Initialization :after wards by :argument-type
-			:reader argument-required-p)
+   (argument-required-p
+    :documentation "Whether the option's argument is required."
+    ;; Initialization :after wards by :argument-type
+    :reader argument-required-p)
    (fallback-value :documentation "The option's fallback value."
 		   :initarg :fallback-value
 		   :reader fallback-value)
    (default-value :documentation "The option's default value."
-		 :initarg :default-value
-		 :reader default-value))
+		  :initarg :default-value
+		  :reader default-value))
   (:default-initargs
-    :argument-type :required)
+   :argument-type :required)
   (:documentation "The VALUED-OPTION class.
 This is the base class for options accepting arguments."))
 
@@ -91,7 +92,8 @@ If OPTION matches, return its short name's length; otherwise 0."
 ;; ---------------------------
 
 (defgeneric short-syntax-help-spec-prefix (option)
-  (:documentation "Return the help specification prefix for OPTION's short call.")
+  (:documentation
+   "Return the help specification prefix for OPTION's short call.")
   (:method ((option valued-option))
     #+ecl (declare (ignore option))
     "-"))
@@ -249,8 +251,8 @@ Available restarts are:
 
 (defmethod initialize-instance :before
     ((option valued-option) &key argument-type
-			       (fallback-value nil fallback-value-supplied-p)
-			       (default-value nil default-value-supplied-p))
+				 (fallback-value nil fallback-value-supplied-p)
+				 (default-value nil default-value-supplied-p))
   (declare (ignore fallback-value default-value))
   "Check validity of the value-related initargs."
   (unless (member argument-type '(:required :mandatory :optional))
@@ -261,13 +263,14 @@ Available restarts are:
   (when (and (eq argument-type :optional)
 	     (not fallback-value-supplied-p)
 	     (not default-value-supplied-p))
-    (error "Option ~A: fallback or default value required for optional argument."
-	   option)))
+    (error
+     "Option ~A: fallback or default value required for optional argument."
+     option)))
 
 (defmethod initialize-instance :after
     ((option valued-option) &key argument-type
-			       (fallback-value nil fallback-value-supplied-p)
-			       (default-value nil default-value-supplied-p))
+				 (fallback-value nil fallback-value-supplied-p)
+				 (default-value nil default-value-supplied-p))
   "Compute uninitialized OPTION slots with indirect initargs.
 This currently involves the conversion of the ARGUMENT-TYPE key to the
 ARGUMENT-REQUIRED-P slot."
@@ -287,7 +290,8 @@ ARGUMENT-REQUIRED-P slot."
     ;; one.
     (handler-case (check option fallback-value)
       (invalid-value ()
-	(error "Option ~A: invalid fallback value ~S." option fallback-value))))
+	(error "Option ~A: invalid fallback value ~S."
+	       option fallback-value))))
   (when default-value-supplied-p
     ;; An error here is in the program itself, not in the usage of the
     ;; program, so wrap the check in a simple error instead of a restartable
@@ -302,10 +306,10 @@ ARGUMENT-REQUIRED-P slot."
 (defmacro defoption (class superclasses slots &rest options)
   "Create a new option CLASS and register it with Clon."
   `(progn
-    (defclass ,class (,@superclasses valued-option)
-    ,slots
-    ,@options)
-    (pushnew (symbol-name ',class) *item-names* :test #'string=)))
+     (defclass ,class (,@superclasses valued-option)
+       ,slots
+       ,@options)
+     (pushnew (symbol-name ',class) *item-names* :test #'string=)))
 
 
 ;;; valued.lisp ends here
