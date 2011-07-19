@@ -113,16 +113,16 @@ This class implements options whose values belong to a set of keywords."))
 - DEFAULT-VALUE is the option's default value, if any.
 - When HIDDEN, the option doesn't appear in help strings."
   (declare (ignore short-name long-name description
-		  argument-name argument-type
-		  enum env-var fallback-value default-value
-		  hidden))
+		   argument-name argument-type
+		   enum env-var fallback-value default-value
+		   hidden))
   (apply #'make-instance 'enum keys))
 
 (defun make-internal-enum (long-name description
-			    &rest keys
-			    &key argument-name argument-type
-				 enum env-var fallback-value default-value
-				 hidden)
+			   &rest keys
+			   &key argument-name argument-type
+				enum env-var fallback-value default-value
+				hidden)
   "Make a new internal (Clon-specific) enum option.
 - LONG-NAME is the option's long-name, sans the 'clon-' prefix.
   (Internal options don't have short names.)
