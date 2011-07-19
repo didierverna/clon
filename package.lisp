@@ -40,7 +40,7 @@
 		#+ecl   :clos
 		#+clisp :clos
 		#+abcl  :mop
-    :class-slots :slot-definition-name #-abcl :validate-superclass)
+		:class-slots :slot-definition-name #-abcl :validate-superclass)
   (:import-from :com.dvlsoft.clon.asdf
     :define-constant
     :+release-major-level+
@@ -50,53 +50,53 @@
     :+release-name+
     :version)
   (:export
-   ;; From com.dvlsoft.clon.asd:
-   :+release-major-level+
-   :+release-minor-level+
-   :+release-status+
-   :+release-status-level+
-   :+release-name+
-   :version
-   ;; From package.lisp:
-   :nickname-package
-   ;; From src/util.lisp:
-   :exit
-   :cmdline
-   :dump
-   ;; From src/text.lisp:
-   :make-text
-   ;; From src/options/flag.lisp:
-   :make-flag
-   ;; From src/options/switch.lisp:
-   :make-switch
-   ;; From src/options/stropt.lisp:
-   :make-stropt
-   ;; From src/options/lispobj.lisp:
-   :make-lispobj
-   ;; From src/options/path.lisp:
-   :make-path
-   ;; From src/options/enum.lisp:
-   :make-enum
-   ;; From src/options/xswitch.lisp:
-   :make-xswitch
-   ;; From src/group.lisp:
-   :make-group :defgroup
-   ;; From src/synopsis.lisp:
-   :*default-synopsis*
-   :make-synopsis :defsynopsis
-   ;; From src/context.lisp:
-   :*current-context*
-   :make-context
-   :with-context
-   :progname
-   :remainder
-   :cmdline-options-p
-   :cmdline-p
-   :getopt
-   :getopt-cmdline
-   :multiple-value-getopt-cmdline
-   :do-cmdline-options
-   :help))
+    ;; From com.dvlsoft.clon.asd:
+    :+release-major-level+
+    :+release-minor-level+
+    :+release-status+
+    :+release-status-level+
+    :+release-name+
+    :version
+    ;; From package.lisp:
+    :nickname-package
+    ;; From src/util.lisp:
+    :exit
+    :cmdline
+    :dump
+    ;; From src/text.lisp:
+    :make-text
+    ;; From src/options/flag.lisp:
+    :make-flag
+    ;; From src/options/switch.lisp:
+    :make-switch
+    ;; From src/options/stropt.lisp:
+    :make-stropt
+    ;; From src/options/lispobj.lisp:
+    :make-lispobj
+    ;; From src/options/path.lisp:
+    :make-path
+    ;; From src/options/enum.lisp:
+    :make-enum
+    ;; From src/options/xswitch.lisp:
+    :make-xswitch
+    ;; From src/group.lisp:
+    :make-group :defgroup
+    ;; From src/synopsis.lisp:
+    :*default-synopsis*
+    :make-synopsis :defsynopsis
+    ;; From src/context.lisp:
+    :*current-context*
+    :make-context
+    :with-context
+    :progname
+    :remainder
+    :cmdline-options-p
+    :cmdline-p
+    :getopt
+    :getopt-cmdline
+    :multiple-value-getopt-cmdline
+    :do-cmdline-options
+    :help))
 
 
 (in-package :com.dvlsoft.clon)
@@ -189,7 +189,7 @@ See CLINDENT for more information."
 (defmacro in-readtable (name)
   "Set the current readtable to the value of NAME::*READTABLE*."
   `(eval-when (:compile-toplevel :load-toplevel :execute)
-    (setf cl:*readtable* (symbol-value (find-symbol "*READTABLE*" ,name)))))
+     (setf cl:*readtable* (symbol-value (find-symbol "*READTABLE*" ,name)))))
 
 
 ;;; package.lisp ends here
