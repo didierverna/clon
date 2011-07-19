@@ -73,14 +73,15 @@ implementing hierarchical program command-line."))
 (defmacro %defgroup (internalp (&rest keys &key header hidden) &body forms)
   "Define a new group."
   (declare (ignore header hidden))
-  `(make-group ,@keys
+  `(make-group
+    ,@keys
     ,@(loop :for form :in forms
 	    :nconc (list :item
 			 (let ((item-name
-				(when (consp form)
-				  (car (member (symbol-name (car form))
-					       *item-names*
-					       :test #'string=)))))
+				 (when (consp form)
+				   (car (member (symbol-name (car form))
+						*item-names*
+						:test #'string=)))))
 			   (if item-name
 			       (list* (intern
 				       (cond ((string= item-name "GROUP")
