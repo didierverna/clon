@@ -141,7 +141,7 @@ If AS-DIRECTORY, ensure that it denotes a directory."
   (loop :for split-point := (position #\: path)
 	:for path-elt := (subseq path 0 split-point)
 	:unless (zerop (length path-elt)) :collect path-elt
-	:do (setq path (when split-point (subseq path (1+ split-point))))
+	  :do (setq path (when split-point (subseq path (1+ split-point))))
 	:while path))
 
 
@@ -247,15 +247,15 @@ useful to specify which part of ARGUMENT is concerned when it is a list."
   :directory-list or nil meaning that everything is allowed.
 - When HIDDEN, the option doesn't appear in help strings."
   (declare (ignore short-name long-name description env-var
-		  argument-name argument-type fallback-value default-value
-		  type hidden))
+		   argument-name argument-type fallback-value default-value
+		   type hidden))
   (apply #'make-instance 'path keys))
 
 (defun make-internal-path (long-name description
-			    &rest keys
-			    &key argument-name argument-type
-				 env-var fallback-value default-value
-				 type hidden)
+			   &rest keys
+			   &key argument-name argument-type
+				env-var fallback-value default-value
+				type hidden)
   "Make a new internal (Clon-specific) path option.
 - LONG-NAME is the option's long-name, sans the 'clon-' prefix.
   (Internal options don't have short names.)
