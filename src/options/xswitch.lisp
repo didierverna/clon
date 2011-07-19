@@ -83,15 +83,15 @@ As such, the negated syntax is available for extended xswitches."))
 (defmethod convert ((xswitch xswitch) argument)
   "Convert ARGUMENT to an XSWITCH value."
   (let ((match (closest-match argument
-			      (append (yes-values xswitch) (no-values xswitch))
-			      :ignore-case t)))
+		   (append (yes-values xswitch) (no-values xswitch))
+		 :ignore-case t)))
     (cond ((member match (yes-values xswitch) :test #'string-equal)
 	   t)
 	  ((member match (no-values xswitch) :test #'string-equal)
 	   nil)
 	  (t
 	   (or (closest-match argument (enum xswitch)
-			      :ignore-case t :key #'symbol-name)
+		 :ignore-case t :key #'symbol-name)
 	       (error 'invalid-argument
 		      :option xswitch
 		      :argument argument
@@ -110,8 +110,8 @@ As such, the negated syntax is available for extended xswitches."))
 ;; ==========================================================================
 
 (defun make-xswitch (&rest keys &key short-name long-name description
-				    argument-name argument-type
-				    enum env-var default-value hidden)
+				     argument-name argument-type
+				     enum env-var default-value hidden)
   "Make a new xswitch.
 - SHORT-NAME is the xswitch's short name (without the dash).
   It defaults to nil.

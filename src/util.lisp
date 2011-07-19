@@ -82,6 +82,7 @@ If IGNORE-CASE, well, ignore case."
        (funcall (if ignore-case #'string-equal #'string=)
 		beginning string :end2 length)))
 
+#i(closest-match 2)
 (defun closest-match
     (match list &key ignore-case (key #'identity)
 		&aux (match-length (length match))
