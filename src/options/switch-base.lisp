@@ -62,10 +62,10 @@ position of the associated strings in the yes-values and no-values slots."
 		   :initarg :argument-style
 		   :reader argument-style))
   (:default-initargs
-    :argument-type :optional
-    :argument-styles '(:yes/no :on/off :true/false :yup/nope :yeah/nah)
-    :yes-values '("yes" "on" "true" "yup" "yeah")
-    :no-values '("no" "off" "false" "nope" "nah"))
+   :argument-type :optional
+   :argument-styles '(:yes/no :on/off :true/false :yup/nope :yeah/nah)
+   :yes-values '("yes" "on" "true" "yup" "yeah")
+   :no-values '("no" "off" "false" "nope" "nah"))
   (:documentation "The SWITCH-BASE abstract class.
 This class provides support for options including boolean values."))
 
