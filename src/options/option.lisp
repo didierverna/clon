@@ -156,7 +156,7 @@ MOST-POSITIVE-FIXNUM."
   (with-slots (long-name) option
     (if (beginning-of-string-p partial-name long-name)
 	(- (length long-name) (length partial-name))
-	most-positive-fixnum)))
+      most-positive-fixnum)))
 
 (defun match-option (option &key short-name long-name)
   "Try to match OPTION against SHORT-NAME, LONG-NAME.
@@ -202,7 +202,7 @@ If AS-STRING, return a string of that character."
     (when (and short-name (= (length short-name) 1))
       (if as-string
 	  short-name
-	  (coerce short-name 'character)))))
+	(coerce short-name 'character)))))
 
 (defgeneric short-pack-char (option &optional as-string)
   (:documentation "Return OPTION's short pack character, if any.
