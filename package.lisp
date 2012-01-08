@@ -145,8 +145,11 @@ This function sets SYMBOL's common-lisp-indent-function property.
 If INDENT is a symbol, use its indentation definition.
 Otherwise, INDENT is considered as an indentation definition."
   (when (and (member :swank *features*)
-	     (boundp 'cl-user::com.dvlsoft.clon.swank-eval-in-emacs)
-	     cl-user::com.dvlsoft.clon.swank-eval-in-emacs)
+	     (let ((configuration
+		     (find-symbol "COM.DVLSOFT.CLON.CONFIGURATION"
+				  :cl-user)))
+	       (when (and configuration (boundp configuration))
+		 (getf (symbol-value configuration) :swank-eval-in-emacs))))
     (funcall (intern "EVAL-IN-EMACS" :swank)
 	     `(put ',symbol 'common-lisp-indent-function
 		   ,(if (symbolp indent)
