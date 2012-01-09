@@ -126,6 +126,7 @@ This class implements boolean options."))
 		   env-var default-value hidden))
   (apply #'make-instance 'switch keys))
 
+#i(make-internal-switch 2)
 (defun make-internal-switch (long-name description
 			     &rest keys &key argument-style argument-type
 					    env-var default-value hidden)

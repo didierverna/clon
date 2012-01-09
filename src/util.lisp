@@ -122,6 +122,7 @@ For instance, completing 'he' with 'help' will produce 'he(lp)'."
 ;; Key-Value Pairs Manipulation
 ;; ==========================================================================
 
+#i(select-keys 1)
 (defun select-keys (keys &rest selected)
   "Return a new property list from KEYS with only SELECTED ones."
   (loop :for key :in keys :by #'cddr
@@ -129,6 +130,7 @@ For instance, completing 'he' with 'help' will produce 'he(lp)'."
 	:when (member key selected)
 	  :nconc (list key val)))
 
+#i(remove-keys 1)
 (defun remove-keys (keys &rest removed)
   "Return a new property list from KEYS without REMOVED ones."
   (loop :for key :in keys :by #'cddr

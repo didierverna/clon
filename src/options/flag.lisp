@@ -61,6 +61,7 @@ This class implements options that don't take any argument."))
   (declare (ignore short-name long-name description env-var hidden))
   (apply #'make-instance 'flag keys))
 
+#i(make-internal-flag 2)
 (defun make-internal-flag (long-name description
 			   &rest keys &key env-var hidden)
   "Make a new internal (Clon-specific) flag.

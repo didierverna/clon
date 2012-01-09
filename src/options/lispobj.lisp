@@ -137,6 +137,7 @@ This class implements read-from-string options."))
 		   hidden))
   (apply #'make-instance 'lispobj keys))
 
+#i(make-internal-lispobj 2)
 (defun make-internal-lispobj (long-name description
 			      &rest keys
 			      &key argument-name argument-type

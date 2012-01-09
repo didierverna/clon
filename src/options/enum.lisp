@@ -118,6 +118,7 @@ This class implements options whose values belong to a set of keywords."))
 		   hidden))
   (apply #'make-instance 'enum keys))
 
+#i(make-internal-enum 2)
 (defun make-internal-enum (long-name description
 			   &rest keys
 			   &key argument-name argument-type

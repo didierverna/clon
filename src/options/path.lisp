@@ -251,6 +251,7 @@ useful to specify which part of ARGUMENT is concerned when it is a list."
 		   type hidden))
   (apply #'make-instance 'path keys))
 
+#i(make-internal-path 2)
 (defun make-internal-path (long-name description
 			   &rest keys
 			   &key argument-name argument-type

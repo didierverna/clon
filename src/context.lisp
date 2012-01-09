@@ -462,6 +462,7 @@ If NEGATED, read a negated call or pack. Otherwise, read a short call or pack."
   (list (read-line)))
 
 #i(push-cmdline-option 1)
+#i(push-retrieved-option 3)
 (defmethod initialize-instance :after ((context context) &key cmdline)
   "Parse CMDLINE."
   (setf (slot-value context 'progname) (pop cmdline))

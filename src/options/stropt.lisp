@@ -109,6 +109,7 @@ This class implements options the values of which are strings."))
 		   hidden))
   (apply #'make-instance 'stropt keys))
 
+#i(make-internal-stropt 2)
 (defun make-internal-stropt (long-name description
 			     &rest keys
 			     &key argument-name argument-type

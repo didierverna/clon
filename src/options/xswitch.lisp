@@ -133,6 +133,7 @@ As such, the negated syntax is available for extended xswitches."))
 		   enum env-var default-value hidden))
   (apply #'make-instance 'xswitch keys))
 
+#i(make-internal-xswitch 2)
 (defun make-internal-xswitch (long-name description
 			      &rest keys &key argument-name argument-type
 					      enum env-var default-value
