@@ -1,9 +1,9 @@
 ;;; lispobj.lisp --- Read-from-string options
 
-;; Copyright (C) 2010, 2011 Didier Verna
+;; Copyright (C) 2010, 2011, 2012 Didier Verna.
 
-;; Author:        Didier Verna <didier@lrde.epita.fr>
-;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
+;; Author:     Didier Verna <didier@lrde.epita.fr>
+;; Maintainer: Didier Verna <didier@lrde.epita.fr>
 
 ;; This file is part of Clon.
 
