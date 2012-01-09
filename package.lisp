@@ -1,9 +1,9 @@
 ;;; package.lisp --- Common Lisp Package definition
 
-;; Copyright (C) 2010, 2011 Didier Verna
+;; Copyright (C) 2010, 2011, 2012 Didier Verna.
 
-;; Author:        Didier Verna <didier@lrde.epita.fr>
-;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
+;; Author:     Didier Verna <didier@lrde.epita.fr>
+;; Maintainer: Didier Verna <didier@lrde.epita.fr>
 
 ;; This file is part of Clon.
 
@@ -121,6 +121,13 @@
 (defvar *readtable* (copy-readtable)
   "The Clon readtable.")
 
+(defun configuration (key)
+  "Return KEY's value in the current Clon configuration."
+  (let ((configuration
+	  (find-symbol "COM.DVLSOFT.CLON.CONFIGURATION" :cl-user)))
+    (when (and configuration (boundp configuration))
+      (getf (symbol-value configuration) key))))
+
 ;; String concatenation
 ;; --------------------
 (defun tilde-reader (stream char)
@@ -145,11 +152,7 @@ This function sets SYMBOL's common-lisp-indent-function property.
 If INDENT is a symbol, use its indentation definition.
 Otherwise, INDENT is considered as an indentation definition."
   (when (and (member :swank *features*)
-	     (let ((configuration
-		     (find-symbol "COM.DVLSOFT.CLON.CONFIGURATION"
-				  :cl-user)))
-	       (when (and configuration (boundp configuration))
-		 (getf (symbol-value configuration) :swank-eval-in-emacs))))
+	     (configuration :swank-eval-in-emacs))
     (funcall (intern "EVAL-IN-EMACS" :swank)
 	     `(put ',symbol 'common-lisp-indent-function
 		   ,(if (symbolp indent)
