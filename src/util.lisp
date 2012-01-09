@@ -1,9 +1,9 @@
 ;;; util.lisp --- General utilities
 
-;; Copyright (C) 2010, 2011 Didier Verna
+;; Copyright (C) 2010, 2011, 2012 Didier Verna.
 
-;; Author:        Didier Verna <didier@lrde.epita.fr>
-;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
+;; Author:     Didier Verna <didier@lrde.epita.fr>
+;; Maintainer: Didier Verna <didier@lrde.epita.fr>
 
 ;; This file is part of Clon.
 
@@ -534,7 +534,7 @@ this function behaves differently in some cases, as described below.
 	       :quiet t
 	       :norc t)
 	     (exit))
-  #+abcl (if (boundp 'cl-user::com.dvlsoft.clon.dump)
+  #+abcl (if (configuration :dump)
 	     (let ((source-pathname (or *compile-file-pathname*
 					*load-pathname*))
 		   (class-name (copy-seq name)))

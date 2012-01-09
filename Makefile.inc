@@ -1,9 +1,9 @@
 ### Makefile.inc --- Inclusion part
 
-## Copyright (C) 2010, 2011 Didier Verna
+## Copyright (C) 2010, 2011, 2012 Didier Verna.
 
-## Author:        Didier Verna <didier@lrde.epita.fr>
-## Maintainer:    Didier Verna <didier@lrde.epita.fr>
+## Author:     Didier Verna <didier@lrde.epita.fr>
+## Maintainer: Didier Verna <didier@lrde.epita.fr>
 
 ## This file is part of Clon.
 
@@ -65,7 +65,9 @@ CLISP_DUMP   := -norc $(CLISP_LOAD)
 ABCL_CACHE  := abcl
 ABCL_BINLOC := abcl
 ABCL_LOAD   := --load
-ABCL_DUMP   := --batch --eval '(defvar cl-user::$(PACKAGE).dump t)' \
+ABCL_DUMP   := --batch --eval '\
+(progn (defvar cl-user::$(PACKAGE).configuration nil)\
+       (setf (getf cl-user::$(PACKAGE).configuration :dump) t))' \
 	       $(ABCL_LOAD)
 
 $(TOP_DIR)/version.inc: $(TOP_DIR)/version.cl $(TOP_DIR)/$(ASDF_FILE)
