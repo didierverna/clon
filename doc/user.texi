@@ -4,8 +4,8 @@
 
 @c Copyright (C) 2010, 2011, 2012 Didier Verna.
 
-@c Author:        Didier Verna <didier@lrde.epita.fr>
-@c Maintainer:    Didier Verna <didier@lrde.epita.fr>
+@c Author:     Didier Verna <didier@lrde.epita.fr>
+@c Maintainer: Didier Verna <didier@lrde.epita.fr>
 
 @c This file is part of Clon.
 
@@ -180,6 +180,14 @@ Command-Line
 @cindex Valued Options, \name\ (@t{\class\}), properties, @t{\prop\}
 @cindex Options, valued, \name\ (@t{\class\}), properties, @t{\prop\}
 @end macro
+
+@c Configuration options
+@macro coindex{name}
+@vindex com.dvlsoft.clon.configuration
+@cindex Configuration Option, @t{\name\}
+@cindex @t{\name\}
+@end macro
+
 
 @c Functions index
 @c ---------------
@@ -413,7 +421,7 @@ it explains how to use @clon{} in your application.
 * Extending Clon::          Creating your own option types
 * Advanced Usage::          Things rarely needed
 * Conclusion::              That's all folks
-* Portability::             The mine field
+* Technical Notes::         Configuration, platforms and portability
 * API Quick Reference::     The Complete protocols
 * Indexes::                 Concept, Function and Variable
 * Acknowledgments::         Hall of Pride
@@ -492,10 +500,9 @@ extend @clon{} with your own option types.
 @c ====================================================================
 @node Quick Start, Using Clon, Introduction, Top
 @chapter Quick Start
-In this chapter, we assume that you have properly installed @clon{} (see
-the @file{INSTALL} file in the distribution and @ref{Portability}), and
-we build a very short program to get you started (let's call it
-@file{quickstart.lisp}).
+In this chapter, we assume that you have properly installed @clon{}
+(@pxref{Technical Notes}), and we build a very short program to get you
+started. Let's call it @file{quickstart.lisp}.
 
 @menu
 * Full Source::         The complete source code
@@ -674,6 +681,7 @@ retrieval method is said to be @dfn{sequential}). This is done with the
 
 Finally, time to save the Lisp image.
 
+@cindex Dumping
 @findex dump
 @cartouche
 @verbatim
@@ -689,7 +697,7 @@ In order to get a standalone executable from this program, all you need
 to do now is to type @samp{CC=gcc sbcl --script quickstart.lisp}. Note
 that the actual way of dumping executables is compiler-dependent. For
 more information on the proper way to do it and on the compilers
-currently supported, see @ref{Portability}.
+currently supported, see @ref{Dumping Executables}.
 
 
 
@@ -1927,9 +1935,10 @@ documentation. More generally, the behavior of @cl{} standalone
 executables may depend on:
 @itemize @bullet
 @item
+@cindex Dumping
 the state of the Lisp environment when the application was dumped, which
 may in turn depend on command-line options passed to the Lisp itself
-(@pxref{Portability}),
+(@pxref{Dumping Executables}),
 @item
 @findex dump
 the arguments passed to the dumping function (look at @clon{}'s
@@ -2496,7 +2505,7 @@ output: 1.3 "Bill Evans".
 @c ====================================================================
 @c Conclusion
 @c ====================================================================
-@node Conclusion, Portability, Advanced Usage, Top
+@node Conclusion, Technical Notes, Advanced Usage, Top
 @chapter Conclusion
 
 So that's it I guess. You know all about @clon{} now. The next step is
@@ -2510,29 +2519,88 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
 
 
 @c ====================================================================
-@c Portability
+@c Technical Notes
 @c ====================================================================
-@node Portability, API Quick Reference, Conclusion, Top
-@appendix Portability
+@node Technical Notes, API Quick Reference, Conclusion, Top
+@appendix Technical Notes
 
-@clon{} is mostly portable and has virtually no dependency at all, by
-design. There are a couple of spots however where portability might be a
-direct concern for you.
+This chapter contains important information about the library's
+configuration, supported platforms, non-ANSI features and
+portability concerns.
 
 @menu
-* Supported Environments::      Systems, compilers and dependencies
+* Configuration::               Pre-loading parameters
+* Non-ANSI Features::           Requiring operating system access
+* Supported Platforms::         Systems, compilers and dependencies
 * Dumping Executables::         Convenience wrappers
 @end menu
 
 
+@c -------------
+@c Configuration
+@c -------------
+@node Configuration, Non-ANSI Features, Technical Notes, Technical Notes
+@section Configuration
+@cindex Configuration
+@vindex com.dvlsoft.clon.configuration
+Some aspects of @clon{}'s behavior can be configured @emph{before} the
+ASDF system is actually loaded. @clon{} looks for configuration options
+in a variable called @code{com.dvlsoft.clon.configuration} in the
+@code{cl-user} package. If set, this variable should contain a property
+list of configuration options and their corresponding values. Currently,
+the following options are provided.
+
+@table @t
+@item :swank-eval-in-emacs
+@coindex{:swank-eval-in-emacs}@c
+@vindex slime-enable-evaluate-in-emacs
+This option is only useful if you use Slime, and mostly if you plan on
+hacking @clon{} itself. The library provides indentation information for
+some of its functions directly embedded in the code. This information
+can be automatically transmitted to (X)Emacs when the ASDF system is
+loaded if you set this option to @code{t}. However, note that for this
+to work, the Slime variable @code{slime-enable-evaluate-in-emacs} must
+also be set to @code{t} in your (X)Emacs session. If you're interested
+to know how this process works, I have described it in the following
+blog entry:
+@uref{http://www.didierverna.com/sciblog/index.php?post/2011/07/20/One-more-indentation-hack}.
+@item :dump
+@coindex{:dump}@c
+This option is only used by the ABCL port. @ref{Dumping Executables},
+provides more information on its use.
+@end table
+
+
+@c -----------------
+@c Non-ANSI Features
+@c -----------------
+@node Non-ANSI Features, Supported Platforms, Configuration, Technical Notes
+@section Non-ANSI Features
+One feature of @clon{} that is beyond the ANSI standard is terminal
+autodetection (it requires an @code{ioctl} call and hence a foreign
+function interface). Terminal autodetection is used in several
+situations, for turning on highlighting automatically and for detecting
+a terminal line width.
+
+@cindex Restricted Mode
+If, for some reason, terminal autodetection is not available, @clon{}
+will work in so-called @emph{restricted mode}. This means that
+@bioption{highlight=auto} won't work (highlighting will @emph{not} be
+turned on automatically on a @tty{}). For the same reason, unless
+otherwise specified via either the @code{COLUMNS} environment variable
+or the @bioption{line-width} option, terminal output will be formatted
+for 80 columns regardless of the actual terminal width
+(@pxenduserref{Global Control}).
+
+
 @c ----------------------
-@c Supported Environments
+@c Supported Platforms
 @c ----------------------
-@node Supported Environments, Dumping Executables, Portability, Portability
-@section Supported Environments
+@node Supported Platforms, Dumping Executables, Non-ANSI Features, Technical Notes
+@section Supported Platforms
 @clon{} currently works on Unix systems (including MacOS X) and has been
 ported to 6 @cl{} implementations. I have no idea about Windows right
-now. The following table lists the supported environments.
+now. The following table lists the supported platforms.
 
 @multitable {Compiler} {Minimum Version} {@code{cffi} (optional)}
 @headitem Compiler @tab Minimum Version @tab Dependencies
@@ -2563,13 +2631,8 @@ now. The following table lists the supported environments.
 @bioindex{highlight}@c
 @bioindex{line-width}@c
 @evindex{COLUMNS}@c
-Terminal autodetection is not supported. This means that
-@bioption{highlight=auto} doesn't work (highlighting is @emph{not}
-turned on automatically on a @tty{}). For the same reason, unless
-otherwise specified via either the @code{COLUMNS} environment variable
-or the @bioption{line-width} option, terminal output will be formatted
-for 80 columns regardless of the actual width (@pxenduserref{Global
-Control}).
+@cindex Restricted Mode
+It only works in restricted mode (@pxref{Non-ANSI Features}).
 @item
 Since Java doesn't have a @code{putenv} or @code{setenv} function (!!),
 the @code{modify-environment} restart, normally proposed when an
@@ -2578,20 +2641,21 @@ environment variable is set to a bogus value, is unavailable
 @end itemize
 
 @unnumberedsubsec CLISP specificities
+@cindex Restricted Mode
 As mentioned in the above table, CLISP's dependency on @code{cffi} is
 optional. CLISP needs @code{cffi} in order to implement terminal
-autodetection only. If @code{cffi} cannot be found when the ASDF system
-is loaded, you get a big red blinking light and a warning but that's
-all. @clon{} will still work, although exhibiting the same limitation as
-ABCL (see above).
+autodetection only (note that many other implementations come with their
+own foreign function interface). If @code{cffi} cannot be found when the
+ASDF system is loaded, you get a big red blinking light and a warning
+but that's all. @clon{} will still work, although in restricted mode.
 
 
 @c -------------------
 @c Dumping Executables
 @c -------------------
-@node Dumping Executables, , Supported Environments, Portability
+@node Dumping Executables, , Supported Platforms, Technical Notes
 @section Dumping Executables
-
+@cindex Dumping
 Creating standalone executables is orthogonal to @clon{}. @clon{} is
 just a library that you might want to use, and in fact, it is also
 possible to use it without dumping executables at all.
@@ -2665,17 +2729,19 @@ There's more to it than that though. It is possible to get closer to
 standalone executables with ABCL by 1/ providing your whole application
 in a @code{jar} file directly, and 2/ overriding ABCL's entry point by
 providing your own interpreter which runs your main function
-automatically.
+automatically. I have described this process in more details in the
+following blog entry:
+@uref{http://www.didierverna.com/sciblog/index.php?post/2011/01/22/Towards-ABCL-Standalone-Executables}.
 
-@vindex com.dvlsoft.clon.dump
-@clon{} helps you to do this to some extend. If the variable
-@code{com.dvlsoft.clon.dump} is bound in the @code{cl-user} package,
-then the @code{dump} macro doesn't expand to a call to the ``main''
-function, but instead dumps a Java file containing an alternate ABCL
-interpreter that you can compile and add to the original ABCL @code{jar}
-file, along with @file{quickstart.lisp}. If you want more details on
-this, you will need to look at the @file{Makefile} in the @code{demo}
-directory.
+@coindex{:dump}@c
+@clon{} helps you to do this to some extend. If the @code{:dump}
+configuration option is set (@pxref{Configuration}), then the
+@code{dump} macro doesn't expand to a call to the ``main'' function, but
+instead dumps a Java file containing an alternate ABCL interpreter that
+you can compile and add to the original ABCL @code{jar} file, along with
+@file{quickstart.lisp}. If you want more details on this, you will need
+to look at the @file{Makefile} in the @code{demo} directory and also at
+the file @file{Makefile.inc} at the toplevel.
 @end table
 
 
@@ -2683,7 +2749,7 @@ directory.
 @c ====================================================================
 @c API Quick Reference
 @c ====================================================================
-@node API Quick Reference, Indexes, Portability, Top
+@node API Quick Reference, Indexes, Technical Notes, Top
 @appendix API Quick Reference
 
 @menu
