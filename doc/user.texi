@@ -2,7 +2,7 @@
 
 @c user.texi --- User manual
 
-@c Copyright (C) 2010, 2011 Didier Verna
+@c Copyright (C) 2010, 2011, 2012 Didier Verna.
 
 @c Author:        Didier Verna <didier@lrde.epita.fr>
 @c Maintainer:    Didier Verna <didier@lrde.epita.fr>
@@ -493,8 +493,9 @@ extend @clon{} with your own option types.
 @node Quick Start, Using Clon, Introduction, Top
 @chapter Quick Start
 In this chapter, we assume that you have properly installed @clon{} (see
-the @file{INSTALL} file in the distribution), and we build a very short
-program to get you started (let's call it @file{quickstart.lisp}).
+the @file{INSTALL} file in the distribution and @ref{Portability}), and
+we build a very short program to get you started (let's call it
+@file{quickstart.lisp}).
 
 @menu
 * Full Source::         The complete source code
