@@ -43,7 +43,7 @@
 @c Settings
 @c ====================================================================
 @set VERSION 1.0 beta 20 "Michael Brecker"
-@set COPYRIGHT_DATE 2010, 2011
+@set COPYRIGHT_DATE 2010, 2011, 2012
 @setchapternewpage odd
 @setcontentsaftertitlepage
 @documentdescription
