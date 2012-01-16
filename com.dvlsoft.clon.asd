@@ -1,9 +1,9 @@
 ;;; com.dvlsoft.clon.asd --- ASDF system definition
 
-;; Copyright (C) 2010, 2011 Didier Verna
+;; Copyright (C) 2010, 2011, 2012 Didier Verna.
 
-;; Author:        Didier Verna <didier@lrde.epita.fr>
-;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
+;; Author:     Didier Verna <didier@lrde.epita.fr>
+;; Maintainer: Didier Verna <didier@lrde.epita.fr>
 
 ;; This file is part of clon.
 
@@ -31,7 +31,7 @@
 
 (eval-when (:load-toplevel :execute)
   #+sbcl  (require :sb-grovel)
-  #+clisp (handler-case (asdf:operate 'asdf:load-op :cffi-grovel)
+  #+clisp (handler-case (asdf:load-system :cffi-grovel)
 	    (asdf:missing-component ()
 	      (format *error-output* "~
 *********************************************************************

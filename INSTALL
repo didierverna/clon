@@ -11,9 +11,10 @@ notice and this notice are preserved.
 
 * Portability
 Clon currently works on Unix systems (MacOS X included) with SBCL, CMUCL, CCL,
-ECL, CLISP and ABCL. Clon has no mandatory dependency. CFFI may optionally be
-used with CLISP. See section A.3 Supported Platforms in the user manual for
-more information. A precompiled version of this manual may be found at
+ECL, CLISP and ABCL. Clon is provided as an ASDF 2 system, but has no
+mandatory dependency. CFFI may optionally be used with CLISP. See section A.3
+Supported Platforms in the user manual for more information. A precompiled
+version of this manual may be found at
 http://www.lrde.epita.fr/~didier/software/lisp/clon/user.pdf.
 
 
@@ -25,16 +26,11 @@ manual installation are needed.
 
 
 * Installation
-Please perform the following steps, in order.
+After unpacking somewhere in the ASDF 2 source registry, please perform the
+following steps, in order.
 
 ** Configuration
-Edit Makefile.cnf to your specific needs. For ASDF 1, the demo programs
-demos/simple.lisp and demos/advanced.lisp might also need some tweaking.
-
-** Pre-installation
-If you're using ASDF 1, you need to "make install-system" before anything else
-in order to create the system file symlink where appropriate. Otherwise (ASDF
-2), we assume that you have unpacked somewhere in the source registry.
+Edit Makefile.cnf to your specific needs.
 
 ** Build
 Type "make" to compile the documentation and the demo programs (end-user

@@ -1,9 +1,9 @@
 ;;; simple.lisp --- Basic usage demonstration program
 
-;; Copyright (C) 2010, 2011 Didier Verna
+;; Copyright (C) 2010, 2011, 2012 Didier Verna.
 
-;; Author:        Didier Verna <didier@lrde.epita.fr>
-;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
+;; Author:     Didier Verna <didier@lrde.epita.fr>
+;; Maintainer: Didier Verna <didier@lrde.epita.fr>
 
 ;; This file is part of Clon.
 
@@ -32,7 +32,7 @@
 ;; ECL-compliant, due to ECL's specific way of generating executables. This
 ;; includes:
 ;; - setting *load-verbose* to nil,
-;; - passing a nil :verbose flag to asdf:operate,
+;; - passing a nil :verbose flag to asdf:load-system,
 ;; - wrapping nickname-package in an eval-when form.
 ;; None of these tweaks are needed for the other compilers.
 
@@ -47,16 +47,7 @@
 	 #-(or sbcl cmu ccl ecl)
 	 '(#p"/usr/local/share/common-lisp/source/asdf/asdf.lisp"))
 
-#-asdf2 (setf asdf:*central-registry*
-	      (list* (merge-pathnames "share/common-lisp/systems/"
-				      (user-homedir-pathname))
-		     #p"/usr/local/share/common-lisp/systems/"
-		     #p"/usr/share/common-lisp/systems/"
-		     asdf:*central-registry*))
-
-#-asdf2 (ignore-errors (asdf:operate 'asdf:load-op :asdf-binary-locations))
-
-(asdf:operate 'asdf:load-op :com.dvlsoft.clon :verbose nil)
+(asdf:load-system :com.dvlsoft.clon :verbose nil)
 
 (eval-when (:execute :load-toplevel :compile-toplevel)
   (com.dvlsoft.clon:nickname-package))

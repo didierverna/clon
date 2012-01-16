@@ -1,9 +1,9 @@
 ### Makefile.cnf --- User level configuration
 
-## Copyright (C) 2010, 2011 Didier Verna
+## Copyright (C) 2010, 2011 Didier Verna.
 
-## Author:        Didier Verna <didier@lrde.epita.fr>
-## Maintainer:    Didier Verna <didier@lrde.epita.fr>
+## Author:     Didier Verna <didier@lrde.epita.fr>
+## Maintainer: Didier Verna <didier@lrde.epita.fr>
 
 ## This file is part of Clon.
 
@@ -28,7 +28,6 @@
 ### Code:
 
 # Installation prefix. This is used for installing Clon as follows:
-# - $(PREFIX)/share/common-lisp/systems/ for the system file (ASDF 1)
 # - $(PREFIX)/share/doc/clon/ for the PDF documentation
 # - $(PREFIX)/share/info/ for the info documentation
 # If any of these are unsatisfactory, you will need to edit the Makefiles, or

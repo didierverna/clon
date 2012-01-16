@@ -1,9 +1,9 @@
 ### Makefile --- Toplevel directory
 
-## Copyright (C) 2010, 2011 Didier Verna
+## Copyright (C) 2010, 2011, 2012 Didier Verna.
 
-## Author:        Didier Verna <didier@lrde.epita.fr>
-## Maintainer:    Didier Verna <didier@lrde.epita.fr>
+## Author:     Didier Verna <didier@lrde.epita.fr>
+## Maintainer: Didier Verna <didier@lrde.epita.fr>
 
 ## This file is part of CLon
 
@@ -39,17 +39,11 @@ include Makefile.inc
 include version.inc
 
 
-SUBDIRS     := src sbcl clisp	\
-	       share doc	\
-	       demos
-SYSTEMS_DIR := $(SHARE)/common-lisp/systems
-
+SUBDIRS   := src sbcl clisp share doc demos
 DIST_NAME := $(PROJECT)-$(SHORT_VERSION)
 TARBALL   := $(DIST_NAME).tar.gz
 SIGNATURE := $(TARBALL).asc
 
-install-system:
-	ln -fs "`pwd`/$(ASDF_FILE)" "$(SYSTEMS_DIR)/"
 
 all-formats dvi ps ref all-formats-ref dvi-ref ps-ref:
 	cd doc && $(MAKE) $@
@@ -60,7 +54,6 @@ install:
 	$(MAKE) gen TARGET=install
 
 uninstall:
-	-rm -f "$(SYSTEMS_DIR)/$(ASDF_FILE)"
 	$(MAKE) gen TARGET=uninstall
 
 clean:
@@ -122,7 +115,7 @@ $(SIGNATURE): $(TARBALL)
 
 .PHONY: hack							\
 	all-formats dvi ps ref all-formats-ref dvi-ref ps-ref	\
-	install-system install install-ref uninstall		\
+	install install-ref uninstall				\
 	clean distclean						\
 	tag tar gpg dist install-www				\
 	update-version						\

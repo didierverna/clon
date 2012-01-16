@@ -1,9 +1,9 @@
 ;;; dump.lisp --- ECL demos dumping code
 
-;; Copyright (C) 2010, 2011 Didier Verna
+;; Copyright (C) 2010, 2011, 2012 Didier Verna.
 
-;; Author:        Didier Verna <didier@lrde.epita.fr>
-;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
+;; Author:     Didier Verna <didier@lrde.epita.fr>
+;; Maintainer: Didier Verna <didier@lrde.epita.fr>
 
 ;; This file is part of Clon.
 
@@ -27,27 +27,21 @@
 
 ;;; Code:
 
-(require :asdf)
+(require :asdf
+	 #-(or sbcl cmu ccl ecl)
+	 '(#p"/usr/local/share/common-lisp/source/asdf/asdf.lisp"))
+
 
 (defconstant +executable+
   (second (member "--" (si:command-args) :test #'string=)))
 (defconstant +source+ (concatenate 'string +executable+ ".lisp"))
 (defconstant +object+ (concatenate 'string +executable+ ".o"))
 
-#-asdf2 (setf asdf:*central-registry*
-	      (list* (merge-pathnames "share/common-lisp/systems/"
-				      (user-homedir-pathname))
-		     #p"/usr/local/share/common-lisp/systems/"
-		     #p"/usr/share/common-lisp/systems/"
-		     asdf:*central-registry*))
-
-#-asdf2 (ignore-errors (asdf:operate 'asdf:load-op :asdf-binary-locations))
-
-(asdf:operate 'asdf:load-op :com.dvlsoft.clon)
+(asdf:load-system :com.dvlsoft.clon)
 
 (compile-file +source+ :output-file +object+ :system-p t)
 (c:build-program +executable+ :lisp-files (list +object+))
 
 (si:exit 0)
 
-;;; dumpecl.lisp ends here
+;;; dump.lisp ends here

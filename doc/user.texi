@@ -524,7 +524,7 @@ called @file{simple} in the distribution.
 (in-package :cl-user)
 
 (require :asdf)
-(asdf:operate 'asdf:load-op :com.dvlsoft.clon)
+(asdf:load-system :com.dvlsoft.clon)
 (use-package :com.dvlsoft.clon)
 
 (defsynopsis (:postfix "FILES...")
@@ -558,8 +558,8 @@ called @file{simple} in the distribution.
 @section Explanation
 Let's examine this program step-by-step now.
 
-@pkgindex{com.dvlsoft.clon}
-@sysindex{com.dvlsoft.clon}
+@pkgindex{com.dvlsoft.clon}@c
+@sysindex{com.dvlsoft.clon}@c
 First, we put ourselves in the @cl{} user package, and load @clon{} from
 its ASDF system @samp{com.dvlsoft.clon}. Next, we use the @clon{}
 package, also named @samp{com.dvlsoft.clon}.
@@ -569,7 +569,7 @@ package, also named @samp{com.dvlsoft.clon}.
 (in-package :cl-user)
 
 (require :asdf)
-(asdf:operate 'asdf:load-op :com.dvlsoft.clon)
+(asdf:load-system :com.dvlsoft.clon)
 (use-package :com.dvlsoft.clon)
 @end verbatim
 @end cartouche
