@@ -97,7 +97,7 @@ clean:
 	-rm *~ $(DEMOS:%=%.o) # this last bit is for ECL
 
 distclean: clean
-	-rm -fr $(DEMOS) $(DEMOS:%=%.jar)
+	-rm -fr $(DEMOS) $(DEMOS:%=%.jar) $(DEMOS:%=%.exe)
 
 install:
 uninstall:
