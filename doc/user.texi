@@ -2614,7 +2614,8 @@ now. The following table lists the supported platforms.
 @tab
 @tab
 @item ECL
-@tab
+@tab 11.1.2@footnote{more precisely, git revision
+3e2e5f9dc3c5176ef6ef8d7794bfa43f1af8f8db}
 @tab
 @item CLISP
 @tab
