@@ -416,6 +416,7 @@ it explains how to use @clon{} in your application.
 @menu
 * Copying::                 The BSD license
 * Introduction::            What Clon is all about
+* Installation::            Library, documentation and sample code
 * Quick Start::             For the brave and the impatient
 * Using Clon::              Clonificating your application
 * Extending Clon::          Creating your own option types
@@ -457,7 +458,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 @c ====================================================================
 @c Introduction
 @c ====================================================================
-@node Introduction, Quick Start, Copying, Top
+@node Introduction, Installation, Copying, Top
 @chapter Introduction
 
 @clon{} is a library for managing @cmdline{} options in standalone @cl{}
@@ -496,9 +497,55 @@ extend @clon{} with your own option types.
 
 
 @c ====================================================================
+@c Installation
+@c ====================================================================
+@node Installation, Quick Start, Introduction, Top
+@chapter Installation
+@clon{} currently works on Unix platforms (MacOS X included) with SBCL,
+CMUCL, CCL, ECL, CLISP and ABCL. @clon{} is provided as an ASDF 2
+system, but has no mandatory dependency. CFFI may optionally be used
+with CLISP. @xref{Supported Platforms}, for more information.
+
+In addition to the library itself, the Clon distribution offers
+documentation in the form of 3 different manuals, some data files that
+are needed for it to work properly, and a couple of demonstration
+programs. Because of that, some bits of manual installation are needed.
+
+After unpacking somewhere in the ASDF 2 source registry, please perform
+the following steps, in order.
+
+@enumerate
+@item
+Edit @file{Makefile.cnf} to your specific needs.
+
+@item
+Type @command{make} to compile the documentation and the demo programs
+(end-user manual, user manual and possibly reference manual). By
+default, the documentation is built in info, PDF and HTML formats. If
+you want other formats (DVI and PostScript are available), type
+@command{make all-formats}. You can also type individually @command{make
+dvi} and/or @command{make ps} in order to get the corresponding format.
+
+@item
+As documented in @file{Makefile.cnf}, the reference manual is only
+generated if you have SBCL and the Declt library at hand (see
+@uref{http://www.lrde.epita.fr/~didier/software/lisp/misc.php#declt}).
+
+@item
+Type @command{make install} to install both the documentation and the
+data files. If you have compiled the documentation in DVI and PostScript
+format, those will be installed as well. The same goes for the reference
+manual. The demo programs are not installed anywhere.
+@end enumerate
+
+Type @command{make uninstall} to uninstall the library.
+
+
+
+@c ====================================================================
 @c Quick Start
 @c ====================================================================
-@node Quick Start, Using Clon, Introduction, Top
+@node Quick Start, Using Clon, Installation, Top
 @chapter Quick Start
 In this chapter, we assume that you have properly installed @clon{}
 (@pxref{Technical Notes}), and we build a very short program to get you
