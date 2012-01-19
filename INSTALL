@@ -1,55 +1,231 @@
-						             -*- outline -*-
 
-* Copyright (C) 2010, 2011, 2012 Didier Verna
+2 Installation
+**************
 
-This file is part of Clon.
+Clon currently works on Unix platforms (MacOS X included) with SBCL,
+CMUCL, CCL, ECL, CLISP and ABCL. Clon is provided as an ASDF 2 system,
+but has no mandatory dependency. CFFI may optionally be used with
+CLISP. *Note Supported Platforms::, for more information.
 
-Copying and distribution of this file, with or without modification,
-are permitted in any medium without royalty provided the copyright
-notice and this notice are preserved.
+   In addition to the library itself, the Clon distribution offers
+documentation in the form of 3 different manuals, some data files that
+are needed for it to work properly, and a couple of demonstration
+programs. Because of that, some bits of manual installation are needed.
+
+   After unpacking somewhere in the ASDF 2 source registry, please
+perform the following steps, in order.
+
+  1. Edit `Makefile.cnf' to your specific needs.
+
+  2. Type `make' to compile the documentation and the demo programs
+     (end-user manual, user manual and possibly reference manual). By
+     default, the documentation is built in info, PDF and HTML formats.
+     If you want other formats (DVI and PostScript are available), type
+     `make all-formats'. You can also type individually `make dvi'
+     and/or `make ps' in order to get the corresponding format.
+
+  3. As documented in `Makefile.cnf', the reference manual is only
+     generated if you have SBCL and the Declt library at hand (see
+     `http://www.lrde.epita.fr/~didier/software/lisp/misc.php#declt').
+
+  4. Type `make install' to install both the documentation and the data
+     files. If you have compiled the documentation in DVI and PostScript
+     format, those will be installed as well. The same goes for the
+     reference manual. The demo programs are not installed anywhere.
+
+   Type `make uninstall' to uninstall the library.
 
 
-* Portability
-Clon currently works on Unix systems (MacOS X included) with SBCL, CMUCL, CCL,
-ECL, CLISP and ABCL. Clon is provided as an ASDF 2 system, but has no
-mandatory dependency. CFFI may optionally be used with CLISP. See section A.3
-Supported Platforms in the user manual for more information. A precompiled
-version of this manual may be found at
-http://www.lrde.epita.fr/~didier/software/lisp/clon/user.pdf.
+Appendix A Technical Notes
+**************************
+
+This chapter contains important information about the library's
+configuration, supported platforms, non-ANSI features and portability
+concerns.
+
+* Menu:
+
+* Configuration::               Pre-loading parameters
+* Non-ANSI Features::           Requiring operating system access
+* Supported Platforms::         Systems, compilers and dependencies
+* Dumping Executables::         Convenience wrappers
 
 
-* Contents
-In addition to the library itself, the Clon distribution offers documentation
-in the form of 3 different manuals, some data files that are needed for it to
-work properly, and a couple of demo programs. Because of that, some bits of
-manual installation are needed.
+A.1 Configuration
+=================
+
+Some aspects of Clon's behavior can be configured _before_ the ASDF
+system is actually loaded. Clon looks for configuration options in a
+variable called `com.dvlsoft.clon.configuration' in the `cl-user'
+package. If set, this variable should contain a property list of
+configuration options and their corresponding values. Currently, the
+following options are provided.
+
+:swank-eval-in-emacs
+     This option is only useful if you use Slime, and mostly if you
+     plan on hacking Clon itself. The library provides indentation
+     information for some of its functions directly embedded in the
+     code. This information can be automatically transmitted to
+     (X)Emacs when the ASDF system is loaded if you set this option to
+     `t'. However, note that for this to work, the Slime variable
+     `slime-enable-evaluate-in-emacs' must also be set to `t' in your
+     (X)Emacs session. If you're interested to know how this process
+     works, I have described it in the following blog entry:
+     `http://www.didierverna.com/sciblog/index.php?post/2011/07/20/One-more-indentation-hack'.
+
+:dump
+     This option is only used by the ABCL port. *note Dumping
+     Executables::, provides more information on its use.
 
 
-* Installation
-After unpacking somewhere in the ASDF 2 source registry, please perform the
-following steps, in order.
+A.2 Non-ANSI Features
+=====================
 
-** Configuration
-Edit Makefile.cnf to your specific needs.
+One feature of Clon that is beyond the ANSI standard is terminal
+autodetection (it requires an `ioctl' call and hence a foreign function
+interface). Terminal autodetection is used in several situations, for
+turning on highlighting automatically and for detecting a terminal line
+width.
 
-** Build
-Type "make" to compile the documentation and the demo programs (end-user
-manual, user manual and possibly reference manual). By default, the
-documentation is built in info, PDF and HTML formats. If you want other
-formats (DVI and PostScript are available), type "make all-formats". You can
-also type individually "make dvi" and/or "make ps" in order to get the
-corresponding format.
+   If, for some reason, terminal autodetection is not available, Clon
+will work in so-called _restricted mode_. This means that
+`--clon-highlight=auto' won't work (highlighting will _not_ be turned
+on automatically on a tty). For the same reason, unless otherwise
+specified via either the `COLUMNS' environment variable or the
+`--clon-line-width' option, terminal output will be formatted for 80
+columns regardless of the actual terminal width (*note Global Control:
+(clon-enduser)Global Control.  ).
 
-As documented in Makefile.cnf, the reference manual is only generated if you
-have SBCL and the Declt library at hand (see
-http://www.lrde.epita.fr/~didier/software/lisp/misc.php#declt).
 
-** Installation
-Type "make install" to install both the documentation and the data files. If
-you have compiled the documentation in DVI and PostScript format, those will
-be installed as well. The same goes for the reference manual.
+A.3 Supported Platforms
+=======================
 
-The demo programs are not installed anywhere.
+Clon currently works on Unix systems (including MacOS X) and has been
+ported to 6 Common Lisp implementations. I have no idea about Windows
+right now. The following table lists the supported platforms.
 
-** Uninstallation
-Type "make uninstall".
+Compiler   Minimum Version   Dependencies
+------------------------------------------------- 
+SBCL                         
+CMU-CL     20b               
+CCL                          
+ECL        11.1.2(1)         
+CLISP                        `cffi' (optional)
+ABCL       0.24.0(2)         
+
+ABCL specificities
+------------------
+
+Clon's ABCL port currently has two limitations:
+   * It only works in restricted mode (*note Non-ANSI Features::).
+
+   * Since Java doesn't have a `putenv' or `setenv' function (!!), the
+     `modify-environment' restart, normally proposed when an
+     environment variable is set to a bogus value, is unavailable
+     (*note Error Management: (clon-enduser)Error Management.  ).
+
+CLISP specificities
+-------------------
+
+As mentioned in the above table, CLISP's dependency on `cffi' is
+optional. CLISP needs `cffi' in order to implement terminal
+autodetection only (note that many other implementations come with their
+own foreign function interface). If `cffi' cannot be found when the
+ASDF system is loaded, you get a big red blinking light and a warning
+but that's all. Clon will still work, although in restricted mode.
+
+   ---------- Footnotes ----------
+
+   (1) more precisely, git revision
+3e2e5f9dc3c5176ef6ef8d7794bfa43f1af8f8db
+
+   (2) more precisely, svn trunk revision 13156
+
+
+A.4 Dumping Executables
+=======================
+
+Creating standalone executables is orthogonal to Clon. Clon is just a
+library that you might want to use, and in fact, it is also possible to
+use it without dumping executables at all.
+
+   Unfortunately, there is no standard way to dump executables from
+Lisp.  We're entering the portability mine field here. Clon, however,
+wants to help. We've already seen that it provides utility wrappers like
+`exit' and `dump' to make your life easier (I mean, more portable) in
+*note Quick Start::. If you're not interested in portability or if you
+prefer to do it your own way, you don't _need_ to use those wrappers.
+If you do, however, please read on.
+
+   Continuing on the quickstart example, the table below provides
+ready-to-use command-line samples for dumping the program with the
+compilers currently supported. Remember that they work in conjunction
+with the `dump' macro mentionned above.
+
+*SBCL*
+     `CC=gcc sbcl --script quickstart.lisp'
+     The `CC=gcc' bit is needed for the `sb-grovel' contrib module that
+     Clon uses.
+
+*CMUCL*
+     `lisp -noinit -nositeinit -load quickstart.lisp'
+
+*CCL*
+     `ccl --no-init --load quickstart.lisp'
+
+*ECL*
+     ECL doesn't work like the other Lisp compilers. In particular,
+     creating an executable does not involve dumping a Lisp image, but
+     compiling the source into separate object files and then linking
+     them. The consequence is that there is no simple command-line
+     recipe to show here. Instead, you might want to look at the file
+     `demos/dump.lisp' in the distribution for an example.
+
+     Because the dumping scheme is different with ECL, it is also less
+     straightforward to write portable code for standalone
+     applications. The demo programs in the distribution both contain
+     comments that are worth reading at the top of them.
+
+     One specific difference between ECL and the other Lisp compilers
+     is that it doesn't require you to specify a particular function as
+     the entry point for your executable, but instead relies on having
+     code to execute directly at the toplevel of some file. Clon's
+     `dump' macro helps you with this: it normally expands to a
+     compiler-specific function which saves the current Lisp image, but
+     for ECL, it simply expands to the "main" function call, hence
+     consituting the entry point to the code that ECL needs.
+
+*CLISP*
+     `CC=gcc clisp -norc -i quickstart.lisp'
+     The `CC=gcc' bit lets you choose your preferred C compiler for
+     `cffi'. Please note that executables dumped (the Clon way) by
+     CLISP still understand lisp-specific command-line options when
+     they are prefixed with `--clisp-', so you should obviously avoid
+     defining options by those names.
+
+*ABCL*
+     ABCL is a totally different beast because it's a Java-based Common
+     Lisp implementation. Most notably, you don't create standalone
+     executables in Java, so the normal way of running ABCL is by
+     telling it to load some lisp code. If you want to run the
+     quickstart program in the usual way, you will typically type this: abcl --noinform --noinit --nosystem --load quickstart.lisp
+      Note that for this to work, the `dump' macro expands to the
+     "main" function call for ABCL, just as for ECL.
+
+     There's more to it than that though. It is possible to get closer
+     to standalone executables with ABCL by 1/ providing your whole
+     application in a `jar' file directly, and 2/ overriding ABCL's
+     entry point by providing your own interpreter which runs your main
+     function automatically. I have described this process in more
+     details in the following blog entry:
+     `http://www.didierverna.com/sciblog/index.php?post/2011/01/22/Towards-ABCL-Standalone-Executables'.
+
+     Clon helps you to do this to some extend. If the `:dump'
+     configuration option is set (*note Configuration::), then the
+     `dump' macro doesn't expand to a call to the "main" function, but
+     instead dumps a Java file containing an alternate ABCL interpreter
+     that you can compile and add to the original ABCL `jar' file,
+     along with `quickstart.lisp'. If you want more details on this,
+     you will need to look at the `Makefile' in the `demo' directory
+     and also at the file `Makefile.inc' at the toplevel.
+

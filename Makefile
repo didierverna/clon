@@ -44,6 +44,9 @@ DIST_NAME := $(PROJECT)-$(SHORT_VERSION)
 TARBALL   := $(DIST_NAME).tar.gz
 SIGNATURE := $(TARBALL).asc
 
+all:
+	$(MAKE) gen TARGET=all
+	$(MAKE) INSTALL
 
 all-formats dvi ps ref all-formats-ref dvi-ref ps-ref:
 	cd doc && $(MAKE) $@
@@ -102,6 +105,15 @@ gen:
 	   ( cd $${i} && $(MAKE) $(TARGET) ) ;    \
 	 done
 
+INSTALL: doc/$(PROJECT)-user.info
+	info --file=./doc/$(PROJECT)-user.info --subnodes \
+	     -n Installation -n 'Technical Notes'   \
+	     --output=$@
+	perl -pi -e 's/^File:.*\n//g' $@
+
+doc/$(PROJECT)-user.info:
+	cd doc && $(MAKE) $(PROJECT)-user.info
+
 $(TARBALL):
 	git archive --format=tar --prefix=$(DIST_NAME)/	\
 	    --worktree-attributes HEAD			\
@@ -113,7 +125,7 @@ $(SIGNATURE): $(TARBALL)
 .DEFAULT:
 	$(MAKE) gen TARGET=$@
 
-.PHONY: hack							\
+.PHONY: hack all						\
 	all-formats dvi ps ref all-formats-ref dvi-ref ps-ref	\
 	install install-ref uninstall				\
 	clean distclean						\
