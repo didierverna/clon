@@ -36,21 +36,6 @@ perform the following steps, in order.
    Type `make uninstall' to uninstall the library.
 
 
-Appendix A Technical Notes
-**************************
-
-This chapter contains important information about the library's
-configuration, supported platforms, non-ANSI features and portability
-concerns.
-
-* Menu:
-
-* Configuration::               Pre-loading parameters
-* Non-ANSI Features::           Requiring operating system access
-* Supported Platforms::         Systems, compilers and dependencies
-* Dumping Executables::         Convenience wrappers
-
-
 A.1 Configuration
 =================
 
@@ -140,92 +125,4 @@ but that's all. Clon will still work, although in restricted mode.
 3e2e5f9dc3c5176ef6ef8d7794bfa43f1af8f8db
 
    (2) more precisely, svn trunk revision 13156
-
-
-A.4 Dumping Executables
-=======================
-
-Creating standalone executables is orthogonal to Clon. Clon is just a
-library that you might want to use, and in fact, it is also possible to
-use it without dumping executables at all.
-
-   Unfortunately, there is no standard way to dump executables from
-Lisp.  We're entering the portability mine field here. Clon, however,
-wants to help. We've already seen that it provides utility wrappers like
-`exit' and `dump' to make your life easier (I mean, more portable) in
-*note Quick Start::. If you're not interested in portability or if you
-prefer to do it your own way, you don't _need_ to use those wrappers.
-If you do, however, please read on.
-
-   Continuing on the quickstart example, the table below provides
-ready-to-use command-line samples for dumping the program with the
-compilers currently supported. Remember that they work in conjunction
-with the `dump' macro mentionned above.
-
-*SBCL*
-     `CC=gcc sbcl --script quickstart.lisp'
-     The `CC=gcc' bit is needed for the `sb-grovel' contrib module that
-     Clon uses.
-
-*CMUCL*
-     `lisp -noinit -nositeinit -load quickstart.lisp'
-
-*CCL*
-     `ccl --no-init --load quickstart.lisp'
-
-*ECL*
-     ECL doesn't work like the other Lisp compilers. In particular,
-     creating an executable does not involve dumping a Lisp image, but
-     compiling the source into separate object files and then linking
-     them. The consequence is that there is no simple command-line
-     recipe to show here. Instead, you might want to look at the file
-     `demos/dump.lisp' in the distribution for an example.
-
-     Because the dumping scheme is different with ECL, it is also less
-     straightforward to write portable code for standalone
-     applications. The demo programs in the distribution both contain
-     comments that are worth reading at the top of them.
-
-     One specific difference between ECL and the other Lisp compilers
-     is that it doesn't require you to specify a particular function as
-     the entry point for your executable, but instead relies on having
-     code to execute directly at the toplevel of some file. Clon's
-     `dump' macro helps you with this: it normally expands to a
-     compiler-specific function which saves the current Lisp image, but
-     for ECL, it simply expands to the "main" function call, hence
-     consituting the entry point to the code that ECL needs.
-
-*CLISP*
-     `CC=gcc clisp -norc -i quickstart.lisp'
-     The `CC=gcc' bit lets you choose your preferred C compiler for
-     `cffi'. Please note that executables dumped (the Clon way) by
-     CLISP still understand lisp-specific command-line options when
-     they are prefixed with `--clisp-', so you should obviously avoid
-     defining options by those names.
-
-*ABCL*
-     ABCL is a totally different beast because it's a Java-based Common
-     Lisp implementation. Most notably, you don't create standalone
-     executables in Java, so the normal way of running ABCL is by
-     telling it to load some lisp code. If you want to run the
-     quickstart program in the usual way, you will typically type this: abcl --noinform --noinit --nosystem --load quickstart.lisp
-      Note that for this to work, the `dump' macro expands to the
-     "main" function call for ABCL, just as for ECL.
-
-     There's more to it than that though. It is possible to get closer
-     to standalone executables with ABCL by 1/ providing your whole
-     application in a `jar' file directly, and 2/ overriding ABCL's
-     entry point by providing your own interpreter which runs your main
-     function automatically. I have described this process in more
-     details in the following blog entry:
-     `http://www.didierverna.com/sciblog/index.php?post/2011/01/22/Towards-ABCL-Standalone-Executables'.
-
-     Clon helps you to do this to some extend. If the `:dump'
-     configuration option is set (*note Configuration::), then the
-     `dump' macro doesn't expand to a call to the "main" function, but
-     instead dumps a Java file containing an alternate ABCL interpreter
-     that you can compile and add to the original ABCL `jar' file,
-     along with `quickstart.lisp'. If you want more details on this,
-     you will need to look at the `Makefile' in the `demo' directory
-     and also at the file `Makefile.inc' at the toplevel.
 

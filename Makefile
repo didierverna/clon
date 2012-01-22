@@ -106,8 +106,11 @@ gen:
 	 done
 
 INSTALL: doc/$(PROJECT)-user.info
-	info --file=./doc/$(PROJECT)-user.info --subnodes \
-	     -n Installation -n 'Technical Notes'   \
+	info --file=./doc/$(PROJECT)-user.info	\
+	     -n Installation			\
+	     -n Configuration			\
+	     -n 'Non-ANSI Features'		\
+	     -n 'Supported Platforms'		\
 	     --output=$@
 	perl -pi -e 's/^File:.*\n//g' $@
 
