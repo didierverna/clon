@@ -408,13 +408,32 @@ Return two values:
   #+clisp (ext:exit status)
   #+abcl  (extensions:exit :status status))
 
+(defvar *executablep* nil
+  "Whether the current Lisp image is a standalone executable dumped by Clon.
+This information is needed in some implementations that treat their
+command-line differently in dumped images.")
+
 (defun cmdline ()
-  "Get the current application's command-line."
+  "Get the current application's command-line.
+This command-line is not supposed to contain any Lisp implementation specific
+option; only user-level ones. When a standalone executable is dumped, this is
+always the case. When used interactively, this depends on the underlying Lisp
+implementation. See section #### FIXME of the user manual for more
+information."
   ;; #### PORTME.
   #+sbcl  sb-ext:*posix-argv*
-  #+cmu   lisp::lisp-command-line-list
-  #+ccl   ccl::*command-line-argument-list*
-  #+ecl   (ext:command-args)
+  #+cmu   (if *executablep*
+	      lisp::lisp-command-line-list
+	    (cons (car lisp::lisp-command-line-list)
+		  ext:*command-line-application-arguments*))
+  #+ccl   (if *executablep*
+	      ccl:*command-line-argument-list*
+	    (cons (car ccl:*command-line-argument-list*)
+		  ccl:*unprocessed-command-line-arguments*))
+  #+ecl   (if *executablep*
+	      (ext:command-args)
+	    (cons (car (ext:command-args))
+		  (cdr (member "--" (ext:command-args) :test #'string=))))
   #+clisp (cons (aref (ext:argv) 0) ext:*args*)
   ;; #### NOTE: the trickery below is here to make CMDLINE work even when Clon
   ;; is loaded into ABCL without dumping the Clon way (see
@@ -508,28 +527,37 @@ this function behaves differently in some cases, as described below.
   the file in which this macro call appears and calls FUNCTION."
   ;; #### PORTME.
   #+ecl (declare (ignore name))
-  #+sbcl  `(sb-ext:save-lisp-and-die ,name
-	     :toplevel #',function
-	     :executable t
-	     :save-runtime-options t)
-  #+cmu   `(ext:save-lisp ,name
-	     :init-function #',function
-	     :executable t
-	     :load-init-file nil
-	     :site-init nil
-	     :print-herald nil
-	     :process-command-line nil)
-  #+ccl   `(ccl:save-application ,name
-	     :toplevel-function #',function
-	     :init-file nil
-	     :error-handler :quit
-	     :prepend-kernel t)
+  #+sbcl  `(progn
+	     (setq *executablep* t) ; not used but here for correctness
+	     (sb-ext:save-lisp-and-die ,name
+	       :toplevel #',function
+	       :executable t
+	       :save-runtime-options t))
+  #+cmu   `(progn
+	     (setq *executablep* t)
+	     (ext:save-lisp ,name
+	       :init-function #',function
+	       :executable t
+	       :load-init-file nil
+	       :site-init nil
+	       :print-herald nil
+	       :process-command-line nil))
+  #+ccl   `(progn
+	     (setq *executablep* t)
+	     (ccl:save-application ,name
+	       :toplevel-function #',function
+	       :init-file nil
+	       :error-handler :quit
+	       :prepend-kernel t))
   ;; #### NOTE: ECL works differently: it needs an entry point (i.e. actual
   ;; code to execute) instead of a main function. So we expand DUMP to just
   ;; call that function.
-  #+ecl   (list function)
+  #+ecl   `(progn
+	     (setq *executablep* t)
+	     (,function))
   ;; CLISP's saveinitmem function doesn't quit, so we need to do so here.
   #+clisp `(progn
+	     (setq *executablep* t) ; not used but here for correctness
 	     (ext:saveinitmem ,name
 	       :init-function #',function
 	       :executable 0
@@ -550,7 +578,9 @@ this function behaves differently in some cases, as described below.
 		 (format t +abcl-main-class-template+
 		   class-name name (namestring source-pathname)))
 	       '(progn))
-	   (list function)))
+	   `(progn
+	      (setq *executablep* t) ; not used but here for correctness
+	      (,function))))
 
 
 ;;; util.lisp ends here
