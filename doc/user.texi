@@ -2694,8 +2694,9 @@ As mentioned in the above table, CLISP's dependency on @code{cffi} is
 optional. CLISP needs @code{cffi} in order to implement terminal
 autodetection only (note that many other implementations come with their
 own foreign function interface). If @code{cffi} cannot be found when the
-ASDF system is loaded, you get a big red blinking light and a warning
-but that's all. @clon{} will still work, although in restricted mode.
+ASDF system is loaded (or if CLISP itself has been compiled without
+@code{ffi} support), you get a big red blinking light and a warning but
+that's all. @clon{} will still work, although in restricted mode.
 
 
 @c -------------------
