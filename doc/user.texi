@@ -746,6 +746,9 @@ that the actual way of dumping executables is compiler-dependent. For
 more information on the proper way to do it and on the compilers
 currently supported, see @ref{Dumping Executables}.
 
+Note also that it is possible to use @clon{} without actually dumping a
+standalone executable (@pxref{Not Dumping Executables}).
+
 
 
 @c ====================================================================
@@ -1453,8 +1456,10 @@ Both of these techniques can be freely combined together at any time,
 because @clon{} keeps track of the current status of the @cmdline{}. In
 fact, @clon{} never works on the original @cmdline{}, but uses a mutable
 @emph{copy} of it after parsing. If you want to access the real
-@cmdline{} of your application, you may use the @code{cmdline} function,
-which is a wrapper around an implementation-dependent way to access it.
+@cmdline{} of your application (except for the compiler-specific
+options, see @ref{Not Dumping Executables}), you may use the
+@code{cmdline} function, which is a wrapper around an
+implementation-dependent way to access it.
 
 
 Finally, remember that the @cmdline{} is scanned from left to right
@@ -1984,7 +1989,7 @@ executables may depend on:
 @item
 @cindex Dumping
 the state of the Lisp environment when the application was dumped, which
-may in turn depend on command-line options passed to the Lisp itself
+may in turn depend on @cmdline{} options passed to the Lisp itself
 (@pxref{Dumping Executables}),
 @item
 @findex dump
@@ -2580,6 +2585,7 @@ portability concerns.
 * Non-ANSI Features::           Requiring operating system access
 * Supported Platforms::         Systems, compilers and dependencies
 * Dumping Executables::         Convenience wrappers
+* Not Dumping Executables::     Using Clon interactively
 @end menu
 
 
@@ -2702,12 +2708,13 @@ that's all. @clon{} will still work, although in restricted mode.
 @c -------------------
 @c Dumping Executables
 @c -------------------
-@node Dumping Executables, , Supported Platforms, Technical Notes
+@node Dumping Executables, Not Dumping Executables, Supported Platforms, Technical Notes
 @section Dumping Executables
 @cindex Dumping
 Creating standalone executables is orthogonal to @clon{}. @clon{} is
 just a library that you might want to use, and in fact, it is also
-possible to use it without dumping executables at all.
+possible to use it without dumping executables at all (@pxref{Not
+Dumping Executables}).
 
 @findex exit
 @findex dump
@@ -2759,7 +2766,7 @@ that ECL needs.
 @code{CC=gcc clisp -norc -i quickstart.lisp}@*
 The @code{CC=gcc} bit lets you choose your preferred C compiler for
 @code{cffi}. Please note that executables dumped (the @clon{} way) by
-CLISP still understand lisp-specific command-line options when they are
+CLISP still understand lisp-specific @cmdline{} options when they are
 prefixed with @code{--clisp-}, so you should obviously avoid defining
 options by those names.
 @item ABCL
@@ -2791,6 +2798,70 @@ you can compile and add to the original ABCL @code{jar} file, along with
 @file{quickstart.lisp}. If you want more details on this, you will need
 to look at the @file{Makefile} in the @code{demo} directory and also at
 the file @file{Makefile.inc} at the toplevel.
+@end table
+
+
+@c -----------------------
+@c Not Dumping Executables
+@c -----------------------
+@node Not Dumping Executables, , Dumping Executables, Technical Notes
+@section Not Dumping Executables
+Although @cmdline{} processing really makes sense for standalone
+executables, you may want to preserve interactivity with your
+application during the development phase, for instance for testing or
+debugging purposes.
+
+It is possible to use @clon{} interactively, that is, within a regular
+Lisp REPL, without dumping anything. First of all, we have already seen
+that it is possible to use a virtual @cmdline{} (@pxref{Using Different
+Command-Lines}). You can also use @clon{} interactively with the actual
+Lisp invocation's @cmdline{}, although a word of advice is in order
+here.
+
+@findex cmdline
+@findex dump
+As you might expect, the problem in that situation lies in the way the
+different Lisp implementations treat their own @cmdline{}. Guess what,
+it's a mess. When you dump an executable the @clon{} way, the
+@code{cmdline} function will always contain user options only (the
+@code{dump} macro instructs the compilers to @emph{not} process the
+@cmdline{} at all). When you use @clon{} interactively and mix
+compiler-specific options with application ones when invoking your Lisp
+environment, the situation is as follows:
+
+@table @strong
+@item SBCL
+SBCL processes its own options and leaves the others unprocessed on the
+@cmdline{}. This means that as long as there is no overlap between
+SBCL's options and yours, you can just put them all together on the
+@cmdline{}. In case of overlap however, you need to separate SBCL's
+options from yours with a call to @code{--end-toplevel-options} (that's
+an SBCL specific option separator).
+@item CMUCL
+@cindex Command-Line, remainder
+@cindex Remainder, of command-line
+CMUCL processes its own options, issues a warning about the options it
+doesn't know about, but in any case, it eats the whole @cmdline{}.
+Consequently, if you want to provide options to your application, you
+need to put them after a @code{--} separator. Note that you can still
+use a second such separator to provide @clon{} with both some options
+and a remainder (@pxenduserref{Option Separator}).
+@item CCL
+@itemx ECL
+@itemx CLISP
+CCL, ECL and CLISP all process their own options but will abort on
+unknown ones. Consequently, if you want to provide options to your
+application, you need to put them after a @code{--} separator. Note that
+you can still use a second such separator to provide @clon{} with both
+some options and a remainder (@pxenduserref{Option Separator}).
+@item ABCL
+Finally, ABCL processes its own options and leaves the others
+unprocessed on the @cmdline{}. This means that as long as there is no
+overlap between ABCL's options and yours, you can just put them all
+together on the @cmdline{}. In case of overlap however, you need to
+separate ABCL's options from yours with a @code{--} separator. Note that
+you can still use a second such separator to provide @clon{} with both
+some options and a remainder (@pxenduserref{Option Separator}).
 @end table
 
 
