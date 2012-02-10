@@ -73,7 +73,7 @@
     :initarg :short-call
     :reader short-call))
   (:report (lambda (error stream)
-	     (format stream "Unrecognized short call: ~S."
+	     (format stream "Unrecognized option or short pack: ~S."
 	       (short-call error))))
   (:documentation "An error related to an unrecognized short call."))
 
@@ -83,7 +83,7 @@
     :initarg :negated-call
     :reader negated-call))
   (:report (lambda (error stream)
-	     (format stream "Unrecognized negated call: ~S."
+	     (format stream "Unrecognized option or negated pack: ~S."
 	       (negated-call error))))
   (:documentation "An error related to an unrecognized negated call."))
 
