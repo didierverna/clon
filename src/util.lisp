@@ -418,7 +418,7 @@ command-line differently in dumped images.")
 This command-line is not supposed to contain any Lisp implementation specific
 option; only user-level ones. When a standalone executable is dumped, this is
 always the case. When used interactively, this depends on the underlying Lisp
-implementation. See appendix A.5 of the user manual for more information."q
+implementation. See appendix A.5 of the user manual for more information."
   ;; #### PORTME.
   #+sbcl  sb-ext:*posix-argv*
   #+cmu   (if *executablep*
