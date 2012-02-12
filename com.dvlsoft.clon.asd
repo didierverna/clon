@@ -168,6 +168,7 @@ The most important features of Clon are:
   :components ((:file "package")
 	       (:module "termio"
 		:depends-on ("package")
+		:serial t
 		:components
 			#+sbcl
 			((:module "sbcl"
@@ -179,7 +180,8 @@ The most important features of Clon are:
 			 (:module "clisp"
 			  :serial t
 			  :components ((cffi-grovel:grovel-file "constants")
-				       (:file "util")))))
+				       (:file "util")))
+			 (:file "termio")))
 	       (:module "src"
 		:depends-on ("termio")
 		:components ((:file "util")
