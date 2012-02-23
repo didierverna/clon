@@ -42,6 +42,7 @@
 		#+abcl  :mop
 		:class-slots :slot-definition-name #-abcl :validate-superclass)
   (:import-from :com.dvlsoft.clon.asdf
+    :configuration
     :define-constant
     :+release-major-level+
     :+release-minor-level+
@@ -121,12 +122,6 @@
 (defvar *readtable* (copy-readtable)
   "The Clon readtable.")
 
-(defun configuration (key)
-  "Return KEY's value in the current Clon configuration."
-  (let ((configuration
-	  (find-symbol "COM.DVLSOFT.CLON.CONFIGURATION" :cl-user)))
-    (when (and configuration (boundp configuration))
-      (getf (symbol-value configuration) key))))
 
 ;; String concatenation
 ;; --------------------

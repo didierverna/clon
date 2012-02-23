@@ -29,6 +29,28 @@
 
 (in-package :cl-user)
 
+
+(defpackage :com.dvlsoft.clon.asdf
+  (:documentation "The Command-Line Options Nuker package for ASDF.")
+  (:use :cl)
+  (:export :define-constant
+	   :+release-major-level+
+	   :+release-minor-level+
+	   :+release-status+ :+release-status-level+
+	   :+release-name+
+	   :version))
+
+(in-package :com.dvlsoft.clon.asdf)
+
+
+(defun configuration (key)
+  "Return KEY's value in the current Clon configuration."
+  (let ((configuration
+	  (find-symbol "COM.DVLSOFT.CLON.CONFIGURATION" :cl-user)))
+    (when (and configuration (boundp configuration))
+      (getf (symbol-value configuration) key))))
+
+
 (eval-when (:load-toplevel :execute)
   #+sbcl  (require :sb-grovel)
   #+clisp (if (featurep :ffi)
@@ -46,19 +68,6 @@
 * Clon will be loaded without support for terminal autodetection.   *
 * See section A.1 of the user manual for more information.          *
 *********************************************************************")))
-
-(defpackage :com.dvlsoft.clon.asdf
-  (:documentation "The Command-Line Options Nuker package for ASDF.")
-  (:use :cl)
-  (:export :define-constant
-	   :+release-major-level+
-	   :+release-minor-level+
-	   :+release-status+ :+release-status-level+
-	   :+release-name+
-	   :version))
-
-
-(in-package :com.dvlsoft.clon.asdf)
 
 (defmacro define-constant (name value &optional doc)
   `(defconstant ,name (if (boundp ',name) (symbol-value ',name) ,value)
