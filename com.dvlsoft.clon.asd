@@ -32,13 +32,7 @@
 
 (defpackage :com.dvlsoft.clon.asdf
   (:documentation "The Command-Line Options Nuker package for ASDF.")
-  (:use :cl)
-  (:export :define-constant
-	   :+release-major-level+
-	   :+release-minor-level+
-	   :+release-status+ :+release-status-level+
-	   :+release-name+
-	   :version))
+  (:use :cl))
 
 (in-package :com.dvlsoft.clon.asdf)
 
