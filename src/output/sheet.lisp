@@ -696,7 +696,8 @@ than the currently available right margin."
   ;; terminal or a simple file.
   (when (or (not line-width) (eq highlight :auto))
     (multiple-value-bind (tty-line-width error-message)
-	(stream-line-width output-stream)
+	(when (fboundp 'stream-line-width) ; depends on the termio module
+	  (stream-line-width output-stream))
       (when error-message
 	;; #### FIXME: a better error printing would be nice.
 	(let (*print-escape*)

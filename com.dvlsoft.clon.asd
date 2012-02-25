@@ -30,6 +30,10 @@
 (in-package :cl-user)
 
 
+;; ------------------
+;; Package definition
+;; ------------------
+
 (defpackage :com.dvlsoft.clon.asdf
   (:documentation "The Command-Line Options Nuker package for ASDF.")
   (:use :cl))
@@ -37,31 +41,34 @@
 (in-package :com.dvlsoft.clon.asdf)
 
 
+;; --------------------
+;; Very early utilities
+;; --------------------
+
+;; Configuration
+
+(defvar cl-user::com.dvlsoft.clon.configuration nil
+  "The Clon configuration settings.
+This variable contains a property list of configuration options.
+Current options are:
+- :swank-eval-in-emacs (Boolean)
+- :restricted (Boolean)
+- :dump (Boolean)
+
+See section A.1 of the user manual for more information.")
+
 (defun configuration (key)
   "Return KEY's value in the current Clon configuration."
-  (let ((configuration
-	  (find-symbol "COM.DVLSOFT.CLON.CONFIGURATION" :cl-user)))
-    (when (and configuration (boundp configuration))
-      (getf (symbol-value configuration) key))))
+  (getf cl-user::com.dvlsoft.clon.configuration key))
+
+(defun set-configuration (key value)
+  "Set KEY to VALUE in the current Clon configuration."
+  (setf (getf cl-user::com.dvlsoft.clon.configuration key) value))
+
+(defsetf configuration set-configuration)
 
 
-(eval-when (:load-toplevel :execute)
-  #+sbcl  (require :sb-grovel)
-  #+clisp (if (featurep :ffi)
-	      (handler-case (asdf:load-system :cffi-grovel)
-		(asdf:missing-component ()
-		  (format *error-output* "~
-*********************************************************************
-* WARNING: ASDF component CFFI-GROVEL not found.                    *
-* Clon will be loaded without support for terminal autodetection.   *
-* See section A.1 of the user manual for more information.          *
-*********************************************************************")))
-	    (format *error-output* "~
-*********************************************************************
-* WARNING: CLISP is compiled without ffi support.                   *
-* Clon will be loaded without support for terminal autodetection.   *
-* See section A.1 of the user manual for more information.          *
-*********************************************************************")))
+;; Versionning
 
 (defmacro define-constant (name value &optional doc)
   `(defconstant ,name (if (boundp ',name) (symbol-value ',name) ,value)
@@ -147,6 +154,55 @@ the short version, a patchlevel of 0 is ignored in the output."
 	    +release-status+ +release-status-level+
 	    +release-name+))
 
+
+;; -------------------
+;; System requirements
+;; -------------------
+
+(unless (configuration :restricted)
+  #+sbcl  (handler-case (asdf:load-system :sb-grovel)
+	    (error ()
+	      (format *error-output* "~
+*******************************************************************
+* WARNING: unable to load module SB-GROVEL.                       *
+* Clon will be loaded without support for terminal autodetection. *
+* See section A.1 of the user manual for more information.        *
+*******************************************************************")
+	      (setf (configuration :restricted) t)))
+  #+clisp (cond ((featurep :ffi)
+		 (handler-case (asdf:load-system :cffi-grovel)
+		   (error ()
+		     (format *error-output* "~
+*******************************************************************
+* WARNING: unable to load ASDF component CFFI-GROVEL.             *
+* Clon will be loaded without support for terminal autodetection. *
+* See section A.1 of the user manual for more information.        *
+*******************************************************************")
+		     (setf (configuration :restricted) t))))
+		(t
+		 (format *error-output* "~
+*******************************************************************
+* WARNING: CLISP is compiled without FFI support.                 *
+* Clon will be loaded without support for terminal autodetection. *
+* See section A.1 of the user manual for more information.        *
+*******************************************************************")
+		 (setf (configuration :restricted) t)))
+  #+abcl (progn (format *error-output* "~
+*******************************************************************
+* NOTE: ABCL is in use.                                           *
+* Clon will be loaded without support for terminal autodetection. *
+* See section A.1 of the user manual for more information.        *
+*******************************************************************")
+		(setf (configuration :restricted) t)))
+
+(unless (configuration :restricted)
+  (push :com.dvlsoft.clon.termio *features*))
+
+
+;; -----------------
+;; System definition
+;; -----------------
+
 (asdf:defsystem :com.dvlsoft.clon
   :description "The Command-Line Options Nuker."
   :long-description "Clon is a library for command-line option management.
@@ -166,27 +222,28 @@ The most important features of Clon are:
   :maintainer "Didier Verna <didier@lrde.epita.fr>"
   :license "BSD"
   :version #.(version :long)
-  :depends-on (#+sbcl             :sb-posix
-	       #+(and clisp ffi cffi) :cffi)
+  :depends-on (#+sbcl :sb-posix
+	       #+(and clisp com.dvlsoft.clon.termio) :cffi)
   :components ((:file "package")
+	       #+com.dvlsoft.clon.termio
 	       (:module "termio"
 		:depends-on ("package")
 		:serial t
 		:components
-			#+sbcl
-			((:module "sbcl"
-			  :serial t
-			  :components ((sb-grovel:grovel-constants-file
-					"constants" :package :com.dvlsoft.clon)
-				       (:file "util")))
-			 #+(and clisp cffi)
-			 (:module "clisp"
-			  :serial t
-			  :components ((cffi-grovel:grovel-file "constants")
-				       (:file "util")))
-			 (:file "termio")))
+		#+sbcl
+		((:module "sbcl"
+		  :serial t
+		  :components ((sb-grovel:grovel-constants-file
+				"constants" :package :com.dvlsoft.clon)
+			       (:file "util")))
+		 #+clisp
+		 (:module "clisp"
+		  :serial t
+		  :components ((cffi-grovel:grovel-file "constants")
+			       (:file "util")))
+		 (:file "termio")))
 	       (:module "src"
-		:depends-on ("termio")
+		:depends-on (#+com.dvlsoft.clon.termio "termio")
 		:components ((:file "util")
 			     (:file "item" :depends-on ("util"))
 			     (:file "text" :depends-on ("item"))

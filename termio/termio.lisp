@@ -85,7 +85,8 @@ Return two values:
 
 ;; #### NOTE: SBCL and CLISP have their specific, not "inlined" version of
 ;; this function elsewhere because they both use a separate ASDF module. The
-;; SBCL one depends on SB-GROVEL and the CLISP one depends on CFFI.
+;; SBCL one depends on SB-GROVEL and the CLISP one depends on CFFI. Also, ABCL
+;; doesn't appear below because this module (termio) is never loaded with it.
 (defun stream-line-width (stream)
   "Get STREAM's line width.
 Return two values:
@@ -98,7 +99,6 @@ Return two values:
   ;; ENOTTY error, which simply means that we're not connected to a terminal,
   ;; and the other which are real errors and need to be reported.
   ;; #### PORTME.
-  #+abcl (declare (ignore stream))
   #+sbcl
   (sbcl/stream-line-width stream)
   #+cmu
@@ -130,9 +130,7 @@ Return two values:
     (values (unless (= cols -1) cols) msg))
   #+clisp
   (when (fboundp 'clisp/stream-line-width)
-    (clisp/stream-line-width stream))
-  #+abcl
-  nil)
+    (clisp/stream-line-width stream)))
 
 
 ;;; termio.lisp ends here
