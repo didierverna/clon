@@ -2,10 +2,10 @@
 2 Installation
 **************
 
-Clon currently works on Unix platforms (MacOS X included) with SBCL,
-CMUCL, CCL, ECL, CLISP and ABCL. Clon is provided as an ASDF 2 system,
-but has no mandatory dependency. CFFI may optionally be used with
-CLISP. *Note Supported Platforms::, for more information.
+Clon currently works on Unix (including MacOS X) and Windows (Cygwin or
+MinGW) with SBCL, CMUCL, CCL, ECL, CLISP and ABCL. Clon is provided as
+an ASDF 2 system, but has no mandatory dependency. CFFI may optionally
+be used with CLISP. *Note Supported Platforms::, for more information.
 
    In addition to the library itself, the Clon distribution offers
 documentation in the form of 3 different manuals, some data files that
@@ -94,9 +94,9 @@ columns regardless of the actual terminal width (*note Global Control:
 A.3 Supported Platforms
 =======================
 
-Clon currently works on Unix systems (including MacOS X) and has been
-ported to 6 Common Lisp implementations. I have no idea about Windows
-right now. The following table lists the supported platforms.
+Clon currently works on Unix (including MacOS X) and Windows (Cygwin or
+MinGW) and has been ported to 6 Common Lisp implementations. The
+following table lists the supported platforms.
 
 Compiler   Minimum Version   Dependencies
 ------------------------------------------------- 

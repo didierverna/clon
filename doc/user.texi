@@ -501,10 +501,11 @@ extend @clon{} with your own option types.
 @c ====================================================================
 @node Installation, Quick Start, Introduction, Top
 @chapter Installation
-@clon{} currently works on Unix platforms (MacOS X included) with SBCL,
-CMUCL, CCL, ECL, CLISP and ABCL. @clon{} is provided as an ASDF 2
-system, but has no mandatory dependency. CFFI may optionally be used
-with CLISP. @xref{Supported Platforms}, for more information.
+@clon{} currently works on Unix (including MacOS X) and Windows (Cygwin
+or MinGW) with SBCL, CMUCL, CCL, ECL, CLISP and ABCL. @clon{} is
+provided as an ASDF 2 system, but has no mandatory dependency. CFFI may
+optionally be used with CLISP. @xref{Supported Platforms}, for more
+information.
 
 In addition to the library itself, the Clon distribution offers
 documentation in the form of 3 different manuals, some data files that
@@ -2661,9 +2662,9 @@ for 80 columns regardless of the actual terminal width
 @c ----------------------
 @node Supported Platforms, Dumping Executables, Non-ANSI Features, Technical Notes
 @section Supported Platforms
-@clon{} currently works on Unix systems (including MacOS X) and has been
-ported to 6 @cl{} implementations. I have no idea about Windows right
-now. The following table lists the supported platforms.
+@clon{} currently works on Unix (including MacOS X) and Windows (Cygwin
+or MinGW) and has been ported to 6 @cl{} implementations. The following
+table lists the supported platforms.
 
 @multitable {Compiler} {Minimum Version} {@code{cffi} (optional)}
 @headitem Compiler @tab Minimum Version @tab Dependencies
