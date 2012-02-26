@@ -58,6 +58,15 @@ following options are provided.
      works, I have described it in the following blog entry:
      `http://www.didierverna.com/sciblog/index.php?post/2011/07/20/One-more-indentation-hack'.
 
+:restricted
+     Some non-ANSI features of Clon require external functionality that
+     may not be available in all contexts. Normally, Clon should
+     autodetect this and switch to so-called _restricted mode_ at
+     build-time (*note Non-ANSI Features::). If Clon has failed to
+     autodetect the problem (in which case I would like to know), or if
+     for some reason, you explicitly want to disable those features,
+     you may set the `:restricted' configuration option to `t'.
+
 :dump
      This option is only used by the ABCL port. *note Dumping
      Executables::, provides more information on its use.

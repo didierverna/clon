@@ -2617,6 +2617,16 @@ also be set to @code{t} in your (X)Emacs session. If you're interested
 to know how this process works, I have described it in the following
 blog entry:
 @uref{http://www.didierverna.com/sciblog/index.php?post/2011/07/20/One-more-indentation-hack}.
+@item :restricted
+@coindex{:restricted}@c
+@cindex Restricted Mode
+Some non-ANSI features of @clon{} require external functionality that
+may not be available in all contexts. Normally, @clon{} should
+autodetect this and switch to so-called @emph{restricted mode} at
+build-time (@pxref{Non-ANSI Features}). If @clon{} has failed to
+autodetect the problem (in which case I would like to know), or if for
+some reason, you explicitly want to disable those features, you may set
+the @code{:restricted} configuration option to @code{t}.
 @item :dump
 @coindex{:dump}@c
 This option is only used by the ABCL port. @ref{Dumping Executables},
