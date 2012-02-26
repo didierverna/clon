@@ -184,8 +184,8 @@ Command-Line
 @c Configuration options
 @macro coindex{name}
 @vindex com.dvlsoft.clon.configuration
-@cindex Configuration Option, @t{\name\}
-@cindex @t{\name\}
+@cindex Configuration Option, @t{:\name\}
+@cindex @t{:\name\}
 @end macro
 
 
@@ -2605,7 +2605,7 @@ the following options are provided.
 
 @table @t
 @item :swank-eval-in-emacs
-@coindex{:swank-eval-in-emacs}@c
+@coindex{swank-eval-in-emacs}@c
 @vindex slime-enable-evaluate-in-emacs
 This option is only useful if you use Slime, and mostly if you plan on
 hacking @clon{} itself. The library provides indentation information for
@@ -2618,7 +2618,7 @@ to know how this process works, I have described it in the following
 blog entry:
 @uref{http://www.didierverna.com/sciblog/index.php?post/2011/07/20/One-more-indentation-hack}.
 @item :restricted
-@coindex{:restricted}@c
+@coindex{restricted}@c
 @cindex Restricted Mode
 Some non-ANSI features of @clon{} require external functionality that
 may not be available in all contexts. Normally, @clon{} should
@@ -2628,7 +2628,7 @@ autodetect the problem (in which case I would like to know), or if for
 some reason, you explicitly want to disable those features, you may set
 the @code{:restricted} configuration option to @code{t}.
 @item :dump
-@coindex{:dump}@c
+@coindex{dump}@c
 This option is only used by the ABCL port. @ref{Dumping Executables},
 provides more information on its use.
 @end table
@@ -2799,7 +2799,7 @@ automatically. I have described this process in more details in the
 following blog entry:
 @uref{http://www.didierverna.com/sciblog/index.php?post/2011/01/22/Towards-ABCL-Standalone-Executables}.
 
-@coindex{:dump}@c
+@coindex{dump}@c
 @clon{} helps you to do this to some extend. If the @code{:dump}
 configuration option is set (@pxref{Configuration}), then the
 @code{dump} macro doesn't expand to a call to the ``main'' function, but
