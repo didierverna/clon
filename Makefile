@@ -31,12 +31,12 @@
 
 TOP_DIR := .
 
-include Makefile.cnf
+include $(TOP_DIR)/Makefile.cnf
 
 hack: all
 
-include Makefile.inc
-include version.inc
+include $(TOP_DIR)/Makefile.inc
+include $(TOP_DIR)/version.inc
 
 
 SUBDIRS   := termio src share doc demos
