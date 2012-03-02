@@ -42,8 +42,10 @@ clean:
 	-rm *~ a.out foo.c
 
 distclean: clean
+ifeq ($(LISP),SBCL)
 	-rm -fr constants.lisp-temp
-	-rm -fr $(SBCL_BINLOC)-*
+endif
+	-rm -fr $($(LISP)_BINLOC)-*
 
 install:
 uninstall:

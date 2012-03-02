@@ -42,8 +42,10 @@ clean:
 	-rm *~ constants constants.c
 
 distclean: clean
+ifeq ($(LISP),CLISP)
 	-rm -fr constants.grovel-tmp.lisp constants.fas constants.lib
-	-rm -fr $(CLISP_BINLOC)-*
+endif
+	-rm -fr $($(LISP)_BINLOC)-*
 
 install:
 uninstall:
