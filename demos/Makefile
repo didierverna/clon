@@ -49,11 +49,11 @@ $(DEMOS): %: %.jar
 else ifeq ($(LISP),ECL)
 # ECL also has a different scheme for producing executables.
 $(DEMOS): %: %.lisp
-	$($(LISP)_PATH) $($(LISP)_DUMP) dump.lisp -- $@
+	$($(LISP)_PATH) $(EVAL_CONFIG) $($(LISP)_DUMP) dump.lisp -- $@
 else
 # The default way of doing things in pure lisp:
 $(DEMOS): %: %.lisp
-	$($(LISP)_PATH) $($(LISP)_DUMP) $<
+	$($(LISP)_PATH) $(EVAL_CONFIG) $($(LISP)_DUMP) $<
 endif
 
 

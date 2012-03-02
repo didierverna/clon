@@ -113,12 +113,18 @@ ps: splash.eps $(PS_FILES)
 
 SPLASH_INSERT := 's/^\@author/\@vskip 2cm\n\@image\{splash,16cm\}\n\@author/'
 
+ifeq ($(CONFIG),)
+EVAL_CONFIG :=
+else
+EVAL_CONFIG := $(SBCL_EVAL) $(CONFIG)
+endif
+
 reference.texi: generate.cl
-	$(SBCL_PATH) $(SBCL_LOAD) ./generate.cl
+	$(SBCL_PATH) $(EVAL_CONFIG) $(SBCL_LOAD) ./generate.cl
 	$(PERL) -pi -e $(SPLASH_INSERT) $@
 
 webreference.texi: generate.cl
-	$(SBCL_PATH) $(SBCL_LOAD) ./generate.cl --web
+	$(SBCL_PATH) $(EVAL_CONFIG) $(SBCL_LOAD) ./generate.cl --web
 	$(PERL) -pi -e $(SPLASH_INSERT) $@
 
 $(PROJECT)-%.info: %.texi

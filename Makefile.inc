@@ -40,38 +40,56 @@ W3DIR := $(HOME)/www/software/lisp/$(PROJECT)
 SBCL_CACHE  := sbcl
 SBCL_BINLOC := sbcl
 SBCL_LOAD   := --load
+SBCL_EVAL   := --eval
 SBCL_DUMP   := --script
 
 CMUCL_CACHE  := cmu
 CMUCL_BINLOC := cmu
 CMUCL_LOAD   := -load
+CMUCL_EVAL   := -eval
 CMUCL_DUMP   := -noinit -nositeinit $(CMUCL_LOAD)
 
 CCL_CACHE  := ccl
 CCL_BINLOC := openmcl
 CCL_LOAD   := --load
+CCL_EVAL   := --eval
 CCL_DUMP   := --no-init $(CCL_LOAD)
 
 ECL_CACHE  := ecl
 ECL_BINLOC := ecl
 ECL_LOAD   := -load
+ECL_EVAL   := -eval
 ECL_DUMP   := -norc $(ECL_LOAD)
 
 CLISP_CACHE  := clisp
 CLISP_BINLOC := clisp
 CLISP_LOAD   := -i
+CLISP_EVAL   := -x ## quits the program !!
 CLISP_DUMP   := -norc $(CLISP_LOAD)
 
 ABCL_CACHE  := abcl
 ABCL_BINLOC := abcl
 ABCL_LOAD   := --load
-ABCL_DUMP   := --batch --eval '\
+ABCL_EVAL   := --eval
+ABCL_DUMP   := --batch $(ABCL_EVAL) '\
 (progn (defvar cl-user::$(PACKAGE).configuration nil)\
        (setf (getf cl-user::$(PACKAGE).configuration :dump) t))' \
 	       $(ABCL_LOAD)
 
+ifeq ($(RESTRICTED),t)
+CONFIG := '(progn (defvar cl-user::$(PACKAGE).configuration nil) \
+	     (setf (getf cl-user::$(PACKAGE).configuration :restricted) t))'
+EVAL_CONFIG := $($(LISP)_EVAL) $(CONFIG)
+else
+CONFIG :=
+EVAL_CONFIG :=
+endif
+
+
 $(TOP_DIR)/version.inc: $(TOP_DIR)/version.cl $(TOP_DIR)/$(ASDF_FILE)
-	$($(LISP)_PATH) $($(LISP)_LOAD) $(TOP_DIR)/version.cl | tail -2 > $@
+	$($(LISP)_PATH) $(EVAL_CONFIG)		\
+	  $($(LISP)_LOAD) $(TOP_DIR)/version.cl	\
+	| tail -2 > $@
 
 
 ### Makefile.inc ends here
