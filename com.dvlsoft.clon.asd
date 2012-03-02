@@ -169,7 +169,7 @@ the short version, a patchlevel of 0 is ignored in the output."
 * See section A.1 of the user manual for more information.        *
 *******************************************************************")
 	      (setf (configuration :restricted) t)))
-  #+clisp (cond ((featurep :ffi)
+  #+clisp (cond ((member :ffi *features*)
 		 (handler-case (asdf:load-system :cffi-grovel)
 		   (error ()
 		     (format *error-output* "~
@@ -224,10 +224,10 @@ The most important features of Clon are:
   :version #.(version :long)
   :depends-on (#+sbcl :sb-posix
 	       #+(and clisp com.dvlsoft.clon.termio) :cffi)
+  :serial t
   :components ((:file "package")
 	       #+com.dvlsoft.clon.termio
 	       (:module "termio"
-		:depends-on ("package")
 		:serial t
 		:components
 		#+sbcl
