@@ -1,6 +1,6 @@
-### Makefile --- CLISP directory
+### Makefile --- termio directory
 
-## Copyright (C) 2010, 2011, 2012 Didier Verna
+## Copyright (C) 2012 Didier Verna
 
 ## Author:     Didier Verna <didier@lrde.epita.fr>
 ## Maintainer: Didier Verna <didier@lrde.epita.fr>
@@ -27,7 +27,7 @@
 
 ### Code:
 
-TOP_DIR := ../..
+TOP_DIR := ..
 
 include $(TOP_DIR)/Makefile.cnf
 
@@ -36,20 +36,31 @@ hack: all
 include $(TOP_DIR)/Makefile.inc
 
 
+SUBDIRS := sbcl clisp
+
 all:
+	$(MAKE) gen TARGET=all
 
 clean:
-	-rm *~ constants constants.c
+	-rm *~
+	$(MAKE) gen TARGET=clean
 
 distclean: clean
-	-rm -fr constants.grovel-tmp.lisp constants.fas constants.lib
-	-rm -fr $(CLISP_BINLOC)-*
+	-rm -fr $($(LISP)_BINLOC)-*
+	$(MAKE) gen TARGET=distclean
 
-install:
-uninstall:
-install-www:
+gen:
+	@for i in $(SUBDIRS) ; do                 \
+	   echo "making $(TARGET) in $${i} ..." ; \
+	   ( cd $${i} && $(MAKE) $(TARGET) ) ;    \
+	 done
 
-.PHONY: hack all clean distclean install uninstall install-www
+.DEFAULT:
+	$(MAKE) gen TARGET=$@
+
+.PHONY: hack all	\
+	clean distclean	\
+	gen
 
 
 ### Makefile ends here

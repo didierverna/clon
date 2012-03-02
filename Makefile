@@ -39,7 +39,7 @@ include Makefile.inc
 include version.inc
 
 
-SUBDIRS   := src sbcl clisp share doc demos
+SUBDIRS   := termio src share doc demos
 DIST_NAME := $(PROJECT)-$(SHORT_VERSION)
 TARBALL   := $(DIST_NAME).tar.gz
 SIGNATURE := $(TARBALL).asc
