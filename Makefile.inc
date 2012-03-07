@@ -89,12 +89,6 @@ CONFIG :=
 EVAL_CONFIG :=
 endif
 
-
-$(TOP_DIR)/version.inc: $(TOP_DIR)/version.cl $(TOP_DIR)/$(ASDF_FILE)
-	$($(LISP)_PATH) $(EVAL_CONFIG)		\
-	  $($(LISP)_LOAD) $(TOP_DIR)/version.cl	\
-	| tail -2 > $@
-
 # This is a gross hack for compensating the lack of --eval option to clisp.
 # This rule doesn't actually create any clisp.inc file, but a clisp
 # configuration file that will be loaded with -i, and which is redone every
@@ -103,6 +97,19 @@ $(TOP_DIR)/version.inc: $(TOP_DIR)/version.cl $(TOP_DIR)/$(ASDF_FILE)
 # clisp.inc in order for this to work.
 $(TOP_DIR)/clisp.inc:
 	echo $(CONFIG) > $(TOP_DIR)/.clisp.cnf
+
+# The rule below duplicates what the one above does, but it's needed for
+# makefiles that include both version.inc and clisp.inc. This is necessary
+# because Make wants to redo things in the wrong order and hence would call
+# clisp -i .clisp.cnf without this file having been created first.
+$(TOP_DIR)/version.inc: $(TOP_DIR)/version.cl $(TOP_DIR)/$(ASDF_FILE)
+ifeq ($(LISP),CLISP)
+	echo $(CONFIG) > $(TOP_DIR)/.clisp.cnf
+endif
+	$($(LISP)_PATH) $(EVAL_CONFIG)		\
+	  $($(LISP)_LOAD) $(TOP_DIR)/version.cl	\
+	| tail -2 > $@
+
 
 
 ### Makefile.inc ends here
