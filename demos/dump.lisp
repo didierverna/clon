@@ -27,10 +27,7 @@
 
 ;;; Code:
 
-(require :asdf
-	 #-(or sbcl cmu ccl ecl)
-	 '(#p"/usr/local/share/common-lisp/source/asdf/asdf.lisp"))
-
+(require :asdf)
 
 (defconstant +executable+
   (second (member "--" (si:command-args) :test #'string=)))
@@ -40,6 +37,9 @@
 (asdf:load-system :com.dvlsoft.clon)
 
 (compile-file +source+ :output-file +object+ :system-p t)
+
+;; #### NOTE: this only dumps an executable without Clon in the image. Clon
+;; will still be loaded dynamically by ASDF every time the program is run.
 (c:build-program +executable+ :lisp-files (list +object+))
 
 (si:exit 0)
