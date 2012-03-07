@@ -230,8 +230,8 @@ The most important features of Clon are:
 	       (:module "termio"
 		:serial t
 		:components
-		#+sbcl
-		((:module "sbcl"
+		(#+sbcl
+		 (:module "sbcl"
 		  :serial t
 		  :components ((sb-grovel:grovel-constants-file
 				"constants" :package :com.dvlsoft.clon)
