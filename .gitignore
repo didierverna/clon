@@ -1,5 +1,7 @@
 version.inc
 
+.clisp.cnf
+
 sbcl-*/
 cmu-*/
 openmcl-*/

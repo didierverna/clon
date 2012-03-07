@@ -36,6 +36,9 @@ include $(TOP_DIR)/Makefile.cnf
 hack: all
 
 include $(TOP_DIR)/Makefile.inc
+ifeq ($(LISP),CLISP)
+  include $(TOP_DIR)/clisp.inc
+endif
 include $(TOP_DIR)/version.inc
 
 
@@ -67,6 +70,9 @@ clean:
 # will keep on being reconstructed.
 distclean: clean
 	$(MAKE) gen TARGET=distclean
+ifeq ($(LISP),CLISP)
+	-rm .clisp.cnf
+endif
 	-rm *.tar.gz *.tar.gz.asc
 	-rm -fr version.inc
 	-rm -fr $($(LISP)_BINLOC)-*

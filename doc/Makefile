@@ -34,6 +34,9 @@ include $(TOP_DIR)/Makefile.cnf
 hack: all
 
 include $(TOP_DIR)/Makefile.inc
+ifeq ($(LISP),CLISP)
+  include $(TOP_DIR)/clisp.inc
+endif
 include $(TOP_DIR)/version.inc
 ifneq ($(SBCL_PATH),)
   include declt.inc

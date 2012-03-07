@@ -37,6 +37,7 @@ SHARE := $(PREFIX)/share
 
 W3DIR := $(HOME)/www/software/lisp/$(PROJECT)
 
+
 SBCL_CACHE  := sbcl
 SBCL_BINLOC := sbcl
 SBCL_LOAD   := --load
@@ -64,7 +65,6 @@ ECL_DUMP   := -norc $(ECL_LOAD)
 CLISP_CACHE  := clisp
 CLISP_BINLOC := clisp
 CLISP_LOAD   := -i
-CLISP_EVAL   := -x ## quits the program !!
 CLISP_DUMP   := -norc $(CLISP_LOAD)
 
 ABCL_CACHE  := abcl
@@ -79,7 +79,11 @@ ABCL_DUMP   := --batch $(ABCL_EVAL) '\
 ifeq ($(RESTRICTED),t)
 CONFIG := '(progn (defvar cl-user::$(PACKAGE).configuration nil) \
 	     (setf (getf cl-user::$(PACKAGE).configuration :restricted) t))'
+  ifeq ($(LISP),CLISP)
+EVAL_CONFIG := $($(LISP)_LOAD) $(TOP_DIR)/.clisp.cnf
+  else
 EVAL_CONFIG := $($(LISP)_EVAL) $(CONFIG)
+  endif
 else
 CONFIG :=
 EVAL_CONFIG :=
@@ -90,6 +94,15 @@ $(TOP_DIR)/version.inc: $(TOP_DIR)/version.cl $(TOP_DIR)/$(ASDF_FILE)
 	$($(LISP)_PATH) $(EVAL_CONFIG)		\
 	  $($(LISP)_LOAD) $(TOP_DIR)/version.cl	\
 	| tail -2 > $@
+
+# This is a gross hack for compensating the lack of --eval option to clisp.
+# This rule doesn't actually create any clisp.inc file, but a clisp
+# configuration file that will be loaded with -i, and which is redone every
+# time make is called (several times actually). This is not a clean solution
+# but it works. Every Makefile that needs to run $(LISP) needs to include
+# clisp.inc in order for this to work.
+$(TOP_DIR)/clisp.inc:
+	echo $(CONFIG) > $(TOP_DIR)/.clisp.cnf
 
 
 ### Makefile.inc ends here
