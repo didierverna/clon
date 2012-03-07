@@ -80,7 +80,7 @@ endef
 # This defines how to create Foo.java from foo.lisp:
 define java_rule
 $(call java_name,$(1).java): $(1).lisp
-	$(ABCL_PATH) $(ABCL_DUMP) $$<
+	$(ABCL_PATH) $(EVAL_CONFIG) $(ABCL_DUMP) $$<
 endef
 
 $(foreach demo,$(DEMOS),$(eval $(call jar_rule,$(demo))))
