@@ -2,10 +2,10 @@
 
 @c enduser.texi --- End-user manual
 
-@c Copyright (C) 2010, 2011 Didier Verna
+@c Copyright (C) 2010, 2011, 2012 Didier Verna
 
-@c Author:        Didier Verna <didier@lrde.epita.fr>
-@c Maintainer:    Didier Verna <didier@lrde.epita.fr>
+@c Author:     Didier Verna <didier@lrde.epita.fr>
+@c Maintainer: Didier Verna <didier@lrde.epita.fr>
 
 @c This file is part of Clon.
 
@@ -42,7 +42,7 @@
 @c Settings
 @c ====================================================================
 @set VERSION 1.0 beta 20 "Michael Brecker"
-@set COPYRIGHT_DATE 2010, 2011
+@set COPYRIGHT_DATE 2010, 2011, 2012
 @setchapternewpage odd
 @setcontentsaftertitlepage
 @documentdescription
@@ -349,6 +349,10 @@ get a more compact version information, and if you try
 @bioption{version=number}, you will end up with a purely numerical
 version number. For more information on @clon{} version numbering, see
 @userref{Version Numbering}.
+
+@item lisp-information
+Finally, this option displays some information about the underlying Lisp
+implementation that was used to create this executable.
 @end table
 
 
