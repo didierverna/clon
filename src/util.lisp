@@ -371,39 +371,40 @@ implementation. See appendix A.5 of the user manual for more information."
 
 public class ~A
 {
-    public static void main (final String[] argv)
+  public static void main (final String[] argv)
+  {
+    Runnable r = new Runnable ()
     {
-	Runnable r = new Runnable ()
-	    {
-		public void run()
-		{
-		    try
-			{
-			    LispObject cmdline = Lisp.NIL;
-			    for (String arg : argv)
-				cmdline = new Cons (arg, cmdline);
-			    cmdline.nreverse ();
-			    Lisp._COMMAND_LINE_ARGUMENT_LIST_.setSymbolValue
-				(cmdline);
+      public void run()
+      {
+	try
+	{
+	  LispObject cmdline = Lisp.NIL;
+	  for (String arg : argv)
+	    cmdline = new Cons (arg, cmdline);
+	  cmdline.nreverse ();
+	  Lisp._COMMAND_LINE_ARGUMENT_LIST_.setSymbolValue (cmdline);
 
-			    Interpreter interpreter =
-			      Interpreter.createInstance ();
-			    interpreter.eval
-			      (\"(defvar extensions::*argv0* \\\"~A\\\")\");
-			    interpreter.eval
-			      (\"(export 'extensions::*argv0* 'extensions)\");
+	  Interpreter interpreter = Interpreter.createInstance ();
+	  interpreter.eval (\"(defvar extensions::*argv0* \\\"~A\\\")\");
+	  interpreter.eval (\"(export 'extensions::*argv0* 'extensions)\");
 
-			    Load.loadSystemFile (\"/~A\", false, false, false);
-			}
-		    catch (ProcessingTerminated e)
-			{
-			    System.exit (e.getStatus ());
-			}
-		}
-	    };
+	  // The following expression prevents Clon's system definition file
+	  // from warning about restricted restricted mode.
+	  interpreter.eval (\"(defvar cl-user::com.dvlsoft.clon.configuration nil)\");
+	  interpreter.eval (\"(setf (getf cl-user::com.dvlsoft.clon.configuration :restricted) t)\");
 
-	new Thread (null, r, \"interpreter\", 4194304L).start();
-    }
+	  Load.loadSystemFile (\"/~A\", false, false, false);
+	}
+	catch (ProcessingTerminated e)
+	{
+	  System.exit (e.getStatus ());
+	}
+      }
+    };
+
+    new Thread (null, r, \"interpreter\", 4194304L).start();
+  }
 }~%"
   "Main class template for ABCL.")
 
