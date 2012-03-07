@@ -3190,6 +3190,7 @@ compiler support or any other kind of help. You have my gratitude!
 
 @multitable @columnfractions .99
 Alessio Stalla@*
+Antony @emph{something}@*
 Erik Huelsmann@*
 Erik Winkels@*
 François-René Rideau@*
