@@ -742,6 +742,11 @@ or FITNESS FOR A PARTICULAR PURPOSE.~%"
     (when version-format
       (format t "~A~%" (version version-format))
       (exit)))
+  (when (getopt :context context :long-name "clon-lisp-information")
+    (format t "~A ~A~%"
+      (lisp-implementation-type)
+      (lisp-implementation-version))
+    (exit))
   (setf (slot-value context 'search-path)
 	(getopt :context context :long-name "clon-search-path"))
   (setf (slot-value context 'theme)
@@ -750,6 +755,8 @@ or FITNESS FOR A PARTICULAR PURPOSE.~%"
 	(getopt :context context :long-name "clon-line-width"))
   (setf (slot-value context 'highlight)
 	(getopt :context context :long-name "clon-highlight"))
+  ;; #### NOTE: do this one last because the output may depend on the values
+  ;; from the above four.
   (when (getopt :context context :long-name "clon-help")
     (help :context context :item (clon-options-group context))
     (exit)))

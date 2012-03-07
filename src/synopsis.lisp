@@ -158,6 +158,9 @@ FMT can be `number', `short' or `long'."
 		     :enum '(:number :short :long)
 		     :fallback-value :long
 		     #|:env-var "VERSION_FORMAT"|#)
+	       (flag "lisp-information"
+		     ~"Display information about the underlying Lisp "
+		     ~"implementation.")
 	       (flag "help" "Display Clon-specific help.")
 	       (group (:header "Option retrieval:")
 		 (enum "error-handler"
