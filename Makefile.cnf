@@ -43,7 +43,7 @@ PREFIX := /usr/local
 CC := gcc
 
 ## Preferred Common Lisp implementation.
-# Choices are SBCL, CMUCL, CCL, ECL, CLISP and ABCL.
+# Choices are SBCL, CMUCL, CCL, ECL, ACL, CLISP and ABCL.
 LISP := SBCL
 
 ## Implementation paths. Note that regardless of the above setting, SBCL is
@@ -54,6 +54,7 @@ SBCL_PATH  := CC=$(CC) sbcl
 CMUCL_PATH := lisp
 CCL_PATH   := ccl
 ECL_PATH   := ecl
+ACL_PATH   := alisp
 # -q is needed to remove 'bye' for version.cl to work properly.
 CLISP_PATH := CC=$(CC) clisp -q
 

@@ -62,6 +62,12 @@ ECL_LOAD   := -load
 ECL_EVAL   := -eval
 ECL_DUMP   := -norc $(ECL_LOAD)
 
+ACL_CACHE  := acl
+ACL_BINLOC := acl
+ACL_LOAD   := -L
+ACL_EVAL   := -e
+ACL_DUMP   := -qq $(ACL_LOAD)
+
 CLISP_CACHE  := clisp
 CLISP_BINLOC := clisp
 CLISP_LOAD   := -i
