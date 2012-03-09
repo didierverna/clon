@@ -129,8 +129,7 @@ Return two values:
       (fd-line-width (ext:file-stream-fd stream))
     (values (unless (= cols -1) cols) msg))
   #+clisp
-  (when (fboundp 'clisp/stream-line-width)
-    (clisp/stream-line-width stream)))
+  (clisp/stream-line-width stream))
 
 
 ;;; termio.lisp ends here
