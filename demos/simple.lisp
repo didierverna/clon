@@ -44,7 +44,8 @@
 (setq *load-verbose* nil)
 
 (require :asdf
-	 #-(or sbcl cmu ccl ecl)
+	 ;; #### PORTME.
+	 #-(or sbcl cmu ccl ecl allegro)
 	 '(#p"/usr/local/share/common-lisp/source/asdf/asdf.lisp"))
 
 (asdf:load-system :com.dvlsoft.clon :verbose nil)
