@@ -52,11 +52,11 @@
   (:documentation "Map FUNC over all options in THERE.")
   (:method (func elsewhere)
     "Do nothing by default."
-    #+(or ccl ecl clisp) (declare (ignore func elsewhere))
+    #+(or ccl ecl clisp allegro) (declare (ignore func elsewhere))
     (values))
   (:method :after (func (item item))
     "Mark TRAVERSABLE as traversed."
-    #+(or ccl ecl clisp) (declare (ignore func))
+    #+(or ccl ecl clisp allegro) (declare (ignore func))
     (setf (traversedp item) t))
   (:method (func (container container))
     "Map FUNC over all containers or options in CONTAINER."
