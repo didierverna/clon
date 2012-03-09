@@ -657,7 +657,7 @@ than the currently available right margin."
   ;; ECL, ACL and CLISP don't have a SIMPLE-VECTOR class, so we use just
   ;; VECTOR instead.
   (:method (sheet (char-vector #+(or ecl allegro clisp) vector
-			       #-(or ecl clisp)         simple-vector))
+			       #-(or ecl allegro clisp) simple-vector))
     "Print CHAR-VECTOR on SHEET with the current face."
     (print-help-spec sheet (coerce char-vector 'string)))
   (:method (sheet (string string))
