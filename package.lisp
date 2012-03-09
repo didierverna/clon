@@ -34,12 +34,13 @@
   (:use :cl)
   (:shadow :*readtable*)
   ;; #### PORTME.
-  (:import-from #+sbcl  :sb-mop
-		#+cmu   :mop
-		#+ccl   :ccl
-		#+ecl   :clos
-		#+clisp :clos
-		#+abcl  :mop
+  (:import-from #+sbcl    :sb-mop
+		#+cmu     :mop
+		#+ccl     :ccl
+		#+ecl     :clos
+		#+allegro :mop
+		#+clisp   :clos
+		#+abcl    :mop
 		:class-slots :slot-definition-name #-abcl :validate-superclass)
   (:import-from :com.dvlsoft.clon.asdf
     :configuration

@@ -653,10 +653,11 @@ than the currently available right margin."
   (:method (sheet (char character))
     "Print CHAR on SHEET with the current face."
     (print-help-spec sheet (make-string 1 :initial-element char)))
-  ;; ECL and CLISP don't have a SIMPLE-VECTOR class, so we use just VECTOR
-  ;; instead.
-  (:method (sheet (char-vector #+(or ecl clisp) vector
-			       #-(or ecl clisp) simple-vector))
+  ;; #### PORTME.
+  ;; ECL, ACL and CLISP don't have a SIMPLE-VECTOR class, so we use just
+  ;; VECTOR instead.
+  (:method (sheet (char-vector #+(or ecl allegro clisp) vector
+			       #-(or ecl clisp)         simple-vector))
     "Print CHAR-VECTOR on SHEET with the current face."
     (print-help-spec sheet (coerce char-vector 'string)))
   (:method (sheet (string string))

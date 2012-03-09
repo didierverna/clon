@@ -297,12 +297,13 @@ Both instances share the same slot values."
 (defun exit (&optional (status 0))
   "Quit the current application with STATUS."
   ;; #### PORTME.
-  #+sbcl  (sb-ext:quit :unix-status status)
-  #+cmu   (unix:unix-exit status)
-  #+ccl   (ccl:quit status)
-  #+ecl   (ext:quit status)
-  #+clisp (ext:exit status)
-  #+abcl  (extensions:exit :status status))
+  #+sbcl    (sb-ext:quit :unix-status status)
+  #+cmu     (unix:unix-exit status)
+  #+ccl     (ccl:quit status)
+  #+ecl     (ext:quit status)
+  #+allegro (excl:exit status :quiet t)
+  #+clisp   (ext:exit status)
+  #+abcl    (extensions:exit :status status))
 
 (defvar *executablep* nil
   "Whether the current Lisp image is a standalone executable dumped by Clon.
@@ -316,39 +317,41 @@ option; only user-level ones. When a standalone executable is dumped, this is
 always the case. When used interactively, this depends on the underlying Lisp
 implementation. See appendix A.5 of the user manual for more information."
   ;; #### PORTME.
-  #+sbcl  sb-ext:*posix-argv*
-  #+cmu   (if *executablep*
-	      lisp::lisp-command-line-list
-	    (cons (car lisp::lisp-command-line-list)
-		  ext:*command-line-application-arguments*))
-  #+ccl   (if *executablep*
-	      ccl:*command-line-argument-list*
-	    (cons (car ccl:*command-line-argument-list*)
-		  ccl:*unprocessed-command-line-arguments*))
-  #+ecl   (if *executablep*
-	      (ext:command-args)
-	    (cons (car (ext:command-args))
-		  (cdr (member "--" (ext:command-args) :test #'string=))))
-  #+clisp (cons (aref (ext:argv) 0) ext:*args*)
+  #+sbcl    sb-ext:*posix-argv*
+  #+cmu     (if *executablep*
+		lisp::lisp-command-line-list
+	      (cons (car lisp::lisp-command-line-list)
+		    ext:*command-line-application-arguments*))
+  #+ccl     (if *executablep*
+		ccl:*command-line-argument-list*
+	      (cons (car ccl:*command-line-argument-list*)
+		    ccl:*unprocessed-command-line-arguments*))
+  #+ecl     (if *executablep*
+		(ext:command-args)
+	      (cons (car (ext:command-args))
+		    (cdr (member "--" (ext:command-args) :test #'string=))))
+  #+allegro (system:command-line-arguments)
+  #+clisp   (cons (aref (ext:argv) 0) ext:*args*)
   ;; #### NOTE: the trickery below is here to make CMDLINE work even when Clon
   ;; is loaded into ABCL without dumping the Clon way (see
   ;; +ABCL-MAIN-CLASS-TEMPLATE+).
-  #+abcl  (cons (or (let ((symbol (find-symbol "*ARGV0*" 'extensions)))
-		      (when symbol
-			(symbol-value symbol)))
-		    "abcl")
-		extensions:*command-line-argument-list*))
+  #+abcl    (cons (or (let ((symbol (find-symbol "*ARGV0*" 'extensions)))
+			(when symbol
+			  (symbol-value symbol)))
+		      "abcl")
+		  extensions:*command-line-argument-list*))
 
 (defun getenv (variable)
   "Get environment VARIABLE's value. VARIABLE may be null."
   ;; #### PORTME.
   (when variable
-    (#+sbcl  sb-posix:getenv
-     #+cmu   unix:unix-getenv
-     #+ccl   ccl:getenv
-     #+ecl   ext:getenv
-     #+clisp ext:getenv
-     #+abcl  extensions:getenv
+    (#+sbcl    sb-posix:getenv
+     #+cmu     unix:unix-getenv
+     #+ccl     ccl:getenv
+     #+ecl     ext:getenv
+     #+allegro system:getenv
+     #+clisp   ext:getenv
+     #+abcl    extensions:getenv
      variable)))
 
 ;; #### NOTE: JAVA doesn't provide a way to set an environment variable. I've
@@ -359,11 +362,12 @@ implementation. See appendix A.5 of the user manual for more information."
 (defun putenv (variable value)
   "Set environment VARIABLE to VALUE."
   ;; #### PORTME.
-  #+sbcl  (sb-posix:putenv  (concatenate 'string variable "=" value))
-  #+cmu   (unix:unix-putenv (concatenate 'string variable "=" value))
-  #+ccl   (ccl:setenv variable value)
-  #+ecl   (ext:setenv variable value)
-  #+clisp (setf (ext:getenv variable) value))
+  #+sbcl    (sb-posix:putenv (concatenate 'string variable "=" value))
+  #+cmu     (unix:unix-putenv (concatenate 'string variable "=" value))
+  #+ccl     (ccl:setenv variable value)
+  #+ecl     (ext:setenv variable value)
+  #+allegro (excl.osi:putenv (concatenate 'string variable "=" value))
+  #+clisp   (setf (ext:getenv variable) value))
 
 #+abcl
 (defconstant +abcl-main-class-template+
