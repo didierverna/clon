@@ -232,15 +232,11 @@ The most important features of Clon are:
 		:components
 		(#+sbcl
 		 (:module "sbcl"
-		  :serial t
-		  :components ((sb-grovel:grovel-constants-file
-				"constants" :package :com.dvlsoft.clon)
-			       (:file "util")))
+		  :components ((sb-grovel:grovel-constants-file	"constants"
+				:package :com.dvlsoft.clon)))
 		 #+clisp
 		 (:module "clisp"
-		  :serial t
-		  :components ((cffi-grovel:grovel-file "constants")
-			       (:file "util")))
+		  :components ((cffi-grovel:grovel-file "constants")))
 		 (:file "termio")))
 	       (:module "src"
 		:depends-on (#+com.dvlsoft.clon.termio "termio")
