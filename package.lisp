@@ -171,13 +171,13 @@ See CLINDENT for more information."
 (set-dispatch-macro-character #\# #\i #'i-reader *readtable*)
 
 
-;; ECL and CLISP do not like to see undefined reader macros in expressions
-;; that belong to other compilers. For instance this will break:
+;; ECL, ACL and CLISP do not like to see undefined reader macros in
+;; expressions that belong to other compilers. For instance this will break:
 ;; #+ccl (#_ccl-only-function)
 ;; It seems to be a correct behavior (see *read-suppress* in CLHS), although
 ;; other implementations like SBCL and CMUCL are more gentle. The solution I
 ;; use is to define those reader macros to simply return nil.
-#+(or ecl clisp)
+#+(or ecl allegro clisp)
 (progn
 
   (defun dummy-reader (stream subchar args)

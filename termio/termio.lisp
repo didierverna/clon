@@ -136,14 +136,16 @@ Return two values:
   (multiple-value-bind (cols msg)
       (fd-line-width (ext:file-stream-fd stream))
     (values (unless (= cols -1) cols) msg))
-  #+clisp
-  (multiple-value-bind (input-fd output-fd)
-      (ext:stream-handles stream)
-    (declare (ignore input-fd))
-    (when output-fd
+  #+(or allegro clisp)
+  (let ((fd #+allegro (excl::stream-output-handle stream)
+	    #+clisp   (multiple-value-bind (input-fd output-fd)
+			  (ext:stream-handles stream)
+			(declare (ignore input-fd))
+			output-fd)))
+    (when fd
       (cffi:with-foreign-object (winsize 'winsize)
 	(let ((result (cffi:foreign-funcall "ioctl"
-			:int output-fd
+			:int fd
 			:int +tiocgwinsz+
 			:pointer winsize
 			:int)))

@@ -1,4 +1,4 @@
-### Makefile --- CLISP directory
+### Makefile --- CFFI directory
 
 ## Copyright (C) 2010, 2011, 2012 Didier Verna
 
