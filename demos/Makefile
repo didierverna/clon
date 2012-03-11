@@ -53,11 +53,25 @@ else ifeq ($(LISP),ECL)
 # ECL also has a different scheme for producing executables.
 $(DEMOS): %: %.lisp
 	$($(LISP)_PATH) $(EVAL_CONFIG) $($(LISP)_DUMP) dump.lisp -- $@
+else ifeq ($(LISP),ACL)
+# ACL's application delivery is complicated and only available in the
+# Enterprise edition, so we just use the dumplisp facility here.
+$(DEMOS): %: %.dxl
+	echo '#! /bin/sh' > $@
+	echo 'alisp -I $< -e "(main)" -- $${1+$$@}' >> $@
+	chmod 755 $@
 else
 # The default way of doing things in pure lisp:
 $(DEMOS): %: %.lisp
 	$($(LISP)_PATH) $(EVAL_CONFIG) $($(LISP)_DUMP) $<
 endif
+
+
+# ------------------
+# ACL specific part:
+# ------------------
+%.dxl: %.lisp
+	$(ACL_PATH) $(EVAL_CONFIG) $(ACL_DUMP) $<
 
 
 # --------------------------
@@ -100,7 +114,7 @@ clean:
 	-rm *~ $(DEMOS:%=%.o) # this last bit is for ECL
 
 distclean: clean
-	-rm -fr $(DEMOS) $(DEMOS:%=%.jar) $(DEMOS:%=%.exe)
+	-rm -fr $(DEMOS) $(DEMOS:%=%.jar) $(DEMOS:%=%.exe) $(DEMOS:%=%.dxl)
 
 install:
 uninstall:
