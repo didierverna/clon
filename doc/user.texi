@@ -502,10 +502,10 @@ extend @clon{} with your own option types.
 @node Installation, Quick Start, Introduction, Top
 @chapter Installation
 @clon{} currently works on Unix (including MacOS X) and Windows (Cygwin
-or MinGW) with SBCL, CMUCL, CCL, ECL, CLISP and ABCL. @clon{} is
-provided as an ASDF 2 system, but has no mandatory dependency. CFFI may
-optionally be used with CLISP. @xref{Supported Platforms}, for more
-information.
+or MinGW) with SBCL, CMUCL, CCL, ECL, Allegro (both standard and modern)
+CLISP and ABCL. @clon{} is provided as an ASDF 2 system, but has no
+mandatory dependency. CFFI may optionally be used with CLISP.
+@xref{Supported Platforms}, for more information.
 
 In addition to the library itself, the Clon distribution offers
 documentation in the form of 3 different manuals, some data files that
@@ -2663,7 +2663,7 @@ for 80 columns regardless of the actual terminal width
 @node Supported Platforms, Dumping Executables, Non-ANSI Features, Technical Notes
 @section Supported Platforms
 @clon{} currently works on Unix (including MacOS X) and Windows (Cygwin
-or MinGW) and has been ported to 6 @cl{} implementations. The following
+or MinGW) and has been ported to 7 @cl{} implementations. The following
 table lists the supported platforms.
 
 @multitable {Compiler} {Minimum Version} {@code{cffi} (optional)}
@@ -2684,10 +2684,24 @@ table lists the supported platforms.
 @item CLISP
 @tab
 @tab @code{cffi} (optional)
+@item Allegro@footnote{both standard and modern images are supported}
+@tab
+@tab @code{cffi} (optional)
 @item ABCL
 @tab 0.24.0@footnote{more precisely, svn trunk revision 13156}
 @tab
 @end multitable
+
+@unnumberedsubsec Allegro and CLISP specificities
+@cindex Restricted Mode
+As mentioned in the above table, Allegro and CLISP's dependency on
+@code{cffi} is optional. They need @code{cffi} in order to implement
+terminal autodetection only (note that many other implementations come
+with their own foreign function interface). If @code{cffi} cannot be
+found when the ASDF system is loaded (or in the case of CLISP, if it has
+been compiled without @code{ffi} support), you get a big red blinking
+light and a warning but that's all. @clon{} will still work, although in
+restricted mode.
 
 @unnumberedsubsec ABCL specificities
 @clon{}'s ABCL port currently has two limitations:
@@ -2704,16 +2718,6 @@ the @code{modify-environment} restart, normally proposed when an
 environment variable is set to a bogus value, is unavailable
 (@pxenduserref{Error Management}).
 @end itemize
-
-@unnumberedsubsec CLISP specificities
-@cindex Restricted Mode
-As mentioned in the above table, CLISP's dependency on @code{cffi} is
-optional. CLISP needs @code{cffi} in order to implement terminal
-autodetection only (note that many other implementations come with their
-own foreign function interface). If @code{cffi} cannot be found when the
-ASDF system is loaded (or if CLISP itself has been compiled without
-@code{ffi} support), you get a big red blinking light and a warning but
-that's all. @clon{} will still work, although in restricted mode.
 
 
 @c -------------------
@@ -2740,13 +2744,13 @@ those wrappers. If you do, however, please read on.
 Continuing on the quickstart example, the table below provides
 ready-to-use @cmdline{} samples for dumping the program with the
 compilers currently supported. Remember that they work in conjunction
-with the @code{dump} macro mentionned above.
+with the somewhat rudimentary @code{dump} macro mentionned above.
 
 @table @strong
 @item SBCL
 @code{CC=gcc sbcl --script quickstart.lisp}@*
 The @code{CC=gcc} bit is needed for the @code{sb-grovel} contrib module
-that @clon{} uses.
+that @clon{} uses (unless restricted mode is requested).
 @item CMUCL
 @code{lisp -noinit -nositeinit -load quickstart.lisp}
 @item CCL
@@ -2757,7 +2761,8 @@ an executable does not involve dumping a Lisp image, but compiling the
 source into separate object files and then linking them. The consequence
 is that there is no simple @cmdline{} recipe to show here. Instead, you
 might want to look at the file @file{demos/dump.lisp} in the
-distribution for an example.
+distribution for an example. Note that this file doesn't really attempt
+to dump the whole application. Only the actual example file is dumped.
 
 Because the dumping scheme is different with ECL, it is also less
 straightforward to write portable code for standalone applications. The
@@ -2773,6 +2778,15 @@ you with this: it normally expands to a compiler-specific function which
 saves the current Lisp image, but for ECL, it simply expands to the
 ``main'' function call, hence consituting the entry point to the code
 that ECL needs.
+@item Allegro
+@findex dumplisp
+Dumping a complete application in Allegro is complicated, but more
+importantly only possible in the Enterprise edition. Because of that,
+@clon{}'s dumping facility only makes use of the @code{dumplisp} feature
+which just dumps a Lisp image. You can perform this operation with a
+@cmdline{} such as @samp{alisp -qq -L quickstart.lisp}. The Makefile
+infrastructure in the @file{demo} directory also creates shell script
+wrappers around this image to simplify their use.
 @item CLISP
 @code{CC=gcc clisp -norc -i quickstart.lisp}@*
 The @code{CC=gcc} bit lets you choose your preferred C compiler for
@@ -2865,6 +2879,13 @@ unknown ones. Consequently, if you want to provide options to your
 application, you need to put them after a @code{--} separator. Note that
 you can still use a second such separator to provide @clon{} with both
 some options and a remainder (@pxenduserref{Option Separator}).
+@item Allegro
+Allegro processes its own options, issues only a warning about options
+it doesn't know of, and leaves anything after a @code{--} alone.
+Consequently, if you want to provide options to your application, you
+need to put them after a @code{--} separator. Note that you can still
+use a second such separator to provide @clon{} with both some options
+and a remainder (@pxenduserref{Option Separator}).
 @item ABCL
 Finally, ABCL processes its own options and leaves the others
 unprocessed on the @cmdline{}. This means that as long as there is no

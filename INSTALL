@@ -3,9 +3,10 @@
 **************
 
 Clon currently works on Unix (including MacOS X) and Windows (Cygwin or
-MinGW) with SBCL, CMUCL, CCL, ECL, CLISP and ABCL. Clon is provided as
-an ASDF 2 system, but has no mandatory dependency. CFFI may optionally
-be used with CLISP. *Note Supported Platforms::, for more information.
+MinGW) with SBCL, CMUCL, CCL, ECL, Allegro (both standard and modern)
+CLISP and ABCL. Clon is provided as an ASDF 2 system, but has no
+mandatory dependency. CFFI may optionally be used with CLISP.  *Note
+Supported Platforms::, for more information.
 
    In addition to the library itself, the Clon distribution offers
 documentation in the form of 3 different manuals, some data files that
@@ -95,7 +96,7 @@ A.3 Supported Platforms
 =======================
 
 Clon currently works on Unix (including MacOS X) and Windows (Cygwin or
-MinGW) and has been ported to 6 Common Lisp implementations. The
+MinGW) and has been ported to 7 Common Lisp implementations. The
 following table lists the supported platforms.
 
 Compiler   Minimum Version   Dependencies
@@ -105,7 +106,20 @@ CMU-CL     20b
 CCL                          
 ECL        11.1.2(1)         
 CLISP                        `cffi' (optional)
-ABCL       0.24.0(2)         
+Allegro(2)                   `cffi' (optional)
+ABCL       0.24.0(3)         
+
+Allegro and CLISP specificities
+-------------------------------
+
+As mentioned in the above table, Allegro and CLISP's dependency on
+`cffi' is optional. They need `cffi' in order to implement terminal
+autodetection only (note that many other implementations come with
+their own foreign function interface). If `cffi' cannot be found when
+the ASDF system is loaded (or in the case of CLISP, if it has been
+compiled without `ffi' support), you get a big red blinking light and a
+warning but that's all. Clon will still work, although in restricted
+mode.
 
 ABCL specificities
 ------------------
@@ -118,21 +132,12 @@ Clon's ABCL port currently has two limitations:
      environment variable is set to a bogus value, is unavailable
      (*note Error Management: (clon-enduser)Error Management.  ).
 
-CLISP specificities
--------------------
-
-As mentioned in the above table, CLISP's dependency on `cffi' is
-optional. CLISP needs `cffi' in order to implement terminal
-autodetection only (note that many other implementations come with their
-own foreign function interface). If `cffi' cannot be found when the
-ASDF system is loaded (or if CLISP itself has been compiled without
-`ffi' support), you get a big red blinking light and a warning but
-that's all. Clon will still work, although in restricted mode.
-
    ---------- Footnotes ----------
 
    (1) more precisely, git revision
 3e2e5f9dc3c5176ef6ef8d7794bfa43f1af8f8db
 
-   (2) more precisely, svn trunk revision 13156
+   (2) both standard and modern images are supported
+
+   (3) more precisely, svn trunk revision 13156
 
