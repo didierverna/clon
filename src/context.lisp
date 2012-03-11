@@ -501,12 +501,13 @@ If NEGATED, read a negated call or pack. Otherwise, read a short call or pack."
 			(source (gensym "source"))
 			(vars (list source value))
 			(call (list option
-				    (find-symbol (concatenate 'string
-							      "RETRIEVE-FROM-"
-							      (symbol-name
-							       func)
-							      "-CALL")
-						 :com.dvlsoft.clon)))
+				    (find-symbol
+				     (concatenate 'string
+				       ;; #### NOTE: case portability
+				       (string :retrieve-from-)
+				       (symbol-name func)
+				       (string :-call))
+				     :com.dvlsoft.clon)))
 			new-cmdline)
 		   (when cmdline-value
 		     (push cmdline-value call))

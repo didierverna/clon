@@ -1,9 +1,9 @@
 ;;; valued.lisp --- Valued options
 
-;; Copyright (C) 2010, 2011 Didier Verna
+;; Copyright (C) 2010, 2011, 2012 Didier Verna.
 
-;; Author:        Didier Verna <didier@lrde.epita.fr>
-;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
+;; Author:     Didier Verna <didier@lrde.epita.fr>
+;; Maintainer: Didier Verna <didier@lrde.epita.fr>
 
 ;; This file is part of Clon.
 
@@ -300,7 +300,8 @@ ARGUMENT-REQUIRED-P slot."
       (invalid-value ()
 	(error "Option ~A: invalid default value ~S." option default-value)))))
 
-(defvar *item-names* '("FLAG" "TEXT" "GROUP")
+;; #### NOTE: case portability
+(defvar *item-names* (mapcar #'string '(:flag :text :group))
   "The list of defined item names.")
 
 (defmacro defoption (class superclasses slots &rest options)

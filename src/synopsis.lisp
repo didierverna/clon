@@ -1,9 +1,9 @@
 ;;; synopsis.lisp --- Synopsis management
 
-;; Copyright (C) 2010, 2011 Didier Verna
+;; Copyright (C) 2010, 2011, 2012 Didier Verna.
 
-;; Author:        Didier Verna <didier@lrde.epita.fr>
-;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
+;; Author:     Didier Verna <didier@lrde.epita.fr>
+;; Maintainer: Didier Verna <didier@lrde.epita.fr>
 
 ;; This file is part of Clon.
 
@@ -274,14 +274,17 @@ remainder.
 						*item-names*
 						:test #'string=)))))
 			   (if item-name
-			       (list* (intern
-				       (cond ((string= item-name "GROUP")
-					      "DEFGROUP")
-					     (t
-					      (format nil "MAKE-~A"
-						item-name)))
-				       :com.dvlsoft.clon)
-				      (cdr form))
+			       (list*
+				(intern
+				 ;; #### NOTE: case portability
+				 (cond ((string= item-name (string :group))
+					(string :defgroup))
+				       (t
+					(format nil "~A~A"
+					  (string :make-)
+					  item-name)))
+				 :com.dvlsoft.clon)
+				(cdr form))
 			     form))))))
 
 

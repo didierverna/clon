@@ -58,7 +58,7 @@ else ifeq ($(LISP),ACL)
 # Enterprise edition, so we just use the dumplisp facility here.
 $(DEMOS): %: %.dxl
 	echo '#! /bin/sh' > $@
-	echo 'alisp -I $< -e "(main)" -- $${1+$$@}' >> $@
+	echo '$(ACL_PATH) -I $< -e "(main)" -- $${1+$$@}' >> $@
 	chmod 755 $@
 else
 # The default way of doing things in pure lisp:

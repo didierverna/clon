@@ -149,7 +149,8 @@ If INDENT is a symbol, use its indentation definition.
 Otherwise, INDENT is considered as an indentation definition."
   (when (and (member :swank *features*)
 	     (configuration :swank-eval-in-emacs))
-    (funcall (intern "EVAL-IN-EMACS" :swank)
+    ;; #### NOTE: case portability
+    (funcall (intern (string :eval-in-emacs) :swank)
 	     `(put ',symbol 'common-lisp-indent-function
 		   ,(if (symbolp indent)
 			`(get ',indent 'common-lisp-indent-function)
@@ -191,7 +192,9 @@ See CLINDENT for more information."
 (defmacro in-readtable (name)
   "Set the current readtable to the value of NAME::*READTABLE*."
   `(eval-when (:compile-toplevel :load-toplevel :execute)
-     (setf cl:*readtable* (symbol-value (find-symbol "*READTABLE*" ,name)))))
+     (setf cl:*readtable*
+	   ;; #### NOTE: case portability
+	   (symbol-value (find-symbol (string :*readtable*) ,name)))))
 
 
 ;;; package.lisp ends here

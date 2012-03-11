@@ -1,9 +1,9 @@
 ;;; group.lisp --- Group management
 
-;; Copyright (C) 2010, 2011 Didier Verna
+;; Copyright (C) 2010, 2011, 2012 Didier Verna.
 
-;; Author:        Didier Verna <didier@lrde.epita.fr>
-;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
+;; Author:     Didier Verna <didier@lrde.epita.fr>
+;; Maintainer: Didier Verna <didier@lrde.epita.fr>
 
 ;; This file is part of Clon.
 
@@ -83,17 +83,21 @@ implementing hierarchical program command-line."))
 						*item-names*
 						:test #'string=)))))
 			   (if item-name
-			       (list* (intern
-				       (cond ((string= item-name "GROUP")
-					      "%DEFGROUP")
-					     (t
-					      (format nil
-						  "MAKE-~:[~;INTERNAL-~]~A"
-						internalp item-name)))
-				       :com.dvlsoft.clon)
-				      (if (string= item-name "GROUP")
-					  (list* internalp (cdr form))
-					(cdr form)))
+			       (list*
+				(intern
+				 ;; #### NOTE: case portability
+				 (cond ((string= item-name (string :group))
+					(string :%defgroup))
+				       (t
+					(format nil "~A~:[~*~;~A~]~A"
+					  (string :make-)
+					  internalp
+					  (string :internal-)
+					  item-name)))
+				 :com.dvlsoft.clon)
+				(if (string= item-name (string :group))
+				    (list* internalp (cdr form))
+				  (cdr form)))
 			     form))))))
 
 (defmacro defgroup ((&rest keys &key header hidden) &body forms)
