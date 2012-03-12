@@ -36,7 +36,7 @@ hack: all
 include $(TOP_DIR)/Makefile.inc
 
 
-SUBDIRS := sbcl clisp
+SUBDIRS := sbcl cffi
 
 all:
 	$(MAKE) gen TARGET=all
