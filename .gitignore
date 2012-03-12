@@ -8,6 +8,8 @@ openmcl-*/
 
 demos/simple
 demos/advanced
+demos/simple.dxl
+demos/advanced.dxl
 demos/*.o
 demos/*.jar
 demos/Simple*
