@@ -169,15 +169,6 @@ the short version, a patchlevel of 0 is ignored in the output."
 * See section A.1 of the user manual for more information.        *
 *******************************************************************")
 		(setf (configuration :restricted) t)))
-  #+allegro (handler-case (asdf:load-system :cffi-grovel)
-	      (error ()
-		(format *error-output* "~
-*******************************************************************
-* WARNING: unable to load ASDF component CFFI-GROVEL.             *
-* Clon will be loaded without support for terminal autodetection. *
-* See section A.1 of the user manual for more information.        *
-*******************************************************************")
-		(setf (configuration :restricted) t)))
   #+clisp   (cond ((member :ffi *features*)
 		   (handler-case (asdf:load-system :cffi-grovel)
 		     (error ()
@@ -196,6 +187,15 @@ the short version, a patchlevel of 0 is ignored in the output."
 * See section A.1 of the user manual for more information.        *
 *******************************************************************")
 		   (setf (configuration :restricted) t)))
+  #+(or allegro lispworks) (handler-case (asdf:load-system :cffi-grovel)
+			     (error ()
+			       (format *error-output* "~
+*******************************************************************
+* WARNING: unable to load ASDF component CFFI-GROVEL.             *
+* Clon will be loaded without support for terminal autodetection. *
+* See section A.1 of the user manual for more information.        *
+*******************************************************************")
+			       (setf (configuration :restricted) t)))
   #+abcl    (progn (format *error-output* "~
 *******************************************************************
 * NOTE: ABCL is in use.                                           *
@@ -243,7 +243,7 @@ The most important features of Clon are:
 		 (:module "sbcl"
 		  :components ((sb-grovel:grovel-constants-file	"constants"
 				:package :com.dvlsoft.clon)))
-		 #+(or allegro clisp)
+		 #+(or clisp allegro lispworks)
 		 (:module "cffi"
 		  :components ((cffi-grovel:grovel-file "constants")))
 		 (:file "termio")))

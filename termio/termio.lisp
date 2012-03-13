@@ -136,7 +136,7 @@ Return two values:
   (multiple-value-bind (cols msg)
       (fd-line-width (ext:file-stream-fd stream))
     (values (unless (= cols -1) cols) msg))
-  #+(or allegro clisp)
+  #+(or clisp allegro lispworks)
   (let ((fd #+allegro (excl::stream-output-handle stream)
 	    #+clisp   (multiple-value-bind (input-fd output-fd)
 			  (ext:stream-handles stream)
