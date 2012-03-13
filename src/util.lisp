@@ -297,13 +297,14 @@ Both instances share the same slot values."
 (defun exit (&optional (status 0))
   "Quit the current application with STATUS."
   ;; #### PORTME.
-  #+sbcl    (sb-ext:quit :unix-status status)
-  #+cmu     (unix:unix-exit status)
-  #+ccl     (ccl:quit status)
-  #+ecl     (ext:quit status)
-  #+allegro (excl:exit status :quiet t)
-  #+clisp   (ext:exit status)
-  #+abcl    (extensions:exit :status status))
+  #+sbcl      (sb-ext:quit :unix-status status)
+  #+cmu       (unix:unix-exit status)
+  #+ccl       (ccl:quit status)
+  #+ecl       (ext:quit status)
+  #+clisp     (ext:exit status)
+  #+abcl      (extensions:exit :status status)
+  #+allegro   (excl:exit status :quiet t)
+  #+lispworks (lispworks:quit :status status))
 
 (defvar *executablep* nil
   "Whether the current Lisp image is a standalone executable dumped by Clon.
@@ -330,7 +331,6 @@ implementation. See appendix A.5 of the user manual for more information."
 		(ext:command-args)
 	      (cons (car (ext:command-args))
 		    (cdr (member "--" (ext:command-args) :test #'string=))))
-  #+allegro (system:command-line-arguments)
   #+clisp   (cons (aref (ext:argv) 0) ext:*args*)
   ;; #### NOTE: the trickery below is here to make CMDLINE work even when Clon
   ;; is loaded into ABCL without dumping the Clon way (see
@@ -339,19 +339,22 @@ implementation. See appendix A.5 of the user manual for more information."
 			(when symbol
 			  (symbol-value symbol)))
 		      "abcl")
-		  extensions:*command-line-argument-list*))
+		  extensions:*command-line-argument-list*)
+  #+allegro (system:command-line-arguments)
+  #+lispworks system:*line-arguments-list*)
 
 (defun getenv (variable)
   "Get environment VARIABLE's value. VARIABLE may be null."
   ;; #### PORTME.
   (when variable
-    (#+sbcl    sb-posix:getenv
-     #+cmu     unix:unix-getenv
-     #+ccl     ccl:getenv
-     #+ecl     ext:getenv
-     #+allegro system:getenv
-     #+clisp   ext:getenv
-     #+abcl    extensions:getenv
+    (#+sbcl      sb-posix:getenv
+     #+cmu       unix:unix-getenv
+     #+ccl       ccl:getenv
+     #+ecl       ext:getenv
+     #+clisp     ext:getenv
+     #+abcl      extensions:getenv
+     #+allegro   system:getenv
+     #+lispworks hcl:getenv
      variable)))
 
 ;; #### NOTE: JAVA doesn't provide a way to set an environment variable. I've
@@ -362,12 +365,13 @@ implementation. See appendix A.5 of the user manual for more information."
 (defun putenv (variable value)
   "Set environment VARIABLE to VALUE."
   ;; #### PORTME.
-  #+sbcl    (sb-posix:putenv (concatenate 'string variable "=" value))
-  #+cmu     (unix:unix-putenv (concatenate 'string variable "=" value))
-  #+ccl     (ccl:setenv variable value)
-  #+ecl     (ext:setenv variable value)
-  #+allegro (excl.osi:putenv (concatenate 'string variable "=" value))
-  #+clisp   (setf (ext:getenv variable) value))
+  #+sbcl      (sb-posix:putenv (concatenate 'string variable "=" value))
+  #+cmu       (unix:unix-putenv (concatenate 'string variable "=" value))
+  #+ccl       (ccl:setenv variable value)
+  #+ecl       (ext:setenv variable value)
+  #+clisp     (setf (ext:getenv variable) value)
+  #+allegro   (excl.osi:putenv (concatenate 'string variable "=" value))
+  #+lispworks (setf (hcl:getenv variable) value))
 
 #+abcl
 (defconstant +abcl-main-class-template+

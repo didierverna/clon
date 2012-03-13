@@ -34,13 +34,14 @@
   (:use :cl)
   (:shadow :*readtable*)
   ;; #### PORTME.
-  (:import-from #+sbcl    :sb-mop
-		#+cmu     :mop
-		#+ccl     :ccl
-		#+ecl     :clos
-		#+allegro :mop
-		#+clisp   :clos
-		#+abcl    :mop
+  (:import-from #+sbcl      :sb-mop
+		#+cmu       :mop
+		#+ccl       :ccl
+		#+ecl       :clos
+		#+clisp     :clos
+		#+abcl      :mop
+		#+allegro   :mop
+		#+lispworks :clos
 		:class-slots :slot-definition-name #-abcl :validate-superclass)
   (:import-from :com.dvlsoft.clon.asdf
     :configuration
@@ -172,20 +173,20 @@ See CLINDENT for more information."
 (set-dispatch-macro-character #\# #\i #'i-reader *readtable*)
 
 
-;; ECL, ACL and CLISP do not like to see undefined reader macros in
-;; expressions that belong to other compilers. For instance this will break:
-;; #+ccl (#_ccl-only-function)
-;; It seems to be a correct behavior (see *read-suppress* in CLHS), although
-;; other implementations like SBCL and CMUCL are more gentle. The solution I
-;; use is to define those reader macros to simply return nil.
-#+(or ecl allegro clisp)
-(progn
+;; ECL, CLISP, Allegro and Lispworks do not like to see undefined reader
+;; macros in expressions that belong to other compilers. For instance this
+;; will break: #+ccl (#_ccl-only-function) It seems to be a correct behavior
+;; (see *read-suppress* in CLHS), although other implementations like SBCL and
+;; CMUCL are more gentle. The solution I use is to define those reader macros
+;; to simply return nil.
 
+;; #### PORTME.
+#+(or ecl clisp allegro lispworks)
+(progn
   (defun dummy-reader (stream subchar args)
     "Return nil."
     (declare (ignore stream subchar args))
     nil)
-
   (set-dispatch-macro-character #\# #\_ #'dummy-reader *readtable*)
   (set-dispatch-macro-character #\# #\$ #'dummy-reader *readtable*))
 
