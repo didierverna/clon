@@ -490,7 +490,11 @@ this function behaves differently in some cases, as described below.
 	       (setq *executablep* t) ; not used but here for correctness
 	       (excl:dumplisp :name (concatenate 'string ,name ".dxl")
 			      :suppress-allegro-cl-banner t)
-	       (exit)))
+	       (exit))
+  #+lispworks `(progn
+		 (setq *executablep* t) ; not used but here for correctness
+		 (lispworks:load-all-patches)
+		 (lispworks:deliver ',function ,name 0)))
 
 
 ;;; util.lisp ends here

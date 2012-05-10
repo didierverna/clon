@@ -86,7 +86,7 @@ LW_CACHE  := lw
 LW_BINLOC := lw
 LW_LOAD   := -load
 LW_EVAL   := -eval
-LW_DUMP   := -init - -siteinit -
+LW_DUMP   := -init - -siteinit - $(LW_LOAD)
 
 
 ifeq ($(RESTRICTED),t)
