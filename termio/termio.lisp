@@ -59,7 +59,7 @@ invalid direction: ~S"
      direction))
   (:method (stream &optional direction)
     (declare (ignore direction))
-    #+(or ccl) (declare (ignore stream))
+    #+(or ccl ecl) (declare (ignore stream))
     nil))
 
 #+ecl
@@ -138,9 +138,10 @@ Return two values:
 	    (unless (= result (- #$ENOTTY))
 	      (values nil (ccl::%strerror (- result)))))))))
   #+ecl
-  (multiple-value-bind (cols msg)
-      (fd-line-width (ext:file-stream-fd stream))
-    (values (unless (= cols -1) cols) msg))
+  (when (stream-file-stream stream :output)
+    (multiple-value-bind (cols msg)
+	(fd-line-width (ext:file-stream-fd stream))
+      (values (unless (= cols -1) cols) msg)))
   #+(or allegro clisp)
   (let ((fd #+allegro (excl::stream-output-handle stream)
 	    #+clisp   (multiple-value-bind (input-fd output-fd)
