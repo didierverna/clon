@@ -114,16 +114,18 @@ Return two values:
 	      (values nil error)))))))
   #+cmu
   (locally (declare (optimize (ext:inhibit-warnings 3)))
-    (alien:with-alien ((winsize (alien:struct unix:winsize)))
-      (multiple-value-bind (success error-number)
-	  (unix:unix-ioctl
-	   (system:fd-stream-fd (stream-file-stream stream :output))
-	   unix:tiocgwinsz
-	   winsize)
-	(if success
-	    (alien:slot winsize 'unix:ws-col)
-	  (unless (= error-number unix:enotty)
-	    (values nil (unix:get-unix-error-msg error-number)))))))
+    (let ((file-stream (stream-file-stream stream :output)))
+      (when file-stream
+	(alien:with-alien ((winsize (alien:struct unix:winsize)))
+	  (multiple-value-bind (success error-number)
+	      (unix:unix-ioctl
+	       (system:fd-stream-fd file-stream)
+	       unix:tiocgwinsz
+	       winsize)
+	    (if success
+		(alien:slot winsize 'unix:ws-col)
+	      (unless (= error-number unix:enotty)
+		(values nil (unix:get-unix-error-msg error-number)))))))))
   #+ccl
   (ccl:rlet ((winsize :winsize))
     (let ((result
