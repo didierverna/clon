@@ -2,8 +2,8 @@
 
 ;; Copyright (C) 2012 Didier Verna.
 
-;; Author:        Didier Verna <didier.verna@gmail.com>
-;; Maintainer:    Didier Verna <didier.verna@gmail.com>
+;; Author:        Didier Verna <didier@lrde.epita.fr>
+;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 
 ;; This file is part of Clon.
 
@@ -40,7 +40,7 @@
 
 ;; Thanks Nikodemus!
 (defgeneric stream-file-stream (stream &optional direction)
-  (:documentation "Convert STREAM to a file-stream.")
+  (:documentation "Return STREAM's file-stream, or nil.")
   (:method ((stream file-stream) &optional direction)
     (declare (ignore direction))
     stream)
@@ -56,7 +56,11 @@
 	(error "Cannot extract file-stream from TWO-WAY-STREAM ~A:
 invalid direction: ~S"
 	       stream direction)))
-     direction)))
+     direction))
+  (:method (stream &optional direction)
+    (declare (ignore direction))
+    #+(or ccl ecl allegro) (declare (ignore stream))
+    nil))
 
 #+ecl
 (defun fd-line-width (fd)
@@ -100,42 +104,44 @@ Return two values:
   ;; #### PORTME.
   #+sbcl
   (locally (declare (sb-ext:muffle-conditions sb-ext:compiler-note))
-    (handler-case
-	(with-winsize winsize ()
-	  (sb-posix:ioctl (stream-file-stream stream :output)
-			  +tiocgwinsz+
-			  winsize)
-	  (winsize-ws-col winsize))
-      (sb-posix:syscall-error (error)
-	(unless (= (sb-posix:syscall-errno error) sb-posix:enotty)
-	  (values nil error)))))
+    (let ((file-stream (stream-file-stream stream :output)))
+      (when file-stream
+	(handler-case
+	    (with-winsize winsize ()
+	      (sb-posix:ioctl file-stream +tiocgwinsz+ winsize)
+	      (winsize-ws-col winsize))
+	  (sb-posix:syscall-error (error)
+	    (unless (= (sb-posix:syscall-errno error) sb-posix:enotty)
+	      (values nil error)))))))
   #+cmu
   (locally (declare (optimize (ext:inhibit-warnings 3)))
-    (alien:with-alien ((winsize (alien:struct unix:winsize)))
-      (multiple-value-bind (success error-number)
-	  (unix:unix-ioctl
-	   (system:fd-stream-fd (stream-file-stream stream :output))
-	   unix:tiocgwinsz
-	   winsize)
-	(if success
-	    (alien:slot winsize 'unix:ws-col)
-	  (unless (= error-number unix:enotty)
-	    (values nil (unix:get-unix-error-msg error-number)))))))
+    (let ((file-stream (stream-file-stream stream :output)))
+      (when file-stream
+	(alien:with-alien ((winsize (alien:struct unix:winsize)))
+	  (multiple-value-bind (success error-number)
+	      (unix:unix-ioctl
+	       (system:fd-stream-fd file-stream)
+	       unix:tiocgwinsz
+	       winsize)
+	    (if success
+		(alien:slot winsize 'unix:ws-col)
+	      (unless (= error-number unix:enotty)
+		(values nil (unix:get-unix-error-msg error-number)))))))))
   #+ccl
-  (ccl:rlet ((winsize :winsize))
-    (let ((result
-	    (ccl::int-errno-call
-	     (#_ioctl (ccl::stream-device stream :output)
-		      #$TIOCGWINSZ
-		      :address winsize))))
-      (if (zerop result)
-	  (ccl:pref winsize :winsize.ws_col)
-	(unless (= result (- #$ENOTTY))
-	  (values nil (ccl::%strerror (- result)))))))
+  (let ((fd (ccl::stream-device stream :output)))
+    (when fd
+      (ccl:rlet ((winsize :winsize))
+	(let ((result (ccl::int-errno-call
+		       (#_ioctl fd #$TIOCGWINSZ :address winsize))))
+	  (if (zerop result)
+	      (ccl:pref winsize :winsize.ws_col)
+	    (unless (= result (- #$ENOTTY))
+	      (values nil (ccl::%strerror (- result)))))))))
   #+ecl
-  (multiple-value-bind (cols msg)
-      (fd-line-width (ext:file-stream-fd stream))
-    (values (unless (= cols -1) cols) msg))
+  (when (stream-file-stream stream :output)
+    (multiple-value-bind (cols msg)
+	(fd-line-width (ext:file-stream-fd stream))
+      (values (unless (= cols -1) cols) msg)))
   #+(or clisp allegro lispworks)
   (let ((fd #+allegro (excl::stream-output-handle stream)
 	    #+clisp   (multiple-value-bind (input-fd output-fd)
