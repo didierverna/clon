@@ -62,12 +62,6 @@ ECL_LOAD   := -load
 ECL_EVAL   := -eval
 ECL_DUMP   := -norc $(ECL_LOAD)
 
-ACL_CACHE  := acl
-ACL_BINLOC := acl
-ACL_LOAD   := -L
-ACL_EVAL   := -e
-ACL_DUMP   := -qq $(ACL_LOAD)
-
 CLISP_CACHE  := clisp
 CLISP_BINLOC := clisp
 CLISP_LOAD   := -i
@@ -81,6 +75,19 @@ ABCL_DUMP   := --batch $(ABCL_EVAL) '\
 (progn (defvar cl-user::$(PACKAGE).configuration nil)\
        (setf (getf cl-user::$(PACKAGE).configuration :dump) t))' \
 	       $(ABCL_LOAD)
+
+ACL_CACHE  := acl
+ACL_BINLOC := acl
+ACL_LOAD   := -L
+ACL_EVAL   := -e
+ACL_DUMP   := -qq $(ACL_LOAD)
+
+LW_CACHE  := lw
+LW_BINLOC := lw
+LW_LOAD   := -load
+LW_EVAL   := -eval
+LW_DUMP   := -init - -siteinit -
+
 
 ifeq ($(RESTRICTED),t)
 CONFIG := '(progn (defvar cl-user::$(PACKAGE).configuration nil) \
