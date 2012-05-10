@@ -59,6 +59,7 @@ invalid direction: ~S"
      direction))
   (:method (stream &optional direction)
     (declare (ignore direction))
+    #+(or ccl) (declare (ignore stream))
     nil))
 
 #+ecl
@@ -127,16 +128,15 @@ Return two values:
 	      (unless (= error-number unix:enotty)
 		(values nil (unix:get-unix-error-msg error-number)))))))))
   #+ccl
-  (ccl:rlet ((winsize :winsize))
-    (let ((result
-	    (ccl::int-errno-call
-	     (#_ioctl (ccl::stream-device stream :output)
-		      #$TIOCGWINSZ
-		      :address winsize))))
-      (if (zerop result)
-	  (ccl:pref winsize :winsize.ws_col)
-	(unless (= result (- #$ENOTTY))
-	  (values nil (ccl::%strerror (- result)))))))
+  (let ((fd (ccl::stream-device stream :output)))
+    (when fd
+      (ccl:rlet ((winsize :winsize))
+	(let ((result (ccl::int-errno-call
+		       (#_ioctl fd #$TIOCGWINSZ :address winsize))))
+	  (if (zerop result)
+	      (ccl:pref winsize :winsize.ws_col)
+	    (unless (= result (- #$ENOTTY))
+	      (values nil (ccl::%strerror (- result)))))))))
   #+ecl
   (multiple-value-bind (cols msg)
       (fd-line-width (ext:file-stream-fd stream))
