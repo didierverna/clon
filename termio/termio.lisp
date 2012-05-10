@@ -2,8 +2,8 @@
 
 ;; Copyright (C) 2012 Didier Verna.
 
-;; Author:        Didier Verna <didier.verna@gmail.com>
-;; Maintainer:    Didier Verna <didier.verna@gmail.com>
+;; Author:        Didier Verna <didier@lrde.epita.fr>
+;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
 
 ;; This file is part of Clon.
 
