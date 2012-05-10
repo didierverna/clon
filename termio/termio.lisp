@@ -59,7 +59,7 @@ invalid direction: ~S"
      direction))
   (:method (stream &optional direction)
     (declare (ignore direction))
-    #+(or ccl ecl) (declare (ignore stream))
+    #+(or ccl ecl allegro) (declare (ignore stream))
     nil))
 
 #+ecl
