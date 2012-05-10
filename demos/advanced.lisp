@@ -46,7 +46,8 @@
 
 (require :asdf
 	 ;; #### PORTME.
-	 #-(or sbcl cmu ccl ecl allegro)
+	 #-(or sbcl cmu ccl ecl allegro
+	       (and lispworks (not lispworks-personal-edition)))
 	 '(#p"/usr/local/share/common-lisp/source/asdf/asdf.lisp"))
 
 (asdf:load-system :com.dvlsoft.clon :verbose nil)
