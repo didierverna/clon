@@ -58,8 +58,9 @@ ECL_PATH   := ecl
 # -q is needed to remove 'bye' for version.cl to work properly.
 CLISP_PATH := CC=$(CC) clisp -q
 ACL_PATH   := alisp
-# Note: it's probably better to use a console image here. See section 12.3.5
-# of the Lispworks user guide and reference manual.
+# Note: if you want to dump the demo examples, you should use a console image
+# without multiprocessing here. See section 12.3.5 of the Lispworks user guide
+# and reference manual.
 LW_PATH    := lispworks
 
 # For ABCL, we need something slightly different.
