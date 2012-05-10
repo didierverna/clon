@@ -40,7 +40,7 @@
 
 ;; Thanks Nikodemus!
 (defgeneric stream-file-stream (stream &optional direction)
-  (:documentation "Convert STREAM to a file-stream.")
+  (:documentation "Return STREAM's file-stream, or nil.")
   (:method ((stream file-stream) &optional direction)
     (declare (ignore direction))
     stream)
@@ -56,7 +56,10 @@
 	(error "Cannot extract file-stream from TWO-WAY-STREAM ~A:
 invalid direction: ~S"
 	       stream direction)))
-     direction)))
+     direction))
+  (:method (stream &optional direction)
+    (declare (ignore direction))
+    nil))
 
 #+ecl
 (defun fd-line-width (fd)
