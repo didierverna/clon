@@ -297,7 +297,7 @@ Both instances share the same slot values."
 (defun exit (&optional (status 0))
   "Quit the current application with STATUS."
   ;; #### PORTME.
-  #+sbcl    (sb-ext:quit :unix-status status)
+  #+sbcl    (sb-ext:exit :code status)
   #+cmu     (unix:unix-exit status)
   #+ccl     (ccl:quit status)
   #+ecl     (ext:quit status)
