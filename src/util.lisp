@@ -459,12 +459,6 @@ this function behaves differently in some cases, as described below.
   #+ecl     `(progn
 	       (setq *executablep* t)
 	       (,function))
-  ;; ACL's dumplisp function doesn't quit, so we need to do so here.
-  #+allegro `(progn
-	       (setq *executablep* t) ; not used but here for correctness
-	       (excl:dumplisp :name (concatenate 'string ,name ".dxl")
-			      :suppress-allegro-cl-banner t)
-	       (exit))
   ;; CLISP's saveinitmem function doesn't quit, so we need to do so here.
   #+clisp   `(progn
 	       (setq *executablep* t) ; not used but here for correctness
@@ -490,7 +484,13 @@ this function behaves differently in some cases, as described below.
 		 '(progn))
 	     `(progn
 		(setq *executablep* t) ; not used but here for correctness
-		(,function))))
+		(,function)))
+  ;; ACL's dumplisp function doesn't quit, so we need to do so here.
+  #+allegro `(progn
+	       (setq *executablep* t) ; not used but here for correctness
+	       (excl:dumplisp :name (concatenate 'string ,name ".dxl")
+			      :suppress-allegro-cl-banner t)
+	       (exit)))
 
 
 ;;; util.lisp ends here
