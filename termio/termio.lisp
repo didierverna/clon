@@ -62,6 +62,29 @@ invalid direction: ~S"
     #+(or ccl ecl clisp allegro) (declare (ignore stream))
     nil))
 
+#+lispworks
+(defgeneric stream-terminal-stream (stream &optional direction)
+  (:documentation "Return STREAM's terminal-stream, or nil.")
+  (:method ((stream system::terminal-stream) &optional direction)
+    (declare (ignore direction))
+    stream)
+  (:method ((stream synonym-stream) &optional direction)
+    (declare (ignore direction))
+    (stream-terminal-stream (symbol-value (synonym-stream-symbol stream))))
+  (:method ((stream two-way-stream) &optional direction)
+    (stream-terminal-stream
+     (case direction
+       (:input (two-way-stream-input-stream stream))
+       (:output (two-way-stream-output-stream stream))
+       (otherwise
+	(error "Cannot extract terminal-stream from TWO-WAY-STREAM ~A:
+invalid direction: ~S"
+	       stream direction)))
+     direction))
+  (:method (stream &optional direction)
+    (declare (ignore direction))
+    nil))
+
 #+ecl
 (defun fd-line-width (fd)
   "Get the line width for FD (file descriptor).
@@ -143,11 +166,20 @@ Return two values:
 	(fd-line-width (ext:file-stream-fd stream))
       (values (unless (= cols -1) cols) msg)))
   #+(or clisp allegro lispworks)
-  (let ((fd #+allegro (excl::stream-output-handle stream)
-	    #+clisp   (multiple-value-bind (input-fd output-fd)
-			  (ext:stream-handles stream)
-			(declare (ignore input-fd))
-			output-fd)))
+  (let ((fd #+clisp     (multiple-value-bind (input-fd output-fd)
+			    (ext:stream-handles stream)
+			  (declare (ignore input-fd))
+			  output-fd)
+	    #+allegro   (excl::stream-output-handle stream)
+	    #+lispworks (let ((file-stream
+				(stream-file-stream stream :output)))
+			  (cond (file-stream
+				 (stream::os-file-handle-stream-file-handle
+				  file-stream))
+				((stream-terminal-stream stream :output)
+				 1)
+				(t
+				 nil)))))
     (when fd
       (cffi:with-foreign-object (winsize 'winsize)
 	(let ((result (cffi:foreign-funcall "ioctl"
