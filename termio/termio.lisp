@@ -103,15 +103,15 @@ Return two values:
   ;; #### PORTME.
   #+sbcl
   (locally (declare (sb-ext:muffle-conditions sb-ext:compiler-note))
-    (handler-case
-	(with-winsize winsize ()
-	  (sb-posix:ioctl (stream-file-stream stream :output)
-			  +tiocgwinsz+
-			  winsize)
-	  (winsize-ws-col winsize))
-      (sb-posix:syscall-error (error)
-	(unless (= (sb-posix:syscall-errno error) sb-posix:enotty)
-	  (values nil error)))))
+    (let ((file-stream (stream-file-stream stream :output)))
+      (when file-stream
+	(handler-case
+	    (with-winsize winsize ()
+	      (sb-posix:ioctl file-stream +tiocgwinsz+ winsize)
+	      (winsize-ws-col winsize))
+	  (sb-posix:syscall-error (error)
+	    (unless (= (sb-posix:syscall-errno error) sb-posix:enotty)
+	      (values nil error)))))))
   #+cmu
   (locally (declare (optimize (ext:inhibit-warnings 3)))
     (alien:with-alien ((winsize (alien:struct unix:winsize)))
