@@ -163,7 +163,7 @@
 	     :type synopsis
 	     :initarg :synopsis
 	     :reader synopsis
-	     :initform *default-synopsis*)
+	     :initform *synopsis*)
    (progname :documentation ~"The program name "
 			    ~"as it appears on the command-line."
 	     :type string) ;; see below for reader
@@ -765,7 +765,7 @@ or FITNESS FOR A PARTICULAR PURPOSE.~%"
 (defun make-context (&rest keys &key synopsis cmdline (make-current t))
   "Make a new context.
 - SYNOPSIS is the program synopsis to use in that context.
-  It defaults to *DEFAULT-SYNOPSIS*.
+  It defaults to *SYNOPSIS*.
 - CMDLINE is the argument list (strings) to process.
   It defaults to a POSIX conformant argv.
 - If MAKE-CURRENT, make the new context current."

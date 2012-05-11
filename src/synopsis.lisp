@@ -31,7 +31,7 @@
 (in-readtable :com.dvlsoft.clon)
 
 
-(defvar *default-synopsis* nil "The default synopsis.")
+(defvar *synopsis* nil "The current synopsis.")
 
 
 
@@ -258,7 +258,7 @@ remainder.
   (let ((synopsis (apply #'make-instance 'synopsis
 			 (remove-keys keys :make-default))))
     (when make-default
-      (setq *default-synopsis* synopsis))
+      (setq *synopsis* synopsis))
     synopsis))
 
 (defmacro defsynopsis ((&rest keys &key postfix make-default) &body forms)

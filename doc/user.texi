@@ -2232,15 +2232,14 @@ Did you notice that after defining a synopsis, there is actually never
 any explicit reference to it anymore? So where is the magick? In fact,
 there's no magick at all involved here.
 
-@vindex *default-synopsis*
+@vindex *synopsis*
 @foindex{defsynopsis,:make-default}
 @cfiaindex{make-synopsis,:make-default}
-@clon{} has a global variable named @code{*default-synopsis*} which
-holds the@dots{} default synopsis, yeah. When you define/create a
-synopsis with either @code{defsynopsis} or @code{make-synopsis}, it is
-automatically made the default one, unless you use the
-@code{:make-default} option/initarg with a value of @code{nil}, like
-this:
+@clon{} has a global variable named @code{*synopsis*} which holds the
+current synopsis. When you define/create a synopsis with either
+@code{defsynopsis} or @code{make-synopsis}, it is automatically made the
+default one, unless you use the @code{:make-default} option/initarg with
+a value of @code{nil}, like this:
 
 @verbatim
 (defsynopsis (:make-default nil) ...)
@@ -2258,10 +2257,10 @@ is used implicitely, but you have two ways to avoid this.
 
 @enumerate
 @item
-@vindex *default-synopsis*
+@vindex *synopsis*
 At any time in your program, you may change the value of
-@code{*default-synopsis*}. All subsequent calls to @code{make-context}
-will hence use this other synopsis.
+@code{*synopsis*}. All subsequent calls to @code{make-context} will
+hence use this other synopsis.
 @item
 @cfiaindex{make-context,:synopsis}@c
 If you prefer to use another synopsis only temporarily, you can use the
@@ -3002,11 +3001,11 @@ See @ref{Constructors} and @ref{Using Different Synopsis}.
 See @ref{Synopsis Definition} and @ref{Using Different Synopsis}.
 @end defmac
 
-@defopt *default-synopsis*
+@defopt *synopsis*
 @xref{Using Different Synopsis}.
 @end defopt
 
-@defun make-context &key (SYNOPSIS *default-synopsis*) CMDLINE @
+@defun make-context &key (SYNOPSIS *synopsis*) CMDLINE @
 (MAKE-CURRENT t)
 @cfsubindex{make-context}
 @cfiaindex{make-context,:synopsis}
