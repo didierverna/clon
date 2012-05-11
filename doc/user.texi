@@ -2288,12 +2288,12 @@ Did you also notice that after creating a context, there is actually
 never any explicit reference to it anymore? So again, where is the
 magick? In fact, there's no magick at all involved here either.
 
-@vindex *current-context*
-@cfiaindex{make-context,:make-current}
-@clon{} has a global variable named @code{*current-context*} which holds
-the@dots{} current context, yeah. When you create a context with
-@code{make-context}, it is automatically made current, unless you use
-the @code{:make-current} initarg with a value of @code{nil}.
+@vindex *context*
+@cfiaindex{make-context,:make-current}@c
+@clon{} has a global variable named @code{*context*} which holds the
+current context. When you create a context with @code{make-context}, it
+is automatically made current, unless you use the @code{:make-current}
+initarg with a value of @code{nil}.
 
 @cindex Runtime Phase
 @findex progname
@@ -2315,14 +2315,14 @@ achieve this.
 
 @enumerate
 @item
-@vindex *current-context*
+@vindex *context*
 At any time in your program, you may change the value of
-@code{*current-context*}. All subsequent calls to the runtime phase API
+@code{*context*}. All subsequent calls to the runtime phase API
 will hence use this other context.
 @item
 @clon{} also provides a macro which changes the current context for you.
 @defun with-context CONTEXT &body BODY
-Execute @var{BODY} with @code{*current-context*} bound to @var{CONTEXT}.
+Execute @var{BODY} with @code{*context*} bound to @var{CONTEXT}.
 @end defun
 @item
 @fkindex{progname,:context}@c
@@ -3024,7 +3024,7 @@ Different Command-Lines}.
 @node Runtime Phase API, Extension API, Initialization Phase API, API Quick Reference
 @section Runtime Phase API
 
-@defopt *current-context*
+@defopt *context*
 @xref{Using Multiple Contexts}.
 @end defopt
 
@@ -3032,39 +3032,39 @@ Different Command-Lines}.
 @xref{Using Multiple Contexts}.
 @end defun
 
-@defun progname &key (CONTEXT *current-context*)
+@defun progname &key (CONTEXT *context*)
 @fkindex{progname,:context}
 See @ref{Contextual Information} and @ref{Using Multiple Contexts}.
 @end defun
 
-@defun remainder &key (CONTEXT *current-context*)
+@defun remainder &key (CONTEXT *context*)
 @fkindex{remainder,:context}
 See @ref{Contextual Information} and @ref{Using Multiple Contexts}.
 @end defun
 
-@defun cmdline-options-p &key (CONTEXT *current-context*)
+@defun cmdline-options-p &key (CONTEXT *context*)
 @fkindex{cmdline-options-p,:context}
 See @ref{Command-Line Polling} and @ref{Using Multiple Contexts}.
 @end defun
 
-@defun cmdline-p &key (CONTEXT *current-context*)
+@defun cmdline-p &key (CONTEXT *context*)
 @fkindex{cmdline-p,:context}
 See @ref{Command-Line Polling} and @ref{Using Multiple Contexts}.
 @end defun
 
-@defun getopt &key (CONTEXT *current-context*) SHORT-NAME LONG-NAME @
+@defun getopt &key (CONTEXT *context*) SHORT-NAME LONG-NAME @
 OPTION
 @fkindex{getopt,:context}
 @fkindex{getopt,:short-name}
 @fkindex{getopt,:long-name}
 @fkindex{getopt,:option}
-@vindex *current-context*
+@vindex *context*
 See @ref{Explicit Retrieval} and @ref{Using Multiple Contexts}.
 @end defun
 
-@defun getopt-cmdline &key (CONTEXT *current-context*)
+@defun getopt-cmdline &key (CONTEXT *context*)
 @fkindex{getopt-cmdline,:context}
-@vindex *current-context*
+@vindex *context*
 See @ref{Sequential Retrieval} and @ref{Using Multiple Contexts}.
 @end defun
 
@@ -3084,7 +3084,7 @@ See @ref{Sequential Retrieval} and @ref{Using Multiple Contexts}.
 @xref{Sequential Retrieval}.
 @end deffn
 
-@defun help &key (CONTEXT *current-context*) @
+@defun help &key (CONTEXT *context*) @
 (ITEM (synopsis context)) @
 (OUTPUT-STREAM *standard-output*) @
 (SEARCH-PATH (search-path context)) @
@@ -3098,7 +3098,7 @@ See @ref{Sequential Retrieval} and @ref{Using Multiple Contexts}.
 @fkindex{help,:search-path}
 @fkindex{help,:line-width}
 @fkindex{help,:highlight}
-@vindex *current-context*
+@vindex *context*
 @vindex *standard-output*
 @xref{Help}, @ref{Using Multiple Contexts} and @ref{Programmatic Help
 Strings}.

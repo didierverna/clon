@@ -30,7 +30,7 @@
 (in-package :com.dvlsoft.clon)
 (in-readtable :com.dvlsoft.clon)
 
-(defvar *current-context* nil "The current context.")
+(defvar *context* nil "The current context.")
 
 
 
@@ -193,19 +193,19 @@
 This class represents the associatiion of a synopsis and a set of command-line
 options based on it."))
 
-(defun progname (&key (context *current-context*))
+(defun progname (&key (context *context*))
   "Return CONTEXT's program name."
   (slot-value context 'progname))
 
-(defun remainder (&key (context *current-context*))
+(defun remainder (&key (context *context*))
   "Return CONTEXT's remainder."
   (slot-value context 'remainder))
 
-(defun cmdline-options-p (&key (context *current-context*))
+(defun cmdline-options-p (&key (context *context*))
   "Return T if CONTEXT has any unprocessed options left."
   (if (cmdline-options context) t nil))
 
-(defun cmdline-p (&key (context *current-context*))
+(defun cmdline-p (&key (context *context*))
   "Return T if CONTEXT has anything on its command-line."
   (or (cmdline-options-p :context context)
       (remainder :context context)))
@@ -260,7 +260,7 @@ options based on it."))
 ;; option for OUTPUT-STREAM. At the end-user level, you can redirect to a file
 ;; from the shell.
 
-(defun help (&key (context *current-context*)
+(defun help (&key (context *context*)
 		  (item (synopsis context))
 		  (output-stream *standard-output*)
 		  (search-path (search-path context))
@@ -356,7 +356,7 @@ When such an option exists, return two values:
 ;; ==========================================================================
 
 (defun getopt (&rest keys
-	       &key (context *current-context*) short-name long-name option)
+	       &key (context *context*) short-name long-name option)
   "Get an option's value in CONTEXT.
 The option can be specified either by SHORT-NAME, LONG-NAME, or directly via
 an OPTION object.
@@ -401,7 +401,7 @@ Return two values:
 	     (slot-boundp option 'default-value))
     (values (default-value option) :default)))
 
-(defun getopt-cmdline (&key (context *current-context*))
+(defun getopt-cmdline (&key (context *context*))
   "Get the next command-line option in CONTEXT.
 When there is no next command-line option, return nil.
 Otherwise, return four values:
@@ -422,7 +422,7 @@ Otherwise, return four values:
 OPTION, NAME and VALUE are bound to the values returned by GETOPT-CMDLINE.
 BODY is executed only if there is a next command-line option."
   `(multiple-value-bind (,option ,name ,value ,source)
-       (getopt-cmdline :context (or ,context *current-context*))
+       (getopt-cmdline :context (or ,context *context*))
      (when ,option
        ,@body)))
 
@@ -432,7 +432,7 @@ BODY is executed only if there is a next command-line option."
 OPTION, NAME and VALUE are bound to each option's object, name used on the
 command-line and retrieved value."
   (let ((ctx (gensym "context")))
-    `(let ((,ctx (or ,context *current-context*)))
+    `(let ((,ctx (or ,context *context*)))
        (do () ((null (cmdline-options ,ctx)))
 	 (multiple-value-getopt-cmdline
 	     (,option ,name ,value ,source :context ,ctx)
@@ -773,7 +773,7 @@ or FITNESS FOR A PARTICULAR PURPOSE.~%"
   (let ((context (apply #'make-instance 'context
 			(remove-keys keys :make-current))))
     (when make-current
-      (setq *current-context* context))
+      (setq *context* context))
     context))
 
 
@@ -783,8 +783,8 @@ or FITNESS FOR A PARTICULAR PURPOSE.~%"
 ;; ==========================================================================
 
 (defmacro with-context (context &body body)
-  "Execute BODY with *current-context* bound to CONTEXT."
-  `(let ((*current-context* ,context))
+  "Execute BODY with *context* bound to CONTEXT."
+  `(let ((*context* ,context))
      ,@body))
 
 

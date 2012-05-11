@@ -3,10 +3,11 @@
 **************
 
 Clon currently works on Unix (including MacOS X) and Windows (Cygwin or
-MinGW) with SBCL, CMUCL, CCL, ECL, Allegro (both standard and modern)
-CLISP and ABCL. Clon is provided as an ASDF 2 system, but has no
-mandatory dependency. CFFI may optionally be used with CLISP.  *Note
-Supported Platforms::, for more information.
+MinGW) with SBCL, CMUCL, CCL, ECL, CLISP, ABCL, Allegro (both standard
+and modern) and Lispworks. Clon is provided as an ASDF 2 system, but
+has no mandatory dependency. CFFI may optionally be used with CLISP,
+Allegro and Lispworks. *Note Supported Platforms::, for more
+information.
 
    In addition to the library itself, the Clon distribution offers
 documentation in the form of 3 different manuals, some data files that
@@ -96,7 +97,7 @@ A.3 Supported Platforms
 =======================
 
 Clon currently works on Unix (including MacOS X) and Windows (Cygwin or
-MinGW) and has been ported to 7 Common Lisp implementations. The
+MinGW) and has been ported to 8 Common Lisp implementations. The
 following table lists the supported platforms.
 
 Compiler   Minimum Version   Dependencies
@@ -106,14 +107,15 @@ CMU-CL     20b
 CCL                          
 ECL        11.1.2(1)         
 CLISP                        `cffi' (optional)
-Allegro(2)                   `cffi' (optional)
-ABCL       0.24.0(3)         
+ABCL       0.24.0(2)         
+Allegro(3)                   `cffi' (optional)
+Lispworks                    `cffi' (optional)
 
-Allegro and CLISP specificities
--------------------------------
+CLISP, Allegro and Lispworks specificities
+------------------------------------------
 
-As mentioned in the above table, Allegro and CLISP's dependency on
-`cffi' is optional. They need `cffi' in order to implement terminal
+As mentioned in the above table, CLISP, Allegro and Lispworks dependency
+on `cffi' is optional. They need `cffi' in order to implement terminal
 autodetection only (note that many other implementations come with
 their own foreign function interface). If `cffi' cannot be found when
 the ASDF system is loaded (or in the case of CLISP, if it has been
@@ -137,7 +139,7 @@ Clon's ABCL port currently has two limitations:
    (1) more precisely, git revision
 3e2e5f9dc3c5176ef6ef8d7794bfa43f1af8f8db
 
-   (2) both standard and modern images are supported
+   (2) more precisely, svn trunk revision 13156
 
-   (3) more precisely, svn trunk revision 13156
+   (3) both standard and modern images are supported
 

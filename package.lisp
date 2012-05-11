@@ -88,7 +88,7 @@
     :*default-synopsis*
     :make-synopsis :defsynopsis
     ;; From src/context.lisp:
-    :*current-context*
+    :*context*
     :make-context
     :with-context
     :progname
