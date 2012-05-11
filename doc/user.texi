@@ -502,10 +502,11 @@ extend @clon{} with your own option types.
 @node Installation, Quick Start, Introduction, Top
 @chapter Installation
 @clon{} currently works on Unix (including MacOS X) and Windows (Cygwin
-or MinGW) with SBCL, CMUCL, CCL, ECL, Allegro (both standard and modern)
-CLISP and ABCL. @clon{} is provided as an ASDF 2 system, but has no
-mandatory dependency. CFFI may optionally be used with CLISP.
-@xref{Supported Platforms}, for more information.
+or MinGW) with SBCL, CMUCL, CCL, ECL, CLISP, ABCL, Allegro (both
+standard and modern) and Lispworks. @clon{} is provided as an ASDF 2
+system, but has no mandatory dependency. CFFI may optionally be used
+with CLISP, Allegro and Lispworks. @xref{Supported Platforms}, for more
+information.
 
 In addition to the library itself, the Clon distribution offers
 documentation in the form of 3 different manuals, some data files that
@@ -2663,7 +2664,7 @@ for 80 columns regardless of the actual terminal width
 @node Supported Platforms, Dumping Executables, Non-ANSI Features, Technical Notes
 @section Supported Platforms
 @clon{} currently works on Unix (including MacOS X) and Windows (Cygwin
-or MinGW) and has been ported to 7 @cl{} implementations. The following
+or MinGW) and has been ported to 8 @cl{} implementations. The following
 table lists the supported platforms.
 
 @multitable {Compiler} {Minimum Version} {@code{cffi} (optional)}
@@ -2684,18 +2685,21 @@ table lists the supported platforms.
 @item CLISP
 @tab
 @tab @code{cffi} (optional)
-@item Allegro@footnote{both standard and modern images are supported}
-@tab
-@tab @code{cffi} (optional)
 @item ABCL
 @tab 0.24.0@footnote{more precisely, svn trunk revision 13156}
 @tab
+@item Allegro@footnote{both standard and modern images are supported}
+@tab
+@tab @code{cffi} (optional)
+@item Lispworks
+@tab
+@tab @code{cffi} (optional)
 @end multitable
 
-@unnumberedsubsec Allegro and CLISP specificities
+@unnumberedsubsec CLISP, Allegro and Lispworks specificities
 @cindex Restricted Mode
-As mentioned in the above table, Allegro and CLISP's dependency on
-@code{cffi} is optional. They need @code{cffi} in order to implement
+As mentioned in the above table, CLISP, Allegro and Lispworks dependency
+on @code{cffi} is optional. They need @code{cffi} in order to implement
 terminal autodetection only (note that many other implementations come
 with their own foreign function interface). If @code{cffi} cannot be
 found when the ASDF system is loaded (or in the case of CLISP, if it has
@@ -2778,15 +2782,6 @@ you with this: it normally expands to a compiler-specific function which
 saves the current Lisp image, but for ECL, it simply expands to the
 ``main'' function call, hence consituting the entry point to the code
 that ECL needs.
-@item Allegro
-@findex dumplisp
-Dumping a complete application in Allegro is complicated, but more
-importantly only possible in the Enterprise edition. Because of that,
-@clon{}'s dumping facility only makes use of the @code{dumplisp} feature
-which just dumps a Lisp image. You can perform this operation with a
-@cmdline{} such as @samp{alisp -qq -L quickstart.lisp}. The Makefile
-infrastructure in the @file{demo} directory also creates shell script
-wrappers around this image to simplify their use.
 @item CLISP
 @code{CC=gcc clisp -norc -i quickstart.lisp}@*
 The @code{CC=gcc} bit lets you choose your preferred C compiler for
@@ -2823,6 +2818,19 @@ you can compile and add to the original ABCL @code{jar} file, along with
 @file{quickstart.lisp}. If you want more details on this, you will need
 to look at the @file{Makefile} in the @code{demo} directory and also at
 the file @file{Makefile.inc} at the toplevel.
+@item Allegro
+@findex dumplisp
+Dumping a complete application with Allegro is complicated, but more
+importantly only possible in the Enterprise edition. Because of that,
+@clon{}'s dumping facility only makes use of the @code{dumplisp} feature
+which just dumps a Lisp image. You can perform this operation with a
+@cmdline{} such as @samp{alisp -qq -L quickstart.lisp}. The Makefile
+infrastructure in the @file{demo} directory also creates shell script
+wrappers around this image to simplify their use.
+@item Lispworks
+@code{lispworks -init - -siteinit - -load quickstart.lisp}@*
+Please note that dumping a complete application with Lispworks is only
+possible in the Professional or Enterprise editions.
 @end table
 
 
@@ -2879,6 +2887,14 @@ unknown ones. Consequently, if you want to provide options to your
 application, you need to put them after a @code{--} separator. Note that
 you can still use a second such separator to provide @clon{} with both
 some options and a remainder (@pxenduserref{Option Separator}).
+@item ABCL
+ABCL processes its own options and leaves the others unprocessed on the
+@cmdline{}. This means that as long as there is no overlap between
+ABCL's options and yours, you can just put them all together on the
+@cmdline{}. In case of overlap however, you need to separate ABCL's
+options from yours with a @code{--} separator. Note that you can still
+use a second such separator to provide @clon{} with both some options
+and a remainder (@pxenduserref{Option Separator}).
 @item Allegro
 Allegro processes its own options, issues only a warning about options
 it doesn't know of, and leaves anything after a @code{--} alone.
@@ -2886,14 +2902,15 @@ Consequently, if you want to provide options to your application, you
 need to put them after a @code{--} separator. Note that you can still
 use a second such separator to provide @clon{} with both some options
 and a remainder (@pxenduserref{Option Separator}).
-@item ABCL
-Finally, ABCL processes its own options and leaves the others
-unprocessed on the @cmdline{}. This means that as long as there is no
-overlap between ABCL's options and yours, you can just put them all
-together on the @cmdline{}. In case of overlap however, you need to
-separate ABCL's options from yours with a @code{--} separator. Note that
-you can still use a second such separator to provide @clon{} with both
-some options and a remainder (@pxenduserref{Option Separator}).
+@item Lispworks
+Lispworks processes its own options and ignores the other ones, but
+always leaves everything on the command-line. It does not currently
+support @code{--} as an option separator either. Consequently, if you
+want to provide options to your application, you need to put them after
+a @code{--} separator, although you @emph{will} get into trouble if any
+option there is recognized by Lispworks itself. Note that you can still
+use a second such separator to provide @clon{} with both some options
+and a remainder (@pxenduserref{Option Separator}).
 @end table
 
 
