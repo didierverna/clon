@@ -3231,7 +3231,10 @@ Antony @emph{something}@*
 Erik Huelsmann@*
 Erik Winkels@*
 François-René Rideau@*
-James Wright
+James Wright@*
+Martin Simmons@*
+Nikodemus Siivola@*
+Sam Steingold@*
 @end multitable
 
 
