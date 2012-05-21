@@ -46,9 +46,8 @@
 ;;    ECL:   FILE-STREAM for both terminals and files.
 ;;    CLISP: STREAM for terminals, FILE-STREAM for files. It is impossible (at
 ;;           the Lisp level) to detect whether a stream has file descriptors
-;;           or not. The only workaround available right now is to catch
-;;           SYSTEM::SIMPLE-STREAM-ERROR potentially thrown by
-;;           EXT:STREAM-HANDLES.
+;;           or not. The only workaround available right now is to catch a
+;;           STREAM-ERROR potentially thrown by EXT:STREAM-HANDLES.
 ;;    ACL:   EXCL:TERMINAL-SIMPLE-STREAM for terminals,
 ;;           EXCL:FILE-SIMPLE-STREAM for files. I'm not sure if any class
 ;;           guarantees the existence of file descriptors, but it doesn't
@@ -107,9 +106,11 @@
     (ccl:stream-device stream :output)
     #+clisp
     (multiple-value-bind (input-handle output-handle)
-	(handler-case (ext:stream-handles stream)
-	  (system::simple-stream-error ()
-	    nil))
+	(when (or (sys::built-in-stream-p stream)
+		  (eq (type-of stream) 'socket:socket-server))
+	  (handler-case (ext:stream-handles stream)
+	    (stream-error ()
+	      nil)))
       (declare (ignore input-handle))
       output-handle)
     #+allegro
