@@ -434,7 +434,8 @@ this function behaves differently in some cases, as described below.
   class file with a main function that creates an interpreter, loads
   the file in which this macro call appears and calls FUNCTION."
   ;; #### PORTME.
-  #+ecl (declare (ignore name))
+  #+ecl     (declare (ignore name))
+  #+allegro (declare (ignore function))
   #+sbcl    `(progn
 	       (setq *executablep* t) ; not used but here for correctness
 	       (sb-ext:save-lisp-and-die ,name
