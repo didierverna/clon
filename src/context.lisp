@@ -262,7 +262,7 @@ options based on it."))
 
 (defun help (&key (context *context*)
 		  (item (synopsis context))
-		  (output-stream *standard-output*)
+		  (output-stream *terminal-io*)
 		  (search-path (search-path context))
 		  (theme (theme context))
 		  (line-width (line-width context))

@@ -2467,9 +2467,9 @@ context object). The keys in question are: @code{:theme},
 @code{:search-path}, @code{:line-width} and @code{:highlight}.
 
 @fkindex{help,:output-stream}
-@vindex *standard-output*
+@vindex *terminal-io*
 In addition to that, there is an @code{:output-stream} key which
-defaults to @code{*standard-output*} which you could use for instance to
+defaults to @code{*terminal-io*} which you could use for instance to
 write directly to a file. Note that there is no end-user level access to
 this parameter.
 
@@ -3085,7 +3085,7 @@ See @ref{Sequential Retrieval} and @ref{Using Multiple Contexts}.
 
 @defun help &key (CONTEXT *context*) @
 (ITEM (synopsis context)) @
-(OUTPUT-STREAM *standard-output*) @
+(OUTPUT-STREAM *terminal-io*) @
 (SEARCH-PATH (search-path context)) @
 (THEME (theme context)) @
 (LINE-WIDTH (line-width context)) @
@@ -3098,7 +3098,7 @@ See @ref{Sequential Retrieval} and @ref{Using Multiple Contexts}.
 @fkindex{help,:line-width}
 @fkindex{help,:highlight}
 @vindex *context*
-@vindex *standard-output*
+@vindex *terminal-io*
 @xref{Help}, @ref{Using Multiple Contexts} and @ref{Programmatic Help
 Strings}.
 @end defun
