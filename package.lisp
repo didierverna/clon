@@ -173,7 +173,7 @@ See CLINDENT for more information."
 (set-dispatch-macro-character #\# #\i #'i-reader *readtable*)
 
 
-;; ECL, CLISP, Allegro and Lispworks do not like to see undefined reader
+;; ECL, CLISP, Allegro and LispWorks do not like to see undefined reader
 ;; macros in expressions that belong to other compilers. For instance this
 ;; will break: #+ccl (#_ccl-only-function) It seems to be a correct behavior
 ;; (see *read-suppress* in CLHS), although other implementations like SBCL and

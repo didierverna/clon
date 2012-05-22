@@ -503,9 +503,9 @@ extend @clon{} with your own option types.
 @chapter Installation
 @clon{} currently works on Unix (including MacOS X) and Windows (Cygwin
 or MinGW) with SBCL, CMUCL, CCL, ECL, CLISP, ABCL, Allegro (both
-standard and modern) and Lispworks. @clon{} is provided as an ASDF 2
+standard and modern) and LispWorks. @clon{} is provided as an ASDF 2
 system, but has no mandatory dependency. CFFI may optionally be used
-with CLISP, Allegro and Lispworks. @xref{Supported Platforms}, for more
+with CLISP, Allegro and LispWorks. @xref{Supported Platforms}, for more
 information.
 
 In addition to the library itself, the Clon distribution offers
@@ -2690,14 +2690,14 @@ table lists the supported platforms.
 @item Allegro@footnote{both standard and modern images are supported}
 @tab
 @tab @code{cffi} (optional)
-@item Lispworks
+@item LispWorks
 @tab
 @tab @code{cffi} (optional)
 @end multitable
 
-@unnumberedsubsec CLISP, Allegro and Lispworks specificities
+@unnumberedsubsec CLISP, Allegro and LispWorks specificities
 @cindex Restricted Mode
-As mentioned in the above table, CLISP, Allegro and Lispworks dependency
+As mentioned in the above table, CLISP, Allegro and LispWorks dependency
 on @code{cffi} is optional. They need @code{cffi} in order to implement
 terminal autodetection only (note that many other implementations come
 with their own foreign function interface). If @code{cffi} cannot be
@@ -2826,9 +2826,9 @@ which just dumps a Lisp image. You can perform this operation with a
 @cmdline{} such as @samp{alisp -qq -L quickstart.lisp}. The Makefile
 infrastructure in the @file{demo} directory also creates shell script
 wrappers around this image to simplify their use.
-@item Lispworks
+@item LispWorks
 @code{lispworks -init - -siteinit - -load quickstart.lisp}@*
-Please note that dumping a complete application with Lispworks is only
+Please note that dumping a complete application with LispWorks is only
 possible in the Professional or Enterprise editions.
 @end table
 
@@ -2901,13 +2901,13 @@ Consequently, if you want to provide options to your application, you
 need to put them after a @code{--} separator. Note that you can still
 use a second such separator to provide @clon{} with both some options
 and a remainder (@pxenduserref{Option Separator}).
-@item Lispworks
-Lispworks processes its own options and ignores the other ones, but
+@item LispWorks
+LispWorks processes its own options and ignores the other ones, but
 always leaves everything on the command-line. It does not currently
 support @code{--} as an option separator either. Consequently, if you
 want to provide options to your application, you need to put them after
 a @code{--} separator, although you @emph{will} get into trouble if any
-option there is recognized by Lispworks itself. Note that you can still
+option there is recognized by LispWorks itself. Note that you can still
 use a second such separator to provide @clon{} with both some options
 and a remainder (@pxenduserref{Option Separator}).
 @end table

@@ -44,7 +44,7 @@ CC := gcc
 
 ## Preferred Common Lisp implementation.
 # Choices are SBCL, CMUCL, CCL, ECL, CLISP, ABCL, ACL (Allegro) and LW
-# (Lispworks).
+# (LispWorks).
 LISP := SBCL
 
 ## Implementation paths. Note that regardless of the above setting, SBCL is
@@ -59,7 +59,7 @@ ECL_PATH   := ecl
 CLISP_PATH := CC=$(CC) clisp -q
 ACL_PATH   := alisp
 # Note: if you want to dump the demo examples, you should use a console image
-# without multiprocessing here. See section 12.3.5 of the Lispworks user guide
+# without multiprocessing here. See section 12.3.5 of the LispWorks user guide
 # and reference manual.
 LW_PATH    := lispworks
 
