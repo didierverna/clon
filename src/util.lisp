@@ -223,9 +223,6 @@ See REPLACE-KEY for more information on the replacement syntax."
 (defmacro declare-valid-superclass (class superclass)
   "Validate SUPERCLASS classes for CLASS classes."
   ;; #### PORTME.
-  #+abcl (declare (ignore class superclass))
-  #+abcl '(progn)
-  #-abcl
   `(defmethod validate-superclass((class ,class) (superclass ,superclass))
      #+ecl (declare (ignore class superclass))
      t))

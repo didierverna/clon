@@ -2699,7 +2699,7 @@ table lists the supported platforms.
 @tab
 @tab @code{cffi} (optional)
 @item ABCL
-@tab 0.24.0@footnote{more precisely, svn trunk revision 13156}
+@tab 1.1.0@footnote{more precisely, svn trunk revision 140640}
 @tab
 @item Allegro@footnote{both standard and modern images are supported}
 @tab

@@ -42,7 +42,7 @@
 		#+abcl      :mop
 		#+allegro   :mop
 		#+lispworks :clos
-		:class-slots :slot-definition-name #-abcl :validate-superclass)
+		:class-slots :slot-definition-name :validate-superclass)
   (:import-from :com.dvlsoft.clon.asdf
     :configuration
     :define-constant

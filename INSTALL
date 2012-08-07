@@ -117,7 +117,7 @@ CMU-CL     20b
 CCL                          
 ECL        11.1.2(1)         
 CLISP                        `cffi' (optional)
-ABCL       0.24.0(2)         
+ABCL       1.1.0(2)          
 Allegro(3)                   `cffi' (optional)
 LispWorks                    `cffi' (optional)
 
@@ -149,7 +149,7 @@ Clon's ABCL port currently has two limitations:
    (1) more precisely, git revision
 3e2e5f9dc3c5176ef6ef8d7794bfa43f1af8f8db
 
-   (2) more precisely, svn trunk revision 13156
+   (2) more precisely, svn trunk revision 140640
 
    (3) both standard and modern images are supported
 
