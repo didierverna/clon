@@ -508,13 +508,27 @@ system, but has no mandatory dependency. CFFI may optionally be used
 with CLISP, Allegro and LispWorks. @xref{Supported Platforms}, for more
 information.
 
-In addition to the library itself, the Clon distribution offers
-documentation in the form of 3 different manuals, some data files that
-are needed for it to work properly, and a couple of demonstration
-programs. Because of that, some bits of manual installation are needed.
+In order to install and load the bare Lisp library, unpack it somewhere
+in the ASDF 2 source registry and type this at the REPL:
+@verbatim
+(asdf:load-system :com.dvlsoft.clon)
+@end verbatim
+If you are using SBCL, you may want to make sure that the @code{CC}
+environment variable is set to your favorite C compiler in your init
+file. Otherwise, @clon{} will run in restricted mode (@pxref{Technical
+Notes}). For instance, put this in your @file{.sbclrc}:
+@verbatim
+(require :sb-posix)
+(sb-posix:setenv "CC" "gcc" 1)
+@end verbatim
 
-After unpacking somewhere in the ASDF 2 source registry, please perform
-the following steps, in order.
+In addition to the library itself, the Clon distribution offers
+documentation in the form of 3 different manuals, some data files like
+sample themes (@pxenduserref{Theme Creation}), and a couple of
+demonstration programs. If you want to benefit from all those wonders,
+some bits of manual installation are needed. After unpacking somewhere
+in the ASDF 2 source registry, please perform the following steps, in
+order.
 
 @enumerate
 @item

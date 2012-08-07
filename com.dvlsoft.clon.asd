@@ -159,53 +159,42 @@ the short version, a patchlevel of 0 is ignored in the output."
 ;; System requirements
 ;; -------------------
 
-(unless (configuration :restricted)
-  #+sbcl    (handler-case (asdf:load-system :sb-grovel)
-	      (error ()
-		(format *error-output* "~
+(defun restrict-because (reason)
+  "Put Clon in restricted mode because of REASON."
+  (format *error-output* "~
 *******************************************************************
-* WARNING: unable to load module SB-GROVEL.                       *
+* WARNING: ~A.~66T*
 * Clon will be loaded without support for terminal autodetection. *
-* See section A.1 of the user manual for more information.        *
-*******************************************************************")
-		(setf (configuration :restricted) t)))
+* See sections 2 and A.1 of the user manual for more information. *
+*******************************************************************"
+    reason)
+  (setf (configuration :restricted) t))
+
+(unless (configuration :restricted)
+  #+sbcl    (progn
+	      (require :sb-posix)
+	      (unless (sb-posix:getenv "CC")
+		(restrict-because "the CC environment variable is not set"))
+	      (handler-case (asdf:load-system :sb-grovel)
+		(error ()
+		  (restrict-because "unable to load module SB-GROVEL"))))
   #+clisp   (cond ((member :ffi *features*)
 		   (handler-case (asdf:load-system :cffi-grovel)
 		     (error ()
-		       (format *error-output* "~
-*******************************************************************
-* WARNING: unable to load ASDF component CFFI-GROVEL.             *
-* Clon will be loaded without support for terminal autodetection. *
-* See section A.1 of the user manual for more information.        *
-*******************************************************************")
-		       (setf (configuration :restricted) t))))
+		       (restrict-because
+			"unable to load ASDF component CFFI-GROVEL"))))
 		  (t
-		   (format *error-output* "~
-*******************************************************************
-* WARNING: CLISP is compiled without FFI support.                 *
-* Clon will be loaded without support for terminal autodetection. *
-* See section A.1 of the user manual for more information.        *
-*******************************************************************")
-		   (setf (configuration :restricted) t)))
+		   (restrict-because
+		    "CLISP is compiled without FFI support")))
   #+(or allegro lispworks) (handler-case (asdf:load-system :cffi-grovel)
 			     (error ()
-			       (format *error-output* "~
-*******************************************************************
-* WARNING: unable to load ASDF component CFFI-GROVEL.             *
-* Clon will be loaded without support for terminal autodetection. *
-* See section A.1 of the user manual for more information.        *
-*******************************************************************")
-			       (setf (configuration :restricted) t)))
-  #+abcl    (progn (format *error-output* "~
-*******************************************************************
-* NOTE: ABCL is in use.                                           *
-* Clon will be loaded without support for terminal autodetection. *
-* See section A.1 of the user manual for more information.        *
-*******************************************************************")
-		   (setf (configuration :restricted) t)))
+			       (restrict-because
+				"unable to load ASDF component CFFI-GROVEL")))
+  #+abcl    (restrict-because "ABCL is in use"))
 
-(unless (configuration :restricted)
-  (push :com.dvlsoft.clon.termio *features*))
+(if (configuration :restricted)
+    (setq *features* (delete  :com.dvlsoft.clon.termio *features*))
+  (pushnew :com.dvlsoft.clon.termio *features*))
 
 
 ;; -----------------
