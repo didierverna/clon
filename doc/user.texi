@@ -502,11 +502,11 @@ extend @clon{} with your own option types.
 @node Installation, Quick Start, Introduction, Top
 @chapter Installation
 @clon{} currently works on Unix (including MacOS X) and Windows (Cygwin
-or MinGW) with SBCL, CMUCL, CCL, ECL, CLISP, ABCL, Allegro (both
-standard and modern) and LispWorks. @clon{} is provided as an ASDF 2
-system, but has no mandatory dependency. CFFI may optionally be used
-with CLISP, Allegro and LispWorks. @xref{Supported Platforms}, for more
-information.
+or MinGW) with SBCL (> 1.0.56), CMUCL (> 20b), CCL, ECL, CLISP, ABCL (>
+1.1.0), Allegro (both standard and modern) and LispWorks. @clon{} is
+provided as an ASDF 2 system, but has no mandatory dependency. CFFI may
+optionally be used with CLISP, Allegro and LispWorks. @xref{Supported
+Platforms}, for more information.
 
 In order to install and load the bare Lisp library, unpack it somewhere
 in the ASDF 2 source registry and type this at the REPL:
@@ -2683,7 +2683,7 @@ table lists the supported platforms.
 @multitable {Compiler} {Minimum Version} {@code{cffi} (optional)}
 @headitem Compiler @tab Minimum Version @tab Dependencies
 @item SBCL
-@tab
+@tab 1.0.56
 @tab
 @item CMU-CL
 @tab 20b
