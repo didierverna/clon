@@ -171,26 +171,30 @@ the short version, a patchlevel of 0 is ignored in the output."
   (setf (configuration :restricted) t))
 
 (unless (configuration :restricted)
-  #+sbcl    (progn
-	      (require :sb-posix)
-	      (unless (sb-posix:getenv "CC")
-		(restrict-because "the CC environment variable is not set"))
-	      (handler-case (asdf:load-system :sb-grovel)
-		(error ()
-		  (restrict-because "unable to load module SB-GROVEL"))))
-  #+clisp   (cond ((member :ffi *features*)
-		   (handler-case (asdf:load-system :cffi-grovel)
-		     (error ()
-		       (restrict-because
-			"unable to load ASDF component CFFI-GROVEL"))))
-		  (t
-		   (restrict-because
-		    "CLISP is compiled without FFI support")))
-  #+(or allegro lispworks) (handler-case (asdf:load-system :cffi-grovel)
-			     (error ()
-			       (restrict-because
-				"unable to load ASDF component CFFI-GROVEL")))
-  #+abcl    (restrict-because "ABCL is in use"))
+  #+sbcl
+  (progn
+    (require :sb-posix)
+    (unless (funcall (intern "GETENV" :sb-posix) "CC")
+      (restrict-because "the CC environment variable is not set"))
+    (handler-case (asdf:load-system :sb-grovel)
+      (error ()
+	(restrict-because "unable to load module SB-GROVEL"))))
+  #+clisp
+  (cond ((member :ffi *features*)
+	 (handler-case (asdf:load-system :cffi-grovel)
+	   (error ()
+	     (restrict-because
+	      "unable to load ASDF component CFFI-GROVEL"))))
+	(t
+	 (restrict-because
+	  "CLISP is compiled without FFI support")))
+  #+(or allegro lispworks)
+  (handler-case (asdf:load-system :cffi-grovel)
+    (error ()
+      (restrict-because
+       "unable to load ASDF component CFFI-GROVEL")))
+  #+abcl
+  (restrict-because "ABCL is in use"))
 
 (if (configuration :restricted)
     (setq *features* (delete  :com.dvlsoft.clon.termio *features*))
