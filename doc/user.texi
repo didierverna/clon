@@ -34,7 +34,7 @@
 @setfilename clon-user.info
 @settitle The Clon User Manual
 @afourpaper
-@documentencoding ISO-8859-1
+@documentencoding UTF-8
 @c %**end of header
 
 
@@ -3246,7 +3246,7 @@ Alessio Stalla@*
 Antony @emph{something}@*
 Erik Huelsmann@*
 Erik Winkels@*
-François-René Rideau@*
+FranÃ§ois-RenÃ© Rideau@*
 James Wright@*
 Martin Simmons@*
 Nikodemus Siivola@*

@@ -90,7 +90,7 @@ install-www: dist
 	-install -m 644 $(SIGNATURE) "$(W3DIR)/attic/"
 	echo "\
 <? lref (\"$(PROJECT)/attic/$(PROJECT)-$(SHORT_VERSION).tar.gz\", \
-	 contents (\"Dernière version\", \"Latest version\")); ?> \
+	 contents (\"DerniÃ¨re version\", \"Latest version\")); ?> \
 | \
 <? lref (\"$(PROJECT)/attic/$(PROJECT)-$(SHORT_VERSION).tar.gz.asc\", \
 	 contents (\"Signature GPG\", \"GPG Signature\")); ?>" \
