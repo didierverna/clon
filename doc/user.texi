@@ -2949,7 +2949,7 @@ and a remainder (@pxenduserref{Option Separator}).
 @node Utilities, Initialization Phase API, API Quick Reference, API Quick Reference
 @section Utilities
 
-@defmac dump NAME FUNCTION
+@defmac dump NAME FUNCTION &rest ARGS
 See @ref{Quick Start}.
 @end defmac
 

@@ -417,19 +417,25 @@ public class ~A
 }~%"
   "Main class template for ABCL.")
 
-(defmacro dump (name function)
+(defmacro dump (name function &rest args)
   "Dump a standalone executable named NAME starting with FUNCTION.
+ARGS may be any arguments understood by the underlying implementation's
+dumping facility. They will simply be passed along. Note that DUMP already
+passes some such arguments. Some of them are critical for the dumping facility
+(e.g. :executable) and cannot be overridden. Some others, however, will be if
+you provide them as well (e.g. :load-init-file).
 
 Since executable dumping is not available in all supported implementations,
 this function behaves differently in some cases, as described below.
 
 - ECL doesn't create executables by dumping a Lisp image, but relies on having
   toplevel code to execute instead, so this macro simply expands to a call to
-  FUNCTION.
+  FUNCTION. This also means that ARGS is unused.
 - ABCL can't dump executables at all because of the underlying Java
   implementation, so this macro expands to just (PROGN) but creates a Java
   class file with a main function that creates an interpreter, loads
-  the file in which this macro call appears and calls FUNCTION."
+  the file in which this macro call appears and calls FUNCTION. This also
+  means that ARGS is unused."
   ;; #### PORTME.
   #+ecl     (declare (ignore name))
   #+allegro (declare (ignore function))
@@ -438,23 +444,26 @@ this function behaves differently in some cases, as described below.
 	       (sb-ext:save-lisp-and-die ,name
 		 :toplevel #',function
 		 :executable t
-		 :save-runtime-options t))
+		 :save-runtime-options t
+		 ,@args))
   #+cmu     `(progn
 	       (setq *executablep* t)
 	       (ext:save-lisp ,name
 		 :init-function #',function
 		 :executable t
+		 :process-command-line nil
+		 ,@args
 		 :load-init-file nil
 		 :site-init nil
-		 :print-herald nil
-		 :process-command-line nil))
+		 :print-herald nil))
   #+ccl     `(progn
 	       (setq *executablep* t)
 	       (ccl:save-application ,name
 		 :toplevel-function #',function
+		 :prepend-kernel t
+		 ,@args
 		 :init-file nil
-		 :error-handler :quit
-		 :prepend-kernel t))
+		 :error-handler :quit))
   ;; #### NOTE: ECL works differently: it needs an entry point (i.e. actual
   ;; code to execute) instead of a main function. So we expand DUMP to just
   ;; call that function.
@@ -467,6 +476,7 @@ this function behaves differently in some cases, as described below.
 	       (ext:saveinitmem ,name
 		 :init-function #',function
 		 :executable 0
+		 ,@args
 		 :quiet t
 		 :norc t)
 	       (exit))
@@ -491,12 +501,13 @@ this function behaves differently in some cases, as described below.
   #+allegro `(progn
 	       (setq *executablep* t) ; not used but here for correctness
 	       (excl:dumplisp :name (concatenate 'string ,name ".dxl")
+			      ,@args
 			      :suppress-allegro-cl-banner t)
 	       (exit))
   #+lispworks `(progn
 		 (setq *executablep* t)
 		 (lispworks:load-all-patches)
-		 (lispworks:deliver ',function ,name 0)))
+		 (lispworks:deliver ',function ,name 0 ,@args)))
 
 
 ;;; util.lisp ends here
