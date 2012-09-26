@@ -754,7 +754,9 @@ Finally, time to save the Lisp image.
 
 The first argument to @code{dump} is the name of the executable to
 produce, and the second argument is the name of the function to call
-automatically at startup.
+automatically at startup. In fact, @code{dump} also accepts a
+@code{&rest} argument that just be passed on to the underlying
+(implementation-specific) dumping facility.
 
 In order to get a standalone executable from this program, all you need
 to do now is to type @samp{CC=gcc sbcl --script quickstart.lisp}. Note
