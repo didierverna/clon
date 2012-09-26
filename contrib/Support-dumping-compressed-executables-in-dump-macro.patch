@@ -90,3 +90,18 @@ index 911caf2..9c82637 100644
 -- 
 1.7.0.4
 
+
+  Hi Jan!
+
+Thank you for the patch. What worries me a little is that DUMP was never
+really intended to be a universal wrapper around implementation-specific
+dumping facilities. Your patch is sort of opening the door to this (who
+knows how many vendor options I will need to support in the future?) and
+I fear that it may become a Rube Goldberg machine.
+
+I would rather be enclined to just change it to
+
+DUMP (NAME FUNCTION &REST <or &KEY> ARGS)
+
+so that ARGS is blindly passed to the underlying implementation. I still
+haven't made up my mind completely...
