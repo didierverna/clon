@@ -3247,6 +3247,7 @@ Antony @emph{something}@*
 Erik Huelsmann@*
 Erik Winkels@*
 François-René Rideau@*
+Jan Moringen@*
 James Wright@*
 Martin Simmons@*
 Nikodemus Siivola@*
