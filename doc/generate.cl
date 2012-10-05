@@ -1,6 +1,6 @@
 ;;; generate.cl --- Clon reference manual generation script
 
-;; Copyright (C) 2010, 2011 Didier Verna
+;; Copyright (C) 2010, 2011, 2012 Didier Verna
 
 ;; Author:        Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
@@ -121,15 +121,15 @@ and extend the library with your own option types.
 			     :info-file "clon-webreference"
 			     :introduction +introduction+
 			     :license :bsd
-			     :copyright-date "2010, 2011"
-			     :link-files nil)
+			     :copyright-date "2010, 2011, 2012")
   (com.dvlsoft.declt:declt :com.dvlsoft.clon
 			   :library-name "Clon"
 			   :texi-file "reference.texi"
 			   :info-file "clon-reference"
 			   :introduction +introduction+
 			   :license :bsd
-			   :copyright-date "2010, 2011"))
+			   :copyright-date "2010, 2011, 2012"
+			   :hyperlinks t))
 
 (sb-ext:quit)
 
