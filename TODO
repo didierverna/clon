@@ -1,6 +1,6 @@
 							-*- mode: outline -*-
 
-* Copyright (C) 2010, 2011 Didier Verna
+* Copyright (C) 2010, 2011, 2013 Didier Verna
 
 This file is part of Clon.
 
@@ -70,6 +70,8 @@ option is supposed to accept empty strings.
 * Support for dynamic default value / fallback
 computed at run-time from a lambda expression for instance. But is this
 different from supporting post-processing ?
+Cf. also current bug in clon-search-path default computation, which is done at
+compile time if defsynopsis is used as a toplevel form.
 
 * Improve advanced usage support
 Maybe we need a way to support declarative definition of a synopsis *tree* for

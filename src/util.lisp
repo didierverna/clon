@@ -1,6 +1,6 @@
 ;;; util.lisp --- General utilities
 
-;; Copyright (C) 2010, 2011, 2012 Didier Verna.
+;; Copyright (C) 2010, 2011, 2012, 2013 Didier Verna.
 
 ;; Author:     Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer: Didier Verna <didier@lrde.epita.fr>
@@ -277,9 +277,34 @@ Both instances share the same slot values."
 ;; System-related utilities
 ;; ==========================================================================
 
+;; #### FIXME: this condition could be improved by having a pathname and a
+;; better error-string message. But that needs to be done in a
+;; compiler-dependent way. We know that the error comes from TRUENAME because
+;; USER-HOMEDIR-PATHNAME cannot return nil when called without a HOST
+;; option. But the actual error object signaled by TRUENAME is not standard.
+(define-condition home-directory (warning)
+  ((error-string :initarg :error-string :accessor error-string))
+  (:report (lambda (warning stream)
+	     (format stream "cannot find home directory: ~A."
+		     (error-string warning)))))
+
+;; #### FIXME: Anyway, this function is not the place to handle the error. It
+;; should only provide a restart. There are currently two places where
+;; HOME-DIRECTORY is used. The first one is for computing the default value of
+;; the clon-search-path option, where this error is not critical. The second
+;; is in the CONVERT method for the PATH options. There, the error is
+;; critical.
 (defun home-directory ()
-  "Return user's home directory in canonical form."
-  (truename (user-homedir-pathname)))
+  "Return user's home directory in canonical form.
+If the user's home directory cannot be computed, signal a warning and return
+NIL."
+  (handler-case (truename (user-homedir-pathname))
+    (file-error (error)
+      (warn 'home-directory
+	    :error-string (with-output-to-string (stream)
+			    (let (*print-escape*)
+			      (print-object error stream))))
+      nil)))
 
 (defun macosp ()
   "Return t if running on Mac OS."

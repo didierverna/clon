@@ -1,6 +1,6 @@
 ;;; path.lisp --- Path options
 
-;; Copyright (C) 2010, 2011, 2012 Didier Verna.
+;; Copyright (C) 2010, 2011, 2012, 2013 Didier Verna.
 
 ;; Author:     Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer: Didier Verna <didier@lrde.epita.fr>
@@ -193,6 +193,9 @@ useful to specify which part of ARGUMENT is concerned when it is a list."
 			 :directory
 			 (list* :relative (cddr (pathname-directory pathname)))
 			 :defaults pathname)
+			;; #### FIXME: this will break when the home directory
+			;; cannot be found (HOME-DIRECTORY returns NIL in that
+			;; case). I need to throw a conversion error.
 			(home-directory))))
 	       pathname)))
       (ecase (path-type path)

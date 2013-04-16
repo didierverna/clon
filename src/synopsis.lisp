@@ -1,6 +1,6 @@
 ;;; synopsis.lisp --- Synopsis management
 
-;; Copyright (C) 2010, 2011, 2012 Didier Verna.
+;; Copyright (C) 2010, 2011, 2012, 2013 Didier Verna.
 
 ;; Author:     Didier Verna <didier@lrde.epita.fr>
 ;; Maintainer: Didier Verna <didier@lrde.epita.fr>
@@ -183,22 +183,30 @@ If you don't want any search path at all, use this option with no argument."
 		       ;; everything here, plus OSX specific values that I
 		       ;; know of. Not sure about Windows or anything else.
 		       :default-value
-		       (let ((local-path '("share/clon/"))
-			     (global-path '(#p"/usr/local/share/clon/"
-					    #p"/usr/share/clon/")))
+		       ;; #### FIXME: this is wrong. If defsynopsis is used as
+		       ;; a toplevel form, the fallback below will be
+		       ;; computed at compile-time although it contains things
+		       ;; that should be computed at run-time only (like the
+		       ;; user home directory).
+		       (let ((path '(#p"/usr/local/share/clon/"
+				     #p"/usr/share/clon/"))
+			     (home-directory (home-directory)))
 			 (when (macosp)
-			   (push "Library/Application Support/Clon/"
-				 local-path)
-			   (push #p"/Library/Application Support/Clon/"
-				 global-path))
-			 (push ".clon/" local-path)
-			 (append
-			  (mapcar
-			   (lambda (subdir)
-			     (merge-pathnames subdir
-					      (home-directory)))
-			   local-path)
-			  global-path))
+			   (push #p"/Library/Application Support/Clon/" path))
+			 (when home-directory
+			   (let ((local-path '("share/clon/")))
+			     (when (macosp)
+			       (push "Library/Application Support/Clon/"
+				     local-path))
+			     (push ".clon/" local-path)
+			     (setq path (append
+					 (mapcar
+					  (lambda (subdir)
+					    (merge-pathnames subdir
+							     home-directory))
+					  local-path)
+					 path))))
+			 path)
 		       :env-var "SEARCH_PATH")
 		 (path "theme"
 		       ~"Set Clon's output theme.
