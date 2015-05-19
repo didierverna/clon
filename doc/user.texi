@@ -397,7 +397,9 @@ except that this permission notice may be translated as well.
 @vskip 0pt plus 1filll
 @insertcopying
 
-@hfill Cover art by Alexis Angelidis.
+@flushright
+Cover art by Alexis Angelidis.
+@end flushright
 @end titlepage
 
 
