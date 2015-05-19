@@ -342,13 +342,16 @@ appropriate in this manual, but here's already the description for a
 couple of them (in addition to @bioption{help} that we've just
 mentioned).
 
-@table @bioption
-@item banner
+@c #### NOTE: Texinfo sucks bones. Before 5.2, I was able to use
+@c @bioption as the formatter below. Now, only built-in formatters are
+@c supported, which means that I have to duplicate the @bioption logic.
+@table @option
+@item --clon--banner
 When given this option, the application outputs a whole bunch of
 information, including the version of @clon{} it is using, and
 @clon{}-specific copyright information.
 
-@item version
+@item --clon-version
 This option makes the application output the version of @clon{} it is
 using. By default (or by using it like this: @bioption{version=long}),
 this information is provided in @emph{long} form (release number, status
@@ -358,7 +361,7 @@ get a more compact version information, and if you try
 version number. For more information on @clon{} version numbering, see
 @userref{Version Numbering}.
 
-@item lisp-information
+@item --clon-lisp-information
 Finally, this option displays some information about the underlying Lisp
 implementation that was used to create this executable.
 @end table
