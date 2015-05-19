@@ -1,9 +1,8 @@
 ;;; declt.cl --- Declt availability checking script
 
-;; Copyright (C) 2011 Didier Verna
+;; Copyright (C) 2011, 2015 Didier Verna
 
-;; Author:        Didier Verna <didier@lrde.epita.fr>
-;; Maintainer:    Didier Verna <didier@lrde.epita.fr>
+;; Author: Didier Verna <didier@didierverna.net>
 
 ;; This file is part of Clon.
 

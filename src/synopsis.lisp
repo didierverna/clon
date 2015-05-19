@@ -1,9 +1,8 @@
 ;;; synopsis.lisp --- Synopsis management
 
-;; Copyright (C) 2010, 2011, 2012, 2013 Didier Verna.
+;; Copyright (C) 2010-2013, 2015 Didier Verna
 
-;; Author:     Didier Verna <didier@lrde.epita.fr>
-;; Maintainer: Didier Verna <didier@lrde.epita.fr>
+;; Author: Didier Verna <didier@didierverna.net>
 
 ;; This file is part of Clon.
 

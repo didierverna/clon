@@ -1,9 +1,8 @@
 ;;; com.dvlsoft.clon.asd --- ASDF system definition
 
-;; Copyright (C) 2010, 2011, 2012 Didier Verna.
+;; Copyright (C) 2010-2012, 2015 Didier Verna
 
-;; Author:     Didier Verna <didier@lrde.epita.fr>
-;; Maintainer: Didier Verna <didier@lrde.epita.fr>
+;; Author: Didier Verna <didier@didierverna.net>
 
 ;; This file is part of clon.
 
@@ -220,8 +219,8 @@ The most important features of Clon are:
   across Clonified applications, including customization of the help strings
   layout (with optional ISO6429 coloring on terminals that support it),
   possibly abbreviated option calls and short/long syntax."
-  :author "Didier Verna <didier@lrde.epita.fr>"
-  :maintainer "Didier Verna <didier@lrde.epita.fr>"
+  :author "Didier Verna <didier@didierverna.net>"
+  :maintainer "Didier Verna <didier@didierverna.net>"
   :license "BSD"
   :version #.(version :short)
   :depends-on (#+sbcl :sb-posix

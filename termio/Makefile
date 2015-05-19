@@ -1,9 +1,8 @@
 ### Makefile --- termio directory
 
-## Copyright (C) 2012 Didier Verna
+## Copyright (C) 2012, 2015 Didier Verna
 
-## Author:     Didier Verna <didier@lrde.epita.fr>
-## Maintainer: Didier Verna <didier@lrde.epita.fr>
+## Author: Didier Verna <didier@didierverna.net>
 
 ## This file is part of Clon.
 

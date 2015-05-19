@@ -1,9 +1,8 @@
 ;;; context.lisp --- Context management
 
-;; Copyright (C) 2010, 2011, 2012 Didier Verna.
+;; Copyright (C) 2010-2012, 2015 Didier Verna
 
-;; Author:     Didier Verna <didier@lrde.epita.fr>
-;; Maintainer: Didier Verna <didier@lrde.epita.fr>
+;; Author: Didier Verna <didier@didierverna.net>
 
 ;; This file is part of Clon.
 
@@ -732,9 +731,9 @@ CONTEXT is where to look for the options."
   (when (getopt :context context :long-name "clon-banner")
     (format t "~A's command-line is powered by Clon,
 the Command-Line Options Nuker library, version ~A,
-written by Didier Verna <didier@lrde.epita.fr>.
+written by Didier Verna <didier@didierverna.net>.
 
-Copyright (C) 2010, 2011 Didier Verna.
+Copyright (C) 2010, 2011, 2015 Didier Verna
 Clon is released under the terms of the BSD license.
 See http://www.opensource.org/licenses/bsd-license for more information.
 Clon is provided with NO warranty; not even for MERCHANTABILITY
