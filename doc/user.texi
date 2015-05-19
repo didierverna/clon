@@ -103,6 +103,12 @@ Command-Line
 @c The following 3 macros are here to circumvent the info filenames
 @c changes, when referencing the end-user manual:
 
+@c #### NOTE: Texinfo sucks bones. Before 5.2, I could use @ifinfo
+@c anywhere. Now, it's only allowed at the beginning of a line, so I
+@c cannot effectively use it within a macro (even at the beginning of a
+@c line) if the macro in question is to be used in the middle of some
+@c text. As a consequence, I need to duplicate the macro definition code
+@c below.
 @ifinfo
 @macro pxenduserref{node}
 @pxref{\node\, , , clon-enduser, The Clon End-User Manual}
