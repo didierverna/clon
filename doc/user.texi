@@ -3250,16 +3250,16 @@ The following people have contributed bug reports or fixes, suggestions,
 compiler support or any other kind of help. You have my gratitude!
 
 @multitable @columnfractions .99
-Alessio Stalla@*
-Antony @emph{something}@*
-Erik Huelsmann@*
-Erik Winkels@*
-François-René Rideau@*
-Jan Moringen@*
-James Wright@*
-Martin Simmons@*
-Nikodemus Siivola@*
-Sam Steingold@*
+@item Alessio Stalla@*
+@item Antony @emph{something}@*
+@item Erik Huelsmann@*
+@item Erik Winkels@*
+@item François-René Rideau@*
+@item Jan Moringen@*
+@item James Wright@*
+@item Martin Simmons@*
+@item Nikodemus Siivola@*
+@item Sam Steingold@*
 @end multitable
 
 
