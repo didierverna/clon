@@ -54,23 +54,27 @@ Common-Lisp
 @i{etc.}
 @end macro
 
+@ifinfo
 @macro pxenduserref{node}
-@ifinfo
 @pxref{\\node\\, , , clon-enduser, The Clon End-User Manual}
+@end macro
 @end ifinfo
 @ifnotinfo
+@macro pxenduserref{node}
 @pxref{\\node\\, , , enduser, The Clon End-User Manual}
-@end ifnotinfo
 @end macro
+@end ifnotinfo
 
-@macro pxuserref{node}
 @ifinfo
+@macro pxuserref{node}
 @pxref{\\node\\, , , clon-user, The Clon User Manual}
+@end macro
 @end ifinfo
 @ifnotinfo
+@macro pxuserref{node}
 @pxref{\\node\\, , , user, The Clon User Manual}
-@end ifnotinfo
 @end macro
+@end ifnotinfo
 
 @clon{} is a library for managing @cmdline{} options in standalone @cl{}
 applications. It provides a unified option syntax with both short and
