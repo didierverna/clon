@@ -99,32 +99,38 @@ Command-Line
 @c The following 3 macros are here to circumvent the info filenames
 @c changes, when referencing the user manual:
 
+@ifinfo
 @macro pxuserref{node}
-@ifinfo
 @pxref{\node\, , , clon-user, The Clon User Manual}
+@end macro
 @end ifinfo
 @ifnotinfo
+@macro pxuserref{node}
 @pxref{\node\, , , user, The Clon User Manual}
-@end ifnotinfo
 @end macro
+@end ifnotinfo
 
+@ifinfo
 @macro xuserref{node}
-@ifinfo
 @xref{\node\, , , clon-user, The Clon User Manual}
+@end macro
 @end ifinfo
 @ifnotinfo
+@macro xuserref{node}
 @xref{\node\, , , user, The Clon User Manual}
-@end ifnotinfo
 @end macro
+@end ifnotinfo
 
-@macro userref{node}
 @ifinfo
+@macro userref{node}
 @ref{\node\, , , clon-user, The Clon User Manual}
+@end macro
 @end ifinfo
 @ifnotinfo
+@macro userref{node}
 @ref{\node\, , , user, The Clon User Manual}
-@end ifnotinfo
 @end macro
+@end ifnotinfo
 
 
 @c ---------------
