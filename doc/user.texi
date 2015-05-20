@@ -1211,7 +1211,7 @@ And once the macro is expanded, it will look like this:
 
 As you can see, every synopsis element has a corresponding
 @code{make-@var{SOMETHING}} constructor, and the keywords used here and
-there in @code{defsyopsis} are in fact initargs to those constructors.
+there in @code{defsynopsis} are in fact initargs to those constructors.
 We now examine those constructors in greater detail.
 
 @cindex Options, creation
@@ -1297,7 +1297,7 @@ texts, options and groups locally, in files, modules or ASDF components
 where they belong. In such a case, you need to keep references to the
 corresponding objects in order to compute the synopsis in the end.
 @item
-Since using constructors explicitely allows you to keep references to
+Since using constructors explicitly allows you to keep references to
 the created objects, these objects can be @emph{reused}. For instance,
 you can use the same text at different places, you can also use a single
 option several times, or even a single group several times so that its
@@ -1658,8 +1658,9 @@ By default, @code{help} prints the whole application help string,
 excluding hidden items. However, if you have kept a reference to any
 synopsis item (option, text, group), you can pass it as the value of the
 @code{:item} key, and @clon{} will only print the help string for that
-particular item. In this case however, the hidden state of the item is
-discarded (but @emph{not} the ones of sub-items).
+particular item. In this case however, it will be displayed even if was
+declared as hidden (this exception does not extend to its sub-items, though,
+and they will @emph{not} be displayed if themselves declared hidden).
 
 @bioindex{help}
 @cindex Built-In Groups
