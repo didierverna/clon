@@ -26,7 +26,7 @@
 
 ;;; Code:
 
-(require :asdf)
+(require "asdf")
 
 (defconstant +introduction+
   "@macro clon

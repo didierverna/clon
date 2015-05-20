@@ -26,7 +26,7 @@
 
 ;;; Code:
 
-(require :asdf)
+(require "asdf")
 
 (with-open-file (stream "declt.inc" :direction :output :if-exists :supersede)
   (princ "TEXI_REF :=" stream)

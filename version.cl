@@ -28,7 +28,7 @@
 
 (in-package :cl-user)
 
-(require :asdf)
+(require "asdf")
 
 (asdf:load-system :com.dvlsoft.clon)
 (com.dvlsoft.clon:nickname-package)

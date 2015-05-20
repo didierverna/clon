@@ -42,7 +42,7 @@
 
 (setq *load-verbose* nil)
 
-(require :asdf
+(require "asdf"
 	 ;; #### PORTME.
 	 #-(or sbcl cmu ccl ecl allegro
 	       (and lispworks (not lispworks-personal-edition)))
