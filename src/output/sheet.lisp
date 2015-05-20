@@ -515,7 +515,7 @@ than the currently available right margin."
     (push-frame sheet
 		(if (highlightp sheet)
 		    (let ((highlight-property-instances
-			    (loop :for property :in +highlight-properties+
+			    (loop :for property :in *highlight-properties*
 				  :when (face-highlight-property-set-p
 					 sface property)
 				    :collect (make-highlight-property-instance

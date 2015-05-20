@@ -69,23 +69,19 @@ See section A.1 of the user manual for more information.")
 
 ;; Versionning
 
-(defmacro define-constant (name value &optional doc)
-  `(defconstant ,name (if (boundp ',name) (symbol-value ',name) ,value)
-     ,@(when doc (list doc))))
-
-(defconstant +release-major-level+ 1
+(defparameter *release-major-level* 1
   "The major level of this release.")
 
-(defconstant +release-minor-level+ 0
+(defparameter *release-minor-level* 0
   "The minor level of this release.")
 
-(defconstant +release-status+ :beta
+(defparameter *release-status* :beta
   "The status of this release.")
 
-(defconstant +release-status-level+ 23
+(defparameter *release-status-level* 23
   "The status level of this release.")
 
-(define-constant +release-name+ "Michael Brecker"
+(defparameter *release-name* "Michael Brecker"
   "The name of this release.")
 
 ;; #### TODO: I'm sure the format strings can be improved
@@ -149,9 +145,9 @@ in the output, so that 1.3.0 appears as just 1.3.
 A long version is something like
 1.3 {alpha,beta,release candidate,patchlevel} 4 \"Michael Brecker\". As for
 the short version, a patchlevel of 0 is ignored in the output."
-  (%version type +release-major-level+ +release-minor-level+
-	    +release-status+ +release-status-level+
-	    +release-name+))
+  (%version type *release-major-level* *release-minor-level*
+	    *release-status* *release-status-level*
+	    *release-name*))
 
 
 ;; -------------------

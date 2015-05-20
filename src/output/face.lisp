@@ -145,7 +145,7 @@ This property can take the following forms:
 ;; The Face Property Access Protocol
 ;; =========================================================================
 
-(define-constant +highlight-properties+
+(defparameter *highlight-properties*
     '(intensity italicp underline blink inversep concealedp crossed-out-p
       framedp foreground background)
   "The highlight face properties.")
@@ -155,7 +155,7 @@ This property can take the following forms:
 If FACE has no parent, return nil.
 For other properties, trigger an error."
   #+(or ccl ecl clisp allegro) (declare (ignore class))
-  (let ((property (member slot +highlight-properties+)))
+  (let ((property (member slot *highlight-properties*)))
     (if property
 	(when (parent face)
 	  (slot-value (parent face) slot))

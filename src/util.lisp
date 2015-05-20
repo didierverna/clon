@@ -399,7 +399,7 @@ implementation. See appendix A.5 of the user manual for more information."
   #+lispworks (setf (hcl:getenv variable) value))
 
 #+abcl
-(defconstant +abcl-main-class-template+
+(defparameter *abcl-main-class-template*
   "import org.armedbear.lisp.*;
 
 public class ~A
@@ -515,7 +515,7 @@ this function behaves differently in some cases, as described below.
 		       (make-pathname :name class-name :type "java")
 		       source-pathname)
 		      :direction :output :if-exists :supersede)
-		   (format t +abcl-main-class-template+
+		   (format t *abcl-main-class-template*
 		     class-name name (namestring source-pathname)))
 		 '(progn))
 	     `(progn

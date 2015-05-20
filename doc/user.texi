@@ -2530,31 +2530,31 @@ returned value is a fixnum. Otherwise, it is a string.
 A @clon{} version is characterized by 4 elements as described below.
 @itemize
 @item
-@vindex +release-major-level+
-A major version number stored in the constant
-@code{+release-major-level+}.
+@vindex *release-major-level*
+A major version number stored in the parameter
+@code{*release-major-level*}.
 @item
-@vindex +release-minor-level+
-A minor version number, stored in the constant
-@code{+release-minor-level+}.
+@vindex *release-minor-level*
+A minor version number, stored in the parameter
+@code{*release-minor-level*}.
 @item
-@vindex +release-status+
-A release status stored in the constant @code{+release-status+}. The
+@vindex *release-status*
+A release status stored in the parameter @code{*release-status*}. The
 status of a release can be @code{:alpha}, @code{:beta}, @code{:rc}
 (standing for ``release candidate'') or @code{:patchlevel}. These are in
 effect 4 levels of expected stability.
 @item
-@vindex +release-status-level+
-A status-specific version number stored in the constant
-@code{+release-status-level+}. Status levels start at 1 (alpha 1, beta 1
+@vindex *release-status-level*
+A status-specific version number stored in the parameter
+@code{*release-status-level*}. Status levels start at 1 (alpha 1, beta 1
 and release candidate 1) except for stable versions, in which case patch
 levels start at 0 (@eg{} 2.4.0).
 @end itemize
 
-@vindex +release-name+
+@vindex *release-name*
 In addition to that, each version of @clon{} (in the sense
 @emph{major.minor}, regardless of the status) has a name, stored in the
-constant @code{+release-name+}. The general theme for @clon{} is ``Great
+parameter @code{*release-name*}. The general theme for @clon{} is ``Great
 Jazz Musicians'', and specifically for the 1.x series: ``Great Saxophone
 Players''. Anyone daring to mention Kenny G at that point will be shot
 on sight.
@@ -3185,11 +3185,11 @@ Strings}.
 @xref{Version Numbering}.
 @end defun
 
-@defvr Constant +release-major-level+
-@defvrx Constant +release-minor-level+
-@defvrx Constant +release-status+
-@defvrx Constant +release-status-level+
-@defvrx Constant +release-name+
+@defvr Parameter *release-major-level*
+@defvrx Parameter *release-minor-level*
+@defvrx Parameter *release-status*
+@defvrx Parameter *release-status-level*
+@defvrx Parameter *release-name*
 @xref{Version Numbering}.
 @end defvr
 

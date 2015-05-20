@@ -44,20 +44,19 @@
 		:class-slots :slot-definition-name :validate-superclass)
   (:import-from :com.dvlsoft.clon.asdf
     :configuration
-    :define-constant
-    :+release-major-level+
-    :+release-minor-level+
-    :+release-status+
-    :+release-status-level+
-    :+release-name+
+    :*release-major-level*
+    :*release-minor-level*
+    :*release-status*
+    :*release-status-level*
+    :*release-name*
     :version)
   (:export
     ;; From com.dvlsoft.clon.asd:
-    :+release-major-level+
-    :+release-minor-level+
-    :+release-status+
-    :+release-status-level+
-    :+release-name+
+    :*release-major-level*
+    :*release-minor-level*
+    :*release-status*
+    :*release-status-level*
+    :*release-name*
     :version
     ;; From package.lisp:
     :nickname-package
