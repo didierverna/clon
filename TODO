@@ -146,7 +146,7 @@ I'm quite proud of this idea ;-) Joe uses program for the first time, so he
 types "program --gui-help" and gets a GUI with all available options, their
 help strings as bubbles, the possibility to select them, provide values etc. 
 He plays around and then clicks "Go", and the program continues with with the
-appropriate command-line (you can already have different contexts in CLon). 
+appropriate command-line (you can already have different contexts in Clon). 
 Cool hey ?
 
 * Provide a negated long form as well ?
