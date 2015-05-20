@@ -113,7 +113,7 @@ and extend the library with your own option types.
 @end itemize"
   "The reference manual's introductory text.")
 
-(asdf:operate 'asdf:load-op :com.dvlsoft.declt)
+(asdf:load-system :com.dvlsoft.declt)
 
 (if (and (second sb-ext:*posix-argv*)
 	 (string= (second sb-ext:*posix-argv*) "--web"))
@@ -134,7 +134,7 @@ and extend the library with your own option types.
 			   :copyright-date "2010-2012, 2015"
 			   :hyperlinks t))
 
-(sb-ext:quit)
+(uiop:quit)
 
 
 ;;; generate.cl ends here

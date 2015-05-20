@@ -26,10 +26,12 @@
 
 ;;; Code:
 
+(require :asdf)
+
 (with-open-file (stream "declt.inc" :direction :output :if-exists :supersede)
   (princ "TEXI_REF :=" stream)
   (handler-case
-      (progn (asdf:operate 'asdf:load-op :com.dvlsoft.declt)
+      (progn (asdf:load-system :com.dvlsoft.declt)
 	     (princ " reference.texi" stream))
   (asdf:missing-component ()
     (format *error-output* "~
@@ -39,7 +41,7 @@
 *********************************************************************")))
   (terpri stream))
 
-(sb-ext:quit)
+(uiop:quit)
 
 
 ;;; declt.cl ends here
