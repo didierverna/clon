@@ -83,6 +83,13 @@ See section A.1 of the user manual for more information.")
 (defparameter *release-name* "Michael Brecker"
   "The name of this release.")
 
+(defun release-status-number (release-status)
+  (ecase release-status
+    (:alpha 0)
+    (:beta 1)
+    (:rc 2)
+    (:patchlevel 3)))
+
 ;; #### TODO: I'm sure the format strings can be improved
 (defun %version (type major minor status level name)
   (ecase type
@@ -102,11 +109,7 @@ See section A.1 of the user manual for more information.")
 		 ~]"
        major
        minor
-       (ecase status
-	 (:alpha 0)
-	 (:beta 1)
-	 (:rc 2)
-	 (:patchlevel 3))
+       (release-status-number status)
        (zerop level)
        level))
     (:long
@@ -120,11 +123,7 @@ See section A.1 of the user manual for more information.")
 		 ~S"
        major
        minor
-       (ecase status
-	 (:alpha 0)
-	 (:beta 1)
-	 (:rc 2)
-	 (:patchlevel 3))
+       (release-status-number status)
        (zerop level)
        level
        name))))
