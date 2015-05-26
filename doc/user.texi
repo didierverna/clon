@@ -643,7 +643,7 @@ package, also named @samp{com.dvlsoft.clon}.
 @verbatim
 (in-package :cl-user)
 
-(require ":asdf")
+(require "asdf")
 (asdf:load-system :com.dvlsoft.clon)
 (use-package :com.dvlsoft.clon)
 @end verbatim
