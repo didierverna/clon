@@ -606,9 +606,9 @@ called @file{simple} in the distribution.
   (text :contents "A very short program.")
   (group (:header "Immediate exit options:")
     (flag :short-name "h" :long-name "help"
-      :description "Print this help and exit.")
+          :description "Print this help and exit.")
     (flag :short-name "v" :long-name "version"
-	  :description "Print version number and exit.")))
+          :description "Print version number and exit.")))
 
 (defun main ()
   "Entry point for our standalone application."
@@ -682,9 +682,9 @@ string. The structure of your @cmdline{} is known to @clon{} as the
   (text :contents "A very short program.")
   (group (:header "Immediate exit options:")
     (flag :short-name "h" :long-name "help"
-      :description "Print this help and exit.")
+          :description "Print this help and exit.")
     (flag :short-name "v" :long-name "version"
-	  :description "Print version number and exit.")))
+          :description "Print version number and exit.")))
 @end verbatim
 @end cartouche
 
@@ -838,9 +838,9 @@ Look again at the synopsis definition provided in @ref{Quick Start}.
   (text :contents "A very short program.")
   (group (:header "Immediate exit options:")
     (flag :short-name "h" :long-name "help"
-	  :description "Print this help and exit.")
+          :description "Print this help and exit.")
     (flag :short-name "v" :long-name "version"
-	  :description "Print version number and exit.")))
+          :description "Print version number and exit.")))
 @end verbatim
 @end cartouche
 
@@ -1182,9 +1182,9 @@ The original code is like this:
   (text :contents "A very short program.")
   (group (:header "Immediate exit options:")
     (flag :short-name "h" :long-name "help"
-	  :description "Print this help and exit.")
+          :description "Print this help and exit.")
     (flag :short-name "v" :long-name "version"
-	  :description "Print version number and exit.")))
+          :description "Print version number and exit.")))
 @end verbatim
 @end cartouche
 
@@ -1859,15 +1859,15 @@ if it is okay, and raise an @code{invalid-value} error otherwise.
 @verbatim
 (define-condition invalid-value (option-error)
   ((value :documentation "The invalid value."
-	  :initarg :value
-	  :reader value)
+          :initarg :value
+          :reader value)
    (comment :documentation "An additional comment about the error."
-	    :type string
-	    :initarg :comment
-	    :reader comment))
+            :type string
+            :initarg :comment
+            :reader comment))
   (:report (lambda (error stream)
-	     (format stream "Option ~A: invalid value ~S.~@[~%~A~]"
-	       (option error) (value error) (comment error))))
+             (format stream "Option ~A: invalid value ~S.~@[~%~A~]"
+               (option error) (value error) (comment error))))
   (:documentation "An invalid value error."))
 @end verbatim
 @end cartouche
@@ -1894,10 +1894,10 @@ Let's look at the enumeration example now.
   "Check that VALUE is a valid ENUM."
   (unless (member value (enum enum))
     (error 'invalid-value
-	   :option enum
-	   :value value
-	   :comment (format nil "Valid values are: ~A."
-		      (list-to-string (enum enum)
+           :option enum
+           :value value
+           :comment (format nil "Valid values are: ~A."
+                      (list-to-string (enum enum)
                                       :key #'prin1-to-string))))
   value)
 @end verbatim
@@ -1942,16 +1942,16 @@ The @code{invalid-argument} error condition is defined like this:
 @verbatim
 (define-condition invalid-argument (option-error)
   ((argument :documentation "The invalid argument."
-	     :type string
-	     :initarg :argument
-	     :reader argument)
+             :type string
+             :initarg :argument
+             :reader argument)
    (comment :documentation "An additional comment about the error."
-	    :type string
-	    :initarg :comment
-	    :reader comment))
+            :type string
+            :initarg :comment
+            :reader comment))
   (:report (lambda (error stream)
-	     (format stream "Option ~A: invalid argument ~S.~@[~%~A~]"
-	       (option error) (argument error) (comment error))))
+             (format stream "Option ~A: invalid argument ~S.~@[~%~A~]"
+               (option error) (argument error) (comment error))))
   (:documentation "An invalid argument error."))
 @end verbatim
 @end cartouche
@@ -1979,12 +1979,12 @@ Let's look at the enumeration example now.
   "Convert ARGUMENT to an ENUM value."
   (or (closest-match argument (enum enum) :ignore-case t :key #'symbol-name)
       (error 'invalid-argument
-	     :option enum
-	     :argument argument
-	     :comment (format nil "Valid arguments are: ~A."
-			(list-to-string (enum enum)
-					:key (lambda (value)
-					       (stringify enum value)))))))
+             :option enum
+             :argument argument
+             :comment (format nil "Valid arguments are: ~A."
+                        (list-to-string (enum enum)
+                                        :key (lambda (value)
+                                               (stringify enum value)))))))
 
 @end verbatim
 @end cartouche
@@ -2120,10 +2120,10 @@ Let's look at the enumeration example now.
 @cartouche
 @verbatim
 (defun make-enum (&rest keys
-		  &key short-name long-name description
-		       argument-name argument-type
-		       enum env-var fallback-value default-value
-		       hidden)
+                  &key short-name long-name description
+                       argument-name argument-type
+                       enum env-var fallback-value default-value
+                       hidden)
   "Make a new enum option.
 - SHORT-NAME is the option's short name (without the dash).
   It defaults to nil.
@@ -2143,8 +2143,8 @@ Let's look at the enumeration example now.
 - DEFAULT-VALUE is the option's default value, if any.
 - When HIDDEN, the option doesn't appear in help strings."
   (declare (ignore short-name long-name description
-		  argument-name argument-type
-		  enum env-var fallback-value default-value
+                  argument-name argument-type
+                  enum env-var fallback-value default-value
                   hidden))
   (apply #'make-instance 'enum keys))
 @end verbatim
