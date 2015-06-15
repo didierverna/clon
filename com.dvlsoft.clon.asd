@@ -199,19 +199,19 @@ the short version, a patchlevel of 0 is ignored in the output."
 ;; -----------------
 
 (asdf:defsystem :com.dvlsoft.clon
-  :description "The Command-Line Options Nuker."
+  :description "The Command-Line Options Nuker"
   :long-description "Clon is a library for command-line option management.
 It is intended to ease the creation of standalone Common Lisp applications by
 providing a powerful and uniform command-line option interface.
-The most important features of Clon are:
+The most important features of Clon are the following.
 - [from the programmer's point of view] Centralized command-line options
   specification and management, including automatic generation of help
   strings, conversion from command-line / environment strings to
   application-level option values, global or on-demand option retrieval, and
   extensibility (the programmer can define his own option types).
 - [from the end-user's point of view] Uniform command-line option syntax
-  across Clonified applications, including customization of the help strings
-  layout (with optional ISO6429 coloring on terminals that support it),
+  across Clon applications, customization of the help strings layout
+  (with optional ISO6429 coloring on terminals that support it),
   possibly abbreviated option calls and short/long syntax."
   :author "Didier Verna <didier@didierverna.net>"
   :maintainer "Didier Verna <didier@didierverna.net>"
