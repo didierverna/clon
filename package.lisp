@@ -30,7 +30,7 @@
 
 (defpackage :com.dvlsoft.clon
   (:documentation "The Command-Line Options Nuker package.")
-  (:use :cl)
+  (:use :cl :com.dvlsoft.clon.configuration)
   (:shadow :*readtable*)
   ;; #### PORTME.
   (:import-from #+sbcl      :sb-mop
@@ -42,16 +42,8 @@
 		#+allegro   :mop
 		#+lispworks :clos
 		:class-slots :slot-definition-name :validate-superclass)
-  (:import-from :com.dvlsoft.clon.asdf
-    :configuration
-    :*release-major-level*
-    :*release-minor-level*
-    :*release-status*
-    :*release-status-level*
-    :*release-name*
-    :version)
   (:export
-    ;; From com.dvlsoft.clon.asd:
+    ;; From com.dvlsoft.clon.configuration.asd:
     :*release-major-level*
     :*release-minor-level*
     :*release-status*
