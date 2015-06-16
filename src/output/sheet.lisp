@@ -94,6 +94,11 @@ If REVERSE, map in reverse order."
 ;; ISO/IEC 6429 SGR handling
 ;; -------------------------
 
+(defstruct highlight-property-instance
+  "The HIGHLIGHT-PROPERTY-INSTANCE structure."
+  name
+  value)
+
 (defmacro highlight-property-ecase (property value &body clauses)
   "Create an ECASE form to extract PROPERTY's VALUE escape sequence.
 Each clause looks like: (PROPERTY-NAME (VALUE-OR-VALUE-LIST ESCAPE-SEQUENCE)*).
@@ -212,11 +217,6 @@ This structure hold layout properties used for printing."
   sface
   left-margin
   right-margin)
-
-(defstruct highlight-property-instance
-  "The HIGHLIGHT-PROEPRTY-INSTANCE structure."
-  name
-  value)
 
 (defstruct (highlight-frame (:include frame))
   "The HIGHLIGHT-FRAME structure.
