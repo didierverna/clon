@@ -1,4 +1,4 @@
-;;; package.lisp --- Common Lisp Package definition
+;;; meta.lisp --- Meta utilities
 
 ;; Copyright (C) 2010-2012, 2015 Didier Verna
 
@@ -28,6 +28,11 @@
 
 (in-package :cl-user)
 
+
+;; -------------------
+;; Package definition:
+;; -------------------
+
 (defpackage :com.dvlsoft.clon
   (:documentation "The Command-Line Options Nuker package.")
   (:use :cl :com.dvlsoft.clon.configuration)
@@ -43,14 +48,14 @@
 		#+lispworks :clos
 		:class-slots :slot-definition-name :validate-superclass)
   (:export
-    ;; From com.dvlsoft.clon.configuration.asd:
+    ;; From the :com.dvlsoft.clon.configuration package:
     :*release-major-level*
     :*release-minor-level*
     :*release-status*
     :*release-status-level*
     :*release-name*
     :version
-    ;; From package.lisp:
+    ;; From meta.lisp (this file):
     :nickname-package
     ;; From src/util.lisp:
     :exit

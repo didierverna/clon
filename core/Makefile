@@ -1,10 +1,10 @@
-### Makefile --- Source directory
+### Makefile --- Core library
 
-## Copyright (C) 2010, 2011, 2015 Didier Verna
+## Copyright (C) 2010-2012, 2015 Didier Verna
 
 ## Author: Didier Verna <didier@didierverna.net>
 
-## This file is part of Clon.
+## This file is part of Clon
 
 ## Permission to use, copy, modify, and distribute this software for any
 ## purpose with or without fee is hereby granted, provided that the above
@@ -23,6 +23,8 @@
 
 ## Contents management by FCM version 0.1.
 
+## Please use GNU Make with this makefile.
+
 
 ### Code:
 
@@ -35,20 +37,31 @@ hack: all
 include $(TOP_DIR)/Makefile.inc
 
 
+SUBDIRS   := src
+
 all:
+	$(MAKE) gen TARGET=all
 
 clean:
 	-rm *~
+	$(MAKE) gen TARGET=clean
 
 distclean: clean
-	-rm -fr $($(LISP)_BINLOC)-*	\
-		*/$($(LISP)_BINLOC)-*	\
-		*/*/$($(LISP)_BINLOC)-*
+	$(MAKE) gen TARGET=distclean
+	-rm -fr $($(LISP)_BINLOC)-*
+
 install:
 uninstall:
-install-www:
 
-.PHONY: hack all clean distclean install uninstall install-www
+gen:
+	@for i in $(SUBDIRS) ; do                 \
+	   echo "making $(TARGET) in $${i} ..." ; \
+	   ( cd $${i} && $(MAKE) $(TARGET) ) ;    \
+	 done
 
+.DEFAULT:
+	$(MAKE) gen TARGET=$@
+
+.PHONY: hack all clean distclean install uninstall gen
 
 ### Makefile ends here

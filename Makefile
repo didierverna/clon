@@ -41,7 +41,7 @@ endif
 include $(TOP_DIR)/version.inc
 
 
-SUBDIRS   := termio src share doc demos
+SUBDIRS   := termio core share doc demos
 DIST_NAME := $(PROJECT)-$(SHORT_VERSION)
 TARBALL   := $(DIST_NAME).tar.gz
 SIGNATURE := $(TARBALL).asc

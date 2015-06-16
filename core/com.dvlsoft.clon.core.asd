@@ -40,7 +40,7 @@ For a more complete description of Clon, see the com.dvlsoft.clon system."
   :depends-on (:com.dvlsoft.clon.configuration
 	       (:feature :sbcl (:require :sb-posix)))
   :serial t
-  :components ((:file "package")
+  :components ((:file "meta")
 	       (:module "src"
 		:components ((:file "util")
 			     (:file "item" :depends-on ("util"))
