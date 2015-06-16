@@ -29,7 +29,7 @@
 (asdf:load-system :com.dvlsoft.clon.configuration)
 
 (asdf:defsystem :com.dvlsoft.clon.core
-  :description "The Command-Line Options Nuker, termio feature"
+  :description "The Command-Line Options Nuker, core library"
   :long-description "Clon is a library for command-line option management.
 The core library provides the platform/feature independent part.
 For a more complete description of Clon, see the com.dvlsoft.clon system."
