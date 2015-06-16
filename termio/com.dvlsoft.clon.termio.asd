@@ -48,7 +48,6 @@ For a more complete description of Clon, see the com.dvlsoft.clon system."
   :depends-on ((:feature :sbcl :sb-posix)
 	       (:feature (:and :clisp :com.dvlsoft.clon.termio) :cffi)
 	       :com.dvlsoft.clon.core)
-  :pathname "termio"
   :serial t
   :components (;; bug in ASDF 3.1.4: cannot deal with conditionally defined
 	       ;; component class!
