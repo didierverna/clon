@@ -87,6 +87,7 @@ LW_LOAD   := -load
 LW_EVAL   := -eval
 LW_DUMP   := -init - -siteinit - $(LW_LOAD)
 
+BINLOC := $($(LISP)_BINLOC)
 
 ifeq ($(RESTRICTED),t)
 CONFIG := '(progn (defvar cl-user::$(PACKAGE).configuration nil) \
