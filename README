@@ -1,4 +1,4 @@
-                                                             -*- outline -*-
+							     -*- outline -*-
 
 * Copyright (C) 2010, 2011, 2015 Didier Verna
 
@@ -31,7 +31,7 @@ Lisp compilers can generate very efficient code today, makes the perspective
 of standalone Common Lisp applications very tempting again.
 
 When it comes to preserving interaction with the user, one of the key
-components in a standalone application is the handling of the command-line. 
+components in a standalone application is the handling of the command-line.
 Clon is a library designed to do just that.
 
 
@@ -42,13 +42,13 @@ conception is that it has been designed with both the application developer
 and the application user in mind: many aspects of the command-line management
 usually imposed by the program are in fact under the control of the
 application user. The idea is that all Clon-enabled applications behave in a
-uniform way, and that it is the user who gets to decide, not the developper. 
+uniform way, and that it is the user who gets to decide, not the developper.
 The most important features of Clon are listed below.
 
 ** Command-Line Syntax
 Clon imposes a particular yet flexible syntax for the command-line. Options
 have short and/or long names, beginning with either one or two dashes. Options
-may take an argument. In that case, the argument may be optional or mandatory. 
+may take an argument. In that case, the argument may be optional or mandatory.
 Option names may be abbreviated and one-character options may be grouped
 together in a single call. There is an additional call syntax for Boolean or
 Boolean-based options. Finally, the command-line may have a "postfix", that
@@ -102,5 +102,4 @@ under the control of the application user, via the notion of "theme". Clon
 comes with a set of predefined themes (for instance, standard, with heavy
 fontification, refcard for quick reference etc.) and application users can
 define their own. As a matter of fact, a theme not only controls the format
-and highlight of the help string, but also its contents. 
-
+and highlight of the help string, but also its contents.
