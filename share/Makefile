@@ -32,7 +32,7 @@ include $(TOP_DIR)/Makefile.cnf
 
 hack: all
 
-include $(TOP_DIR)/Makefile.inc
+include $(TOP_DIR)/make/include.make
 
 
 PROJECT_SHARE := $(SHARE)/$(PROJECT)

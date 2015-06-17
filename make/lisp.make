@@ -33,7 +33,7 @@ include local.inc
 
 include $(TOP_DIR)/Makefile.cnf
 hack: all
-include $(TOP_DIR)/Makefile.inc
+include $(TOP_DIR)/make/include.make
 
 all:
 

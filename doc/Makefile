@@ -32,7 +32,7 @@ include $(TOP_DIR)/Makefile.cnf
 
 hack: all
 
-include $(TOP_DIR)/Makefile.inc
+include $(TOP_DIR)/make/include.make
 ifeq ($(LISP),CLISP)
   include $(TOP_DIR)/clisp.inc
 endif
@@ -42,7 +42,7 @@ ifneq ($(SBCL_PATH),)
 endif
 
 INFO_DIR        := $(PREFIX)/share/info
-DOC_DIR	        := $(SHARE)/doc
+DOC_DIR		:= $(SHARE)/doc
 PROJECT_DOC_DIR := $(DOC_DIR)/$(PROJECT)
 TEXI_FILES      := user.texi enduser.texi $(TEXI_REF)
 

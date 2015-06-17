@@ -1,4 +1,4 @@
-### Makefile.inc --- Inclusion part
+### include.make --- Inclusion part
 
 ## Copyright (C) 2010-2012, 2015 Didier Verna
 
@@ -125,4 +125,4 @@ endif
 
 
 
-### Makefile.inc ends here
+### include.make ends here
