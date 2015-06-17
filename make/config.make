@@ -1,4 +1,4 @@
-### Makefile.cnf --- User level configuration
+### config.make --- Configuration part
 
 ## Copyright (C) 2010-2012, 2015 Didier Verna
 
@@ -81,4 +81,4 @@ DVIPS    = dvips
 CONVERT  = convert
 
 
-### Makefile.cnf ends here
+### config.make ends here

@@ -30,7 +30,7 @@
 
 TOP_DIR := .
 
-include $(TOP_DIR)/Makefile.cnf
+include $(TOP_DIR)/make/config.make
 
 hack: all
 

@@ -28,7 +28,7 @@
 
 TOP_DIR := ..
 
-include $(TOP_DIR)/Makefile.cnf
+include $(TOP_DIR)/make/config.make
 
 hack: all
 
@@ -168,7 +168,7 @@ install-www: webref
 	install -d -m 755 "$(W3DIR)/reference"
 	install -m 644 webreference/* "$(W3DIR)/reference/"
 
-declt.inc: $(TOP_DIR)/Makefile.cnf
+declt.inc: $(TOP_DIR)/make/config.make
 	$(SBCL_PATH) $(SBCL_LOAD) ./declt.cl
 
 .PHONY: all webref all-formats		\

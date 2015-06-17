@@ -31,7 +31,7 @@
 # Should contain at least TOP_DIR and SUBDIRS settings
 include local.inc
 
-include $(TOP_DIR)/Makefile.cnf
+include $(TOP_DIR)/make/config.make
 hack: all
 include $(TOP_DIR)/make/include.make
 
