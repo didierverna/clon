@@ -18,7 +18,7 @@ demos/Advanced*
 sbcl/foo.c
 sbcl/constants.lisp-temp
 
-doc/declt.inc
+doc/declt.make
 
 doc/splash.eps
 
