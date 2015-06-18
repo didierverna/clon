@@ -44,9 +44,12 @@
 
 (require "asdf"
 	 ;; #### PORTME.
+	 ;; #### NOTE: the trickery below (which works for me) is because I've
+	 ;; told the various Lisps to not load user init files for compiling
+	 ;; the demo programs.
 	 #-(or sbcl cmu ccl ecl allegro
 	       (and lispworks (not lispworks-personal-edition)))
-	 '(#p"/usr/local/share/common-lisp/source/asdf/asdf.lisp"))
+	 '(#p"/usr/local/share/common-lisp/source/asdf/build/asdf.lisp"))
 
 (asdf:load-system :com.dvlsoft.clon :verbose nil)
 
