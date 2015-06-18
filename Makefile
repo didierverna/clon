@@ -28,7 +28,8 @@
 
 ### Code:
 
-TOP_DIR := . # needed in include.make
+# Needed in include.make
+TOP_DIR := .
 
 include make/config.make
 hack: all
