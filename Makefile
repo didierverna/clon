@@ -28,17 +28,13 @@
 
 ### Code:
 
-TOP_DIR := .
-
-include $(TOP_DIR)/make/config.make
-
+include make/config.make
 hack: all
-
-include $(TOP_DIR)/make/include.make
+include make/include.make
 ifeq ($(LISP),CLISP)
-  include $(TOP_DIR)/clisp.inc
+  include clisp.inc
 endif
-include $(TOP_DIR)/version.inc
+include version.inc
 
 
 SUBDIRS   := config core termio demos share doc
