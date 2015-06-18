@@ -27,11 +27,8 @@
 ### Code:
 
 TOP_DIR := ..
-
 include $(TOP_DIR)/make/config.make
-
 hack: all
-
 include $(TOP_DIR)/make/include.make
 ifeq ($(LISP),CLISP)
   include $(TOP_DIR)/make/clisp.make
@@ -54,6 +51,7 @@ PS_FILES       := $(TEXI_FILES:%.texi=%.ps)
 HTML_DIRS      := $(TEXI_FILES:%.texi=%)
 
 INFO_REF       := $(PROJECT)-reference.info
+
 
 all: info pdf html
 

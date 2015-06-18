@@ -29,14 +29,12 @@
 TOP_DIR := ..
 
 include $(TOP_DIR)/make/config.make
-
 hack: all
-
 include $(TOP_DIR)/make/include.make
-
 
 PROJECT_SHARE := $(SHARE)/$(PROJECT)
 THEMES_DIR    := $(PROJECT_SHARE)/themes
+
 
 all:
 

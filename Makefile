@@ -39,11 +39,11 @@ ifeq ($(LISP),CLISP)
 endif
 include .version
 
-
 SUBDIRS   := config core termio demos share doc
 DIST_NAME := $(PROJECT)-$(SHORT_VERSION)
 TARBALL   := $(DIST_NAME).tar.gz
 SIGNATURE := $(TARBALL).asc
+
 
 all:
 	$(MAKE) gen TARGET=all
