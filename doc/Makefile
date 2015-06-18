@@ -36,10 +36,10 @@ include $(TOP_DIR)/make/include.make
 ifeq ($(LISP),CLISP)
   include $(TOP_DIR)/clisp.inc
 endif
-include $(TOP_DIR)/version.inc
 ifneq ($(SBCL_PATH),)
   include declt.inc
 endif
+include $(TOP_DIR)/.version
 
 INFO_DIR        := $(PREFIX)/share/info
 DOC_DIR		:= $(SHARE)/doc

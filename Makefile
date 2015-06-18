@@ -36,7 +36,7 @@ include make/include.make
 ifeq ($(LISP),CLISP)
   include clisp.inc
 endif
-include version.inc
+include .version
 
 
 SUBDIRS   := config core termio demos share doc
@@ -63,7 +63,7 @@ clean:
 	-rm *~
 	$(MAKE) gen TARGET=clean
 
-# #### NOTE: be sure to propagate to the subdirs first, otherwise, version.inc
+# #### NOTE: be sure to propagate to the subdirs first, otherwise, .version
 # will keep on being reconstructed.
 distclean: clean
 	$(MAKE) gen TARGET=distclean
@@ -71,7 +71,7 @@ ifeq ($(LISP),CLISP)
 	-rm .clisp.cnf
 endif
 	-rm *.tar.gz *.tar.gz.asc
-	-rm -fr version.inc
+	-rm -fr .version
 	-rm -fr $($(LISP)_BINLOC)-*
 	-rm -fr "${HOME}"/.cache/common-lisp/$($(LISP)_CACHE)-*"`pwd`"
 

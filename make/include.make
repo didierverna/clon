@@ -115,7 +115,7 @@ $(TOP_DIR)/clisp.inc:
 # makefiles that include both version.inc and clisp.inc. This is necessary
 # because Make wants to redo things in the wrong order and hence would call
 # clisp -i .clisp.cnf without this file having been created first.
-$(TOP_DIR)/version.inc: $(TOP_DIR)/make/version.cl $(TOP_DIR)/$(ASDF_FILE)
+$(TOP_DIR)/.version: $(TOP_DIR)/make/version.cl $(TOP_DIR)/$(ASDF_FILE)
 ifeq ($(LISP),CLISP)
 	echo $(CONFIG) > $(TOP_DIR)/.clisp.cnf
 endif
