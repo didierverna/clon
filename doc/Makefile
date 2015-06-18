@@ -37,7 +37,7 @@ ifeq ($(LISP),CLISP)
   include $(TOP_DIR)/make/clisp.make
 endif
 ifneq ($(SBCL_PATH),)
-  include declt.inc
+  include declt.make
 endif
 include $(TOP_DIR)/.version
 
@@ -152,7 +152,7 @@ clean:
 	-rm *.tmp *.fn* *.vr* *.ky* *.tp* *.cp* *.pg *.toc *.aux *.log *~
 
 distclean: clean
-	-rm -fr declt.inc splash.eps webreference* $(TEXI_REF)		\
+	-rm -fr declt.make splash.eps webreference* $(TEXI_REF)	\
 		$(HTML_DIRS)						\
 		$(ALL_INFO_FILES) $(PDF_FILES) $(DVI_FILES) $(PS_FILES)
 
@@ -168,7 +168,7 @@ install-www: webref
 	install -d -m 755 "$(W3DIR)/reference"
 	install -m 644 webreference/* "$(W3DIR)/reference/"
 
-declt.inc: $(TOP_DIR)/make/config.make
+declt.make: $(TOP_DIR)/make/config.make
 	$(SBCL_PATH) $(SBCL_LOAD) ./declt.cl
 
 .PHONY: all webref all-formats		\

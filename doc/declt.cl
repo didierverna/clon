@@ -28,7 +28,7 @@
 
 (require "asdf")
 
-(with-open-file (stream "declt.inc" :direction :output :if-exists :supersede)
+(with-open-file (stream "declt.make" :direction :output :if-exists :supersede)
   (princ "TEXI_REF :=" stream)
   (handler-case
       (progn (asdf:load-system :com.dvlsoft.declt)
