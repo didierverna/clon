@@ -34,7 +34,7 @@ hack: all
 
 include $(TOP_DIR)/make/include.make
 ifeq ($(LISP),CLISP)
-  include $(TOP_DIR)/clisp.inc
+  include $(TOP_DIR)/make/clisp.make
 endif
 
 

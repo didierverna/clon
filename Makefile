@@ -35,7 +35,7 @@ include make/config.make
 hack: all
 include make/include.make
 ifeq ($(LISP),CLISP)
-  include clisp.inc
+  include make/clisp.make
 endif
 include .version
 
