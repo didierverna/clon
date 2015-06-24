@@ -30,15 +30,13 @@
 
 (require "asdf")
 
-(asdf:load-system :com.dvlsoft.clon)
-(com.dvlsoft.clon:nickname-package)
+(asdf:load-system :com.dvlsoft.clon.setup)
 
 (format t "LONG_VERSION  := ~A~%~
 	   SHORT_VERSION := ~A~%"
-  (clon:version :long)
-  (clon:version :short))
+  (com.dvlsoft.clon.setup:version :long)
+  (com.dvlsoft.clon.setup:version :short))
 
-(clon:exit)
-
+(uiop:quit)
 
 ;;; version.cl ends here
