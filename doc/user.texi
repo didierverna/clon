@@ -525,10 +525,16 @@ in the ASDF 3 source registry and type this at the REPL:
 @verbatim
 (asdf:load-system :com.dvlsoft.clon)
 @end verbatim
-If you are using SBCL, you may want to make sure that the @code{CC}
-environment variable is set to your favorite C compiler in your init
-file. Otherwise, @clon{} will run in restricted mode (@pxref{Technical
-Notes}). For instance, put this in your @file{.sbclrc}:
+@sysindex{com.dvlsoft.clon.core}
+Alternatively, if you just want to use the core library without all the
+platform-dependent bells and whistles (@pxref{Technical Notes}), you can
+also just load the @samp{com.dvlsoft.clon.core} system.
+
+In the general case, and if you are using SBCL, you may want to make
+sure that the @code{CC} environment variable is set to your favorite C
+compiler in your init file. Otherwise, @clon{} will run in restricted
+mode (@pxref{Technical Notes}). For instance, put this in your
+@file{.sbclrc}:
 @verbatim
 (require :sb-posix)
 (sb-posix:setenv "CC" "gcc" 1)
@@ -2667,13 +2673,16 @@ blog entry:
 @item :restricted
 @coindex{restricted}@c
 @cindex Restricted Mode
+@sysindex{com.dvlsoft.clon.core}
 Some non-ANSI features of @clon{} require external functionality that
 may not be available in all contexts. Normally, @clon{} should
 autodetect this and switch to so-called @emph{restricted mode} at
 build-time (@pxref{Non-ANSI Features}). If @clon{} has failed to
 autodetect the problem (in which case I would like to know), or if for
 some reason, you explicitly want to disable those features, you may set
-the @code{:restricted} configuration option to @code{t}.
+the @code{:restricted} configuration option to @code{t}. Another way to
+do it, without even bothering with configuration is to just use the
+@samp{com.svlsoft.clon.core} system instead of the regular one.
 @item :dump
 @coindex{dump}@c
 This option is only used by the ABCL port. @ref{Dumping Executables},

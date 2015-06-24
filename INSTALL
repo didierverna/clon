@@ -12,10 +12,14 @@ Platforms::, for more information.
    In order to install and load the bare Lisp library, unpack it
 somewhere in the ASDF 3 source registry and type this at the REPL:
 (asdf:load-system :com.dvlsoft.clon)
-   If you are using SBCL, you may want to make sure that the ‘CC’
-environment variable is set to your favorite C compiler in your init
-file.  Otherwise, Clon will run in restricted mode (*note Technical
-Notes::).  For instance, put this in your ‘.sbclrc’:
+   Alternatively, if you just want to use the core library without all
+the platform-dependent bells and whistles (*note Technical Notes::), you
+can also just load the ‘com.dvlsoft.clon.core’ system.
+
+   In the general case, and if you are using SBCL, you may want to make
+sure that the ‘CC’ environment variable is set to your favorite C
+compiler in your init file.  Otherwise, Clon will run in restricted mode
+(*note Technical Notes::).  For instance, put this in your ‘.sbclrc’:
 (require :sb-posix)
 (sb-posix:setenv "CC" "gcc" 1)
 
@@ -89,7 +93,9 @@ specific options with the following function.
      build-time (*note Non-ANSI Features::).  If Clon has failed to
      autodetect the problem (in which case I would like to know), or if
      for some reason, you explicitly want to disable those features, you
-     may set the ‘:restricted’ configuration option to ‘t’.
+     may set the ‘:restricted’ configuration option to ‘t’.  Another way
+     to do it, without even bothering with configuration is to just use
+     the ‘com.svlsoft.clon.core’ system instead of the regular one.
 :dump
      This option is only used by the ABCL port.  *note Dumping
      Executables::, provides more information on its use.
