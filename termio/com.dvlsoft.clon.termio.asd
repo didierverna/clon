@@ -27,7 +27,7 @@
 ;;; Code:
 
 #+sbcl (require :sb-grovel)
-(asdf:load-system :com.dvlsoft.clon.configuration)
+(asdf:load-system :com.dvlsoft.clon.setup)
 
 (asdf:defsystem :com.dvlsoft.clon.termio
   :description "The Command-Line Options Nuker, termio feature"
@@ -37,10 +37,10 @@ For a more complete description of Clon, see the com.dvlsoft.clon system."
   :author "Didier Verna <didier@didierverna.net>"
   :maintainer "Didier Verna <didier@didierverna.net>"
   :license "BSD"
-  :version #.(com.dvlsoft.clon.configuration:version :short)
+  :version #.(com.dvlsoft.clon.setup:version :short)
   :if-feature :com.dvlsoft.clon.termio
   :defsystem-depends-on
-  (:com.dvlsoft.clon.configuration/compute-termio-configuration
+  (:com.dvlsoft.clon.setup/termio
    #+sbcl ;; BUG in ASDF 3.1.4: d-d-o can't deal dependency expanding to NIL
    (:feature :sbcl (:require :sb-grovel))
    #+(or allegro clisp lispworks)

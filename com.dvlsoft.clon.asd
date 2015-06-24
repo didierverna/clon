@@ -26,7 +26,7 @@
 
 ;;; Code:
 
-(asdf:load-system :com.dvlsoft.clon.configuration/compute-termio-configuration)
+(asdf:load-system :com.dvlsoft.clon.setup/termio)
 
 (asdf:defsystem :com.dvlsoft.clon
   :description "The Command-Line Options Nuker"
@@ -46,8 +46,8 @@ The most important features of Clon are the following.
   :author "Didier Verna <didier@didierverna.net>"
   :maintainer "Didier Verna <didier@didierverna.net>"
   :license "BSD"
-  :version #.(com.dvlsoft.clon.configuration:version :short)
-  :depends-on (:com.dvlsoft.clon.configuration
+  :version #.(com.dvlsoft.clon.setup:version :short)
+  :depends-on (:com.dvlsoft.clon.setup
 	       :com.dvlsoft.clon.core
 	       (:feature :com.dvlsoft.clon.termio :com.dvlsoft.clon.termio)))
 

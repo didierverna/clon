@@ -26,7 +26,7 @@
 
 ;;; Code:
 
-(asdf:load-system :com.dvlsoft.clon.configuration)
+(asdf:load-system :com.dvlsoft.clon.setup)
 
 (asdf:defsystem :com.dvlsoft.clon.core
   :description "The Command-Line Options Nuker, core library"
@@ -36,8 +36,8 @@ For a more complete description of Clon, see the com.dvlsoft.clon system."
   :author "Didier Verna <didier@didierverna.net>"
   :maintainer "Didier Verna <didier@didierverna.net>"
   :license "BSD"
-  :version #.(com.dvlsoft.clon.configuration:version :short)
-  :depends-on (:com.dvlsoft.clon.configuration
+  :version #.(com.dvlsoft.clon.setup:version :short)
+  :depends-on (:com.dvlsoft.clon.setup
 	       (:feature :sbcl (:require :sb-posix)))
   :serial t
   :components ((:file "meta")

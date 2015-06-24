@@ -1,4 +1,4 @@
-;;; configuration.lisp --- Clon configuration
+;;; setup.lisp --- Clon setup
 
 ;; Copyright (C) 2015 Didier Verna
 
@@ -26,41 +26,17 @@
 
 ;;; Code:
 
-(defpackage :com.dvlsoft.clon.configuration
-  (:documentation "The Command-Line Options Nuker, configuration package.")
+(defpackage :com.dvlsoft.clon.setup
+  (:documentation "The Command-Line Options Nuker, setup.")
   (:use :cl :uiop)
   (:export
    :*release-major-level* :*release-minor-level* :*release-status*
    :*release-status-level* :*release-name*
-   :configuration :version
-   :compute-termio-configuration))
+   :version
+   :configuration
+   :setup-termio))
 
-(in-package :com.dvlsoft.clon.configuration)
-
-
-;; -------------
-;; Configuration
-;; -------------
-
-(defvar cl-user::com.dvlsoft.clon.configuration nil
-  "The Clon configuration settings.
-This variable contains a property list of configuration options.
-Current options are:
-- :swank-eval-in-emacs (Boolean)
-- :restricted (Boolean)
-- :dump (Boolean)
-
-See section A.1 of the user manual for more information.")
-
-(defun configuration (key)
-  "Return KEY's value in the current Clon configuration."
-  (getf cl-user::com.dvlsoft.clon.configuration key))
-
-(defun set-configuration (key value)
-  "Set KEY to VALUE in the current Clon configuration."
-  (setf (getf cl-user::com.dvlsoft.clon.configuration key) value))
-
-(defsetf configuration set-configuration)
+(in-package :com.dvlsoft.clon.setup)
 
 
 ;; ----------
@@ -147,6 +123,31 @@ the short version, a patchlevel of 0 is ignored in the output."
 	    *release-name*))
 
 
+;; -------------
+;; Configuration
+;; -------------
+
+(defvar cl-user::com.dvlsoft.clon.configuration nil
+  "The Clon configuration settings.
+This variable contains a property list of configuration options.
+Current options are:
+- :swank-eval-in-emacs (Boolean)
+- :restricted (Boolean)
+- :dump (Boolean)
+
+See section A.1 of the user manual for more information.")
+
+(defun configuration (key)
+  "Return KEY's value in the current Clon configuration."
+  (getf cl-user::com.dvlsoft.clon.configuration key))
+
+(defun set-configuration (key value)
+  "Set KEY to VALUE in the current Clon configuration."
+  (setf (getf cl-user::com.dvlsoft.clon.configuration key) value))
+
+(defsetf configuration set-configuration)
+
+
 ;; -------------------
 ;; System requirements
 ;; -------------------
@@ -162,7 +163,7 @@ the short version, a patchlevel of 0 is ignored in the output."
     reason)
   (setf (configuration :restricted) t))
 
-(defun compute-termio-configuration ()
+(defun setup-termio ()
   (unless (configuration :restricted)
     #+sbcl
     (progn
@@ -193,4 +194,4 @@ the short version, a patchlevel of 0 is ignored in the output."
       (pushnew :com.dvlsoft.clon.termio *features*)))
 
 
-;;; configuration.lisp ends here
+;;; setup.lisp ends here

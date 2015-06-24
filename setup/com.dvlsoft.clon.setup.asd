@@ -1,4 +1,4 @@
-;;; com.dvlsoft.clon.configuration.asd --- ASDF system definition
+;;; com.dvlsoft.clon.setup.asd --- ASDF system definition
 
 ;; Copyright (C) 2015 Didier Verna
 
@@ -26,15 +26,13 @@
 
 ;;; Code:
 
-(asdf:defsystem :com.dvlsoft.clon.configuration
-  :components ((:file "configuration")))
+(asdf:defsystem :com.dvlsoft.clon.setup
+  :components ((:file "setup")))
 
-(asdf:defsystem :com.dvlsoft.clon.configuration/compute-termio-configuration
-  :depends-on (:com.dvlsoft.clon.configuration)
+(asdf:defsystem :com.dvlsoft.clon.setup/termio
+  :depends-on (:com.dvlsoft.clon.setup)
   :perform (load-op (o c)
 	     (declare (ignore o c))
-	     (call-function
-	      "com.dvlsoft.clon.configuration:compute-termio-configuration")))
+	     (call-function "com.dvlsoft.clon.setup:setup-termio")))
 
-
-;;; com.dvlsoft.clon.configuration.asd ends here
+;;; com.dvlsoft.clon.setup.asd ends here
