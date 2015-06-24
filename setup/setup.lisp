@@ -28,7 +28,7 @@
 
 (defpackage :com.dvlsoft.clon.setup
   (:documentation "The Command-Line Options Nuker, setup.")
-  (:use :cl :uiop)
+  (:use :cl)
   (:export
    :*release-major-level* :*release-minor-level* :*release-status*
    :*release-status-level* :*release-name*
