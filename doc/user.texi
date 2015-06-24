@@ -193,7 +193,6 @@ Command-Line
 
 @c Configuration options
 @macro coindex{name}
-@vindex com.dvlsoft.clon.configuration
 @cindex Configuration Option, @t{:\name\}
 @cindex @t{:\name\}
 @end macro
@@ -522,6 +521,7 @@ Platforms}, for more information.
 
 In order to install and load the bare Lisp library, unpack it somewhere
 in the ASDF 3 source registry and type this at the REPL:
+@sysindex{com.dvlsoft.clon}
 @verbatim
 (asdf:load-system :com.dvlsoft.clon)
 @end verbatim
@@ -2625,14 +2625,31 @@ portability concerns.
 @node Configuration, Non-ANSI Features, Technical Notes, Technical Notes
 @section Configuration
 @cindex Configuration
-@vindex com.dvlsoft.clon.configuration
+@sysindex{com.dvlsoft.clon.setup}@c
+@pkgindex{com.dvlsoft.clon.setup}@c
 Some aspects of @clon{}'s behavior can be configured @emph{before} the
-ASDF system is actually loaded. @clon{} looks for configuration options
-in a variable called @code{com.dvlsoft.clon.configuration} in the
-@code{cl-user} package. If set, this variable should contain a property
-list of configuration options and their corresponding values. Currently,
-the following options are provided.
+library is actually loaded. Clon stores its user-level configuration
+(along with some other setup parameters) in another ASDF system called
+@samp{com.dvlsoft.clon.setup} (and the eponym package). In order to
+configure the library (I repeat, prior to loading it), you will
+typically do something like this:
+@verbatim
+(require "asdf")
+(asdf:load-system :com.dvlsoft.clon.setup)
+(com.dvlsoft.clon.setup:configure <option> <value>)
+@end verbatim
 
+@defun configure KEY VALUE
+Set KEY to VALUE in the current Clon configuration.
+@end defun
+
+Out of curiosity, you can also inquire the current configuration for
+specific options with the following function.
+@defun configuration KEY
+Return KEY's value in the current Clon configuration.
+@end defun
+
+Currently, the following options are provided.
 @table @t
 @item :swank-eval-in-emacs
 @coindex{swank-eval-in-emacs}@c
@@ -2950,6 +2967,7 @@ and a remainder (@pxenduserref{Option Separator}).
 @appendix API Quick Reference
 
 @menu
+* Setup::                       Preload configuration
 * Utilities::                   Miscellaneous stuff
 * Initialization Phase API::    Synopsis, items and context creation
 * Runtime Phase API::           Option retrieval and help formatting
@@ -2958,10 +2976,25 @@ and a remainder (@pxenduserref{Option Separator}).
 @end menu
 
 
+@c -----
+@c Setup
+@c -----
+@node Setup, Utilities, API Quick Reference, API Quick Reference
+@section Setup
+
+@defun configure KEY VALUE
+See @ref{Configuration}.
+@end defun
+
+@defun configuration KEY
+See @ref{Configuration}.
+@end defun
+
+
 @c ---------
 @c Utilities
 @c ---------
-@node Utilities, Initialization Phase API, API Quick Reference, API Quick Reference
+@node Utilities, Initialization Phase API, Setup, API Quick Reference
 @section Utilities
 
 @defmac dump NAME FUNCTION &rest ARGS

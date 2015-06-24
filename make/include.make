@@ -70,9 +70,11 @@ ABCL_CACHE  := abcl
 ABCL_BINLOC := abcl
 ABCL_LOAD   := --load
 ABCL_EVAL   := --eval
-ABCL_DUMP   := --batch $(ABCL_EVAL) '\
-(progn (defvar cl-user::$(PACKAGE).configuration nil)\
-       (setf (getf cl-user::$(PACKAGE).configuration :dump) t))' \
+#### NOTE: multiple usage of the eval option to avoid a funcall/intern mess.
+ABCL_DUMP   := --batch							\
+	       $(ABCL_EVAL) '(require "asdf")'				\
+	       $(ABCL_EVAL) '(asdf:load-system :$(PACKAGE).setup)'	\
+	       $(ABCL_EVAL) '($(PACKAGE).setup:configure :dump t)'	\
 	       $(ABCL_LOAD)
 
 ACL_CACHE  := acl
@@ -90,15 +92,21 @@ LW_DUMP   := -init - -siteinit - $(LW_LOAD)
 BINLOC := $($(LISP)_BINLOC)
 
 ifeq ($(RESTRICTED),t)
-CONFIG := '(progn (defvar cl-user::$(PACKAGE).configuration nil) \
-	     (setf (getf cl-user::$(PACKAGE).configuration :restricted) t))'
+#### NOTE: multiple usage of the eval option to avoid a funcall/intern mess.
+CONFIG_1 := '(require "asdf")'
+CONFIG_2 := '(asdf:load-system :$(PACKAGE).setup)'
+CONFIG_3 := '($(PACKAGE).setup:configure :restricted t)'
   ifeq ($(LISP),CLISP)
 EVAL_CONFIG := $($(LISP)_LOAD) $(TOP_DIR)/.clisp.cnf
   else
-EVAL_CONFIG := $($(LISP)_EVAL) $(CONFIG)
+EVAL_CONFIG := $($(LISP)_EVAL) $(CONFIG_1)	\
+	       $($(LISP)_EVAL) $(CONFIG_2)	\
+	       $($(LISP)_EVAL) $(CONFIG_3)
   endif
 else
-CONFIG :=
+CONFIG_1 :=
+CONFIG_2 :=
+CONFIG_3 :=
 EVAL_CONFIG :=
 endif
 
@@ -109,7 +117,9 @@ endif
 # but it works. Every Makefile that needs to run $(LISP) needs to include
 # clisp.make in order for this to work.
 $(TOP_DIR)/make/clisp.make:
-	echo $(CONFIG) > $(TOP_DIR)/.clisp.cnf
+	echo $(CONFIG_1) >  $(TOP_DIR)/.clisp.cnf
+	echo $(CONFIG_2) >> $(TOP_DIR)/.clisp.cnf
+	echo $(CONFIG_3) >> $(TOP_DIR)/.clisp.cnf
 
 # The rule below duplicates what the one above does, but it's needed for
 # makefiles that include both version.inc and clisp.make. This is necessary
@@ -117,7 +127,9 @@ $(TOP_DIR)/make/clisp.make:
 # clisp -i .clisp.cnf without this file having been created first.
 $(TOP_DIR)/.version: $(TOP_DIR)/make/version.cl $(TOP_DIR)/$(ASDF_FILE)
 ifeq ($(LISP),CLISP)
-	echo $(CONFIG) > $(TOP_DIR)/.clisp.cnf
+	echo $(CONFIG_1) >  $(TOP_DIR)/.clisp.cnf
+	echo $(CONFIG_2) >> $(TOP_DIR)/.clisp.cnf
+	echo $(CONFIG_3) >> $(TOP_DIR)/.clisp.cnf
 endif
 	$($(LISP)_PATH) $(EVAL_CONFIG)			\
 	  $($(LISP)_LOAD) $(TOP_DIR)/make/version.cl	\

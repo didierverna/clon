@@ -52,13 +52,25 @@ order.
 A.1 Configuration
 =================
 
-Some aspects of Clon’s behavior can be configured _before_ the ASDF
-system is actually loaded.  Clon looks for configuration options in a
-variable called ‘com.dvlsoft.clon.configuration’ in the ‘cl-user’
-package.  If set, this variable should contain a property list of
-configuration options and their corresponding values.  Currently, the
-following options are provided.
+Some aspects of Clon’s behavior can be configured _before_ the library
+is actually loaded.  Clon stores its user-level configuration (along
+with some other setup parameters) in another ASDF system called
+‘com.dvlsoft.clon.setup’ (and the eponym package).  In order to
+configure the library (I repeat, prior to loading it), you will
+typically do something like this:
+(require "asdf")
+(asdf:load-system :com.dvlsoft.clon.setup)
+(com.dvlsoft.clon.setup:configure <option> <value>)
 
+ -- Function: configure KEY VALUE
+     Set KEY to VALUE in the current Clon configuration.
+
+   Out of curiosity, you can also inquire the current configuration for
+specific options with the following function.
+ -- Function: configuration KEY
+     Return KEY’s value in the current Clon configuration.
+
+   Currently, the following options are provided.
 :swank-eval-in-emacs
      This option is only useful if you use Slime, and mostly if you plan
      on hacking Clon itself.  The library provides indentation

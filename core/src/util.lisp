@@ -422,10 +422,9 @@ public class ~A
 	  interpreter.eval (\"(defvar extensions::*argv0* \\\"~A\\\")\");
 	  interpreter.eval (\"(export 'extensions::*argv0* 'extensions)\");
 
-	  // The following expression prevents Clon's system definition file
-	  // from warning about restricted restricted mode.
-	  interpreter.eval (\"(defvar cl-user::com.dvlsoft.clon.configuration nil)\");
-	  interpreter.eval (\"(setf (getf cl-user::com.dvlsoft.clon.configuration :restricted) t)\");
+	  interpreter.eval (\"(require \\\"asdf\\\")\");
+	  interpreter.eval (\"(asdf:load-system :com.dvlsoft.clon.setup)\");
+	  interpreter.eval (\"(com.dvlsoft.clon.setup:configure :restricted t)\");
 
 	  Load.loadSystemFile (\"/~A\", false, false, false);
 	}

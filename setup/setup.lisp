@@ -34,6 +34,7 @@
    :*release-status-level* :*release-name*
    :version
    :configuration
+   :configure
    :setup-termio))
 
 (in-package :com.dvlsoft.clon.setup)
@@ -127,7 +128,7 @@ the short version, a patchlevel of 0 is ignored in the output."
 ;; Configuration
 ;; -------------
 
-(defvar cl-user::com.dvlsoft.clon.configuration nil
+(defvar configuration nil
   "The Clon configuration settings.
 This variable contains a property list of configuration options.
 Current options are:
@@ -139,13 +140,11 @@ See section A.1 of the user manual for more information.")
 
 (defun configuration (key)
   "Return KEY's value in the current Clon configuration."
-  (getf cl-user::com.dvlsoft.clon.configuration key))
+  (getf configuration key))
 
-(defun set-configuration (key value)
+(defun configure (key value)
   "Set KEY to VALUE in the current Clon configuration."
-  (setf (getf cl-user::com.dvlsoft.clon.configuration key) value))
-
-(defsetf configuration set-configuration)
+  (setf (getf configuration key) value))
 
 
 ;; -------------------
@@ -161,9 +160,11 @@ See section A.1 of the user manual for more information.")
 * See sections 2 and A.1 of the user manual for more information. *
 *******************************************************************"
     reason)
-  (setf (configuration :restricted) t))
+  (configure :restricted t))
 
 (defun setup-termio ()
+  "Autodetect termio support.
+Update Clon configuration and *FEATURES* accordingly."
   (unless (configuration :restricted)
     #+sbcl
     (progn
