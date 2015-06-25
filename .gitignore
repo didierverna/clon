@@ -1,5 +1,3 @@
-.version
-
 .clisp.cnf
 
 sbcl-*/
