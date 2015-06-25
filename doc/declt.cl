@@ -36,9 +36,9 @@
   (asdf:missing-component ()
     (format *error-output* "~
 *********************************************************************
-* WARNING: ASDF component COM.DVLSOFT.DECLT not found.              *
+* WARNING: ASDF component NET.DIDIERVERNA.DECLT not found.          *
 * The Clon reference manual will not be generated.                  *
-*********************************************************************")))
+*********************************************************************~%")))
   (terpri stream))
 
 (uiop:quit)
