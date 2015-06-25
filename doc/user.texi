@@ -663,7 +663,7 @@ demonstration programs in the distribution show how to use it):
 
 @cindex Package, nicknames
 @defun nickname-package &optional NICKNAME
-Add NICKNAME (:CLON by default) to the :COM.DVLSOFT.CLON package.
+Add NICKNAME (:CLON by default) to the :NET.DIDIERVERNA.CLON package.
 @end defun
 
 @cindex Synopsis

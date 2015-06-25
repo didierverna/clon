@@ -105,7 +105,7 @@
 ;; -------------------
 
 (defun nickname-package (&optional (nickname :clon))
-  "Add NICKNAME (:CLON by default) to the :COM.DVLSOFT.CLON package."
+  "Add NICKNAME (:CLON by default) to the :NET.DIDIERVERNA.CLON package."
   (rename-package :net.didierverna.clon
 		  (package-name :net.didierverna.clon)
 		  (adjoin nickname (package-nicknames :net.didierverna.clon)
