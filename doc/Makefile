@@ -36,7 +36,7 @@ endif
 ifneq ($(SBCL_PATH),)
   include declt.make
 endif
-include $(TOP_DIR)/.version
+include $(TOP_DIR)/make/version.make
 
 INFO_DIR        := $(PREFIX)/share/info
 DOC_DIR		:= $(SHARE)/doc

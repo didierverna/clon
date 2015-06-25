@@ -37,7 +37,7 @@ include make/include.make
 ifeq ($(LISP),CLISP)
   include make/clisp.make
 endif
-include .version
+include make/version.make
 
 SUBDIRS   := setup core termio demos share doc
 DIST_NAME := $(PROJECT)-$(SHORT_VERSION)
@@ -64,8 +64,6 @@ clean:
 	-rm *~
 	$(MAKE) gen TARGET=clean
 
-# #### NOTE: be sure to propagate to the subdirs first, otherwise, .version
-# will keep on being reconstructed.
 distclean: clean
 	$(MAKE) gen TARGET=distclean
 	-rm -f .clisp.cnf
