@@ -30,12 +30,15 @@
 (asdf:load-system :net.didierverna.clon.setup)
 
 (asdf:defsystem :net.didierverna.clon.termio
-  :description "The Command-Line Options Nuker, termio feature"
-  :long-description "Clon is a library for command-line option management.
-The termio feature provides ISO6429 coloring on terminals that support it.
-For a more complete description of Clon, see the net.didierverna.clon system."
+  :long-name "The Command-Line Options Nuker, termio library"
+  :description "Clon's support for termio (tty geometry and fontification)"
+  :long-description "Clon's termio library provides automatic detection of tty
+geometry and ISO6429 coloring on terminals that support it. For a more
+complete description of Clon, see the net.didierverna.clon system."
   :author "Didier Verna <didier@didierverna.net>"
-  :maintainer "Didier Verna <didier@didierverna.net>"
+  :mailto "didier@didierverna.net"
+  :homepage "http://www.lrde.epita.fr/~didier/software/lisp/clon.php"
+  :source-control "https://github.com/didierverna/clon"
   :license "BSD"
   :version #.(net.didierverna.clon.setup:version :short)
   :if-feature :net.didierverna.clon.termio

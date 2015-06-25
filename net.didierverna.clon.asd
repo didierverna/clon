@@ -29,7 +29,9 @@
 (asdf:load-system :net.didierverna.clon.setup/termio)
 
 (asdf:defsystem :net.didierverna.clon
-  :description "The Command-Line Options Nuker"
+  :long-name "The Command-Line Options Nuker"
+  :description
+  "Command-line options management for standalone Common Lisp applications"
   :long-description "Clon is a library for command-line option management.
 It is intended to ease the creation of standalone Common Lisp applications by
 providing a powerful and uniform command-line option interface.
@@ -44,7 +46,9 @@ The most important features of Clon are the following.
   (with optional ISO6429 coloring on terminals that support it),
   possibly abbreviated option calls and short/long syntax."
   :author "Didier Verna <didier@didierverna.net>"
-  :maintainer "Didier Verna <didier@didierverna.net>"
+  :mailto "didier@didierverna.net"
+  :homepage "http://www.lrde.epita.fr/~didier/software/lisp/clon.php"
+  :source-control "https://github.com/didierverna/clon"
   :license "BSD"
   :version #.(net.didierverna.clon.setup:version :short)
   :depends-on (:net.didierverna.clon.setup

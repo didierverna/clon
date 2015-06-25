@@ -29,12 +29,15 @@
 (asdf:load-system :net.didierverna.clon.setup)
 
 (asdf:defsystem :net.didierverna.clon.core
-  :description "The Command-Line Options Nuker, core library"
-  :long-description "Clon is a library for command-line option management.
-The core library provides the platform/feature independent part.
-For a more complete description of Clon, see the net.didierverna.clon system."
+  :long-name "The Command-Line Options Nuker, core library"
+  :description "Clon's basic, platform-independent functionality"
+  :long-description "Clon's core library provides the platform/feature
+independent part. For a more complete description of Clon, see the
+net.didierverna.clon system."
   :author "Didier Verna <didier@didierverna.net>"
-  :maintainer "Didier Verna <didier@didierverna.net>"
+  :mailto "didier@didierverna.net"
+  :homepage "http://www.lrde.epita.fr/~didier/software/lisp/clon.php"
+  :source-control "https://github.com/didierverna/clon"
   :license "BSD"
   :version #.(net.didierverna.clon.setup:version :short)
   :depends-on (:net.didierverna.clon.setup
