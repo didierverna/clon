@@ -41,7 +41,8 @@ include $(TOP_DIR)/make/version.make
 INFO_DIR        := $(PREFIX)/share/info
 DOC_DIR		:= $(SHARE)/doc
 PROJECT_DOC_DIR := $(DOC_DIR)/$(PROJECT)
-TEXI_FILES      := user.texi enduser.texi $(TEXI_REF)
+TEXI_MAN	:= user.texi enduser.texi
+TEXI_FILES      := $(TEXI_MAN) $(TEXI_REF)
 
 INFO_FILES     := $(TEXI_FILES:%.texi=$(PROJECT)-%.info)
 PDF_FILES      := $(TEXI_FILES:%.texi=%.pdf)
@@ -154,11 +155,8 @@ distclean: clean
 		$(HTML_DIRS)						\
 		$(ALL_INFO_FILES) $(PDF_FILES) $(DVI_FILES) $(PS_FILES)
 
-update-version:
-	for f in $(TEXI_FILES); do					   \
-	  $(PERL) -pi -e 's/@set VERSION .*/@set VERSION $(LONG_VERSION)/' \
-	    $$f;							   \
-	done
+$(TEXI_MAN): $(TOP_DIR)/make/version.make
+	$(PERL) -pi -e 's/@set VERSION .*/@set VERSION $(LONG_VERSION)/' $@
 
 install-www: webref
 	$(MAKE) install-at LOCATION="$(W3DIR)"
