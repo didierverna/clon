@@ -79,6 +79,7 @@ gpg: $(SIGNATURE)
 dist: tar gpg
 
 install-www: dist
+	$(MAKE) gen TARGET=install-www
 	-install -m 644 $(TARBALL)   "$(W3DIR)/attic/"
 	-install -m 644 $(SIGNATURE) "$(W3DIR)/attic/"
 	echo "\
@@ -89,7 +90,6 @@ install-www: dist
 	 contents (\"Signature GPG\", \"GPG Signature\")); ?>" \
 	  > "$(W3DIR)/latest.txt"
 	chmod 644 "$(W3DIR)/latest.txt"
-	$(MAKE) gen TARGET=install-www
 	cd "$(W3DIR)"					\
 	  && ln -fs attic/$(TARBALL) latest.tar.gz	\
 	  && ln -fs attic/$(SIGNATURE) latest.tar.gz.asc
