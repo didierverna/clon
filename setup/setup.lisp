@@ -53,7 +53,7 @@
 (defparameter *release-status* :beta
   "The status of this release.")
 
-(defparameter *release-status-level* 23
+(defparameter *release-status-level* 24
   "The status level of this release.")
 
 (defparameter *release-name* "Michael Brecker"
