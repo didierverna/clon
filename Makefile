@@ -68,11 +68,8 @@ clean:
 # will keep on being reconstructed.
 distclean: clean
 	$(MAKE) gen TARGET=distclean
-ifeq ($(LISP),CLISP)
-	-rm .clisp.cnf
-endif
+	-rm -f .version .clisp.cnf
 	-rm *.tar.gz *.tar.gz.asc
-	-rm -fr .version
 	-rm -fr $($(LISP)_BINLOC)-*
 	-rm -fr "${HOME}"/.cache/common-lisp/$($(LISP)_CACHE)-*"`pwd`"
 
