@@ -176,7 +176,7 @@ declt.make: $(TOP_DIR)/make/config.make
 	html html-webref		\
 	dvi				\
 	ps				\
-	clean distclean			\
+	clean distclean		\
 	update-version			\
 	install-www
 

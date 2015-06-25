@@ -46,9 +46,6 @@ distclean: clean
 	-rm -fr $(BINLOC)-* $(EXTRA_DISTCLEAN_FILES)
 	-rm -fr $(BINLOC_CACHE)/$(BINLOC)-*$(abspath $(PWD))
 
-install:
-uninstall:
-
 gen:
 	@for i in $(SUBDIRS) ; do                 \
 	   echo "making $(TARGET) in $${i} ..." ; \
@@ -58,6 +55,6 @@ gen:
 .DEFAULT:
 	$(MAKE) gen TARGET=$@
 
-.PHONY: hack all clean distclean install uninstall gen
+.PHONY: hack all clean distclean gen
 
-### Makefile ends here
+### lisp.make ends here
