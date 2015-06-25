@@ -1,4 +1,4 @@
-;;; com.dvlsoft.clon.termio.asd --- ASDF system definition, termio feature
+;;; net.didierverna.clon.termio.asd --- ASDF system definition, termio feature
 
 ;; Copyright (C) 2015 Didier Verna
 
@@ -27,35 +27,35 @@
 ;;; Code:
 
 #+sbcl (require :sb-grovel)
-(asdf:load-system :com.dvlsoft.clon.setup)
+(asdf:load-system :net.didierverna.clon.setup)
 
-(asdf:defsystem :com.dvlsoft.clon.termio
+(asdf:defsystem :net.didierverna.clon.termio
   :description "The Command-Line Options Nuker, termio feature"
   :long-description "Clon is a library for command-line option management.
 The termio feature provides ISO6429 coloring on terminals that support it.
-For a more complete description of Clon, see the com.dvlsoft.clon system."
+For a more complete description of Clon, see the net.didierverna.clon system."
   :author "Didier Verna <didier@didierverna.net>"
   :maintainer "Didier Verna <didier@didierverna.net>"
   :license "BSD"
-  :version #.(com.dvlsoft.clon.setup:version :short)
-  :if-feature :com.dvlsoft.clon.termio
+  :version #.(net.didierverna.clon.setup:version :short)
+  :if-feature :net.didierverna.clon.termio
   :defsystem-depends-on
-  (:com.dvlsoft.clon.setup/termio
+  (:net.didierverna.clon.setup/termio
    #+sbcl ;; BUG in ASDF 3.1.4: d-d-o can't deal dependency expanding to NIL
    (:feature :sbcl (:require :sb-grovel))
    #+(or allegro clisp lispworks)
    (:feature (:or :allegro :clisp :lispworks) :cffi-grovel))
   :depends-on ((:feature :sbcl :sb-posix)
-	       (:feature (:and :clisp :com.dvlsoft.clon.termio) :cffi)
-	       :com.dvlsoft.clon.core)
+	       (:feature (:and :clisp :net.didierverna.clon.termio) :cffi)
+	       :net.didierverna.clon.core)
   :serial t
   :components (;; bug in ASDF 3.1.4: cannot deal with conditionally defined
 	       ;; component class!
 	       #+sbcl (sb-grovel:grovel-constants-file "sbcl/constants"
-		       :package :com.dvlsoft.clon :if-feature :sbcl)
+		       :package :net.didierverna.clon :if-feature :sbcl)
 	       #+(or allegro clisp lispworks)
 	       (:grovel-file "cffi/constants"
 		:if-feature (:or :allegro :clisp :lispworks))
 	       (:file "termio")))
 
-;;; com.dvlsoft.clon.termio.asd ends here
+;;; net.didierverna.clon.termio.asd ends here

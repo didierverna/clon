@@ -27,7 +27,7 @@
 ### Code:
 
 PROJECT   := clon
-PACKAGE   := com.dvlsoft.$(PROJECT)
+PACKAGE   := net.didierverna.$(PROJECT)
 ASDF_FILE := $(PACKAGE).asd
 
 PERL := perl

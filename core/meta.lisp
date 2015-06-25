@@ -33,9 +33,9 @@
 ;; Package definition:
 ;; -------------------
 
-(defpackage :com.dvlsoft.clon
+(defpackage :net.didierverna.clon
   (:documentation "The Command-Line Options Nuker package.")
-  (:use :cl :com.dvlsoft.clon.setup)
+  (:use :cl :net.didierverna.clon.setup)
   (:shadow :*readtable*)
   ;; #### PORTME.
   (:import-from #+sbcl      :sb-mop
@@ -48,7 +48,7 @@
 		#+lispworks :clos
 		:class-slots :slot-definition-name :validate-superclass)
   (:export
-    ;; From the :com.dvlsoft.clon.setup package:
+    ;; From the :net.didierverna.clon.setup package:
     :*release-major-level*
     :*release-minor-level*
     :*release-status*
@@ -97,7 +97,7 @@
     :help))
 
 
-(in-package :com.dvlsoft.clon)
+(in-package :net.didierverna.clon)
 
 
 ;; -------------------
@@ -106,9 +106,9 @@
 
 (defun nickname-package (&optional (nickname :clon))
   "Add NICKNAME (:CLON by default) to the :COM.DVLSOFT.CLON package."
-  (rename-package :com.dvlsoft.clon
-		  (package-name :com.dvlsoft.clon)
-		  (adjoin nickname (package-nicknames :com.dvlsoft.clon)
+  (rename-package :net.didierverna.clon
+		  (package-name :net.didierverna.clon)
+		  (adjoin nickname (package-nicknames :net.didierverna.clon)
 			  :test #'string-equal)))
 
 

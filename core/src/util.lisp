@@ -26,8 +26,8 @@
 
 ;;; Code:
 
-(in-package :com.dvlsoft.clon)
-(in-readtable :com.dvlsoft.clon)
+(in-package :net.didierverna.clon)
+(in-readtable :net.didierverna.clon)
 
 
 ;; ==========================================================================
@@ -423,8 +423,8 @@ public class ~A
 	  interpreter.eval (\"(export 'extensions::*argv0* 'extensions)\");
 
 	  interpreter.eval (\"(require \\\"asdf\\\")\");
-	  interpreter.eval (\"(asdf:load-system :com.dvlsoft.clon.setup)\");
-	  interpreter.eval (\"(com.dvlsoft.clon.setup:configure :restricted t)\");
+	  interpreter.eval (\"(asdf:load-system :net.didierverna.clon.setup)\");
+	  interpreter.eval (\"(net.didierverna.clon.setup:configure :restricted t)\");
 
 	  Load.loadSystemFile (\"/~A\", false, false, false);
 	}

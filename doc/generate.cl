@@ -113,11 +113,11 @@ and extend the library with your own option types.
 @end itemize"
   "The reference manual's introductory text.")
 
-(asdf:load-system :com.dvlsoft.declt)
+(asdf:load-system :net.didierverna.declt)
 
 (if (and (second sb-ext:*posix-argv*)
 	 (string= (second sb-ext:*posix-argv*) "--web"))
-    (com.dvlsoft.declt:declt :com.dvlsoft.clon
+    (net.didierverna.declt:declt :net.didierverna.clon
 			     :library-name "Clon"
 			     :texi-file "webreference.texi"
 			     ;; but we don't care
@@ -125,7 +125,7 @@ and extend the library with your own option types.
 			     :introduction +introduction+
 			     :license :bsd
 			     :copyright-date "2010-2012, 2015")
-  (com.dvlsoft.declt:declt :com.dvlsoft.clon
+  (net.didierverna.declt:declt :net.didierverna.clon
 			   :library-name "Clon"
 			   :texi-file "reference.texi"
 			   :info-file "clon-reference"

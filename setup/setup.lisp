@@ -26,7 +26,7 @@
 
 ;;; Code:
 
-(defpackage :com.dvlsoft.clon.setup
+(defpackage :net.didierverna.clon.setup
   (:documentation "The Command-Line Options Nuker, setup.")
   (:use :cl)
   (:export
@@ -37,7 +37,7 @@
    :configure
    :setup-termio))
 
-(in-package :com.dvlsoft.clon.setup)
+(in-package :net.didierverna.clon.setup)
 
 
 ;; ----------
@@ -191,8 +191,8 @@ Update Clon configuration and *FEATURES* accordingly."
     #+abcl
     (restrict-because "ABCL is in use"))
   (if (configuration :restricted)
-      (setq *features* (delete  :com.dvlsoft.clon.termio *features*))
-      (pushnew :com.dvlsoft.clon.termio *features*)))
+      (setq *features* (delete  :net.didierverna.clon.termio *features*))
+      (pushnew :net.didierverna.clon.termio *features*)))
 
 
 ;;; setup.lisp ends here

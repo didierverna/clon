@@ -26,8 +26,8 @@
 
 ;;; Code:
 
-(in-package :com.dvlsoft.clon)
-(in-readtable :com.dvlsoft.clon)
+(in-package :net.didierverna.clon)
+(in-readtable :net.didierverna.clon)
 
 
 (defvar *synopsis* nil "The current synopsis.")
@@ -290,7 +290,7 @@ remainder.
 					(format nil "~A~A"
 					  (string :make-)
 					  item-name)))
-				 :com.dvlsoft.clon)
+				 :net.didierverna.clon)
 				(cdr form))
 			     form))))))
 

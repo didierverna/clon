@@ -26,7 +26,7 @@
 
 ;;; Code:
 
-(in-package :com.dvlsoft.clon)
+(in-package :net.didierverna.clon)
 
 (define "winsize_t" "struct winsize")
 

@@ -1,4 +1,4 @@
-;;; com.dvlsoft.clon.core.asd --- ASDF system definition, core library
+;;; net.didierverna.clon.core.asd --- ASDF system definition, core library
 
 ;; Copyright (C) 2015 Didier Verna
 
@@ -26,18 +26,18 @@
 
 ;;; Code:
 
-(asdf:load-system :com.dvlsoft.clon.setup)
+(asdf:load-system :net.didierverna.clon.setup)
 
-(asdf:defsystem :com.dvlsoft.clon.core
+(asdf:defsystem :net.didierverna.clon.core
   :description "The Command-Line Options Nuker, core library"
   :long-description "Clon is a library for command-line option management.
 The core library provides the platform/feature independent part.
-For a more complete description of Clon, see the com.dvlsoft.clon system."
+For a more complete description of Clon, see the net.didierverna.clon system."
   :author "Didier Verna <didier@didierverna.net>"
   :maintainer "Didier Verna <didier@didierverna.net>"
   :license "BSD"
-  :version #.(com.dvlsoft.clon.setup:version :short)
-  :depends-on (:com.dvlsoft.clon.setup
+  :version #.(net.didierverna.clon.setup:version :short)
+  :depends-on (:net.didierverna.clon.setup
 	       (:feature :sbcl (:require :sb-posix)))
   :serial t
   :components ((:file "meta")
@@ -90,4 +90,4 @@ For a more complete description of Clon, see the com.dvlsoft.clon system."
 			     (:file "context"
 			      :depends-on ("output"))))))
 
-;;; com.dvlsoft.clon.core.asd ends here
+;;; net.didierverna.clon.core.asd ends here

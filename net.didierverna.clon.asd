@@ -1,4 +1,4 @@
-;;; com.dvlsoft.clon.asd --- ASDF system definition
+;;; net.didierverna.clon.asd --- ASDF system definition
 
 ;; Copyright (C) 2010-2012, 2015 Didier Verna
 
@@ -26,9 +26,9 @@
 
 ;;; Code:
 
-(asdf:load-system :com.dvlsoft.clon.setup/termio)
+(asdf:load-system :net.didierverna.clon.setup/termio)
 
-(asdf:defsystem :com.dvlsoft.clon
+(asdf:defsystem :net.didierverna.clon
   :description "The Command-Line Options Nuker"
   :long-description "Clon is a library for command-line option management.
 It is intended to ease the creation of standalone Common Lisp applications by
@@ -46,9 +46,9 @@ The most important features of Clon are the following.
   :author "Didier Verna <didier@didierverna.net>"
   :maintainer "Didier Verna <didier@didierverna.net>"
   :license "BSD"
-  :version #.(com.dvlsoft.clon.setup:version :short)
-  :depends-on (:com.dvlsoft.clon.setup
-	       :com.dvlsoft.clon.core
-	       (:feature :com.dvlsoft.clon.termio :com.dvlsoft.clon.termio)))
+  :version #.(net.didierverna.clon.setup:version :short)
+  :depends-on (:net.didierverna.clon.setup
+	       :net.didierverna.clon.core
+	       (:feature :net.didierverna.clon.termio :net.didierverna.clon.termio)))
 
-;;; com.dvlsoft.clon.asd ends here
+;;; net.didierverna.clon.asd ends here

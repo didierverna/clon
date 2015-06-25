@@ -33,7 +33,7 @@
 (defconstant +source+ (concatenate 'string +executable+ ".lisp"))
 (defconstant +object+ (concatenate 'string +executable+ ".o"))
 
-(asdf:load-system :com.dvlsoft.clon)
+(asdf:load-system :net.didierverna.clon)
 
 (compile-file +source+ :output-file +object+ :system-p t)
 

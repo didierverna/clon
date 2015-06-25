@@ -26,8 +26,8 @@
 
 ;;; Code:
 
-(in-package :com.dvlsoft.clon)
-(in-readtable :com.dvlsoft.clon)
+(in-package :net.didierverna.clon)
+(in-readtable :net.didierverna.clon)
 
 
 ;; ==========================================================================
@@ -734,7 +734,7 @@ than the currently available right margin."
   (make-face-tree
    (list* 'toplevel
 	  (with-open-file (stream pathname)
-	    (let ((*package* (find-package :com.dvlsoft.clon)))
+	    (let ((*package* (find-package :net.didierverna.clon)))
 	      (loop :for item := (read stream nil stream)
 		    :if (eql item stream)
 		      :return items

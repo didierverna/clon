@@ -1,4 +1,4 @@
-;;; com.dvlsoft.clon.setup.asd --- ASDF system definition
+;;; net.didierverna.clon.setup.asd --- ASDF system definition
 
 ;; Copyright (C) 2015 Didier Verna
 
@@ -26,13 +26,13 @@
 
 ;;; Code:
 
-(asdf:defsystem :com.dvlsoft.clon.setup
+(asdf:defsystem :net.didierverna.clon.setup
   :components ((:file "setup")))
 
-(asdf:defsystem :com.dvlsoft.clon.setup/termio
-  :depends-on (:com.dvlsoft.clon.setup)
+(asdf:defsystem :net.didierverna.clon.setup/termio
+  :depends-on (:net.didierverna.clon.setup)
   :perform (load-op (o c)
 	     (declare (ignore o c))
-	     (call-function "com.dvlsoft.clon.setup:setup-termio")))
+	     (call-function "net.didierverna.clon.setup:setup-termio")))
 
-;;; com.dvlsoft.clon.setup.asd ends here
+;;; net.didierverna.clon.setup.asd ends here

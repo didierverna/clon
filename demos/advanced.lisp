@@ -52,10 +52,10 @@
 	       (and lispworks (not lispworks-personal-edition)))
 	 '(#p"/usr/local/share/common-lisp/source/asdf/build/asdf.lisp"))
 
-(asdf:load-system :com.dvlsoft.clon :verbose nil)
+(asdf:load-system :net.didierverna.clon :verbose nil)
 
 (eval-when (:execute :load-toplevel :compile-toplevel)
-  (com.dvlsoft.clon:nickname-package))
+  (net.didierverna.clon:nickname-package))
 
 (clon:defsynopsis (:postfix "cmd [OPTIONS]")
   (text :contents "Available commands: push pull.

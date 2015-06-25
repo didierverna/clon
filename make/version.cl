@@ -30,12 +30,12 @@
 
 (require "asdf")
 
-(asdf:load-system :com.dvlsoft.clon.setup)
+(asdf:load-system :net.didierverna.clon.setup)
 
 (format t "LONG_VERSION  := ~A~%~
 	   SHORT_VERSION := ~A~%"
-  (com.dvlsoft.clon.setup:version :long)
-  (com.dvlsoft.clon.setup:version :short))
+  (net.didierverna.clon.setup:version :long)
+  (net.didierverna.clon.setup:version :short))
 
 (uiop:quit)
 

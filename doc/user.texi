@@ -521,14 +521,14 @@ Platforms}, for more information.
 
 In order to install and load the bare Lisp library, unpack it somewhere
 in the ASDF 3 source registry and type this at the REPL:
-@sysindex{com.dvlsoft.clon}
+@sysindex{net.didierverna.clon}
 @verbatim
-(asdf:load-system :com.dvlsoft.clon)
+(asdf:load-system :net.didierverna.clon)
 @end verbatim
-@sysindex{com.dvlsoft.clon.core}
+@sysindex{net.didierverna.clon.core}
 Alternatively, if you just want to use the core library without all the
 platform-dependent bells and whistles (@pxref{Technical Notes}), you can
-also just load the @samp{com.dvlsoft.clon.core} system.
+also just load the @samp{net.didierverna.clon.core} system.
 
 In the general case, and if you are using SBCL, you may want to make
 sure that the @code{CC} environment variable is set to your favorite C
@@ -605,8 +605,8 @@ called @file{simple} in the distribution.
 (in-package :cl-user)
 
 (require "asdf")
-(asdf:load-system :com.dvlsoft.clon)
-(use-package :com.dvlsoft.clon)
+(asdf:load-system :net.didierverna.clon)
+(use-package :net.didierverna.clon)
 
 (defsynopsis (:postfix "FILES...")
   (text :contents "A very short program.")
@@ -639,19 +639,19 @@ called @file{simple} in the distribution.
 @section Explanation
 Let's examine this program step-by-step now.
 
-@pkgindex{com.dvlsoft.clon}@c
-@sysindex{com.dvlsoft.clon}@c
+@pkgindex{net.didierverna.clon}@c
+@sysindex{net.didierverna.clon}@c
 First, we put ourselves in the @cl{} user package, and load @clon{} from
-its ASDF system @samp{com.dvlsoft.clon}. Next, we use the @clon{}
-package, also named @samp{com.dvlsoft.clon}.
+its ASDF system @samp{net.didierverna.clon}. Next, we use the @clon{}
+package, also named @samp{net.didierverna.clon}.
 
 @cartouche
 @verbatim
 (in-package :cl-user)
 
 (require "asdf")
-(asdf:load-system :com.dvlsoft.clon)
-(use-package :com.dvlsoft.clon)
+(asdf:load-system :net.didierverna.clon)
+(use-package :net.didierverna.clon)
 @end verbatim
 @end cartouche
 
@@ -1282,10 +1282,10 @@ To sum up, here's a example of things you can do in @code{defsynopsis}.
 
 @cartouche
 @verbatim
-(com.dvlsoft.clon:defsynopsis ()
+(net.didierverna.clon:defsynopsis ()
   (flag #| ... |#)
   *my-great-option*
-  (setq *another-option* (com.dvlsoft.clon:make-switch #| ... |#)))
+  (setq *another-option* (net.didierverna.clon:make-switch #| ... |#)))
 @end verbatim
 @end cartouche
 
@@ -1749,14 +1749,14 @@ have flags.
 @section New Option Types
 @cindex Option Types, in files
 @cindex Files, one per option type
-@pkgindex{com.dvlsoft.clon}
+@pkgindex{net.didierverna.clon}
 From a software engineering point of view, it is better to implement new
 option types in a file of their own, preferably named after the option
 type itself, and to put this file in the @clon{} package, like this:
 
 @cartouche
 @verbatim
-(in-package :com.dvlsoft.clon)
+(in-package :net.didierverna.clon)
 @end verbatim
 @end cartouche
 
@@ -2631,18 +2631,18 @@ portability concerns.
 @node Configuration, Non-ANSI Features, Technical Notes, Technical Notes
 @section Configuration
 @cindex Configuration
-@sysindex{com.dvlsoft.clon.setup}@c
-@pkgindex{com.dvlsoft.clon.setup}@c
+@sysindex{net.didierverna.clon.setup}@c
+@pkgindex{net.didierverna.clon.setup}@c
 Some aspects of @clon{}'s behavior can be configured @emph{before} the
 library is actually loaded. Clon stores its user-level configuration
 (along with some other setup parameters) in another ASDF system called
-@samp{com.dvlsoft.clon.setup} (and the eponym package). In order to
+@samp{net.didierverna.clon.setup} (and the eponym package). In order to
 configure the library (I repeat, prior to loading it), you will
 typically do something like this:
 @verbatim
 (require "asdf")
-(asdf:load-system :com.dvlsoft.clon.setup)
-(com.dvlsoft.clon.setup:configure <option> <value>)
+(asdf:load-system :net.didierverna.clon.setup)
+(net.didierverna.clon.setup:configure <option> <value>)
 @end verbatim
 
 @defun configure KEY VALUE
@@ -2673,7 +2673,7 @@ blog entry:
 @item :restricted
 @coindex{restricted}@c
 @cindex Restricted Mode
-@sysindex{com.dvlsoft.clon.core}
+@sysindex{net.didierverna.clon.core}
 Some non-ANSI features of @clon{} require external functionality that
 may not be available in all contexts. Normally, @clon{} should
 autodetect this and switch to so-called @emph{restricted mode} at

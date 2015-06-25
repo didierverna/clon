@@ -26,8 +26,8 @@
 
 ;;; Code:
 
-(in-package :com.dvlsoft.clon)
-(in-readtable :com.dvlsoft.clon)
+(in-package :net.didierverna.clon)
+(in-readtable :net.didierverna.clon)
 
 
 ;; ==========================================================================
@@ -93,7 +93,7 @@ implementing hierarchical program command-line."))
 					  internalp
 					  (string :internal-)
 					  item-name)))
-				 :com.dvlsoft.clon)
+				 :net.didierverna.clon)
 				(if (string= item-name (string :group))
 				    (list* internalp (cdr form))
 				  (cdr form)))

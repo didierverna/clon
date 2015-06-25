@@ -26,8 +26,8 @@
 
 ;;; Code:
 
-(in-package :com.dvlsoft.clon)
-(in-readtable :com.dvlsoft.clon)
+(in-package :net.didierverna.clon)
+(in-readtable :net.didierverna.clon)
 
 (defvar *context* nil "The current context.")
 
@@ -509,7 +509,7 @@ If NEGATED, read a negated call or pack. Otherwise, read a short call or pack."
 				       (string :retrieve-from-)
 				       (symbol-name func)
 				       (string :-call))
-				     :com.dvlsoft.clon)))
+				     :net.didierverna.clon)))
 			new-cmdline)
 		   (when cmdline-value
 		     (push cmdline-value call))
