@@ -32,10 +32,11 @@
   :long-name "The Command-Line Options Nuker"
   :description
   "Command-line options management for standalone Common Lisp applications"
-  :long-description "Clon is a library for command-line option management.
-It is intended to ease the creation of standalone Common Lisp applications by
-providing a powerful and uniform command-line option interface.
-The most important features of Clon are the following.
+  :long-description "\
+Clon is a library for command-line option management. It is intended to ease
+the creation of standalone Common Lisp applications by providing a powerful
+and uniform command-line option interface. The most important features of Clon
+are the following.
 - [from the programmer's point of view] Centralized command-line options
   specification and management, including automatic generation of help
   strings, conversion from command-line / environment strings to

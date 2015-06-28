@@ -29,8 +29,9 @@
 (asdf:defsystem :net.didierverna.clon.setup
   :long-name "The Command-Line Options Nuker, setup library"
   :description "Clon's preload setup library"
-  :long-description "Clon's setup library provides support for various preload
-configuration parameters. For a more complete description of Clon, see the
+  :long-description "\
+Clon's setup library provides support for various preload configuration
+parameters. For a more complete description of Clon, see the
 net.didierverna.clon system."
   :author "Didier Verna <didier@didierverna.net>"
   :mailto "didier@didierverna.net"
@@ -42,10 +43,10 @@ net.didierverna.clon system."
 (asdf:defsystem :net.didierverna.clon.setup/termio
   :long-name "The Command-Line Options Nuker, termio setup"
   :description "Clon's support for automatic configuration of termio support"
-  :long-description "This is a virtual subsystem or Clon (no actual code). Its
-purpose is only to autodetect termio support and update Clon's preload
-configuration on load. For a more complete description of Clon, see the
-net.didierverna.clon system."
+  :long-description "\
+This is a virtual subsystem or Clon (no actual code). Its purpose is only to
+autodetect termio support and update Clon's preload configuration on load. For
+a more complete description of Clon, see the net.didierverna.clon system."
   :author "Didier Verna <didier@didierverna.net>"
   :mailto "didier@didierverna.net"
   :homepage "http://www.lrde.epita.fr/~didier/software/lisp/clon.php"

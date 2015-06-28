@@ -31,9 +31,9 @@
 (asdf:defsystem :net.didierverna.clon.core
   :long-name "The Command-Line Options Nuker, core library"
   :description "Clon's basic, platform-independent functionality"
-  :long-description "Clon's core library provides the platform/feature
-independent part. For a more complete description of Clon, see the
-net.didierverna.clon system."
+  :long-description "\
+Clon's core library provides the platform/feature independent part. For a more
+complete description of Clon, see the net.didierverna.clon system."
   :author "Didier Verna <didier@didierverna.net>"
   :mailto "didier@didierverna.net"
   :homepage "http://www.lrde.epita.fr/~didier/software/lisp/clon.php"
