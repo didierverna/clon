@@ -14,3 +14,7 @@ Clon are the following.
   syntax across all Clon applications, customization of the help strings
   layout (with optional ISO6429 coloring on terminals that support it),
   automatic completion of abbreviated option names and short/long/pack syntax.
+
+Clon's [homepage](https://www.lrde.epita.fr/~didier/software/lisp/clon.php)
+contains a lot of resources, including the manifesto, the doocumentation and
+some screenshots.
