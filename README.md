@@ -16,5 +16,5 @@ Clon are the following.
   automatic completion of abbreviated option names and short/long/pack syntax.
 
 Clon's [homepage](https://www.lrde.epita.fr/~didier/software/lisp/clon.php)
-contains a lot of resources, including the manifesto, the doocumentation and
+contains a lot of resources, including the manifesto, the documentation and
 some screenshots.
