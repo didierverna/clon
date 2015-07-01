@@ -114,25 +114,25 @@ and extend the library with your own option types.
   "The reference manual's introductory text.")
 
 (asdf:load-system :net.didierverna.declt)
+(net.didierverna.declt:nickname-package)
 
 (if (and (second sb-ext:*posix-argv*)
 	 (string= (second sb-ext:*posix-argv*) "--web"))
-    (net.didierverna.declt:declt :net.didierverna.clon
-			     :library-name "Clon"
-			     :texi-file "webreference.texi"
-			     ;; but we don't care
-			     :info-file "clon-webreference"
-			     :introduction +introduction+
-			     :license :bsd
-			     :copyright-date "2010-2012, 2015")
-  (net.didierverna.declt:declt :net.didierverna.clon
-			   :library-name "Clon"
-			   :texi-file "reference.texi"
-			   :info-file "clon-reference"
-			   :introduction +introduction+
-			   :license :bsd
-			   :copyright-date "2010-2012, 2015"
-			   :hyperlinks t))
+    (declt:declt :net.didierverna.clon
+		 :library-name "Clon"
+		 :texi-file "webreference.texi"
+		 :info-file "clon-webreference" ;; but we don't care
+		 :introduction +introduction+
+		 :license :bsd
+		 :copyright-date "2010-2012, 2015")
+    (declt:declt :net.didierverna.clon
+		 :library-name "Clon"
+		 :texi-file "reference.texi"
+		 :info-file "clon-reference"
+		 :introduction +introduction+
+		 :license :bsd
+		 :copyright-date "2010-2012, 2015"
+		 :hyperlinks t))
 
 (uiop:quit)
 
