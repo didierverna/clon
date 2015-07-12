@@ -36,7 +36,7 @@
 Clon's termio library provides automatic detection of tty geometry and ISO6429
 coloring on terminals that support it. For a more complete description of
 Clon, see the net.didierverna.clon system."
-  :author "Didier Verna <didier@didierverna.net>"
+  :author "Didier Verna"
   :mailto "didier@didierverna.net"
   :homepage "http://www.lrde.epita.fr/~didier/software/lisp/clon.php"
   :source-control "https://github.com/didierverna/clon"

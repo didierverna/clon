@@ -49,7 +49,7 @@ Clon are the following.
   syntax across all Clon applications, customization of the help strings
   layout (with optional ISO6429 coloring on terminals that support it),
   automatic completion of abbreviated option names and short/long/pack syntax."
-  :author "Didier Verna <didier@didierverna.net>"
+  :author "Didier Verna"
   :mailto "didier@didierverna.net"
   :homepage "http://www.lrde.epita.fr/~didier/software/lisp/clon.php"
   :source-control "https://github.com/didierverna/clon"
