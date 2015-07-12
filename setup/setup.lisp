@@ -4,7 +4,7 @@
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
-;; This file is part of clon.
+;; This file is part of Clon.
 
 ;; Permission to use, copy, modify, and distribute this software for any
 ;; purpose with or without fee is hereby granted, provided that the above
