@@ -289,6 +289,22 @@ Command-Line
 @end macro
 
 
+@c Variables index
+@c ---------------
+
+@c Constant variables
+@macro cvindex{var}
+@vindex \var\
+@vindex @r{Constant, }\var\
+@end macro
+
+@c Parameter variables
+@macro pvindex{var}
+@vindex \var\
+@vindex @r{Parameter, }\var\
+@end macro
+
+
 @c Data Types index
 @c ----------------
 
@@ -2542,28 +2558,28 @@ returned value is a fixnum. Otherwise, it is a string.
 A @clon{} version is characterized by 4 elements as described below.
 @itemize
 @item
-@vindex *release-major-level*
+@pvindex{*release-major-level*}
 A major version number stored in the parameter
 @code{*release-major-level*}.
 @item
-@vindex *release-minor-level*
+@pvindex{*release-minor-level*}
 A minor version number, stored in the parameter
 @code{*release-minor-level*}.
 @item
-@vindex *release-status*
+@pvindex{*release-status*}
 A release status stored in the parameter @code{*release-status*}. The
 status of a release can be @code{:alpha}, @code{:beta}, @code{:rc}
 (standing for ``release candidate'') or @code{:patchlevel}. These are in
 effect 4 levels of expected stability.
 @item
-@vindex *release-status-level*
+@pvindex{*release-status-level*}
 A status-specific version number stored in the parameter
 @code{*release-status-level*}. Status levels start at 1 (alpha 1, beta 1
 and release candidate 1) except for stable versions, in which case patch
 levels start at 0 (@eg{} 2.4.0).
 @end itemize
 
-@vindex *release-name*
+@pvindex{*release-name*}
 In addition to that, each version of @clon{} (in the sense
 @emph{major.minor}, regardless of the status) has a name, stored in the
 parameter @code{*release-name*}. The general theme for @clon{} is ``Great
