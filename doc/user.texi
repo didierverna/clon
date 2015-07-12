@@ -519,6 +519,11 @@ provided as an ASDF 3 system, but has no mandatory dependency. CFFI may
 optionally be used with CLISP, Allegro and LispWorks. @xref{Supported
 Platforms}, for more information.
 
+See @clon{}'s
+@uref{http://www.lrde.epita.fr/~didier/software/lisp/clon.php,,homepage}
+for tarballs, Git repository and online documentation. @clon{} is also
+available via @uref{http://www.quicklisp.org,,Quicklisp}.
+
 In order to install and load the bare Lisp library, unpack it somewhere
 in the ASDF 3 source registry and type this at the REPL:
 @sysindex{net.didierverna.clon}
@@ -2634,7 +2639,7 @@ portability concerns.
 @sysindex{net.didierverna.clon.setup}@c
 @pkgindex{net.didierverna.clon.setup}@c
 Some aspects of @clon{}'s behavior can be configured @emph{before} the
-library is actually loaded. Clon stores its user-level configuration
+library is actually loaded. @clon{} stores its user-level configuration
 (along with some other setup parameters) in another ASDF system called
 @samp{net.didierverna.clon.setup} (and the eponym package). In order to
 configure the library (I repeat, prior to loading it), you will
@@ -2717,9 +2722,9 @@ for 80 columns regardless of the actual terminal width
 @c ----------------------
 @node Supported Platforms, Dumping Executables, Non-ANSI Features, Technical Notes
 @section Supported Platforms
-@clon{} currently works on Unix (including MacOS X) and Windows (Cygwin
-or MinGW) and has been ported to 8 @cl{} implementations. The following
-table lists the supported platforms.
+@clon{} is an ASDF 3 library. It currently works on Unix (including
+MacOS X) and Windows (Cygwin or MinGW) and has been ported to 8 @cl{}
+implementations. The following table lists the supported platforms.
 
 @multitable {Compiler} {Minimum Version} {@code{cffi} (optional)}
 @headitem Compiler @tab Minimum Version @tab Dependencies

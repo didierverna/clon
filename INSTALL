@@ -9,6 +9,9 @@ provided as an ASDF 3 system, but has no mandatory dependency.  CFFI may
 optionally be used with CLISP, Allegro and LispWorks.  *Note Supported
 Platforms::, for more information.
 
+   See Clon’s homepage for tarballs, Git repository and online
+documentation.  Clon is also available via Quicklisp.
+
    In order to install and load the bare Lisp library, unpack it
 somewhere in the ASDF 3 source registry and type this at the REPL:
 (asdf:load-system :net.didierverna.clon)
@@ -123,9 +126,9 @@ columns regardless of the actual terminal width (*note
 A.3 Supported Platforms
 =======================
 
-Clon currently works on Unix (including MacOS X) and Windows (Cygwin or
-MinGW) and has been ported to 8 Common Lisp implementations.  The
-following table lists the supported platforms.
+Clon is an ASDF 3 library.  It currently works on Unix (including MacOS
+X) and Windows (Cygwin or MinGW) and has been ported to 8 Common Lisp
+implementations.  The following table lists the supported platforms.
 
 Compiler   Minimum Version   Dependencies
 -------------------------------------------------
