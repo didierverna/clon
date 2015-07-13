@@ -116,6 +116,12 @@ and extend the library with your own option types.
 (asdf:load-system :net.didierverna.declt)
 (net.didierverna.declt:nickname-package)
 
+;; ASDF doesn't understand my version numnbering scheme. That will change
+;; soon, but in the meantime, I have to provide my version number explicitly
+;; here (and so I need to load the system in order to get the VERSION
+;; function).
+(asdf:load-system :net.didierverna.clon)
+
 (if (and (second sb-ext:*posix-argv*)
 	 (string= (second sb-ext:*posix-argv*) "--web"))
     (declt:declt :net.didierverna.clon
@@ -123,6 +129,7 @@ and extend the library with your own option types.
 		 :texi-file "webreference.texi"
 		 :info-file "clon-webreference" ;; but we don't care
 		 :introduction +introduction+
+		 :version (net.didierverna.clon:version :long)
 		 :license :bsd
 		 :copyright-date "2010-2012, 2015")
     (declt:declt :net.didierverna.clon
@@ -130,6 +137,7 @@ and extend the library with your own option types.
 		 :texi-file "reference.texi"
 		 :info-file "clon-reference"
 		 :introduction +introduction+
+		 :version (net.didierverna.clon:version :long)
 		 :license :bsd
 		 :copyright-date "2010-2012, 2015"
 		 :hyperlinks t))
