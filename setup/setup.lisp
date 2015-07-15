@@ -128,7 +128,7 @@ the short version, a patchlevel of 0 is ignored in the output."
 ;; Configuration
 ;; -------------
 
-(defvar configuration nil
+(defvar *configuration* nil
   "The Clon configuration settings.
 This variable contains a property list of configuration options.
 Current options are:
@@ -140,11 +140,11 @@ See section A.1 of the user manual for more information.")
 
 (defun configuration (key)
   "Return KEY's value in the current Clon configuration."
-  (getf configuration key))
+  (getf *configuration* key))
 
 (defun configure (key value)
   "Set KEY to VALUE in the current Clon configuration."
-  (setf (getf configuration key) value))
+  (setf (getf *configuration* key) value))
 
 
 ;; -------------------
