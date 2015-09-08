@@ -2,15 +2,9 @@
 2 Installation
 **************
 
-Clon currently works on Unix (including MacOS X) and Windows (Cygwin or
-MinGW) with SBCL (> 1.0.56), CMUCL (> 20b), CCL, ECL, CLISP, ABCL (>
-1.1.0), Allegro (both standard and modern) and LispWorks.  Clon is
-provided as an ASDF 3 system, but has no mandatory dependency.  CFFI may
-optionally be used with CLISP, Allegro and LispWorks.  *Note Supported
-Platforms::, for more information.
-
-   See Clon’s homepage for tarballs, Git repository and online
-documentation.  Clon is also available via Quicklisp.
+*Note Supported Platforms::, for information on portability or
+requirements.  See Clon’s homepage for tarballs, Git repository and
+online documentation.  Clon is also available via Quicklisp.
 
    In order to install and load the bare Lisp library, unpack it
 somewhere in the ASDF 3 source registry and type this at the REPL:
