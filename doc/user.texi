@@ -555,7 +555,7 @@ mode (@pxref{Technical Notes}). For instance, put this in your
 (sb-posix:setenv "CC" "gcc" 1)
 @end verbatim
 
-In addition to the library itself, the Clon distribution offers
+In addition to the library itself, the @clon{} distribution offers
 documentation in the form of 3 different manuals, some data files like
 sample themes (@pxenduserref{Theme Creation}), and a couple of
 demonstration programs. If you want to benefit from all those wonders,
@@ -678,7 +678,8 @@ demonstration programs in the distribution show how to use it):
 
 @cindex Package, nicknames
 @defun nickname-package &optional NICKNAME
-Add NICKNAME (:CLON by default) to the :NET.DIDIERVERNA.CLON package.
+Add @var{NICKNAME} (@code{:clon} by default) to the
+@code{:NET.DIDIERVERNA.CLON} package.
 @end defun
 
 @cindex Synopsis
@@ -2576,10 +2577,9 @@ levels start at 0 (@eg{} 2.4.0).
 @pvindex{*release-name*}
 In addition to that, each version of @clon{} (in the sense
 @emph{major.minor}, regardless of the status) has a name, stored in the
-parameter @code{*release-name*}. The general theme for @clon{} is ``Great
-Jazz Musicians'', and specifically for the 1.x series: ``Great Saxophone
-Players''. Anyone daring to mention Kenny G at that point will be shot
-on sight.
+parameter @code{*release-name*}. The general naming theme for @clon{} is
+``Great Jazz Musicians''. Anyone daring to mention Kenny G at that point
+will be shot on sight.
 
 Here is how the @code{version} function computes its value.
 @itemize
@@ -2661,13 +2661,13 @@ typically do something like this:
 @end verbatim
 
 @defun configure KEY VALUE
-Set KEY to VALUE in the current Clon configuration.
+Set @var{KEY} to @var{VALUE} in the current @clon{} configuration.
 @end defun
 
 Out of curiosity, you can also inquire the current configuration for
 specific options with the following function.
 @defun configuration KEY
-Return KEY's value in the current Clon configuration.
+Return @var{KEY}'s value in the current @clon{} configuration.
 @end defun
 
 Currently, the following options are provided.
