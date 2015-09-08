@@ -57,7 +57,8 @@
   "The status level of this release.")
 
 (defparameter *release-name* "Michael Brecker"
-  "The name of this release.")
+  "The name of this release.
+The general naming theme for Clon is \"Great Jazz musicians\".")
 
 (defun release-status-number (release-status)
   (ecase release-status
