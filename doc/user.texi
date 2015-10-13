@@ -654,8 +654,8 @@ called @file{simple} in the distribution.
 @section Explanation
 Let's examine this program step-by-step now.
 
-@pkgindex{net.didierverna.clon}@c
 @sysindex{net.didierverna.clon}@c
+@pkgindex{net.didierverna.clon}@c
 First, we put ourselves in the @cl{} user package, and load @clon{} from
 its ASDF system @samp{net.didierverna.clon}. Next, we use the @clon{}
 package, also named @samp{net.didierverna.clon}.
