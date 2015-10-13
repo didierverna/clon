@@ -2697,7 +2697,7 @@ autodetect the problem (in which case I would like to know), or if for
 some reason, you explicitly want to disable those features, you may set
 the @code{:restricted} configuration option to @code{t}. Another way to
 do it, without even bothering with configuration is to just use the
-@samp{com.svlsoft.clon.core} system instead of the regular one.
+@samp{net.didierverna.clon.core} system instead of the regular one.
 @item :dump
 @coindex{dump}@c
 This option is only used by the ABCL port. @ref{Dumping Executables},
