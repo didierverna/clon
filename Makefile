@@ -94,9 +94,6 @@ install-www: dist
 	  && ln -fs attic/$(TARBALL) latest.tar.gz	\
 	  && ln -fs attic/$(SIGNATURE) latest.tar.gz.asc
 
-update-version:
-	cd doc && $(MAKE) $@
-
 gen:
 	@for i in $(SUBDIRS) ; do                 \
 	   echo "making $(TARGET) in $${i} ..." ; \
@@ -129,9 +126,8 @@ $(SIGNATURE): $(TARBALL)
 .PHONY: hack all						\
 	all-formats dvi ps ref all-formats-ref dvi-ref ps-ref	\
 	install install-ref uninstall				\
-	clean distclean						\
+	clean distclean					\
 	tag tar gpg dist install-www				\
-	update-version						\
 	gen
 
 
