@@ -92,7 +92,7 @@ specific options with the following function.
      for some reason, you explicitly want to disable those features, you
      may set the ‘:restricted’ configuration option to ‘t’.  Another way
      to do it, without even bothering with configuration is to just use
-     the ‘com.svlsoft.clon.core’ system instead of the regular one.
+     the ‘net.didierverna.clon.core’ system instead of the regular one.
 :dump
      This option is only used by the ABCL port.  *note Dumping
      Executables::, provides more information on its use.
