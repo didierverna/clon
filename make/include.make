@@ -41,30 +41,30 @@ SBCL_CACHE  := sbcl
 SBCL_BINLOC := sbcl
 SBCL_LOAD   := --load
 SBCL_EVAL   := --eval
-SBCL_DUMP   := --script
+SBCL_DUMP   := $(SBCL_LOAD)
 
 CMUCL_CACHE  := cmu
 CMUCL_BINLOC := cmu
 CMUCL_LOAD   := -load
 CMUCL_EVAL   := -eval
-CMUCL_DUMP   := -noinit -nositeinit $(CMUCL_LOAD)
+CMUCL_DUMP   := $(CMUCL_LOAD)
 
 CCL_CACHE  := ccl
 CCL_BINLOC := openmcl
 CCL_LOAD   := --load
 CCL_EVAL   := --eval
-CCL_DUMP   := --no-init $(CCL_LOAD)
+CCL_DUMP   := $(CCL_LOAD)
 
 ECL_CACHE  := ecl
 ECL_BINLOC := ecl
 ECL_LOAD   := -load
 ECL_EVAL   := -eval
-ECL_DUMP   := -norc $(ECL_LOAD)
+ECL_DUMP   := $(ECL_LOAD)
 
 CLISP_CACHE  := clisp
 CLISP_BINLOC := clisp
 CLISP_LOAD   := -i
-CLISP_DUMP   := -norc $(CLISP_LOAD)
+CLISP_DUMP   := $(CLISP_LOAD)
 
 ABCL_CACHE  := abcl
 ABCL_BINLOC := abcl
@@ -81,13 +81,13 @@ ACL_CACHE  := acl
 ACL_BINLOC := acl
 ACL_LOAD   := -L
 ACL_EVAL   := -e
-ACL_DUMP   := -qq $(ACL_LOAD)
+ACL_DUMP   := $(ACL_LOAD)
 
 LW_CACHE  := lw
 LW_BINLOC := lw
 LW_LOAD   := -load
 LW_EVAL   := -eval
-LW_DUMP   := -init - -siteinit - $(LW_LOAD)
+LW_DUMP   := $(LW_LOAD)
 
 BINLOC := $($(LISP)_BINLOC)
 
