@@ -118,7 +118,7 @@
 
 ;; String concatenation
 ;; --------------------
-(defun tilde-reader (stream char)
+(defun ~-reader (stream char)
   "Read a series of ~\"string\" to be concatenated together."
   (declare (ignore char))
   (flet ((read-string (&aux (string (read stream t nil t)))
@@ -181,7 +181,7 @@ See CLINDENT for more information."
 	  ;; #### PORTME.
 	  #+(or ecl clisp allegro lispworks)
 	  dummy)
-  (:macro-char #\~ #'tilde-reader)
+  (:macro-char #\~ #'~-reader)
   (:dispatch-macro-char #\# #\i #'i-reader))
 
 ;;; package.lisp ends here
