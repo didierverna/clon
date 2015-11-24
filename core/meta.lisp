@@ -130,8 +130,8 @@
 		 :do (read-char stream t nil t)
 		 :collect (read-string)))))
 
-;; Emacs indentation
-;; -----------------
+;; Code indentation
+;; ----------------
 (defun clindent (symbol indent)
   "Set SYMBOL's indentation to INDENT in (X)Emacs.
 This function sets SYMBOL's common-lisp-indent-function property.
@@ -141,10 +141,7 @@ Otherwise, INDENT is considered as an indentation definition."
 	     (configuration :swank-eval-in-emacs))
     ;; #### NOTE: case portability
     (funcall (intern (string :eval-in-emacs) :swank)
-	     `(put ',symbol 'common-lisp-indent-function
-		   ,(if (symbolp indent)
-			`(get ',indent 'common-lisp-indent-function)
-		      `',indent))
+	     `(clon-defindent ',symbol ',indent)
 	     t)))
 
 (defmacro defindent (symbol indent)
