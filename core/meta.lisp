@@ -36,7 +36,7 @@
 (defpackage :net.didierverna.clon
   (:documentation "The Command-Line Options Nuker package.")
   (:use :cl :net.didierverna.clon.setup)
-  (:shadow :*readtable*)
+  (:import-from :named-readtables :in-readtable)
   ;; #### PORTME.
   (:import-from #+sbcl      :sb-mop
 		#+cmu       :mop
@@ -100,9 +100,9 @@
 (in-package :net.didierverna.clon)
 
 
-;; -------------------
-;; External utilities:
-;; -------------------
+;; ------------------
+;; Package utilities:
+;; ------------------
 
 (defun nickname-package (&optional (nickname :clon))
   "Add NICKNAME (:CLON by default) to the :NET.DIDIERVERNA.CLON package."
@@ -112,13 +112,9 @@
 			  :test #'string-equal)))
 
 
-;; -------------------
-;; Internal utilities:
-;; -------------------
-
-(defvar *readtable* (copy-readtable)
-  "The Clon readtable.")
-
+;; ---------------------
+;; Readtable management:
+;; ---------------------
 
 ;; String concatenation
 ;; --------------------
@@ -133,8 +129,6 @@
 	   (loop :while (char= (peek-char t stream nil nil t) #\~)
 		 :do (read-char stream t nil t)
 		 :collect (read-string)))))
-
-(set-macro-character #\~ #'tilde-reader nil *readtable*)
 
 ;; Emacs indentation
 ;; -----------------
@@ -165,8 +159,6 @@ See CLINDENT for more information."
   (declare (ignore subchar arg))
   (cons 'defindent (read stream)))
 
-(set-dispatch-macro-character #\# #\i #'i-reader *readtable*)
-
 
 ;; ECL, CLISP, Allegro and LispWorks do not like to see undefined reader
 ;; macros in expressions that belong to other compilers. For instance this
@@ -182,15 +174,17 @@ See CLINDENT for more information."
     "Return nil."
     (declare (ignore stream subchar args))
     nil)
-  (set-dispatch-macro-character #\# #\_ #'dummy-reader *readtable*)
-  (set-dispatch-macro-character #\# #\$ #'dummy-reader *readtable*))
+  (named-readtables:defreadtable dummy
+    (:dispatch-macro-char #\# #\_ #'dummy-reader)
+    (:dispatch-macro-char #\# #\$ #'dummy-reader)))
 
-(defmacro in-readtable (name)
-  "Set the current readtable to the value of NAME::*READTABLE*."
-  `(eval-when (:compile-toplevel :load-toplevel :execute)
-     (setf cl:*readtable*
-	   ;; #### NOTE: case portability
-	   (symbol-value (find-symbol (string :*readtable*) ,name)))))
 
+(named-readtables:defreadtable :net.didierverna.clon
+  (:merge :standard
+	  ;; #### PORTME.
+	  #+(or ecl clisp allegro lispworks)
+	  dummy)
+  (:macro-char #\~ #'tilde-reader)
+  (:dispatch-macro-char #\# #\i #'i-reader))
 
 ;;; package.lisp ends here

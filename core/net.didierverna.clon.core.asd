@@ -41,7 +41,8 @@ complete description of Clon, see the net.didierverna.clon system."
   :license "BSD"
   :version #.(net.didierverna.clon.setup:version :short)
   :depends-on (:net.didierverna.clon.setup
-	       (:feature :sbcl (:require :sb-posix)))
+	       (:feature :sbcl (:require :sb-posix))
+	       :named-readtables)
   :serial t
   :components ((:file "meta")
 	       (:module "src"
