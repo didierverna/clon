@@ -22,11 +22,11 @@ compiler in your init file.  Otherwise, Clon will run in restricted mode
 
    In addition to the library itself, the Clon distribution offers
 documentation in the form of 3 different manuals, some data files like
-sample themes (*note (clon-enduser)Theme Creation::), and a couple of
-demonstration programs.  If you want to benefit from all those wonders,
-some bits of manual installation are needed.  After unpacking somewhere
-in the ASDF 3 source registry, please perform the following steps, in
-order.
+sample themes (*note (clon-enduser)Theme Creation::), a couple of
+demonstration programs and an Emacs Lisp library for supporting the
+development.  If you want to benefit from all those wonders, some bits
+of manual installation are needed.  After unpacking somewhere in the
+ASDF 3 source registry, please perform the following steps, in order.
 
   1. Edit ‘make/config.make’ to your specific needs.
 
@@ -78,10 +78,15 @@ specific options with the following function.
      information for some of its functions directly embedded in the
      code.  This information can be automatically transmitted to
      (X)Emacs when the ASDF system is loaded if you set this option to
-     ‘t’.  However, note that for this to work, the Slime variable
-     ‘slime-enable-evaluate-in-emacs’ must also be set to ‘t’ in your
-     (X)Emacs session.  If you’re interested to know how this process
-     works, I have described it in the following blog entry:
+     ‘t’.  For this to work, there are two things to do first in your
+     (X)Emacs session:
+       1. set the Slime variable ‘slime-enable-evaluate-in-emacs’ to
+          ‘t’,
+       2. and load the ‘clon’ Emacs Lisp library.  This library is part
+          of the distribution and installed in a standard Emacs Lisp
+          directory by ‘make install’.
+     If you’re interested to know how this process works, I have
+     described it in the following blog entry:
      <http://www.didierverna.com/sciblog/index.php?post/2011/07/20/One-more-indentation-hack>.
 :restricted
      Some non-ANSI features of Clon require external functionality that
