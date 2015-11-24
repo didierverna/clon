@@ -184,4 +184,4 @@ See CLINDENT for more information."
   (:macro-char #\~ #'~-reader)
   (:dispatch-macro-char #\# #\i #'i-reader))
 
-;;; package.lisp ends here
+;;; meta.lisp ends here
