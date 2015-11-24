@@ -39,7 +39,7 @@ ifeq ($(LISP),CLISP)
 endif
 include make/version.make
 
-SUBDIRS   := setup core termio demos share doc
+SUBDIRS   := setup core termio demos share doc emacs
 DIST_NAME := $(PROJECT)-$(SHORT_VERSION)
 TARBALL   := $(DIST_NAME).tar.gz
 SIGNATURE := $(TARBALL).asc

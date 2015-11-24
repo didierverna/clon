@@ -81,4 +81,7 @@ DVIPS    = dvips
 CONVERT  = convert
 
 
+## Emacs site-lisp:
+SITE_LISP = $(SHARE)/emacs/site-lisp
+
 ### config.make ends here
