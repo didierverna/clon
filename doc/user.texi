@@ -2732,9 +2732,12 @@ for 80 columns regardless of the actual terminal width
 @c ----------------------
 @node Supported Platforms, Dumping Executables, Non-ANSI Features, Technical Notes
 @section Supported Platforms
+@sysindex{editor-hints.named-readtables}
 @clon{} is an ASDF 3 library. It currently works on Unix (including
 MacOS X) and Windows (Cygwin or MinGW) and has been ported to 8 @cl{}
-implementations. The following table lists the supported platforms.
+implementations. It requires @code{editor-hints.named-readtables}. The
+following table lists the supported platforms and some additional,
+platform-dependent dependencies.
 
 @multitable {Compiler} {Minimum Version} {@code{cffi} (optional)}
 @headitem Compiler @tab Minimum Version @tab Dependencies

@@ -122,7 +122,9 @@ A.3 Supported Platforms
 
 Clon is an ASDF 3 library.  It currently works on Unix (including MacOS
 X) and Windows (Cygwin or MinGW) and has been ported to 8 Common Lisp
-implementations.  The following table lists the supported platforms.
+implementations.  It requires ‘editor-hints.named-readtables’.  The
+following table lists the supported platforms and some additional,
+platform-dependent dependencies.
 
 Compiler   Minimum Version   Dependencies
 -------------------------------------------------
