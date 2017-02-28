@@ -1,6 +1,6 @@
 ### Makefile --- Doc directory
 
-## Copyright (C) 2010, 2011, 2015 Didier Verna
+## Copyright (C) 2010, 2011, 2015, 2017 Didier Verna
 
 ## Author: Didier Verna <didier@didierverna.net>
 
@@ -52,6 +52,8 @@ PS_FILES       := $(TEXI_FILES:%.texi=%.ps)
 HTML_DIRS      := $(TEXI_FILES:%.texi=%)
 
 INFO_REF       := $(PROJECT)-reference.info
+
+CSS := https://sirgazil.bitbucket.org/static/docs/css/texinfo/tip/document.css
 
 
 all: info pdf html
@@ -135,7 +137,7 @@ $(PROJECT)-%.info: %.texi
 	$(TEXI2DVI) -p $<
 
 $(HTML_DIRS) webreference: %: %.texi
-	$(MAKEINFO) --html -o $@ $<
+	$(MAKEINFO) --css-ref=$(CSS) --html -o $@ $<
 	touch $@
 
 %.dvi: %.texi
