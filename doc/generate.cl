@@ -125,21 +125,21 @@ and extend the library with your own option types.
 (if (and (second sb-ext:*posix-argv*)
 	 (string= (second sb-ext:*posix-argv*) "--web"))
     (declt:declt :net.didierverna.clon
-		 :library-name "Clon"
-		 :texi-file "webreference.texi"
-		 :info-file "clon-webreference" ;; but we don't care
-		 :introduction +introduction+
+		 :library "Clon"
 		 :version (net.didierverna.clon:version :long)
+		 :copyright "2010-2012, 2015"
 		 :license :bsd
-		 :copyright-date "2010-2012, 2015")
+		 :introduction +introduction+
+		 :texi-file "webreference.texi"
+		 :info-file "clon-webreference") ;; but we don't care
     (declt:declt :net.didierverna.clon
-		 :library-name "Clon"
+		 :library "Clon"
+		 :version (net.didierverna.clon:version :long)
+		 :copyright "2010-2012, 2015"
+		 :license :bsd
 		 :texi-file "reference.texi"
 		 :info-file "clon-reference"
 		 :introduction +introduction+
-		 :version (net.didierverna.clon:version :long)
-		 :license :bsd
-		 :copyright-date "2010-2012, 2015"
 		 :hyperlinks t))
 
 (uiop:quit)
