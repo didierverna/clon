@@ -122,13 +122,14 @@
   "Read a series of ~\"string\" to be concatenated together."
   (declare (ignore char))
   (flet ((read-string (&aux (string (read stream t nil t)))
-	   (check-type string string "a string")
-	   string))
+           (unless *read-suppress*
+             (check-type string string "a string"))
+           string))
     (apply #'concatenate 'string
-	   (read-string)
-	   (loop :while (char= (peek-char t stream nil nil t) #\~)
-		 :do (read-char stream t nil t)
-		 :collect (read-string)))))
+           (read-string)
+           (loop :while (char= (peek-char t stream nil nil t) #\~)
+                 :do (read-char stream t nil t)
+                 :collect (read-string)))))
 
 ;; Code indentation
 ;; ----------------
