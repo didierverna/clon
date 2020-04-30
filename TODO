@@ -149,6 +149,11 @@ He plays around and then clicks "Go", and the program continues with with the
 appropriate command-line (you can already have different contexts in Clon).
 Cool hey ?
 
+Some related works on GCLI (Graphical Command-Line Interfaces):
+https://github.com/Impedimenta/Suitcase
+https://blog.repl.it/clui
+https://ugui.io/
+
 * Provide a negated long form as well ?
 ++debug
 
