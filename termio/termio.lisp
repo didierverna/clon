@@ -69,6 +69,7 @@
 
 ;; Preamble C code needed for ECL's FD-LINE-WIDTH function.
 #+ecl (ffi:clines "
+#include <string.h>
 #include <stdio.h>
 #include <errno.h>
 #include <sys/ioctl.h>")
