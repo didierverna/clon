@@ -1,6 +1,6 @@
 ;;; generate.cl --- Clon reference manual generation script
 
-;; Copyright (C) 2010-2012, 2015, 2017 Didier Verna
+;; Copyright (C) 2010-2012, 2015, 2017, 2021 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
@@ -27,6 +27,8 @@
 ;;; Code:
 
 (require "asdf")
+
+(defconstant +copyright-years+ "2010--2012, 2015, 2017, 2020, 2021")
 
 (defconstant +introduction+
   "@macro clon
@@ -118,29 +120,29 @@ and extend the library with your own option types.
 
 ;; ASDF doesn't understand my version numnbering scheme. That will change
 ;; soon, but in the meantime, I have to provide my version number explicitly
-;; here (and so I need to load the system in order to get the VERSION
-;; function).
-(asdf:load-system :net.didierverna.clon)
+;; here (and so I need to load at least the setup system in order to get the
+;; VERSION function).
+(asdf:load-system :net.didierverna.clon.setup)
 
 (if (and (second sb-ext:*posix-argv*)
 	 (string= (second sb-ext:*posix-argv*) "--web"))
-    (declt:declt :net.didierverna.clon
-		 :library "Clon"
-		 :version (net.didierverna.clon:version :long)
-		 :copyright "2010-2012, 2015"
-		 :license :bsd
-		 :introduction +introduction+
-		 :texi-file "webreference.texi"
-		 :info-file "clon-webreference") ;; but we don't care
-    (declt:declt :net.didierverna.clon
-		 :library "Clon"
-		 :version (net.didierverna.clon:version :long)
-		 :copyright "2010-2012, 2015"
-		 :license :bsd
-		 :texi-file "reference.texi"
-		 :info-file "clon-reference"
-		 :introduction +introduction+
-		 :hyperlinks t))
+  (declt:declt :net.didierverna.clon
+	       :library-name "Clon"
+	       :version (net.didierverna.clon.setup:version :long)
+	       :copyright-years +copyright-years+
+	       :license :bsd
+	       :introduction +introduction+
+	       :texi-name "webreference"
+	       :info-name "clon-webreference") ;; but we don't care
+  (declt:declt :net.didierverna.clon
+	       :library-name "Clon"
+	       :version (net.didierverna.clon.setup:version :long)
+	       :copyright-years +copyright-years+
+	       :license :bsd
+	       :introduction +introduction+
+	       :texi-name "reference"
+	       :info-name "clon-reference"
+	       :hyperlinks t))
 
 (uiop:quit)
 
