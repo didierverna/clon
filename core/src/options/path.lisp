@@ -213,7 +213,7 @@ useful to specify which part of ARGUMENT is concerned when it is a list."
 	((nil)
 	 (let ((paths (split-path argument)))
 	   (if (= (length paths) 1)
-	       (string-pathname paths)
+	       (string-pathname (first paths))
 	     (mapcar (lambda (pathname)
 		       (string-pathname pathname :specify t))
 		     paths))))))))
