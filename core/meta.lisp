@@ -172,8 +172,10 @@ See CLINDENT for more information."
     (declare (ignore stream subchar args))
     nil)
   (named-readtables:defreadtable dummy
+    (:macro-char #\# :dispatch t)
     (:dispatch-macro-char #\# #\_ #'dummy-reader)
-    (:dispatch-macro-char #\# #\$ #'dummy-reader)))
+    ;; ECL has this one for random generator initialization.
+    #-ecl (:dispatch-macro-char #\# #\$ #'dummy-reader)))
 
 
 (named-readtables:defreadtable :net.didierverna.clon
