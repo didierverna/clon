@@ -194,7 +194,7 @@ Return two values:
 	(fd-line-width handle)
       (values (unless (= cols -1) cols) msg))
     #+(or clisp allegro lispworks)
-    (cffi:with-foreign-object (winsize 'winsize)
+    (cffi:with-foreign-object (winsize '(:struct winsize))
       (let ((result (cffi:foreign-funcall "ioctl"
 		      :int handle
 		      :int +tiocgwinsz+
@@ -205,7 +205,7 @@ Return two values:
 	      (values nil
 		      (cffi:foreign-funcall "strerror"
 			:int +errno+ :string)))
-	  (cffi:with-foreign-slots ((ws-col) winsize winsize)
+	  (cffi:with-foreign-slots ((ws-col) winsize (:struct winsize))
 	    ws-col))))))
 
 ;;; termio.lisp ends here

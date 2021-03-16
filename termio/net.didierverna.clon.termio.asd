@@ -58,7 +58,7 @@ Clon, see the net.didierverna.clon system."
 	       #+sbcl (sb-grovel:grovel-constants-file "sbcl/constants"
 		       :package :net.didierverna.clon :if-feature :sbcl)
 	       #+(or allegro clisp lispworks)
-	       (:grovel-file "cffi/constants"
+	       (:cffi-grovel-file "cffi/constants"
 		:if-feature (:or :allegro :clisp :lispworks))
 	       (:file "termio")))
 
