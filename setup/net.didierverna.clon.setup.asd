@@ -30,15 +30,24 @@
   :long-name "The Command-Line Options Nuker, setup library"
   :description "Clon's preload setup library"
   :long-description "\
-Clon's setup library provides support for various preload configuration
-parameters. For a more complete description of Clon, see the
-net.didierverna.clon system."
+The Clon setup library provides support for various preload configuration
+parameters and meta-utilities. For a more complete description of Clon,
+see the `net.didierverna.clon' system."
   :author "Didier Verna"
   :mailto "didier@didierverna.net"
   :homepage "http://www.lrde.epita.fr/~didier/software/lisp/clon.php"
   :source-control "https://github.com/didierverna/clon"
   :license "BSD"
-  :components ((:file "setup")))
+  :depends-on (:named-readtables)
+  :serial t
+  :components ((:file "package")
+	       (:module "src"
+		:components ((:file "version")
+			     (:file "configuration")
+			     (:file "readtable"
+			      :depends-on ("configuration"))
+			     (:file "termio"
+			      :depends-on ("configuration"))))))
 
 (asdf:defsystem :net.didierverna.clon.setup/termio
   :long-name "The Command-Line Options Nuker, termio setup"

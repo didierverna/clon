@@ -1,6 +1,6 @@
-;;; setup.lisp --- Clon setup
+;;; version.lisp --- Clon version management
 
-;; Copyright (C) 2015 Didier Verna
+;; Copyright (C) 2021 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
@@ -26,23 +26,11 @@
 
 ;;; Code:
 
-(defpackage :net.didierverna.clon.setup
-  (:documentation "The Command-Line Options Nuker, setup.")
-  (:use :cl)
-  (:export
-   :*release-major-level* :*release-minor-level* :*release-status*
-   :*release-status-level* :*release-name*
-   :version
-   :configuration
-   :configure
-   :setup-termio))
-
 (in-package :net.didierverna.clon.setup)
 
 
-;; ----------
-;; Versioning
-;; ----------
+
+;; Version specifiers
 
 (defparameter *release-major-level* 1
   "The major level of this release.")
@@ -59,6 +47,10 @@
 (defparameter *release-name* "Michael Brecker"
   "The name of this release.
 The general naming theme for Clon is \"Great Jazz musicians\".")
+
+
+
+;; Internal utilities
 
 (defun release-status-number (release-status)
   (ecase release-status
@@ -105,6 +97,10 @@ The general naming theme for Clon is \"Great Jazz musicians\".")
        level
        name))))
 
+
+
+;; Entry point
+
 (defun version (&optional (type :number))
   "Return the current version of Clon.
 TYPE can be one of :number, :short or :long.
@@ -124,76 +120,4 @@ the short version, a patchlevel of 0 is ignored in the output."
 	    *release-status* *release-status-level*
 	    *release-name*))
 
-
-;; -------------
-;; Configuration
-;; -------------
-
-(defvar *configuration* nil
-  "The Clon configuration settings.
-This variable contains a property list of configuration options.
-Current options are:
-- :swank-eval-in-emacs (Boolean)
-- :restricted (Boolean)
-- :dump (Boolean)
-
-See section A.1 of the user manual for more information.")
-
-(defun configuration (key)
-  "Return KEY's value in the current Clon configuration."
-  (getf *configuration* key))
-
-(defun configure (key value)
-  "Set KEY to VALUE in the current Clon configuration."
-  (setf (getf *configuration* key) value))
-
-
-;; -------------------
-;; System requirements
-;; -------------------
-
-(defun restrict-because (reason)
-  "Put Clon in restricted mode because of REASON."
-  (format *error-output* "~
-*******************************************************************
-* WARNING: ~A.~66T*
-* Clon will be loaded without support for terminal autodetection. *
-* See sections 2 and A.1 of the user manual for more information. *
-*******************************************************************"
-    reason)
-  (configure :restricted t))
-
-(defun setup-termio ()
-  "Autodetect termio support.
-Update Clon configuration and *FEATURES* accordingly."
-  (unless (configuration :restricted)
-    #+sbcl
-    (progn
-      (require :sb-posix)
-      (unless (funcall (intern "GETENV" :sb-posix) "CC")
-	(restrict-because "the CC environment variable is not set"))
-      (handler-case (asdf:load-system :sb-grovel)
-	(error ()
-	  (restrict-because "unable to load module SB-GROVEL"))))
-    #+clisp
-    (cond ((member :ffi *features*)
-	   (handler-case (asdf:load-system :cffi-grovel)
-	     (error ()
-	       (restrict-because
-		"unable to load ASDF component CFFI-GROVEL"))))
-	  (t
-	   (restrict-because
-	    "CLISP is compiled without FFI support")))
-    #+(or allegro lispworks)
-    (handler-case (asdf:load-system :cffi-grovel)
-      (error ()
-	(restrict-because
-	 "unable to load ASDF component CFFI-GROVEL")))
-    #+abcl
-    (restrict-because "ABCL is in use"))
-  (if (configuration :restricted)
-      (setq *features* (delete  :net.didierverna.clon.termio *features*))
-      (pushnew :net.didierverna.clon.termio *features*)))
-
-
-;;; setup.lisp ends here
+;;; version.lisp ends here

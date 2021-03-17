@@ -44,7 +44,7 @@ complete description of Clon, see the net.didierverna.clon system."
 	       (:feature :sbcl (:require :sb-posix))
 	       :named-readtables)
   :serial t
-  :components ((:file "meta")
+  :components ((:file "package")
 	       (:module "src"
 		:components ((:file "util")
 			     (:file "item" :depends-on ("util"))

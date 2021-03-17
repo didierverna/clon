@@ -1,6 +1,6 @@
-;;; clon.el --- Source code maintenance utilities
+;;; package.lisp --- Clon setup package definition
 
-;; Copyright (C) 2015 Didier Verna
+;; Copyright (C) 2021 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
@@ -23,23 +23,24 @@
 
 ;; Contents management by FCM version 0.1.
 
-;; This file contains various Emacs utilities called from the Common Lisp side
-;; (Swank) when Clon is loaded / compiled with the :swank-eval-in-emacs-setup
-;; option (see section A.1 of the user manual). It also requires that the
-;; variable slime-enable-evaluate-in-emacs be set to t in (X)Emacs.
-
-;; The provided information currently includes:
-;; - indentation properties for some symbols.
-
 
 ;;; Code:
 
-(defun clon-defindent (symbol indent)
-  "Set SYMBOL's indentation to INDENT.
-This function sets SYMBOL's common-lisp-indent-function property.
-If INDENT is a symbol, use its indentation definition.
-Otherwise, INDENT is considered as an indentation definition."
-  (put symbol 'common-lisp-indent-function
-       (if (symbolp indent)
-	   (get indent 'common-lisp-indent-function)
-	 indent)))
+(in-package :cl-user)
+
+(defpackage :net.didierverna.clon.setup
+  (:documentation "The Clon setup library's package.")
+  (:use :cl)
+  (:import-from :named-readtables :defreadtable :in-readtable)
+  (:export
+    :in-readtable
+    ;; from src/version.lisp:
+    :*release-major-level* :*release-minor-level* :*release-status*
+    :*release-status-level* :*release-name*
+    :version
+    ;; from src/configuration.lisp:
+    :configuration :configure
+    ;; from src/termio.lisp:
+    :setup-termio))
+
+;;; package.lisp ends here

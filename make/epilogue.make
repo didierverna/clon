@@ -27,7 +27,7 @@
 ### Code:
 
 $(TOP_DIR)/make/version.make: \
-  $(TOP_DIR)/make/version.cl $(TOP_DIR)/setup/setup.lisp
+  $(TOP_DIR)/make/version.cl $(TOP_DIR)/setup/src/version.lisp
 	$($(LISP)_PATH) $(EVAL_CONFIG)		     \
 	  $($(LISP)_LOAD) $(TOP_DIR)/make/version.cl \
 	  | tail -2 > $@

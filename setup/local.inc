@@ -1,2 +1,2 @@
 TOP_DIR := ..
-SUBDIRS :=
+SUBDIRS := src
