@@ -329,8 +329,15 @@ NIL."
 
 (defvar *executablep* nil
   "Whether the current Lisp image is a standalone executable dumped by Clon.
+See `executablep' for more information.")
+
+(defun executablep ()
+  "Return T if the current Lisp image is a standalone executable.
 This information is needed in some implementations that treat their
-command-line differently in dumped images.")
+command-line differently in dumped images.
+This function detects executables dumped by Clon (see `*executablep*'),
+or by ASDF's program-op operation."
+  (or *executablep* (eq uiop:*image-dumped-p* :executable)))
 
 (defun cmdline ()
   "Get the current application's command-line.
@@ -339,31 +346,31 @@ option; only user-level ones. When a standalone executable is dumped, this is
 always the case. When used interactively, this depends on the underlying Lisp
 implementation. See appendix A.5 of the user manual for more information."
   ;; #### PORTME.
-  #+sbcl      sb-ext:*posix-argv*
-  #+cmu       (if *executablep*
-		  lisp::lisp-command-line-list
-		(cons (car lisp::lisp-command-line-list)
-		      ext:*command-line-application-arguments*))
-  #+ccl       (if *executablep*
-		  ccl:*command-line-argument-list*
-		(cons (car ccl:*command-line-argument-list*)
-		      ccl:*unprocessed-command-line-arguments*))
-  #+ecl       (if *executablep*
-		  (ext:command-args)
-		(cons (car (ext:command-args))
-		      (cdr (member "--" (ext:command-args) :test #'string=))))
-  #+clisp     (cons (aref (ext:argv) 0) ext:*args*)
+  #+sbcl sb-ext:*posix-argv*
+  #+cmu (if (executablep)
+	  lisp::lisp-command-line-list
+	  (cons (car lisp::lisp-command-line-list)
+		ext:*command-line-application-arguments*))
+  #+ccl (if (executablep)
+	  ccl:*command-line-argument-list*
+	  (cons (car ccl:*command-line-argument-list*)
+		ccl:*unprocessed-command-line-arguments*))
+  #+ecl (if (executablep)
+	  (ext:command-args)
+	  (cons (car (ext:command-args))
+		(cdr (member "--" (ext:command-args) :test #'string=))))
+  #+clisp (cons (aref (ext:argv) 0) ext:*args*)
   ;; #### NOTE: the trickery below is here to make CMDLINE work even when Clon
   ;; is loaded into ABCL without dumping the Clon way (see
   ;; +ABCL-MAIN-CLASS-TEMPLATE+).
-  #+abcl      (cons (or (let ((symbol (find-symbol "*ARGV0*" 'extensions)))
-			  (when symbol
-			    (symbol-value symbol)))
-			"abcl")
-		    extensions:*command-line-argument-list*)
-  #+allegro   (system:command-line-arguments)
-  #+lispworks (if *executablep*
-		  system:*line-arguments-list*
+  #+abcl (cons (or (let ((symbol (find-symbol "*ARGV0*" 'extensions)))
+		     (when symbol
+		       (symbol-value symbol)))
+		   "abcl")
+	       extensions:*command-line-argument-list*)
+  #+allegro (system:command-line-arguments)
+  #+lispworks (if (executablep)
+		system:*line-arguments-list*
 		(cons (car system:*line-arguments-list*)
 		      (cdr (member "--" system:*line-arguments-list*
 				   :test #'string=)))))
