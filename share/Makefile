@@ -29,8 +29,7 @@
 TOP_DIR := ..
 
 include $(TOP_DIR)/make/config.make
-hack: all
-include $(TOP_DIR)/make/include.make
+include $(TOP_DIR)/make/prologue.make
 
 PROJECT_SHARE := $(SHARE)/$(PROJECT)
 THEMES_DIR    := $(PROJECT_SHARE)/themes
@@ -50,6 +49,8 @@ clean:
 
 distclean:
 install-www:
+
+include $(TOP_DIR)/make/epilogue.make
 
 .PHONY: hack all install uninstall clean distclean install-www
 

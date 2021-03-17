@@ -27,16 +27,16 @@
 ### Code:
 
 TOP_DIR := ..
+
 include $(TOP_DIR)/make/config.make
-hack: all
-include $(TOP_DIR)/make/include.make
+include $(TOP_DIR)/make/prologue.make
 ifneq ($(SBCL_PATH),)
   include declt.make
 endif
 include $(TOP_DIR)/make/version.make
 
 INFO_DIR        := $(PREFIX)/share/info
-DOC_DIR		:= $(SHARE)/doc
+DOC_DIR	:= $(SHARE)/doc
 PROJECT_DOC_DIR := $(DOC_DIR)/$(PROJECT)
 TEXI_MAN	:= user.texi enduser.texi
 TEXI_FILES      := $(TEXI_MAN) $(TEXI_REF)
@@ -165,6 +165,8 @@ install-www: webref
 
 declt.make: $(TOP_DIR)/make/config.make
 	$(SBCL_PATH) $(SBCL_LOAD) ./declt.cl
+
+include $(TOP_DIR)/make/epilogue.make
 
 .PHONY: all webref all-formats		\
 	install-at install uninstall	\

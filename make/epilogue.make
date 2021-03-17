@@ -1,6 +1,6 @@
-### Makefile --- Emacs directory
+### epilogue.make --- Epilogue Makefile
 
-## Copyright (C) 2015 Didier Verna
+## Copyright (C) 2021 Didier Verna
 
 ## Author: Didier Verna <didier@didierverna.net>
 
@@ -26,29 +26,10 @@
 
 ### Code:
 
-TOP_DIR := ..
+$(TOP_DIR)/make/version.make: \
+  $(TOP_DIR)/make/version.cl $(TOP_DIR)/setup/setup.lisp
+	$($(LISP)_PATH) $(EVAL_CONFIG)		     \
+	  $($(LISP)_LOAD) $(TOP_DIR)/make/version.cl \
+	  | tail -2 > $@
 
-include $(TOP_DIR)/make/config.make
-include $(TOP_DIR)/make/prologue.make
-
-all:
-
-install:
-	install -d -m 755 "$(SITE_LISP)"
-	install -m 644 clon.el "$(SITE_LISP)/"
-
-uninstall:
-	-rm -fr "$(SITE_LISP)/clon.el"
-
-clean:
-	-rm *~ */*~ */*/*~
-
-distclean:
-install-www:
-
-include $(TOP_DIR)/make/epilogue.make
-
-.PHONY: hack all install uninstall clean distclean install-www
-
-
-### Makefile ends here
+### prologue.make ends here

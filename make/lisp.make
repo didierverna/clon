@@ -28,12 +28,9 @@
 
 ### Code:
 
-# Should contain at least TOP_DIR and SUBDIRS settings
-include local.inc
-
+include local.inc # Should contain at least TOP_DIR and SUBDIRS settings
 include $(TOP_DIR)/make/config.make
-hack: all
-include $(TOP_DIR)/make/include.make
+include $(TOP_DIR)/make/prologue.make
 
 all:
 
@@ -51,6 +48,8 @@ gen:
 	   echo "making $(TARGET) in $${i} ..." ; \
 	   ( cd $${i} && $(MAKE) $(TARGET) ) ;    \
 	 done
+
+include $(TOP_DIR)/make/epilogue.make
 
 .DEFAULT:
 	$(MAKE) gen TARGET=$@

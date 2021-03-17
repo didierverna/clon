@@ -1,4 +1,4 @@
-### include.make --- Inclusion part
+### prologue.make --- Prologue Makefile
 
 ## Copyright (C) 2010-2012, 2015 Didier Verna
 
@@ -107,10 +107,4 @@ CONFIG_3 :=
 EVAL_CONFIG :=
 endif
 
-$(TOP_DIR)/make/version.make: \
-  $(TOP_DIR)/make/version.cl $(TOP_DIR)/setup/setup.lisp
-	$($(LISP)_PATH) $(EVAL_CONFIG)		     \
-	  $($(LISP)_LOAD) $(TOP_DIR)/make/version.cl \
-	  | tail -2 > $@
-
-### include.make ends here
+### prologue.make ends here

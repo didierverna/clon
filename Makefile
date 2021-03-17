@@ -28,12 +28,10 @@
 
 ### Code:
 
-# Needed in include.make
 TOP_DIR := .
 
 include make/config.make
-hack: all
-include make/include.make
+include make/prologue.make
 include make/version.make
 
 SUBDIRS   := setup core termio demos share doc emacs
@@ -115,6 +113,8 @@ $(TARBALL):
 
 $(SIGNATURE): $(TARBALL)
 	gpg -b -a $<
+
+include make/epilogue.make
 
 .DEFAULT:
 	$(MAKE) gen TARGET=$@

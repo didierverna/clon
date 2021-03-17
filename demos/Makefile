@@ -29,8 +29,7 @@
 TOP_DIR := ..
 
 include $(TOP_DIR)/make/config.make
-hack: all
-include $(TOP_DIR)/make/include.make
+include $(TOP_DIR)/make/prologue.make
 
 DEMOS := simple advanced
 
@@ -113,6 +112,8 @@ distclean: clean
 install:
 uninstall:
 install-www:
+
+include $(TOP_DIR)/make/epilogue.make
 
 .INTERMEDIATE: $(foreach demo,$(DEMOS), $(call java_name,$(demo)).txt)	 \
 	       $(foreach demo,$(DEMOS), $(call java_name,$(demo)).java)	 \
