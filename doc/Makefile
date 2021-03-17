@@ -30,9 +30,6 @@ TOP_DIR := ..
 include $(TOP_DIR)/make/config.make
 hack: all
 include $(TOP_DIR)/make/include.make
-ifeq ($(LISP),CLISP)
-  include $(TOP_DIR)/make/clisp.make
-endif
 ifneq ($(SBCL_PATH),)
   include declt.make
 endif

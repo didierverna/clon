@@ -34,9 +34,6 @@ TOP_DIR := .
 include make/config.make
 hack: all
 include make/include.make
-ifeq ($(LISP),CLISP)
-  include make/clisp.make
-endif
 include make/version.make
 
 SUBDIRS   := setup core termio demos share doc emacs
@@ -53,7 +50,7 @@ all-formats dvi ps ref all-formats-ref dvi-ref ps-ref:
 	cd doc && $(MAKE) $@
 
 # Needed because we have an INSTALL file which fucks up the gen mechanism
-# (remember that Mac OSX is case-insensitive).
+# on case-insensitive OSX platforms.
 install:
 	$(MAKE) gen TARGET=install
 
@@ -66,7 +63,6 @@ clean:
 
 distclean: clean
 	$(MAKE) gen TARGET=distclean
-	-rm -f .clisp.cnf
 	-rm *.tar.gz *.tar.gz.asc
 	-rm -fr $($(LISP)_BINLOC)-*
 	-rm -fr "${HOME}"/.cache/common-lisp/$($(LISP)_CACHE)-*"`pwd`"
@@ -129,6 +125,5 @@ $(SIGNATURE): $(TARBALL)
 	clean distclean					\
 	tag tar gpg dist install-www				\
 	gen
-
 
 ### Makefile ends here

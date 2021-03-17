@@ -31,9 +31,6 @@ TOP_DIR := ..
 include $(TOP_DIR)/make/config.make
 hack: all
 include $(TOP_DIR)/make/include.make
-ifeq ($(LISP),CLISP)
-  include $(TOP_DIR)/make/clisp.make
-endif
 
 DEMOS := simple advanced
 
@@ -122,6 +119,5 @@ install-www:
 	       $(foreach demo,$(DEMOS), $(call java_name,$(demo)).class)
 
 .PHONY: hack all clean distclean install uninstall install-www
-
 
 ### Makefile ends here

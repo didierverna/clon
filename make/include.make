@@ -64,6 +64,7 @@ ECL_DUMP   := $(ECL_LOAD)
 CLISP_CACHE  := clisp
 CLISP_BINLOC := clisp
 CLISP_LOAD   := -i
+CLISP_EVAL   := -x
 CLISP_DUMP   := $(CLISP_LOAD)
 
 ABCL_CACHE  := abcl
@@ -71,10 +72,10 @@ ABCL_BINLOC := abcl
 ABCL_LOAD   := --load
 ABCL_EVAL   := --eval
 #### NOTE: multiple usage of the eval option to avoid a funcall/intern mess.
-ABCL_DUMP   := --batch							\
-	       $(ABCL_EVAL) '(require "asdf")'				\
-	       $(ABCL_EVAL) '(asdf:load-system :$(PACKAGE).setup)'	\
-	       $(ABCL_EVAL) '($(PACKAGE).setup:configure :dump t)'	\
+ABCL_DUMP   := --batch						   \
+	       $(ABCL_EVAL) '(require "asdf")'			   \
+	       $(ABCL_EVAL) '(asdf:load-system :$(PACKAGE).setup)' \
+	       $(ABCL_EVAL) '($(PACKAGE).setup:configure :dump t)' \
 	       $(ABCL_LOAD)
 
 ACL_CACHE  := acl
@@ -96,13 +97,9 @@ ifeq ($(RESTRICTED),t)
 CONFIG_1 := '(require "asdf")'
 CONFIG_2 := '(asdf:load-system :$(PACKAGE).setup)'
 CONFIG_3 := '($(PACKAGE).setup:configure :restricted t)'
-  ifeq ($(LISP),CLISP)
-EVAL_CONFIG := $($(LISP)_LOAD) $(TOP_DIR)/.clisp.cnf
-  else
-EVAL_CONFIG := $($(LISP)_EVAL) $(CONFIG_1)	\
-	       $($(LISP)_EVAL) $(CONFIG_2)	\
+EVAL_CONFIG := $($(LISP)_EVAL) $(CONFIG_1) \
+	       $($(LISP)_EVAL) $(CONFIG_2) \
 	       $($(LISP)_EVAL) $(CONFIG_3)
-  endif
 else
 CONFIG_1 :=
 CONFIG_2 :=
@@ -110,32 +107,10 @@ CONFIG_3 :=
 EVAL_CONFIG :=
 endif
 
-# This is a gross hack for compensating the lack of --eval option to clisp.
-# This rule doesn't actually create any clisp.make file, but a clisp
-# configuration file that will be loaded with -i, and which is redone every
-# time make is called (several times actually). This is not a clean solution
-# but it works. Every Makefile that needs to run $(LISP) needs to include
-# clisp.make in order for this to work.
-$(TOP_DIR)/make/clisp.make:
-	echo $(CONFIG_1) >  $(TOP_DIR)/.clisp.cnf
-	echo $(CONFIG_2) >> $(TOP_DIR)/.clisp.cnf
-	echo $(CONFIG_3) >> $(TOP_DIR)/.clisp.cnf
-
-# The rule below duplicates what the one above does, but it's needed for
-# makefiles that include both version.inc and clisp.make. This is necessary
-# because Make wants to redo things in the wrong order and hence would call
-# clisp -i .clisp.cnf without this file having been created first.
 $(TOP_DIR)/make/version.make: \
   $(TOP_DIR)/make/version.cl $(TOP_DIR)/setup/setup.lisp
-ifeq ($(LISP),CLISP)
-	echo $(CONFIG_1) >  $(TOP_DIR)/.clisp.cnf
-	echo $(CONFIG_2) >> $(TOP_DIR)/.clisp.cnf
-	echo $(CONFIG_3) >> $(TOP_DIR)/.clisp.cnf
-endif
-	$($(LISP)_PATH) $(EVAL_CONFIG)			\
-	  $($(LISP)_LOAD) $(TOP_DIR)/make/version.cl	\
+	$($(LISP)_PATH) $(EVAL_CONFIG)		     \
+	  $($(LISP)_LOAD) $(TOP_DIR)/make/version.cl \
 	  | tail -2 > $@
-
-
 
 ### include.make ends here
