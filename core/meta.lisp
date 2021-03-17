@@ -177,9 +177,8 @@ See CLINDENT for more information."
     ;; ECL has this one for random generator initialization.
     #-ecl (:dispatch-macro-char #\# #\$ #'dummy-reader)))
 
-
 (named-readtables:defreadtable :net.didierverna.clon
-  (:merge :standard
+  (:merge :current
 	  ;; #### PORTME.
 	  #+(or ecl clisp allegro lispworks)
 	  dummy)
