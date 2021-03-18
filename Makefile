@@ -34,7 +34,7 @@ include make/config.make
 include make/prologue.make
 include make/version.make
 
-SUBDIRS   := setup core termio demos share doc
+SUBDIRS   := demos share doc
 DIST_NAME := $(PROJECT)-$(SHORT_VERSION)
 TARBALL   := $(DIST_NAME).tar.gz
 SIGNATURE := $(TARBALL).asc
