@@ -41,22 +41,21 @@ Clon, see the net.didierverna.clon system."
   :source-control "https://github.com/didierverna/clon"
   :license "BSD"
   :version #.(net.didierverna.clon.setup:version :short)
-  :defsystem-depends-on (:net.didierverna.clon.setup/termio
-			 (:feature :sbcl (:require :sb-grovel))
-			 (:feature (:or :allegro :clisp :lispworks)
-			  :cffi-grovel))
+  :defsystem-depends-on
+  (:net.didierverna.clon.setup/termio
+   (:feature :sbcl (:require :sb-grovel))
+   (:feature (:or :allegro :clisp :lispworks) :cffi-grovel))
   :if-feature :net.didierverna.clon.termio
   :depends-on ((:feature :sbcl :sb-posix)
 	       (:feature (:and :clisp :net.didierverna.clon.termio) :cffi)
 	       :net.didierverna.clon.setup :net.didierverna.clon.core)
   :serial t
-  :components (#+sbcl (sb-grovel:grovel-constants-file "sbcl/constants"
-			:package :net.didierverna.clon :if-feature :sbcl)
-	       ;; ASDF 3.1.4 bug: cannot deal with conditionally defined
-	       ;; component class!
+  :components (#+sbcl
+	       (sb-grovel:grovel-constants-file "sbcl/constants"
+		 :package :net.didierverna.clon)
+	       ;; Cf. https://gitlab.common-lisp.net/asdf/asdf/-/issues/63
 	       #+(or allegro clisp lispworks)
-	       (:cffi-grovel-file "cffi/constants"
-		 :if-feature (:or :allegro :clisp :lispworks))
+	       (:cffi-grovel-file "cffi/constants")
 	       (:file "termio")))
 
 ;;; net.didierverna.clon.termio.asd ends here
