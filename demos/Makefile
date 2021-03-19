@@ -81,7 +81,7 @@ java_name = $(shell echo $(1) | $(SED) 's/\([a-z]\)\([a-zA-Z0-9]*\)/\u\1\2/')
 define jar_rule
 $(1).jar: $(call java_name,$(1)).txt $(call java_name,$(1)).class $(1).lisp
 	cp $(ABCL_JAR) $$@
-	$(JAR) -ufm $$@ $$^ $(call java_name,$(1))\$$$$1.class $(1).lisp
+	$(JAR) -ufm $$@ $$^ $(call java_name,$(1))\$$$$1.class
 	rm $(call java_name,$(1))\$$$$1.class
 endef
 # This defines how to create Foo.java from foo.lisp:

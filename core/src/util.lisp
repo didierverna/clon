@@ -429,6 +429,10 @@ public class ~A
 	  interpreter.eval (\"(defvar extensions::*argv0* \\\"~A\\\")\");
 	  interpreter.eval (\"(export 'extensions::*argv0* 'extensions)\");
 
+	  // You may need the line below or some other startup code if the
+	  // dumped ABCL pseudo-executable has trouble finding Clon or its
+	  // dependencies (e.g. if Quicklisp is involved).
+	  // interpreter.eval (\"(load #p\\\"~~/.abclrc\\\")\");
 	  interpreter.eval (\"(require \\\"asdf\\\")\");
 	  interpreter.eval (\"(asdf:load-system :net.didierverna.clon.setup)\");
 	  interpreter.eval (\"(net.didierverna.clon.setup:configure :restricted t)\");
@@ -538,6 +542,5 @@ this function behaves differently in some cases, as described below.
 		 (setq *executablep* t)
 		 (lispworks:load-all-patches)
 		 (lispworks:deliver ',function ,name 0 ,@args)))
-
 
 ;;; util.lisp ends here
