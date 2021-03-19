@@ -26,7 +26,7 @@
 
 ;;; Code:
 
-(asdf:load-system :net.didierverna.clon.setup/termio)
+(asdf:load-system :net.didierverna.clon.setup)
 
 (asdf:defsystem :net.didierverna.clon
   :long-name "The Command-Line Options Nuker"
@@ -54,9 +54,10 @@ Clon are the following.
   :homepage "http://www.lrde.epita.fr/~didier/software/lisp/clon.php"
   :source-control "https://github.com/didierverna/clon"
   :license "BSD"
+  :defsystem-depends-on (:net.didierverna.clon.setup/termio)
   :version #.(net.didierverna.clon.setup:version :short)
-  :depends-on (:net.didierverna.clon.setup
-	       :net.didierverna.clon.core
-	       (:feature :net.didierverna.clon.termio :net.didierverna.clon.termio)))
+  :depends-on (:net.didierverna.clon.core
+	       (:feature :net.didierverna.clon.termio
+		:net.didierverna.clon.termio)))
 
 ;;; net.didierverna.clon.asd ends here

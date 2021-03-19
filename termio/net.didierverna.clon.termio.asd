@@ -26,7 +26,6 @@
 
 ;;; Code:
 
-#+sbcl (require :sb-grovel)
 (asdf:load-system :net.didierverna.clon.setup)
 
 (asdf:defsystem :net.didierverna.clon.termio
@@ -42,24 +41,22 @@ Clon, see the net.didierverna.clon system."
   :source-control "https://github.com/didierverna/clon"
   :license "BSD"
   :version #.(net.didierverna.clon.setup:version :short)
+  :defsystem-depends-on (:net.didierverna.clon.setup/termio
+			 (:feature :sbcl (:require :sb-grovel))
+			 (:feature (:or :allegro :clisp :lispworks)
+			  :cffi-grovel))
   :if-feature :net.didierverna.clon.termio
-  :defsystem-depends-on
-  (:net.didierverna.clon.setup/termio
-   #+sbcl ;; BUG in ASDF 3.1.4: d-d-o can't deal dependency expanding to NIL
-   (:feature :sbcl (:require :sb-grovel))
-   #+(or allegro clisp lispworks)
-   (:feature (:or :allegro :clisp :lispworks) :cffi-grovel))
   :depends-on ((:feature :sbcl :sb-posix)
 	       (:feature (:and :clisp :net.didierverna.clon.termio) :cffi)
-	       :net.didierverna.clon.core)
+	       :net.didierverna.clon.setup :net.didierverna.clon.core)
   :serial t
-  :components (;; bug in ASDF 3.1.4: cannot deal with conditionally defined
+  :components (#+sbcl (sb-grovel:grovel-constants-file "sbcl/constants"
+			:package :net.didierverna.clon :if-feature :sbcl)
+	       ;; ASDF 3.1.4 bug: cannot deal with conditionally defined
 	       ;; component class!
-	       #+sbcl (sb-grovel:grovel-constants-file "sbcl/constants"
-		       :package :net.didierverna.clon :if-feature :sbcl)
 	       #+(or allegro clisp lispworks)
 	       (:cffi-grovel-file "cffi/constants"
-		:if-feature (:or :allegro :clisp :lispworks))
+		 :if-feature (:or :allegro :clisp :lispworks))
 	       (:file "termio")))
 
 ;;; net.didierverna.clon.termio.asd ends here
