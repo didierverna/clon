@@ -1,6 +1,6 @@
 ;;; simple.lisp --- Basic usage demonstration program
 
-;; Copyright (C) 2010-2012, 2015 Didier Verna
+;; Copyright (C) 2010-2012, 2015, 2021 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
@@ -27,23 +27,12 @@
 ;; command-line syntax, initialize the library, retrieve option values and
 ;; generate help strings.
 
-;; #### NOTE: some trickery is needed below in order to make this code
-;; ECL-compliant, due to ECL's specific way of generating executables. This
-;; includes:
-;; - setting *load-verbose* to nil,
-;; - passing a nil :verbose flag to asdf:load-system,
-;; - wrapping nickname-package in an eval-when form.
-;; None of these tweaks are needed for the other compilers.
-
 
 ;;; Code:
 
 (in-package :cl-user)
-
-(setq *load-verbose* nil)
-
-(require "asdf")
-(asdf:load-system :net.didierverna.clon :verbose nil)
+(defpackage :simple (:use :cl) (:export :main))
+(in-package :simple)
 
 (eval-when (:execute :load-toplevel :compile-toplevel)
   (net.didierverna.clon:nickname-package))
@@ -56,22 +45,22 @@
 	  :description "Print this help and exit."))
   (group (:header "Built-in valued option types:")
     (group (:header "String options:")
-	   (stropt :short-name "n" :long-name "name"
-		   :description "Set your name to NAME."
-		   :argument-name "NAME"))
+      (stropt :short-name "n" :long-name "name"
+	      :description "Set your name to NAME."
+	      :argument-name "NAME"))
     (group (:header "Lisp objects:")
-	   (lispobj :short-name "e" :long-name "eval"
-		    :description "Evaluate EXPR."
-		    :argument-name "EXPR"))
+      (lispobj :short-name "e" :long-name "eval"
+	       :description "Evaluate EXPR."
+	       :argument-name "EXPR"))
     (group (:header "Enumerations:")
-	   (enum :long-name "copyright"
-		 :description "Set the copyright to LICENSE.
+      (enum :long-name "copyright"
+	    :description "Set the copyright to LICENSE.
 Possible values are: none, gpl, lppl, bsd or mit."
-		 :argument-name "LICENSE"
-		 :argument-type :optional
-		 :enum '(:none :gpl :lppl :bsd :mit)
-		 :fallback-value :gpl
-		 :default-value :none))
+	    :argument-name "LICENSE"
+	    :argument-type :optional
+	    :enum '(:none :gpl :lppl :bsd :mit)
+	    :fallback-value :gpl
+	    :default-value :none))
     (group (:header "Path options:")
       (path :long-name "tmpdir"
 	    :description "Set the temporary directory to DIR."
@@ -114,8 +103,5 @@ Possible values are yes, no or try. If try, no errors are reported."
 	 (terpri)
 	 (format t "Remainder: ~A~%" (clon:remainder))))
   (clon:exit))
-
-(clon:dump "simple" main)
-
 
 ;;; simple.lisp ends here

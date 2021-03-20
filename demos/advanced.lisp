@@ -28,23 +28,12 @@
 ;; complex command-line syntax where options and non-options parts can be
 ;; freely intermixed. See section 5 "Advanced Usage" in the Clon User Manual.
 
-;; #### NOTE: some trickery is needed below in order to make this code
-;; ECL-compliant, due to ECL's specific way of generating executables. This
-;; includes:
-;; - setting *load-verbose* to nil,
-;; - passing a nil :verbose flag to asdf:load-system,
-;; - wrapping nickname-package in an eval-when form.
-;; None of these tweaks are needed for the other compilers.
-
 
 ;;; Code:
 
 (in-package :cl-user)
-
-(setq *load-verbose* nil)
-
-(require "asdf")
-(asdf:load-system :net.didierverna.clon :verbose nil)
+(defpackage :advanced (:use :cl) (:export :main))
+(in-package :advanced)
 
 (eval-when (:execute :load-toplevel :compile-toplevel)
   (net.didierverna.clon:nickname-package))
@@ -59,36 +48,35 @@ Use 'cmd --help' to get command-specific help.")
 	  :argument-style :on/off
 	  :env-var "DEBUG"))
 
-(defconstant +push-synopsis+
-    (clon:defsynopsis (:make-default nil)
-      (text :contents "Push local changes to the remote server.")
-      (flag :short-name "h" :long-name "help"
-	    :description "Print this help and exit.")
-      (flag :short-name "d" :long-name "dry-run"
-	    :description "Fake the push operation.")
-      (stropt :long-name "remote"
-	      :argument-name "SERVER"
-	      :description "Use SERVER instead of default remote."))
+(defparameter *push-synopsis*
+  (clon:defsynopsis (:make-default nil)
+    (text :contents "Push local changes to the remote server.")
+    (flag :short-name "h" :long-name "help"
+	  :description "Print this help and exit.")
+    (flag :short-name "d" :long-name "dry-run"
+	  :description "Fake the push operation.")
+    (stropt :long-name "remote"
+	    :argument-name "SERVER"
+	    :description "Use SERVER instead of default remote."))
   "The synopsis for the PUSH operation.")
 
-(defconstant +pull-synopsis+
-    (clon:defsynopsis (:make-default nil)
-      (text :contents "Pull remote changes to the local server.")
-      (flag :short-name "h" :long-name "help"
-	    :description "Print this help and exit.")
-      (flag :short-name "d" :long-name "dry-run"
-	    :description "Fake the push operation.")
-      (switch :long-name "update"
-	      :default-value t
-	      :description "Also update the working directory."))
+(defparameter *pull-synopsis*
+  (clon:defsynopsis (:make-default nil)
+    (text :contents "Pull remote changes to the local server.")
+    (flag :short-name "h" :long-name "help"
+	  :description "Print this help and exit.")
+    (flag :short-name "d" :long-name "dry-run"
+	  :description "Fake the push operation.")
+    (switch :long-name "update"
+	    :default-value t
+	    :description "Also update the working directory."))
   "The synopsis for the PULL operation.")
 
 
 (defun main ()
   "Entry point for the standalone application."
   (clon:make-context)
-  (cond ((or (clon:getopt :short-name "h")
-	     (not (clon:cmdline-p)))
+  (cond ((or (clon:getopt :short-name "h") (not (clon:cmdline-p)))
 	 (clon:help))
 	(t
 	 (unless (clon:remainder)
@@ -96,9 +84,9 @@ Use 'cmd --help' to get command-specific help.")
 	   (clon:exit 1))
 	 (clon:make-context
 	  :synopsis (cond ((string= (first (clon:remainder)) "push")
-			   +push-synopsis+)
+			   *push-synopsis*)
 			  ((string= (first (clon:remainder)) "pull")
-			   +pull-synopsis+)
+			   *pull-synopsis*)
 			  (t
 			   (format t "Unknown command.~%")
 			   (clon:exit 1)))
@@ -113,8 +101,5 @@ Use 'cmd --help' to get command-specific help.")
 		(terpri)
 		(format t "Remainder: ~A~%" (clon:remainder))))))
   (clon:exit))
-
-(clon:dump "advanced" main)
-
 
 ;;; advanced.lisp ends here
