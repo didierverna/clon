@@ -636,11 +636,11 @@ called @file{simple} in the distribution.
   (make-context)
   (when (getopt :short-name "h")
     (help)
-    (exit))
+    (uiop:quit))
   (do-cmdline-options (option name value source)
     (print (list option name value source)))
   (terpri)
-  (exit))
+  (uiop:quit))
 
 (dump "quickstart" main)
 @end verbatim
@@ -749,15 +749,13 @@ name (this retrieval method is said to be @dfn{explicit}).
 @verbatim
   (when (getopt :short-name "h")
     (help)
-    (exit))
+    (uiop:quit))
 @end verbatim
 @end cartouche
 
-@findex exit
-The @code{exit} function is a wrapper around an
-implementation-dependent way to exit (shall I say quit?) the @cl{}
-environment, hence the program. It takes an optional argument that
-stands for the exit status.
+UIOP's @code{quit} function is a portable wrapper around an
+implementation-dependent way of saying goodbye. It takes an exit status
+code as optional argument.
 
 @cindex Options Retrieval, sequential
 @cindex Retrieval, of options, sequential
@@ -772,7 +770,7 @@ retrieval method is said to be @dfn{sequential}). This is done with the
   (do-cmdline-options (option name value source)
     (print (list option name value source)))
   (terpri)
-  (exit))
+  (uiop:quit))
 @end verbatim
 @end cartouche
 
@@ -2815,15 +2813,14 @@ just a library that you might want to use, and in fact, it is also
 possible to use it without dumping executables at all (@pxref{Not
 Dumping Executables}).
 
-@findex exit
 @findex dump
 Unfortunately, there is no standard way to dump executables from Lisp.
 We're entering the portability mine field here. @clon{}, however, wants
 to help. We've already seen that it provides utility wrappers like
-@code{exit} and @code{dump} to make your life easier (I mean, more
-portable) in @ref{Quick Start}. If you're not interested in portability
-or if you prefer to do it your own way, you don't @emph{need} to use
-those wrappers. If you do, however, please read on.
+@code{dump} to make your life easier (I mean, more portable) in
+@ref{Quick Start}. If you're not interested in portability or if you
+prefer to do it your own way, you don't @emph{need} to use those
+wrappers. If you do, however, please read on.
 
 Continuing on the quickstart example, the table below provides
 ready-to-use @cmdline{} samples for dumping the program with the
@@ -3035,10 +3032,6 @@ See @ref{Configuration}.
 @defmac dump NAME FUNCTION &rest ARGS
 See @ref{Quick Start}.
 @end defmac
-
-@defun exit &optional (STATUS 0)
-See @ref{Quick Start}.
-@end defun
 
 @cindex Command-Line
 @defun cmdline
