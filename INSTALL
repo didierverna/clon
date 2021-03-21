@@ -22,20 +22,20 @@ compiler in your init file.  Otherwise, Clon will run in restricted mode
 
    In addition to the library itself, the Clon distribution offers
 documentation in the form of 3 different manuals, some data files like
-sample themes (*note (clon-enduser)Theme Creation::), a couple of
-demonstration programs and an Emacs Lisp library for supporting the
-development.  If you want to benefit from all those wonders, some bits
-of manual installation are needed.  After unpacking somewhere in the
-ASDF 3 source registry, please perform the following steps, in order.
+sample themes (*note (clon-enduser)Theme Creation::), and a couple of
+demonstration programs.  If you want to benefit from all those wonders,
+some bits of manual installation are needed.  After unpacking somewhere
+in the ASDF 3 source registry, please perform the following steps, in
+order.
 
   1. Edit ‘make/config.make’ to your specific needs.
 
-  2. Type ‘make’ to compile the documentation and the demo programs
-     (end-user manual, user manual and possibly reference manual).  By
-     default, the documentation is built in info, PDF and HTML formats.
-     If you want other formats (DVI and PostScript are available), type
-     ‘make all-formats’.  You can also type individually ‘make dvi’
-     and/or ‘make ps’ in order to get the corresponding format.
+  2. Type ‘make’ to compile the documentation (end-user manual, user
+     manual and possibly reference manual).  By default, the
+     documentation is built in info, PDF and HTML formats.  If you want
+     other formats (DVI and PostScript are available), type ‘make
+     all-formats’.  You can also type individually ‘make dvi’ and/or
+     ‘make ps’ in order to get the corresponding format.
 
   3. As documented in ‘make/config.make’, the reference manual is only
      generated if you have SBCL and the Declt library at hand (see
@@ -44,10 +44,16 @@ ASDF 3 source registry, please perform the following steps, in order.
   4. Type ‘make install’ to install both the documentation and the data
      files.  If you have compiled the documentation in DVI and
      PostScript format, those will be installed as well.  The same goes
-     for the reference manual.  The demo programs are not installed
-     anywhere.
+     for the reference manual.
 
    Type ‘make uninstall’ to uninstall the library.
+
+   Finally, if you want to play with the demo programs, ‘cd’ to the
+‘demo’ directory, and type either ‘make asdf-dump’ or ‘make clon-dump’.
+These are two different methods for producing standalone executables,
+via ASDF or via Clon itself.  *Note Dumping Executables:: for more
+information.  ‘make install’ does not do anything with the demo
+programs.
 
 
 A.1 Configuration
