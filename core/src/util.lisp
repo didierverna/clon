@@ -315,28 +315,21 @@ NIL."
 ;; Wrappers around non ANSI features
 ;; ==========================================================================
 
-(defun exit (&optional (status 0))
-  "Quit the current application with STATUS."
-  ;; #### PORTME.
-  #+sbcl      (sb-ext:exit :code status)
-  #+cmu       (unix:unix-exit status)
-  #+ccl       (ccl:quit status)
-  #+ecl       (ext:quit status)
-  #+clisp     (ext:exit status)
-  #+abcl      (extensions:exit :status status)
-  #+allegro   (excl:exit status :quiet t)
-  #+lispworks (lispworks:quit :status status))
-
 (defvar *executablep* nil
-  "Whether the current Lisp image is a standalone executable dumped by Clon.
-See `executablep' for more information.")
+  "Whether the current Lisp image is a standalone executable.
+This information is needed in several implementations to distinguish
+user options from implementation-specific ones on the command-line.
+
+It is set automatically to T by the `dump' function, which see.
+If the image is dumped by ASDF's program-op, this variable is ignored.
+In any other case, that is, when dumping via an implementation-specific
+function, it must be set manually to T just before dumping.")
 
 (defun executablep ()
   "Return T if the current Lisp image is a standalone executable.
-This information is needed in some implementations that treat their
-command-line differently in dumped images.
-This function detects executables dumped by Clon (see `*executablep*'),
-or by ASDF's program-op operation."
+This function detects executables dumped by ASDF's program-op operation,
+those dumped by Clon's `dump' function (which see), and those in which
+`*executablep*' (which see) has been set to T manually."
   (or *executablep* (eq uiop:*image-dumped-p* :executable)))
 
 (defun cmdline ()
@@ -450,6 +443,18 @@ public class ~A
   }
 }~%"
   "Main class template for ABCL.")
+
+(defun exit (&optional (status 0))
+  "Quit the current application with STATUS."
+  ;; #### PORTME.
+  #+sbcl      (sb-ext:exit :code status)
+  #+cmu       (unix:unix-exit status)
+  #+ccl       (ccl:quit status)
+  #+ecl       (ext:quit status)
+  #+clisp     (ext:exit status)
+  #+abcl      (extensions:exit :status status)
+  #+allegro   (excl:exit status :quiet t)
+  #+lispworks (lispworks:quit :status status))
 
 (defmacro dump (name function &rest args)
   "Dump a standalone executable named NAME starting with FUNCTION.

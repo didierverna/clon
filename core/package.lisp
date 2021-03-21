@@ -56,6 +56,7 @@
     :exit
     :cmdline
     :dump
+    :*executablep*
     ;; From src/text.lisp:
     :make-text
     ;; From src/options/flag.lisp:
