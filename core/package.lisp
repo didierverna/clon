@@ -53,7 +53,7 @@
     ;; From package.lisp (this file):
     :nickname-package
     ;; From src/util.lisp:
-    :exit
+    :exit ;; #### WARNING: retained only for backward compatibility.
     :cmdline
     :dump
     :*executablep*

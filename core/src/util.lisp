@@ -444,8 +444,10 @@ public class ~A
 }~%"
   "Main class template for ABCL.")
 
+;; #### WARNING: retained only for backward compatibility.
 (defun exit (&optional (status 0))
-  "Quit the current application with STATUS."
+  "Quit the current application with STATUS.
+This function is considered deprecated. Please use UIOP:QUIT instead."
   ;; #### PORTME.
   #+sbcl      (sb-ext:exit :code status)
   #+cmu       (unix:unix-exit status)
@@ -518,7 +520,7 @@ this function behaves differently in some cases, as described below.
 		 ,@args
 		 :quiet t
 		 :norc t)
-	       (exit))
+	       (uiop:quit))
   #+abcl   (if (configuration :dump)
 	       (let ((source-pathname (or *compile-file-pathname*
 					  *load-pathname*))
@@ -542,7 +544,7 @@ this function behaves differently in some cases, as described below.
 	       (excl:dumplisp :name (concatenate 'string ,name ".dxl")
 			      ,@args
 			      :suppress-allegro-cl-banner t)
-	       (exit))
+	       (uiop:quit))
   #+lispworks `(progn
 		 (setq *executablep* t)
 		 (lispworks:load-all-patches)

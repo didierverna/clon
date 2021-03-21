@@ -114,7 +114,7 @@ When INTERACTIVEP, print on *QUERY-IO* instead."
 (defun exit-abnormally (error)
   "Print ERROR on *ERROR-OUTPUT* and exit with status code 1."
   (print-error error)
-  (exit 1))
+  (uiop:quit 1))
 
 ;; Adapted from the Hyperspec
 (defun restart-on-error (error)
@@ -740,16 +740,16 @@ Clon is provided with NO warranty; not even for MERCHANTABILITY
 or FITNESS FOR A PARTICULAR PURPOSE.~%"
       (pathname-name (progname :context context))
       (version :long))
-    (exit))
+    (uiop:quit))
   (let ((version-format (getopt :context context :long-name "clon-version")))
     (when version-format
       (format t "~A~%" (version version-format))
-      (exit)))
+      (uiop:quit)))
   (when (getopt :context context :long-name "clon-lisp-information")
     (format t "~A ~A~%"
       (lisp-implementation-type)
       (lisp-implementation-version))
-    (exit))
+    (uiop:quit))
   (setf (slot-value context 'search-path)
 	(getopt :context context :long-name "clon-search-path"))
   (setf (slot-value context 'theme)
@@ -762,7 +762,7 @@ or FITNESS FOR A PARTICULAR PURPOSE.~%"
   ;; from the above four.
   (when (getopt :context context :long-name "clon-help")
     (help :context context :item (clon-options-group context))
-    (exit)))
+    (uiop:quit)))
 
 (defun make-context (&rest keys &key synopsis cmdline (make-current t))
   "Make a new context.

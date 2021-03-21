@@ -81,7 +81,7 @@ Use 'cmd --help' to get command-specific help.")
 	(t
 	 (unless (clon:remainder)
 	   (format t "Missing command.~%")
-	   (clon:exit 1))
+	   (uiop:quit 1))
 	 (clon:make-context
 	  :synopsis (cond ((string= (first (clon:remainder)) "push")
 			   *push-synopsis*)
@@ -89,7 +89,7 @@ Use 'cmd --help' to get command-specific help.")
 			   *pull-synopsis*)
 			  (t
 			   (format t "Unknown command.~%")
-			   (clon:exit 1)))
+			   (uiop:quit 1)))
 	  :cmdline (clon:remainder))
 	 (cond ((clon:getopt :short-name "h")
 		(clon:help))
@@ -100,6 +100,6 @@ Use 'cmd --help' to get command-specific help.")
 		  (print (list option name value source)))
 		(terpri)
 		(format t "Remainder: ~A~%" (clon:remainder))))))
-  (clon:exit))
+  (uiop:quit))
 
 ;;; advanced.lisp ends here

@@ -102,6 +102,6 @@ Possible values are yes, no or try. If try, no errors are reported."
 	   (print (list option name value source)))
 	 (terpri)
 	 (format t "Remainder: ~A~%" (clon:remainder))))
-  (clon:exit))
+  (uiop:quit))
 
 ;;; simple.lisp ends here
