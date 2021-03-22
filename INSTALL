@@ -2,31 +2,35 @@
 2 Installation
 **************
 
-*Note Supported Platforms::, for information on portability or
-requirements.  See Clon’s homepage for tarballs, Git repository and
-online documentation.  Clon is also available via Quicklisp.
+First of all, see Clon’s homepage for tarballs, Git repository and
+online documentation.  Clon is an ASDF 3 library.  If you download a
+Clon tarball, or clone the repository, you need to unpack somewhere in
+the ASDF source registry.  Otherwise, Clon is also available via
+Quicklisp.  *Note Supported Platforms::, for more information on
+portability and dependencies.
 
-   In order to install and load the bare Lisp library, unpack it
-somewhere in the ASDF 3 source registry and type this at the REPL:
-(asdf:load-system :net.didierverna.clon)
+   Clon’s main system is called ‘net.didierverna.clon’.  Depending on
+your installation, you may thus either ‘asdf:load-system’, or
+‘ql:quickload’ it in your Lisp image.
+
    Alternatively, if you just want to use the core library without all
-the platform-dependent bells and whistles (*note Technical Notes::), you
-can also just load the ‘net.didierverna.clon.core’ system.
+the platform-dependent bells and whistles (*note Non-ANSI Features::),
+you may also just load the ‘net.didierverna.clon.core’ system.
 
-   In the general case, and if you are using SBCL, you may want to make
-sure that the ‘CC’ environment variable is set to your favorite C
-compiler in your init file.  Otherwise, Clon will run in restricted mode
-(*note Technical Notes::).  For instance, put this in your ‘.sbclrc’:
+   In the general case, but specifically if you are using SBCL or CLISP,
+you may want to make sure that the ‘CC’ environment variable is set to
+your favorite C compiler in your init file.  Otherwise, Clon will run in
+restricted mode (*note Configuration::).  For instance, put this in your
+‘.sbclrc’:
 (require :sb-posix)
 (sb-posix:setenv "CC" "gcc" 1)
 
    In addition to the library itself, the Clon distribution offers
 documentation in the form of 3 different manuals, some data files like
 sample themes (*note (clon-enduser)Theme Creation::), and a couple of
-demonstration programs.  If you want to benefit from all those wonders,
-some bits of manual installation are needed.  After unpacking somewhere
-in the ASDF 3 source registry, please perform the following steps, in
-order.
+demonstration programs.  If you want to benefit from all these wonders,
+some bits of manual installation are needed.  After unpacking, please
+perform the following steps, in order.
 
   1. Edit ‘make/config.make’ to your specific needs.
 
@@ -49,14 +53,14 @@ order.
    Type ‘make uninstall’ to uninstall the library.
 
    Finally, if you want to play with the demo programs, ‘cd’ to the
-‘demo’ directory, and type either ‘make asdf-dump’ or ‘make clon-dump’.
+‘demo/’ directory, and type either ‘make asdf-dump’ or ‘make clon-dump’.
 These are two different methods for producing standalone executables,
 via ASDF or via Clon itself.  *Note Dumping Executables:: for more
 information.  ‘make install’ does not do anything with the demo
 programs.
 
 
-A.1 Configuration
+8.1 Configuration
 =================
 
 Some aspects of Clon’s behavior can be configured _before_ the library
@@ -82,18 +86,13 @@ specific options with the following function.
      This option is only useful if you use Slime, and mostly if you plan
      on hacking Clon itself.  The library provides indentation
      information for some of its functions directly embedded in the
-     code.  This information can be automatically transmitted to
-     (X)Emacs when the ASDF system is loaded if you set this option to
-     ‘t’.  For this to work, there are two things to do first in your
-     (X)Emacs session:
-       1. set the Slime variable ‘slime-enable-evaluate-in-emacs’ to
-          ‘t’,
-       2. and load the ‘clon’ Emacs Lisp library.  This library is part
-          of the distribution and installed in a standard Emacs Lisp
-          directory by ‘make install’.
-     If you’re interested to know how this process works, I have
-     described it in the following blog entry:
-     <http://www.didierverna.com/sciblog/index.php?post/2011/07/20/One-more-indentation-hack>.
+     code.  This information can be automatically transmitted to Emacs
+     when the ASDF system is loaded if you set this option to ‘t’.
+     However, note that for this to work, the Slime variable
+     ‘slime-enable-evaluate-in-emacs’ must also be set to ‘t’ in your
+     Emacs session.  If you’re interested to know how this process
+     works, I have described it in this blog entry
+     (http://www.didierverna.net/blog/index.php?post/2011/07/20/One-more-indentation-hack).
 :restricted
      Some non-ANSI features of Clon require external functionality that
      may not be available in all contexts.  Normally, Clon should
@@ -109,7 +108,7 @@ specific options with the following function.
      Executables::, provides more information on its use.
 
 
-A.2 Non-ANSI Features
+8.2 Non-ANSI Features
 =====================
 
 One feature of Clon that is beyond the ANSI standard is terminal
@@ -128,8 +127,8 @@ columns regardless of the actual terminal width (*note
 (clon-enduser)Global Control::).
 
 
-A.3 Supported Platforms
-=======================
+Appendix A Supported Platforms
+******************************
 
 Clon is an ASDF 3 library.  It currently works on Unix (including MacOS
 X) and Windows (Cygwin or MinGW) and has been ported to 8 Common Lisp
@@ -148,8 +147,8 @@ ABCL       1.1.0(2)
 Allegro(3)                   ‘cffi’ (optional)
 LispWorks                    ‘cffi’ (optional)
 
-CLISP, Allegro and LispWorks specificities
-------------------------------------------
+A.1 CLISP, Allegro and LispWorks specificities
+==============================================
 
 As mentioned in the above table, CLISP, Allegro and LispWorks dependency
 on ‘cffi’ is optional.  They need ‘cffi’ in order to implement terminal
@@ -159,8 +158,8 @@ ASDF system is loaded (or in the case of CLISP, if it has been compiled
 without ‘ffi’ support), you get a big red blinking light and a warning
 but that’s all.  Clon will still work, although in restricted mode.
 
-ABCL specificities
-------------------
+A.2 ABCL specificities
+======================
 
 Clon’s ABCL port currently has two limitations:
    • It only works in restricted mode (*note Non-ANSI Features::).

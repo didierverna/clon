@@ -94,6 +94,10 @@ Command-Line
 @option{--clon-\name\}
 @end macro
 
+@macro chkmrk
+@U{2713}
+@end macro
+
 
 @c --------------------------------
 @c Manuals cross-referencing macros
@@ -441,18 +445,20 @@ This is the @clon{} User Manual for @clon{} version @value{VERSION}:
 it explains how to use @clon{} in your application.
 
 @menu
-* Copying::                 The BSD license
-* Introduction::            What Clon is all about
-* Installation::            Library, documentation and sample code
-* Quick Start::             For the brave and the impatient
-* Using Clon::              Clonificating your application
-* Extending Clon::          Creating your own option types
-* Advanced Usage::          Things rarely needed
-* Conclusion::              That's all folks
-* Technical Notes::         Configuration, platforms and portability
-* API Quick Reference::     The Complete protocols
-* Indexes::                 Concept, Function and Variable
-* Acknowledgments::         Hall of Pride
+* Copying::                     The BSD license
+* Introduction::                What Clon is all about
+* Installation::                Library, documentation and sample code
+* Quick Start::                 For the brave and the impatient
+* Using Clon::                  Clonificating your application
+* Extending Clon::              Creating your own option types
+* Advanced Usage::              Things less often needed
+* Application Delivery::        Dumping standalone executables (or not)
+* Other Considerations::        Miscellaneous information
+* Conclusion::                  That's all folks
+* Supported Platforms::         Portability, dependencies, etc.
+* API Quick Reference::         The Complete protocols
+* Indexes::                     Concept, Function and Variable
+* Acknowledgments::             Hall of Pride
 @end menu
 
 @insertcopying
@@ -528,28 +534,30 @@ extend @clon{} with your own option types.
 @c ====================================================================
 @node Installation, Quick Start, Introduction, Top
 @chapter Installation
-@xref{Supported Platforms}, for information on portability or
-requirements. See @clon{}'s
+First of all, see @clon{}'s
 @uref{http://www.lrde.epita.fr/~didier/software/lisp/clon.php,,homepage}
-for tarballs, Git repository and online documentation. @clon{} is also
-available via @uref{http://www.quicklisp.org,,Quicklisp}.
+for tarballs, Git repository and online documentation. @clon{} is an
+ASDF 3 library. If you download a @clon{} tarball, or clone the
+repository, you need to unpack somewhere in the ASDF source registry.
+Otherwise, @clon{} is also available via
+@uref{http://www.quicklisp.org,,Quicklisp}. @xref{Supported Platforms},
+for more information on portability and dependencies.
 
-In order to install and load the bare Lisp library, unpack it somewhere
-in the ASDF 3 source registry and type this at the REPL:
 @sysindex{net.didierverna.clon}
-@verbatim
-(asdf:load-system :net.didierverna.clon)
-@end verbatim
+@clon{}'s main system is called @samp{net.didierverna.clon}. Depending on
+your installation, you may thus either @code{asdf:load-system}, or
+@code{ql:quickload} it in your Lisp image.
+
 @sysindex{net.didierverna.clon.core}
 Alternatively, if you just want to use the core library without all the
-platform-dependent bells and whistles (@pxref{Technical Notes}), you can
-also just load the @samp{net.didierverna.clon.core} system.
+platform-dependent bells and whistles (@pxref{Non-ANSI Features}), you
+may also just load the @samp{net.didierverna.clon.core} system.
 
-In the general case, and if you are using SBCL, you may want to make
-sure that the @code{CC} environment variable is set to your favorite C
-compiler in your init file. Otherwise, @clon{} will run in restricted
-mode (@pxref{Technical Notes}). For instance, put this in your
-@file{.sbclrc}:
+In the general case, but specifically if you are using SBCL or CLISP,
+you may want to make sure that the @code{CC} environment variable is set
+to your favorite C compiler in your init file. Otherwise, @clon{} will
+run in restricted mode (@pxref{Configuration}). For instance, put this
+in your @file{.sbclrc}:
 @verbatim
 (require :sb-posix)
 (sb-posix:setenv "CC" "gcc" 1)
@@ -558,10 +566,9 @@ mode (@pxref{Technical Notes}). For instance, put this in your
 In addition to the library itself, the @clon{} distribution offers
 documentation in the form of 3 different manuals, some data files like
 sample themes (@pxenduserref{Theme Creation}), and a couple of
-demonstration programs. If you want to benefit from all those wonders,
-some bits of manual installation are needed. After unpacking somewhere
-in the ASDF 3 source registry, please perform the following steps, in
-order.
+demonstration programs. If you want to benefit from all these wonders,
+some bits of manual installation are needed. After unpacking, please
+perform the following steps, in order.
 
 @enumerate
 @item
@@ -590,7 +597,7 @@ manual.
 Type @command{make uninstall} to uninstall the library.
 
 Finally, if you want to play with the demo programs, @command{cd} to the
-@file{demo} directory, and type either @command{make asdf-dump} or
+@file{demo/} directory, and type either @command{make asdf-dump} or
 @command{make clon-dump}. These are two different methods for producing
 standalone executables, via ASDF or via @clon{} itself. @xref{Dumping
 Executables} for more information. @code{make install} does not do
@@ -603,13 +610,13 @@ anything with the demo programs.
 @c ====================================================================
 @node Quick Start, Using Clon, Installation, Top
 @chapter Quick Start
-In this chapter, we assume that you have properly installed @clon{}
-(@pxref{Technical Notes}), and we build a very short program to get you
-started. Let's call it @file{quickstart.lisp}.
+In this chapter, we assume that @clon{} is available, along with all its
+dependencies (@pxref{Installation}), and we build a very short program
+to get you started. Let's call it @file{quickstart.lisp}.
 
 @menu
-* Full Source::         The complete source code
-* Explanation::         Step-by-step code walking
+* Full Source::                 The complete source code
+* Explanation::                 Step-by-step code walking
 @end menu
 
 
@@ -626,6 +633,7 @@ called @file{simple} in the distribution.
 @verbatim
 (in-package :cl-user)
 
+;; This is the ASDF way, but use Quicklisp's ql:quickload if you prefer.
 (require "asdf")
 (asdf:load-system :net.didierverna.clon)
 (use-package :net.didierverna.clon)
@@ -657,20 +665,21 @@ called @file{simple} in the distribution.
 @c -----------
 @c Explanation
 @c -----------
-@node Explanation, , Full Source, Quick Start
+@node Explanation,  , Full Source, Quick Start
 @section Explanation
 Let's examine this program step-by-step now.
 
 @sysindex{net.didierverna.clon}@c
 @pkgindex{net.didierverna.clon}@c
-First, we put ourselves in the @cl{} user package, and load @clon{} from
-its ASDF system @samp{net.didierverna.clon}. Next, we use the @clon{}
-package, also named @samp{net.didierverna.clon}.
+First, we put ourselves in the @cl{} user package, and load @clon{}'s
+main ASDF system, called @samp{net.didierverna.clon}. Next, we use the
+@clon{} package, also named @samp{net.didierverna.clon}.
 
 @cartouche
 @verbatim
 (in-package :cl-user)
 
+;; This is the ASDF way, but use Quicklisp's ql:quickload if you prefer.
 (require "asdf")
 (asdf:load-system :net.didierverna.clon)
 (use-package :net.didierverna.clon)
@@ -801,10 +810,9 @@ In order to get a standalone executable from this program, all you need
 to do now is to type @samp{CC=gcc sbcl --script quickstart.lisp}. Note
 that the actual way of dumping executables is compiler-dependent. For
 more information on the proper way to do it and on the compilers
-currently supported, see @ref{Dumping Executables}.
-
-Note also that it is possible to use @clon{} without actually dumping a
-standalone executable (@pxref{Not Dumping Executables}).
+currently supported, see @ref{Dumping Executables}. Note also that it is
+possible to use @clon{} without actually dumping a standalone executable
+(@pxref{Not Dumping Executables}) at all.
 
 
 
@@ -823,11 +831,11 @@ values and possibly display help strings. Phase 1 is called the
 phase}.
 
 @menu
-* Synopsis Definition:: Describing your command-line
-* Context Creation::    Instantiating your command-line
-* Integrity Checks::    Verifying the Clon semantics
-* Option Retrieval::    Getting the options values
-* Help::                Generating the help string
+* Synopsis Definition::         Describing your command-line
+* Context Creation::            Instantiating your command-line
+* Integrity Checks::            Verifying the Clon semantics
+* Option Retrieval::            Getting the options values
+* Help::                        Generating the help string
 @end menu
 
 
@@ -896,9 +904,9 @@ Remainder} on how to access the @cmdline{} remainder.
 
 We now examine the syntax for each possible @var{ITEM}.
 @menu
-* Text::        Adding arbitrary text
-* Options::     Adding options
-* Groups::      Adding groups
+* Text::                        Adding arbitrary text
+* Options::                     Adding options
+* Groups::                      Adding groups
 @end menu
 
 @node Text, Options, Synopsis Items, Synopsis Items
@@ -949,7 +957,7 @@ Option properties vary depending on the option type. The exact list of
 available option types, and the corresponding properties are described
 in @ref{Built-In Option Types}.
 
-@node Groups, , Options, Synopsis Items
+@node Groups,  , Options, Synopsis Items
 @subsubsection Groups
 @cindex Groups
 @cindex Groups, in synopsis
@@ -999,10 +1007,10 @@ them directly in your synopsis description. For adding personal option
 types to @clon{}, see @ref{New Option Types}.
 
 @menu
-* Common Properties::                   For all options
-* Flags::                               Built-in options without arguments
-* Common Valued Option Properties::     For all valued options
-* Built-In Valued Options::             Built-in options with arguments
+* Common Properties::           For all options
+* Flags::                       Built-in options without arguments
+* Common Valued Option Properties::  For all valued options
+* Built-In Valued Options::     Built-in options with arguments
 @end menu
 
 @node Common Properties, Flags, Built-In Option Types, Built-In Option Types
@@ -1084,7 +1092,7 @@ argument is optional, you need to provide at least a fallback or a
 default value (or both of course; see @enduserref{Value Sources}).
 @end table
 
-@node Built-In Valued Options, , Common Valued Option Properties, Built-In Option Types
+@node Built-In Valued Options,  , Common Valued Option Properties, Built-In Option Types
 @subsubsection Built-In Valued Options
 @cindex Option Types, valued
 @cindex Built-In Option Types, valued
@@ -1178,7 +1186,7 @@ or false values are displayed in help strings. Look at the
 @bioption{highlight} built-in option for an example.
 @end table
 
-@node Advanced Synopsis Creation, , Built-In Option Types, Synopsis Definition
+@node Advanced Synopsis Creation,  , Built-In Option Types, Synopsis Definition
 @subsection Advanced Synopsis Creation
 @findex defsynopsis
 The fact that @code{defsynopsis} lets you define things in a
@@ -1191,9 +1199,9 @@ functions for all such objects. Instead of using @code{defsynopsis}, you
 can then use those constructor functions explicitely.
 
 @menu
-* Constructors::        The expansion of defsynopsis
-* Advantages::          Yes, but why?
-* Group Definition::    The declarative way
+* Constructors::                The expansion of defsynopsis
+* Advantages::                  Yes, but why?
+* Group Definition::            The declarative way
 @end menu
 
 @node Constructors, Advantages, Advanced Synopsis Creation, Advanced Synopsis Creation
@@ -1334,7 +1342,7 @@ option object several times in a synopsis, @clon{} only maintains a
 single option definition.
 @end enumerate
 
-@node Group Definition, , Advantages, Advanced Synopsis Creation
+@node Group Definition,  , Advantages, Advanced Synopsis Creation
 @subsubsection Group Definition
 There is one last point we need to address in order to complete this
 section. There might be times when you need to manipulate an explicit
@@ -1387,7 +1395,7 @@ You create a context with the @code{make-context} function.
 Create a new context. That's it.
 @end defun
 
-@node Contextual Information, , Making A Context, Context Creation
+@node Contextual Information,  , Making A Context, Context Creation
 @subsection Contextual Information
 
 Once a context object is created, you have access to some interesting
@@ -1424,7 +1432,7 @@ The @cmdline{} remainder is known to @clon{} as soon as a context is
 created. You can retrieve it by using the @code{remainder} function like
 this: @code{(remainder)}. The remainder is provided as a list of strings.
 
-@node Command-Line Polling, , Command-Line Remainder, Contextual Information
+@node Command-Line Polling,  , Command-Line Remainder, Contextual Information
 @subsubsection Command-Line Polling
 @cindex Polling, of command-line
 @cindex Command-Line, polling
@@ -1607,7 +1615,7 @@ second retrun value to make the difference between an option not found,
 and an actual value of @code{nil}.
 
 
-@node Sequential Retrieval, , Explicit Retrieval, Option Retrieval
+@node Sequential Retrieval,  , Explicit Retrieval, Option Retrieval
 @subsection Sequential Retrieval
 @cindex Options Retrieval, sequential
 @cindex Retrieval, of options, sequential
@@ -1657,7 +1665,7 @@ As above, but loop over all @cmdline{} options.
 @c ----
 @c Help
 @c ----
-@node Help, , Option Retrieval, Using Clon
+@node Help,  , Option Retrieval, Using Clon
 @section Help
 @cindex Help String
 One of the first motivations in the design of @clon{} was to automate
@@ -1758,8 +1766,8 @@ option types are always @emph{valued}. There's no point in extending
 have flags.
 
 @menu
-* New Option Types::    In four steps
-* Extension Tips::      Some advice
+* New Option Types::            In four steps
+* Extension Tips::              Some advice
 @end menu
 
 
@@ -1787,12 +1795,12 @@ and providing a constructor function. We now review those 5 steps in
 order.
 
 @menu
-* New Option Classes::                  Step 1
-* Value Check Protocol::                Step 2
-* Argument Conversion Protocol::        Step 3
-* Error Management::                    In-between steps coffee time!
-* Value Stringification Protocol::      Step 4
-* Constructor Functions::               Step 5
+* New Option Classes::          Step 1
+* Value Check Protocol::        Step 2
+* Argument Conversion Protocol::  Step 3
+* Error Management::            In-between steps coffee time!
+* Value Stringification Protocol::  Step 4
+* Constructor Functions::       Step 5
 @end menu
 
 @node New Option Classes, Value Check Protocol, New Option Types, New Option Types
@@ -2113,7 +2121,7 @@ Let's look at the enumeration example now.
 Pretty straightforward, right?
 
 
-@node Constructor Functions, , Value Stringification Protocol, New Option Types
+@node Constructor Functions,  , Value Stringification Protocol, New Option Types
 @subsection Constructor Functions
 @cindex Constructors, for options objects
 @cindex Option Constructors
@@ -2187,7 +2195,7 @@ I grow older though).
 @c --------------
 @c Extension Tips
 @c --------------
-@node Extension Tips, , New Option Types, Extending Clon
+@node Extension Tips,  , New Option Types, Extending Clon
 @section Extension Tips
 So that's it. Now you know how to extend @clon{} with your own option
 types. Here is some piece of advice that you might find useful in the
@@ -2215,7 +2223,7 @@ Wrong.
 @code{defgroup} to recognize your new option type. So please, do use it
 systematically.
 
-@node Lisp Option Abuse, , Incremental Option Types, Extension Tips
+@node Lisp Option Abuse,  , Incremental Option Types, Extension Tips
 @subsection Lisp Option Abuse
 @voindex{Lisp Objects,lispobj}
 @vopindex{Lisp Objects,lispobj,:typespec}
@@ -2250,17 +2258,14 @@ situation, you might want to subclass @code{lispobj} (with
 @c ====================================================================
 @c Advanced Usage
 @c ====================================================================
-@node Advanced Usage, Conclusion, Extending Clon, Top
+@node Advanced Usage, Application Delivery, Extending Clon, Top
 @chapter Advanced Usage
 
-This chapter contains information about different features that are
-present in @clon{} because of design decisions, but that I expect to be
-used only rarely, if at all.
+This chapter contains information about more advanced ways of using @clon{}.
 
 @menu
 * Multiple Clon Instances::     Different command-lines, synopsis or contexts
 * Programmatic Help Strings::   Beyond the --help option
-* Version Numbering::           In case you need to conditionalize
 @end menu
 
 
@@ -2275,10 +2280,10 @@ single application, by using a virtual @cmdline{} instead of the real
 one, different synopsis and multiple contexts simultaneously.
 
 @menu
-* Using Different Synopsis::            The default one, and the others
-* Using Different Command-Lines::       The real one, and the others
-* Using Multiple Contexts::             The current one, and the others
-* Potential Uses::                      What to do with all that
+* Using Different Synopsis::    The default one, and the others
+* Using Different Command-Lines::  The real one, and the others
+* Using Multiple Contexts::     The current one, and the others
+* Potential Uses::              What to do with all that
 @end menu
 
 @node Using Different Synopsis, Using Different Command-Lines, Multiple Clon Instances, Multiple Clon Instances
@@ -2403,7 +2408,7 @@ already seen. For the macros @code{multiple-value-getopt-cmdline} and
 @end verbatim
 @end enumerate
 
-@node Potential Uses, , Using Multiple Contexts, Multiple Clon Instances
+@node Potential Uses,  , Using Multiple Contexts, Multiple Clon Instances
 @subsection Potential Uses
 By combining @clon{}'s ability to use a virtual @cmdline{}, different
 synopsis and multiple contexts, you can achieve very neat (read: totally
@@ -2479,7 +2484,7 @@ things (a notion of ``sub-context'' may be in order).
 @c -------------------------
 @c Programmatic Help Strings
 @c -------------------------
-@node Programmatic Help Strings, Version Numbering, Multiple Clon Instances, Advanced Usage
+@node Programmatic Help Strings,  , Multiple Clon Instances, Advanced Usage
 @section Programmatic Help Strings
 
 @findex help
@@ -2531,10 +2536,384 @@ this parameter.
 
 
 
+@c ====================================================================
+@c Application Delivery
+@c ====================================================================
+@node Application Delivery, Other Considerations, Advanced Usage, Top
+@chapter Application Delivery
+Application delivery, in other words, creating standalone executables,
+is a concern beyond the ANSI standard, and is implemented differently by
+each and every Lisp vendor. In theory, @clon{} should have nothing to do
+with it; it's just a library that you might want to use in order to
+process the @cmdline{}. Unfortunately (and precisely because of the lack
+of standardization), there are some non-orthogonal concerns that need to
+be dealt with carefully for @clon{} to work properly in all situations.
+The following sections provide some important information regarding the
+use of @clon{} in standalone applications, or in regular interactive
+Lisp images.
+
+@menu
+* Dumping Executables::         Using Clon in standalone applications
+* Distributing Clon Material::  Themes and documentation
+* Not Dumping Executables::     Using Clon in regular interactive sessions
+@end menu
+
+
+@c -------------------
+@c Dumping Executables
+@c -------------------
+@node Dumping Executables, Distributing Clon Material, Application Delivery, Application Delivery
+@section Dumping Executables
+@cindex Dumping
+@findex dump
+Dumping standalone executables is ultimately the job of the Lisp
+implementation, but there are also more or less portable wrappers to
+ease the process.
+
+@menu
+* Dumping Methods::             Portable dumping wrappers
+* Method Compatibility::        Which method works, in which situation
+@end menu
+
+@node Dumping Methods, Method Compatibility, Dumping Executables, Dumping Executables
+@subsection Dumping Methods
+One method we have already encountered (@pxref{Quick Start}) is
+@clon{}'s @code{dump} macro. It's a simple wrapper around each
+implementation's native function for dumping the current state of Lisp
+(in most cases anyway, but please read on).
+
+Another one is ASDF's @code{program-op} operation. This one works
+slightly differently: it allows you to request the dumping of a specific
+ASDF system (along with all its dependencies), and, just like
+@code{dump}, it allows you to provide a specific entry point for the
+standalone executable to start somewhere. For example, assume that you
+define an ASDF system for the quick start program as follows (the ECL
+bit will be explained shortly).
+@cartouche
+@verbatim
+(asdf:defsystem :quickstart
+  :depends-on (#+ecl :net.didierverna.clon.setup :net.didierverna.clon)
+  :components ((:file "quickstart"))
+  :entry-point "cl-user::main")
+@end verbatim
+@end cartouche
+Then, you can remove the call to @clon{}'s @code{dump} macro at the
+end of @file{quickstart.lisp}, and instead call @code{(asdf:operate
+'asdf:program-op :quickstart)} from a fresh REPL, and be done with it.
+Almost. If you are wondering where your dumped executable has landed,
+it's located at the same place as the rest of the compiled files (ASDF's
+output translations are involved). Good luck finding it.
+
+The @file{demo/} directory included in the distribution contains all the
+infrastructure needed to dump the demonstrations programs using both of
+these methods (when possible; @xref{Method Compatibility}), and also to
+figure out the location of the executables dump by ASDF. If you are
+interested, look into the Makefile there.
+
+In order for @clon{} to work properly in a standalone executable, it
+@emph{needs} to know that it's running in a dumped image rather than in
+a regular interactive session. This is because some Lisps treat their
+own @cmdline{} differently, depending on the context. If you use either
+@clon{}'s @code{dump} macro or ASDF's @code{program-op} operation to
+dump, then, there is no problem. @clon{} will detect that automatically.
+
+@vindex *executablep*
+If, on the other hand, you decide to go a different way (like, use your
+favorite Lisp implementation's native function for dumping), then you
+@b{absolutely} need to tell @clon{}, by setting the @code{*executablep*}
+global variable to true, just before dumping. In fact, some
+implementations don't really require it, but it's always preferable to
+do it systematically, to be completely portable.
+
+@node Method Compatibility,  , Dumping Methods, Dumping Executables
+@subsection Method Compatibility
+Not all dumping methods work with all implementations either. The
+following table summarizes the situation. And of course, don't mix
+methods! For example, do not attempt to dump the ASDF way if your code
+includes a call to @code{dump}.
+@multitable @columnfractions .1 .1 .12 .1 .1 .1 .1 .14 .1
+@item @tab @b{SBCL} @tab @b{CMUCL} @tab @b{CCL} @tab @b{CLISP} @tab @
+      @b{ECL} @tab @b{ABCL} @tab @b{Lispworks} @tab @b{ACL}
+@item @b{@clon{}} @tab @chkmrk{} @tab @chkmrk{} @tab @chkmrk{} @tab @
+      @emph{(1)} @tab @emph{(2)} @tab @emph{(3)} @tab @emph{(4)} @tab @emph{(5)}
+@item @t{ASDF} @tab @chkmrk{} @tab @chkmrk{} @tab @chkmrk{} @tab @
+      @emph{(1)} @tab @emph{(2)} @tab @tab @emph{(4)} @tab
+@end multitable
+
+@table @emph
+@item (1)
+Dumping with both @clon{} and ASDF should work with CLISP in theory, but
+the current trunk (2.49) seems to have a problem with its @cmdline{} in
+dumped images. Its is possible to work around it by putting all
+@cmdline{} options after a @t{--} separator, as for regular sessions
+(@pxref{Not Dumping Executables}). This issue has been reported at
+@uref{https://sourceforge.net/p/clisp/bugs/745/}.
+
+Please note also that standalone CLISP executables continue to recognize
+lisp-specific @cmdline{} options, when they are prefixed with
+@code{--clisp-}. Hence, you should obviously avoid defining options by
+those names.
+@item (2)
+Dumping an ECL image with @clon{} is not supported because of the way
+ECL works. In short, ECL requires every single Lisp file to be compiled
+to a system object file first, so you would need to know all the Lisp
+files involved, and I mean, all: all systems, all dependencies,
+@etc{} ASDF, on the other hand, has this information, so the ASDF
+method is much preferred.
+
+@findex dump
+Another difference between ECL and the other Lisp compilers is that it
+doesn't require a particular function as the entry point for your
+executable, but instead relies on having code to execute directly at the
+toplevel of some file. @clon{} helps a little bit with this by making
+the @code{dump} macro expand to a call to the specified function. That
+way, you can still have a more or less portable file including a call to
+@code{dump}, should you choose to call ECL's @code{c:build-program} all
+by yourself.
+
+@sysindex{net.didierverna.clon.setup}
+Finally, note also that @clon{} has some peculiar bootstrapping
+requirements with its setup sub-system. These requirements seem to cause
+problems with ASDF's way of dumping executables in ECL, so in order for
+it to work properly, your own system depending on @clon{} needs to
+include an explicit dependency on @samp{net.didierverna.clon.setup} first,
+as shown in the example above, as well as in the demonstration programs
+included in the distribution.
+@item (3)
+@findex dump
+ABCL is a totally different beast because it's a Java implementation, so
+there's no real notion of standalone executable. In order to be able to
+use a clonified program portably with ABCL, the @code{dump} macro does
+as in ECL: it simply expands to a call to the specified function.
+
+There's more to it than that though. It is possible to get closer to
+standalone executables with ABCL by providing your whole application in
+a @code{jar} file, and overriding ABCL's entry point with a custom
+interpreter running the main function automatically. I have described
+this process in more details in the following blog entry:
+@uref{http://www.didierverna.com/sciblog/index.php?post/2011/01/22/Towards-ABCL-Standalone-Executables}.
+
+@coindex{dump}@c
+@clon{} helps you to do this to some extend. If the @code{:dump}
+configuration option is set (@pxref{Configuration}), then the
+@code{dump} macro doesn't do as described above, but instead dumps a
+Java file containing an alternate ABCL interpreter that you can compile
+and add to the original ABCL @code{jar} file, along with the Lisp file
+containing the main function. If you want more details on this, you will
+need to look at the @file{Makefile} in the @code{demo/} directory and
+also at the file @file{make/config.make}. You can also use @command{make
+-n clon-dump LISP=ABCL} to see it in (fake) action.
+@item (4)
+Everything should work normally in Lispworks, but please remember that
+dumping a complete application is only possible in the Professional or
+Enterprise editions.
+@item (5)
+@findex dumplisp
+Finally, dumping a complete application with Allegro is complicated, but
+more importantly only possible in the Enterprise edition. Because of
+that, @clon{}'s dumping facility is currently limited to the
+@code{dumplisp} feature, which only dumps a Lisp image. When dumped with
+ACL, the demonstration programs included in the distribution also get
+their own shell wrappers for loading the concerned images.
+@end table
+
+
+@c --------------------------
+@c Distributing Clon Material
+@c --------------------------
+@node Distributing Clon Material, Not Dumping Executables, Dumping Executables, Application Delivery
+@section Distributing Clon Material
+If you ship a clonified standalone executable, your clients may not have
+a properly installed @clon{} distribution locally. Although this is not
+a requirement by any means, it may be worth distributing some of
+@clon{}'s material with your application, for example, the end-user
+manual (@pxenduserref{Top}), or the standard output themes located in
+the @file{share/} directory.
+
+
+@c -----------------------
+@c Not Dumping Executables
+@c -----------------------
+@node Not Dumping Executables,  , Distributing Clon Material, Application Delivery
+@section Not Dumping Executables
+Although @cmdline{} processing really makes sense for standalone
+executables, you may want to preserve interactivity with your
+application during the development phase, for instance for testing or
+debugging purposes.
+
+It is possible to use @clon{} interactively, that is, within a regular
+Lisp REPL, without dumping anything. First of all, we have already seen
+that it is possible to use a virtual @cmdline{} (@pxref{Using Different
+Command-Lines}). You can also use @clon{} interactively with the actual
+Lisp invocation's @cmdline{}, although a word of advice is in order
+here.
+
+@findex cmdline
+@findex dump
+As you might expect, the problem in that situation lies in the way the
+different Lisp implementations treat their own @cmdline{}. Guess what,
+it's a mess. When you dump an executable as described previsouly, the
+@code{cmdline} function will always contain user options only. When you
+use @clon{} interactively and mix compiler-specific options with
+application ones when invoking your Lisp environment, the situation is
+as follows:
+
+@table @strong
+@item SBCL
+SBCL processes its own options and leaves the others unprocessed on the
+@cmdline{}. This means that as long as there is no overlap between
+SBCL's options and yours, you can just put them all together on the
+@cmdline{}. In case of overlap however, you need to separate SBCL's
+options from yours with a call to @code{--end-toplevel-options} (that's
+an SBCL specific option separator).
+@item CMUCL
+@cindex Command-Line, remainder
+@cindex Remainder, of command-line
+CMUCL processes its own options, issues a warning about the options it
+doesn't know about, but in any case, it eats the whole @cmdline{}.
+Consequently, if you want to provide options to your application, you
+need to put them after a @code{--} separator. Note that you can still
+use a second such separator to provide @clon{} with both some options
+and a remainder (@pxenduserref{Option Separator}).
+@item CCL, ECL, CLISP
+CCL, ECL, and CLISP all process their own options but will abort on
+unknown ones. Consequently, if you want to provide options to your
+application, you need to put them after a @code{--} separator. Note that
+you can still use a second such separator to provide @clon{} with both
+some options and a remainder (@pxenduserref{Option Separator}).
+@item ABCL
+ABCL processes its own options and leaves the others unprocessed on the
+@cmdline{}. This means that as long as there is no overlap between
+ABCL's options and yours, you can just put them all together on the
+@cmdline{}. In case of overlap however, you need to separate ABCL's
+options from yours with a @code{--} separator. Note that you can still
+use a second such separator to provide @clon{} with both some options
+and a remainder (@pxenduserref{Option Separator}).
+@item Allegro
+Allegro processes its own options, issues only a warning about options
+it doesn't know of, and leaves anything after a @code{--} alone.
+Consequently, if you want to provide options to your application, you
+need to put them after a @code{--} separator. Note that you can still
+use a second such separator to provide @clon{} with both some options
+and a remainder (@pxenduserref{Option Separator}).
+@item LispWorks
+LispWorks processes its own options and ignores the other ones, but
+always leaves everything on the command-line. It does not currently
+support @code{--} as an option separator either. Consequently, if you
+want to provide options to your application, you need to put them after
+a @code{--} separator, although you @emph{will} get into trouble if any
+option there is recognized by LispWorks itself. Note that you can still
+use a second such separator to provide @clon{} with both some options
+and a remainder (@pxenduserref{Option Separator}).
+@end table
+
+
+
+@c ====================================================================
+@c Other Considerations
+@c ====================================================================
+@node Other Considerations, Conclusion, Application Delivery, Top
+@chapter Other Considerations
+This chapter contains marginal or meta-level information, orthogonal to
+the library’s main purpose.
+
+@menu
+* Configuration::               Pre-loading parameters
+* Non-ANSI Features::           Requiring operating system access
+* Version Numbering::           In case you need to conditionalize
+@end menu
+
+@c -------------
+@c Configuration
+@c -------------
+@node Configuration, Non-ANSI Features, Other Considerations, Other Considerations
+@section Configuration
+@cindex Configuration
+@sysindex{net.didierverna.clon.setup}@c
+@pkgindex{net.didierverna.clon.setup}@c
+Some aspects of @clon{}'s behavior can be configured @emph{before} the
+library is actually loaded. @clon{} stores its user-level configuration
+(along with some other setup parameters) in another ASDF system called
+@samp{net.didierverna.clon.setup} (and the eponym package). In order to
+configure the library (I repeat, prior to loading it), you will
+typically do something like this:
+@verbatim
+(require "asdf")
+(asdf:load-system :net.didierverna.clon.setup)
+(net.didierverna.clon.setup:configure <option> <value>)
+@end verbatim
+
+@defun configure KEY VALUE
+Set @var{KEY} to @var{VALUE} in the current @clon{} configuration.
+@end defun
+
+Out of curiosity, you can also inquire the current configuration for
+specific options with the following function.
+@defun configuration KEY
+Return @var{KEY}'s value in the current @clon{} configuration.
+@end defun
+
+Currently, the following options are provided.
+@table @t
+@item :swank-eval-in-emacs
+@coindex{swank-eval-in-emacs}@c
+@vindex slime-enable-evaluate-in-emacs
+This option is only useful if you use Slime, and mostly if you plan on
+hacking @clon{} itself. The library provides indentation information for
+some of its functions directly embedded in the code. This information
+can be automatically transmitted to Emacs when the ASDF system is loaded
+if you set this option to @code{t}. However, note that for this to work,
+the Slime variable @code{slime-enable-evaluate-in-emacs} must also be
+set to @code{t} in your Emacs session. If you're interested to know how
+this process works, I have described it in this
+@url{http://www.didierverna.net/blog/index.php?post/2011/07/20/One-more-indentation-hack,blog
+entry}.
+@item :restricted
+@coindex{restricted}@c
+@cindex Restricted Mode
+@sysindex{net.didierverna.clon.core}
+Some non-ANSI features of @clon{} require external functionality that
+may not be available in all contexts. Normally, @clon{} should
+autodetect this and switch to so-called @emph{restricted mode} at
+build-time (@pxref{Non-ANSI Features}). If @clon{} has failed to
+autodetect the problem (in which case I would like to know), or if for
+some reason, you explicitly want to disable those features, you may set
+the @code{:restricted} configuration option to @code{t}. Another way to
+do it, without even bothering with configuration is to just use the
+@samp{net.didierverna.clon.core} system instead of the regular one.
+@item :dump
+@coindex{dump}@c
+This option is only used by the ABCL port. @ref{Dumping Executables},
+provides more information on its use.
+@end table
+
+
+@c -----------------
+@c Non-ANSI Features
+@c -----------------
+@node Non-ANSI Features, Version Numbering, Configuration, Other Considerations
+@section Non-ANSI Features
+One feature of @clon{} that is beyond the ANSI standard is terminal
+autodetection (it requires an @code{ioctl} call and hence a foreign
+function interface). Terminal autodetection is used in several
+situations, for turning on highlighting automatically and for detecting
+a terminal line width.
+
+@cindex Restricted Mode
+If, for some reason, terminal autodetection is not available, @clon{}
+will work in so-called @emph{restricted mode}. This means that
+@bioption{highlight=auto} won't work (highlighting will @emph{not} be
+turned on automatically on a @tty{}). For the same reason, unless
+otherwise specified via either the @code{COLUMNS} environment variable
+or the @bioption{line-width} option, terminal output will be formatted
+for 80 columns regardless of the actual terminal width
+(@pxenduserref{Global Control}).
+
+
 @c -----------------
 @c Version Numbering
 @c -----------------
-@node Version Numbering, , Programmatic Help Strings, Advanced Usage
+@node Version Numbering,  , Non-ANSI Features, Other Considerations
 @section Version Numbering
 
 @bioindex{version}
@@ -2613,7 +2992,7 @@ output: 1.3 "Bill Evans".
 @c ====================================================================
 @c Conclusion
 @c ====================================================================
-@node Conclusion, Technical Notes, Advanced Usage, Top
+@node Conclusion, Supported Platforms, Other Considerations, Top
 @chapter Conclusion
 
 So that's it I guess. You know all about @clon{} now. The next step is
@@ -2627,124 +3006,10 @@ Now, go Luke. The Attack of the @clon{} is ready to begin.
 
 
 @c ====================================================================
-@c Technical Notes
-@c ====================================================================
-@node Technical Notes, API Quick Reference, Conclusion, Top
-@appendix Technical Notes
-
-This chapter contains important information about the library's
-configuration, supported platforms, non-ANSI features and
-portability concerns.
-
-@menu
-* Configuration::               Pre-loading parameters
-* Non-ANSI Features::           Requiring operating system access
-* Supported Platforms::         Systems, compilers and dependencies
-* Dumping Executables::         Convenience wrappers
-* Not Dumping Executables::     Using Clon interactively
-@end menu
-
-
-@c -------------
-@c Configuration
-@c -------------
-@node Configuration, Non-ANSI Features, Technical Notes, Technical Notes
-@section Configuration
-@cindex Configuration
-@sysindex{net.didierverna.clon.setup}@c
-@pkgindex{net.didierverna.clon.setup}@c
-Some aspects of @clon{}'s behavior can be configured @emph{before} the
-library is actually loaded. @clon{} stores its user-level configuration
-(along with some other setup parameters) in another ASDF system called
-@samp{net.didierverna.clon.setup} (and the eponym package). In order to
-configure the library (I repeat, prior to loading it), you will
-typically do something like this:
-@verbatim
-(require "asdf")
-(asdf:load-system :net.didierverna.clon.setup)
-(net.didierverna.clon.setup:configure <option> <value>)
-@end verbatim
-
-@defun configure KEY VALUE
-Set @var{KEY} to @var{VALUE} in the current @clon{} configuration.
-@end defun
-
-Out of curiosity, you can also inquire the current configuration for
-specific options with the following function.
-@defun configuration KEY
-Return @var{KEY}'s value in the current @clon{} configuration.
-@end defun
-
-Currently, the following options are provided.
-@table @t
-@item :swank-eval-in-emacs
-@coindex{swank-eval-in-emacs}@c
-@vindex slime-enable-evaluate-in-emacs
-This option is only useful if you use Slime, and mostly if you plan on
-hacking @clon{} itself. The library provides indentation information for
-some of its functions directly embedded in the code. This information
-can be automatically transmitted to (X)Emacs when the ASDF system is
-loaded if you set this option to @code{t}. For this to work, there are
-two things to do first in your (X)Emacs session:
-@enumerate
-@item
-set the Slime variable @code{slime-enable-evaluate-in-emacs} to
-@code{t},
-@item
-and load the @file{clon} Emacs Lisp library. This library is part of the
-distribution and installed in a standard Emacs Lisp directory by
-@samp{make install}.
-@end enumerate
-If you're interested to know how this process works, I have described it
-in the following blog entry:
-@uref{http://www.didierverna.com/sciblog/index.php?post/2011/07/20/One-more-indentation-hack}.
-@item :restricted
-@coindex{restricted}@c
-@cindex Restricted Mode
-@sysindex{net.didierverna.clon.core}
-Some non-ANSI features of @clon{} require external functionality that
-may not be available in all contexts. Normally, @clon{} should
-autodetect this and switch to so-called @emph{restricted mode} at
-build-time (@pxref{Non-ANSI Features}). If @clon{} has failed to
-autodetect the problem (in which case I would like to know), or if for
-some reason, you explicitly want to disable those features, you may set
-the @code{:restricted} configuration option to @code{t}. Another way to
-do it, without even bothering with configuration is to just use the
-@samp{net.didierverna.clon.core} system instead of the regular one.
-@item :dump
-@coindex{dump}@c
-This option is only used by the ABCL port. @ref{Dumping Executables},
-provides more information on its use.
-@end table
-
-
-@c -----------------
-@c Non-ANSI Features
-@c -----------------
-@node Non-ANSI Features, Supported Platforms, Configuration, Technical Notes
-@section Non-ANSI Features
-One feature of @clon{} that is beyond the ANSI standard is terminal
-autodetection (it requires an @code{ioctl} call and hence a foreign
-function interface). Terminal autodetection is used in several
-situations, for turning on highlighting automatically and for detecting
-a terminal line width.
-
-@cindex Restricted Mode
-If, for some reason, terminal autodetection is not available, @clon{}
-will work in so-called @emph{restricted mode}. This means that
-@bioption{highlight=auto} won't work (highlighting will @emph{not} be
-turned on automatically on a @tty{}). For the same reason, unless
-otherwise specified via either the @code{COLUMNS} environment variable
-or the @bioption{line-width} option, terminal output will be formatted
-for 80 columns regardless of the actual terminal width
-(@pxenduserref{Global Control}).
-
-
-@c ----------------------
 @c Supported Platforms
-@c ----------------------
-@node Supported Platforms, Dumping Executables, Non-ANSI Features, Technical Notes
-@section Supported Platforms
+@c ====================================================================
+@node Supported Platforms, API Quick Reference, Conclusion, Top
+@appendix Supported Platforms
 @sysindex{editor-hints.named-readtables}
 @clon{} is an ASDF 3 library. It currently works on Unix (including
 MacOS X) and Windows (Cygwin or MinGW) and has been ported to 8 @cl{}
@@ -2781,7 +3046,7 @@ platform-dependent dependencies.
 @tab @code{cffi} (optional)
 @end multitable
 
-@unnumberedsubsec CLISP, Allegro and LispWorks specificities
+@appendixsec CLISP, Allegro and LispWorks specificities
 @cindex Restricted Mode
 As mentioned in the above table, CLISP, Allegro and LispWorks dependency
 on @code{cffi} is optional. They need @code{cffi} in order to implement
@@ -2792,7 +3057,7 @@ been compiled without @code{ffi} support), you get a big red blinking
 light and a warning but that's all. @clon{} will still work, although in
 restricted mode.
 
-@unnumberedsubsec ABCL specificities
+@appendixsec ABCL specificities
 @clon{}'s ABCL port currently has two limitations:
 @itemize @bullet
 @item
@@ -2809,200 +3074,11 @@ environment variable is set to a bogus value, is unavailable
 @end itemize
 
 
-@c -------------------
-@c Dumping Executables
-@c -------------------
-@node Dumping Executables, Not Dumping Executables, Supported Platforms, Technical Notes
-@section Dumping Executables
-@cindex Dumping
-Creating standalone executables is orthogonal to @clon{}. @clon{} is
-just a library that you might want to use, and in fact, it is also
-possible to use it without dumping executables at all (@pxref{Not
-Dumping Executables}).
-
-@findex dump
-Unfortunately, there is no standard way to dump executables from Lisp.
-We're entering the portability mine field here. @clon{}, however, wants
-to help. We've already seen that it provides utility wrappers like
-@code{dump} to make your life easier (I mean, more portable) in
-@ref{Quick Start}. If you're not interested in portability or if you
-prefer to do it your own way, you don't @emph{need} to use those
-wrappers. If you do, however, please read on.
-
-Continuing on the quickstart example, the table below provides
-ready-to-use @cmdline{} samples for dumping the program with the
-compilers currently supported. Remember that they work in conjunction
-with the somewhat rudimentary @code{dump} macro mentionned above.
-
-@table @strong
-@item SBCL
-@code{CC=gcc sbcl --script quickstart.lisp}@*
-The @code{CC=gcc} bit is needed for the @code{sb-grovel} contrib module
-that @clon{} uses (unless restricted mode is requested).
-@item CMUCL
-@code{lisp -noinit -nositeinit -load quickstart.lisp}
-@item CCL
-@code{ccl --no-init --load quickstart.lisp}
-@item ECL
-ECL doesn't work like the other Lisp compilers. In particular, creating
-an executable does not involve dumping a Lisp image, but compiling the
-source into separate object files and then linking them. The consequence
-is that there is no simple @cmdline{} recipe to show here. Instead, you
-might want to look at the file @file{demos/dump.lisp} in the
-distribution for an example. Note that this file doesn't really attempt
-to dump the whole application. Only the actual example file is dumped.
-
-Because the dumping scheme is different with ECL, it is also less
-straightforward to write portable code for standalone applications. The
-demo programs in the distribution both contain comments that are worth
-reading at the top of them.
-
-@findex dump
-One specific difference between ECL and the other Lisp compilers is that
-it doesn't require you to specify a particular function as the entry
-point for your executable, but instead relies on having code to execute
-directly at the toplevel of some file. @clon{}'s @code{dump} macro helps
-you with this: it normally expands to a compiler-specific function which
-saves the current Lisp image, but for ECL, it simply expands to the
-``main'' function call, hence consituting the entry point to the code
-that ECL needs.
-@item CLISP
-@code{CC=gcc clisp -norc -i quickstart.lisp}@*
-The @code{CC=gcc} bit lets you choose your preferred C compiler for
-@code{cffi}. Please note that executables dumped (the @clon{} way) by
-CLISP still understand lisp-specific @cmdline{} options when they are
-prefixed with @code{--clisp-}, so you should obviously avoid defining
-options by those names.
-@item ABCL
-ABCL is a totally different beast because it's a Java-based @cl{}
-implementation. Most notably, you don't create standalone executables in
-Java, so the normal way of running ABCL is by telling it to load some
-lisp code. If you want to run the quickstart program in the usual way,
-you will typically type this:
-@verbatim
-abcl --noinform --noinit --nosystem --load quickstart.lisp
-@end verbatim
-Note that for this to work, the @code{dump} macro expands to the
-``main'' function call for ABCL, just as for ECL.
-
-There's more to it than that though. It is possible to get closer to
-standalone executables with ABCL by 1/ providing your whole application
-in a @code{jar} file directly, and 2/ overriding ABCL's entry point by
-providing your own interpreter which runs your main function
-automatically. I have described this process in more details in the
-following blog entry:
-@uref{http://www.didierverna.com/sciblog/index.php?post/2011/01/22/Towards-ABCL-Standalone-Executables}.
-
-@coindex{dump}@c
-@clon{} helps you to do this to some extend. If the @code{:dump}
-configuration option is set (@pxref{Configuration}), then the
-@code{dump} macro doesn't expand to a call to the ``main'' function, but
-instead dumps a Java file containing an alternate ABCL interpreter that
-you can compile and add to the original ABCL @code{jar} file, along with
-@file{quickstart.lisp}. If you want more details on this, you will need
-to look at the @file{Makefile} in the @code{demo} directory and also at
-the file @file{make/config.make}.
-@item Allegro
-@findex dumplisp
-Dumping a complete application with Allegro is complicated, but more
-importantly only possible in the Enterprise edition. Because of that,
-@clon{}'s dumping facility only makes use of the @code{dumplisp} feature
-which just dumps a Lisp image. You can perform this operation with a
-@cmdline{} such as @samp{alisp -qq -L quickstart.lisp}. The Makefile
-infrastructure in the @file{demo} directory also creates shell script
-wrappers around this image to simplify their use.
-@item LispWorks
-@code{lispworks -init - -siteinit - -load quickstart.lisp}@*
-Please note that dumping a complete application with LispWorks is only
-possible in the Professional or Enterprise editions.
-@end table
-
-
-@c -----------------------
-@c Not Dumping Executables
-@c -----------------------
-@node Not Dumping Executables, , Dumping Executables, Technical Notes
-@section Not Dumping Executables
-Although @cmdline{} processing really makes sense for standalone
-executables, you may want to preserve interactivity with your
-application during the development phase, for instance for testing or
-debugging purposes.
-
-It is possible to use @clon{} interactively, that is, within a regular
-Lisp REPL, without dumping anything. First of all, we have already seen
-that it is possible to use a virtual @cmdline{} (@pxref{Using Different
-Command-Lines}). You can also use @clon{} interactively with the actual
-Lisp invocation's @cmdline{}, although a word of advice is in order
-here.
-
-@findex cmdline
-@findex dump
-As you might expect, the problem in that situation lies in the way the
-different Lisp implementations treat their own @cmdline{}. Guess what,
-it's a mess. When you dump an executable the @clon{} way, the
-@code{cmdline} function will always contain user options only (the
-@code{dump} macro instructs the compilers to @emph{not} process the
-@cmdline{} at all). When you use @clon{} interactively and mix
-compiler-specific options with application ones when invoking your Lisp
-environment, the situation is as follows:
-
-@table @strong
-@item SBCL
-SBCL processes its own options and leaves the others unprocessed on the
-@cmdline{}. This means that as long as there is no overlap between
-SBCL's options and yours, you can just put them all together on the
-@cmdline{}. In case of overlap however, you need to separate SBCL's
-options from yours with a call to @code{--end-toplevel-options} (that's
-an SBCL specific option separator).
-@item CMUCL
-@cindex Command-Line, remainder
-@cindex Remainder, of command-line
-CMUCL processes its own options, issues a warning about the options it
-doesn't know about, but in any case, it eats the whole @cmdline{}.
-Consequently, if you want to provide options to your application, you
-need to put them after a @code{--} separator. Note that you can still
-use a second such separator to provide @clon{} with both some options
-and a remainder (@pxenduserref{Option Separator}).
-@item CCL
-@itemx ECL
-@itemx CLISP
-CCL, ECL and CLISP all process their own options but will abort on
-unknown ones. Consequently, if you want to provide options to your
-application, you need to put them after a @code{--} separator. Note that
-you can still use a second such separator to provide @clon{} with both
-some options and a remainder (@pxenduserref{Option Separator}).
-@item ABCL
-ABCL processes its own options and leaves the others unprocessed on the
-@cmdline{}. This means that as long as there is no overlap between
-ABCL's options and yours, you can just put them all together on the
-@cmdline{}. In case of overlap however, you need to separate ABCL's
-options from yours with a @code{--} separator. Note that you can still
-use a second such separator to provide @clon{} with both some options
-and a remainder (@pxenduserref{Option Separator}).
-@item Allegro
-Allegro processes its own options, issues only a warning about options
-it doesn't know of, and leaves anything after a @code{--} alone.
-Consequently, if you want to provide options to your application, you
-need to put them after a @code{--} separator. Note that you can still
-use a second such separator to provide @clon{} with both some options
-and a remainder (@pxenduserref{Option Separator}).
-@item LispWorks
-LispWorks processes its own options and ignores the other ones, but
-always leaves everything on the command-line. It does not currently
-support @code{--} as an option separator either. Consequently, if you
-want to provide options to your application, you need to put them after
-a @code{--} separator, although you @emph{will} get into trouble if any
-option there is recognized by LispWorks itself. Note that you can still
-use a second such separator to provide @clon{} with both some options
-and a remainder (@pxenduserref{Option Separator}).
-@end table
-
-
 
 @c ====================================================================
 @c API Quick Reference
 @c ====================================================================
-@node API Quick Reference, Indexes, Technical Notes, Top
+@node API Quick Reference, Indexes, Supported Platforms, Top
 @appendix API Quick Reference
 
 @menu
@@ -3039,6 +3115,10 @@ See @ref{Configuration}.
 @defmac dump NAME FUNCTION &rest ARGS
 See @ref{Quick Start}.
 @end defmac
+
+@defvar *executablep*
+See @ref{Dumping Methods}
+@end defvar
 
 @cindex Command-Line
 @defun cmdline
@@ -3247,7 +3327,7 @@ Strings}.
 @c --------------
 @c Versioning API
 @c --------------
-@node Versioning API, , Extension API, API Quick Reference
+@node Versioning API,  , Extension API, API Quick Reference
 @section Versioning API
 
 @defun version &optional (TYPE :number)
@@ -3271,10 +3351,10 @@ Strings}.
 @appendix Indexes
 
 @menu
-* Concept Index::       Well, the concept index
-* Function Index::      Well, the function index
-* Variable Index::      Well, the variable index
-* Data Type Index::     Well, the data type index
+* Concept Index::               Well, the concept index
+* Function Index::              Well, the function index
+* Variable Index::              Well, the variable index
+* Data Type Index::             Well, the data type index
 @end menu
 
 
@@ -3308,7 +3388,7 @@ Strings}.
 @c ---------------
 @c Data Type Index
 @c ---------------
-@node Data Type Index, , Variable Index, Indexes
+@node Data Type Index,  , Variable Index, Indexes
 @section Data Types
 @printindex tp
 
@@ -3317,22 +3397,22 @@ Strings}.
 @c ====================================================================
 @c Acknowledgments
 @c ====================================================================
-@node Acknowledgments, , Indexes, Top
+@node Acknowledgments,  , Indexes, Top
 @appendix Acknowledgments
 The following people have contributed bug reports or fixes, suggestions,
 compiler support or any other kind of help. You have my gratitude!
 
 @multitable @columnfractions .99
-@item Alessio Stalla@*
-@item Antony @emph{something}@*
-@item Erik Huelsmann@*
-@item Erik Winkels@*
-@item François-René Rideau@*
-@item Jan Moringen@*
-@item James Wright@*
-@item Martin Simmons@*
-@item Nikodemus Siivola@*
-@item Sam Steingold@*
+@item Alessio Stalla
+@item Antony @emph{something}
+@item Erik Huelsmann
+@item Erik Winkels
+@item François-René Rideau
+@item Jan Moringen
+@item James Wright
+@item Martin Simmons
+@item Nikodemus Siivola
+@item Sam Steingold
 @end multitable
 
 
