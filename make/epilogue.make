@@ -27,9 +27,10 @@
 ### Code:
 
 $(TOP_DIR)/make/version.make: \
-  $(TOP_DIR)/make/version.cl $(TOP_DIR)/setup/src/version.lisp
+  $(TOP_DIR)/make/epilogue.make $(TOP_DIR)/make/version.cl \
+  $(TOP_DIR)/setup/src/version.lisp
 	$($(LISP)_PATH) $(EVAL_CONFIG)		     \
 	  $($(LISP)_LOAD) $(TOP_DIR)/make/version.cl \
-	  | tail -2 > $@
+	  | tail -3 > $@
 
-### prologue.make ends here
+### epilogue.make ends here

@@ -31,8 +31,8 @@
 TOP_DIR := .
 
 include make/config.make
-include make/prologue.make
 include make/version.make
+include make/prologue.make
 
 SUBDIRS   := demos share doc
 DIST_NAME := $(PROJECT)-$(SHORT_VERSION)

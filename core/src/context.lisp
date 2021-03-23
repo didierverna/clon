@@ -733,13 +733,14 @@ CONTEXT is where to look for the options."
 the Command-Line Options Nuker library, version ~A,
 written by Didier Verna <didier@didierverna.net>.
 
-Copyright (C) 2010-2012, 2015, 2017, 2020, 2021 Didier Verna
+Copyright (C) ~A Didier Verna
 Clon is released under the terms of the BSD license.
 See http://www.opensource.org/licenses/bsd-license for more information.
 Clon is provided with NO warranty; not even for MERCHANTABILITY
 or FITNESS FOR A PARTICULAR PURPOSE.~%"
       (pathname-name (progname :context context))
-      (version :long))
+      (version :long)
+      *copyright-years*)
     (uiop:quit))
   (let ((version-format (getopt :context context :long-name "clon-version")))
     (when version-format

@@ -32,10 +32,12 @@
 
 (asdf:load-system :net.didierverna.clon.setup)
 
-(format t "LONG_VERSION  := ~A~%~
-	   SHORT_VERSION := ~A~%"
+(format t "LONG_VERSION    := ~A~%~
+	   SHORT_VERSION   := ~A~%~
+	   COPYRIGHT_YEARS := ~A~%"
   (net.didierverna.clon.setup:version :long)
-  (net.didierverna.clon.setup:version :short))
+  (net.didierverna.clon.setup:version :short)
+  net.didierverna.clon.setup:*copyright-years*)
 
 (uiop:quit)
 

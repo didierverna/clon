@@ -2,7 +2,7 @@
 
 @c user.texi --- User manual
 
-@c Copyright (C) 2010-2012, 2015, 2021 Didier Verna
+@c Copyright (C) 2010-2012, 2015, 2017, 2020, 2021 Didier Verna
 
 @c Author: Didier Verna <didier@didierverna.net>
 
@@ -42,7 +42,7 @@
 @c Settings
 @c ====================================================================
 @set VERSION 1.0 beta 24 "Michael Brecker"
-@set COPYRIGHT_DATE 2010-2012, 2015, 2017, 2020, 2021
+@set COPYRIGHT_YEARS 2010--2012, 2015, 2017, 2020, 2021
 @setchapternewpage odd
 @documentdescription
 The Clon User Manual for version @value{VERSION}.
@@ -382,7 +382,7 @@ Command-Line
 @c ====================================================================
 @copying
 @quotation
-Copyright @copyright{} @value{COPYRIGHT_DATE} Didier Verna
+Copyright @copyright{} @value{COPYRIGHT_YEARS} Didier Verna
 
 Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -2994,6 +2994,12 @@ Corea". As for the short version, a patchlevel of 0 is ignored in the
 output: 1.3 "Bill Evans".
 @end itemize
 
+@vindex *copyright-years*
+Incidentally, but you will probably never need to use it, @clon{} also
+exports a variable named @code{*copyright-years*}, which, as its name
+suggests, is a string denoting the copyright years for the whole
+project.
+
 
 
 @c ====================================================================
@@ -3346,6 +3352,7 @@ Strings}.
 @defvrx Parameter *release-status*
 @defvrx Parameter *release-status-level*
 @defvrx Parameter *release-name*
+@defvrx Parameter *copyright-years*
 @xref{Version Numbering}.
 @end defvr
 

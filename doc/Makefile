@@ -29,11 +29,11 @@
 TOP_DIR := ..
 
 include $(TOP_DIR)/make/config.make
+include $(TOP_DIR)/make/version.make
 include $(TOP_DIR)/make/prologue.make
 ifneq ($(SBCL_PATH),)
   include declt.make
 endif
-include $(TOP_DIR)/make/version.make
 
 INFO_DIR        := $(PREFIX)/share/info
 DOC_DIR	:= $(SHARE)/doc
@@ -156,6 +156,7 @@ distclean: clean
 
 $(TEXI_MAN): $(TOP_DIR)/make/version.make
 	$(PERL) -pi -e 's/@set VERSION .*/@set VERSION $(LONG_VERSION)/' $@
+	$(PERL) -pi -e 's/@set COPYRIGHT_YEARS .*/@set COPYRIGHT_YEARS $(TYPESET_COPYRIGHT_YEARS)/' $@
 
 install-www: webref
 	$(MAKE) install-at LOCATION="$(W3DIR)"
@@ -177,6 +178,5 @@ include $(TOP_DIR)/make/epilogue.make
 	ps				\
 	clean distclean		\
 	install-www
-
 
 ### Makefile ends here

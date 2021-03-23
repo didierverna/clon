@@ -28,8 +28,6 @@
 
 (require "asdf")
 
-(defconstant +copyright-years+ "2010--2012, 2015, 2017, 2020, 2021")
-
 (defconstant +introduction+
   "@macro clon
 @t{Clon}
@@ -129,7 +127,7 @@ and extend the library with your own option types.
   (declt:declt :net.didierverna.clon
 	       :library-name "Clon"
 	       :version (net.didierverna.clon.setup:version :long)
-	       :copyright-years +copyright-years+
+	       :copyright-years net.didierverna.clon.setup:*copyright-years*
 	       :license :bsd
 	       :introduction +introduction+
 	       :texi-name "webreference"
@@ -137,7 +135,7 @@ and extend the library with your own option types.
   (declt:declt :net.didierverna.clon
 	       :library-name "Clon"
 	       :version (net.didierverna.clon.setup:version :long)
-	       :copyright-years +copyright-years+
+	       :copyright-years net.didierverna.clon.setup:*copyright-years*
 	       :license :bsd
 	       :introduction +introduction+
 	       :texi-name "reference"
@@ -145,6 +143,5 @@ and extend the library with your own option types.
 	       :hyperlinks t))
 
 (uiop:quit)
-
 
 ;;; generate.cl ends here

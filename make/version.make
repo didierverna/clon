@@ -1,2 +1,3 @@
-LONG_VERSION  := 1.0 beta 24 "Michael Brecker"
-SHORT_VERSION := 1.0b24
+LONG_VERSION    := 1.0 beta 24 "Michael Brecker"
+SHORT_VERSION   := 1.0b24
+COPYRIGHT_YEARS := 2010-2012, 2015, 2017, 2020, 2021

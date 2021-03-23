@@ -35,6 +35,7 @@
   (:export
     :in-readtable
     ;; from src/version.lisp:
+    :*copyright-years*
     :*release-major-level* :*release-minor-level* :*release-status*
     :*release-status-level* :*release-name*
     :version

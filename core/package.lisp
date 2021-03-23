@@ -44,6 +44,7 @@
 		:class-slots :slot-definition-name :validate-superclass)
   (:export
     ;; From the :net.didierverna.clon.setup package:
+    :*copyright-years*
     :*release-major-level*
     :*release-minor-level*
     :*release-status*

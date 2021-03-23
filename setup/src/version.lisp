@@ -30,6 +30,12 @@
 
 
 
+;; Copyright years
+(defvar *copyright-years* "2010-2012, 2015, 2017, 2020, 2021"
+  "A string denoting the copyright years for the whole project.")
+
+
+
 ;; Version specifiers
 
 (defparameter *release-major-level* 1

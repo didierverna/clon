@@ -30,6 +30,8 @@ PROJECT   := clon
 PACKAGE   := net.didierverna.$(PROJECT)
 ASDF_FILE := $(PACKAGE).asd
 
+TYPESET_COPYRIGHT_YEARS := $(subst -,--,$(COPYRIGHT_YEARS))
+
 PERL := perl
 
 SHARE := $(PREFIX)/share
