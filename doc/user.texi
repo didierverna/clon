@@ -2703,6 +2703,21 @@ containing the main function. If you want more details on this, you will
 need to look at the @file{Makefile} in the @code{demo/} directory and
 also at the file @file{make/config.make}. You can also use @command{make
 -n clon-dump LISP=ABCL} to see it in (fake) action.
+
+The file in question is created based on a template that is located
+under @file{etc/abcl/template.java} in the distribution, so you can also
+edit this file, copy it, or do whatever you want with it. Note that this
+file is @emph{not} installed anywhere. Every time dumping is requested,
+@clon{} looks for it in its own directory tree, so it must stay there.
+
+Also, if you ever want to modify its contents and keep it as a template
+for dumping (for example, in order to use @samp{ql:quickload} instead of
+@samp{asdf:load-system}, you should know that this file is read in as a
+Lisp @code{format} string, and in must always contain three
+@code{format} directives: the first one for the class name, the second
+one for the program invocation name (@code{argv[0]}), and the thrid one
+for the file containing the call to @code{dump}. Again, better take a
+look at how it is done in the demonstration programs.
 @item (4)
 Everything should work normally in Lispworks, but please remember that
 dumping a complete application is only possible in the Professional or
