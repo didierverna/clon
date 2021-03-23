@@ -544,24 +544,16 @@ Otherwise, @clon{} is also available via
 for more information on portability and dependencies.
 
 @sysindex{net.didierverna.clon}
-@clon{}'s main system is called @samp{net.didierverna.clon}. Depending on
-your installation, you may thus either @code{asdf:load-system}, or
-@code{ql:quickload} it in your Lisp image.
+@clon{}'s main system is called @samp{net.didierverna.clon}. Depending
+on your installation, you may thus either @code{asdf:load-system}, or
+@code{ql:quickload} it in your Lisp image. If you encounter grovel or
+ffi related problems, you may need to set the @samp{CC} environment
+variable to a working compiler before loading.
 
 @sysindex{net.didierverna.clon.core}
 Alternatively, if you just want to use the core library without all the
 platform-dependent bells and whistles (@pxref{Non-ANSI Features}), you
 may also just load the @samp{net.didierverna.clon.core} system.
-
-In the general case, but specifically if you are using SBCL or CLISP,
-you may want to make sure that the @code{CC} environment variable is set
-to your favorite C compiler in your init file. Otherwise, @clon{} will
-run in restricted mode (@pxref{Configuration}). For instance, put this
-in your @file{.sbclrc}:
-@verbatim
-(require :sb-posix)
-(sb-posix:setenv "CC" "gcc" 1)
-@end verbatim
 
 In addition to the library itself, the @clon{} distribution offers
 documentation in the form of 3 different manuals, some data files like
@@ -807,11 +799,11 @@ automatically at startup. In fact, @code{dump} also accepts a
 (implementation-specific) dumping facility.
 
 In order to get a standalone executable from this program, all you need
-to do now is to type @samp{CC=gcc sbcl --script quickstart.lisp}. Note
-that the actual way of dumping executables is compiler-dependent. For
-more information on the proper way to do it and on the compilers
-currently supported, see @ref{Dumping Executables}. Note also that it is
-possible to use @clon{} without actually dumping a standalone executable
+to do now is to type @samp{sbcl --script quickstart.lisp}. Note that the
+actual way of dumping executables is compiler-dependent. For more
+information on the proper way to do it and on the compilers currently
+supported, see @ref{Dumping Executables}. Note also that it is possible
+to use @clon{} without actually dumping a standalone executable
 (@pxref{Not Dumping Executables}) at all.
 
 
