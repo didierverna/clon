@@ -1,6 +1,6 @@
 ;;; util.lisp --- General utilities
 
-;; Copyright (C) 2010-2013, 2015 Didier Verna
+;; Copyright (C) 2010-2013, 2015, 2021 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 

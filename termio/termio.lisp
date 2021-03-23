@@ -1,6 +1,6 @@
 ;;; termio.lisp --- Terminal-related utilities
 
-;; Copyright (C) 2012, 2015 Didier Verna
+;; Copyright (C) 2012, 2015, 2021 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
