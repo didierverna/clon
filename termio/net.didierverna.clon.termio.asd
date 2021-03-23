@@ -26,9 +26,9 @@
 
 ;;; Code:
 
-(asdf:load-system :net.didierverna.clon.setup)
+(load-system :net.didierverna.clon.setup)
 
-(asdf:defsystem :net.didierverna.clon.termio
+(defsystem :net.didierverna.clon.termio
   :long-name "The Command-Line Options Nuker, termio library"
   :description "Clon's support for termio (tty geometry and fontification)"
   :long-description "\

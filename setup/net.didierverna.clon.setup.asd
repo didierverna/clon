@@ -26,7 +26,7 @@
 
 ;;; Code:
 
-(asdf:defsystem :net.didierverna.clon.setup
+(defsystem :net.didierverna.clon.setup
   :long-name "The Command-Line Options Nuker, setup library"
   :description "Clon's preload setup library"
   :long-description "\
@@ -49,7 +49,7 @@ see the `net.didierverna.clon' system."
 			     (:file "termio"
 			      :depends-on ("configuration"))))))
 
-(asdf:defsystem :net.didierverna.clon.setup/termio
+(defsystem :net.didierverna.clon.setup/termio
   :long-name "The Command-Line Options Nuker, termio setup"
   :description "Clon's support for automatic configuration of termio support"
   :long-description "\

@@ -26,9 +26,9 @@
 
 ;;; Code:
 
-(asdf:load-system :net.didierverna.clon.setup)
+(load-system :net.didierverna.clon.setup)
 
-(asdf:defsystem :net.didierverna.clon
+(defsystem :net.didierverna.clon
   :long-name "The Command-Line Options Nuker"
   :description
   "Command-line options management for standalone Common Lisp applications"

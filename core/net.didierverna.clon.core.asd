@@ -26,9 +26,9 @@
 
 ;;; Code:
 
-(asdf:load-system :net.didierverna.clon.setup)
+(load-system :net.didierverna.clon.setup)
 
-(asdf:defsystem :net.didierverna.clon.core
+(defsystem :net.didierverna.clon.core
   :long-name "The Command-Line Options Nuker, core library"
   :description "Clon's basic, platform-independent functionality"
   :long-description "\
