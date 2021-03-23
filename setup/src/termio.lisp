@@ -45,27 +45,19 @@
 Update Clon configuration and *FEATURES* accordingly."
   (unless (configuration :restricted)
     #+sbcl
-    (progn
-      (require :sb-posix)
-      (unless (funcall (intern "GETENV" :sb-posix) "CC")
-	(restrict-because "the CC environment variable is not set"))
-      (handler-case (asdf:load-system :sb-grovel)
-	(error ()
-	  (restrict-because "unable to load module SB-GROVEL"))))
+    (handler-case (asdf:load-system :sb-grovel)
+      (error () (restrict-because "unable to load SB-GROVEL")))
     #+clisp
     (cond ((member :ffi *features*)
 	   (handler-case (asdf:load-system :cffi-grovel)
 	     (error ()
-	       (restrict-because
-		"unable to load ASDF component CFFI-GROVEL"))))
+	       (restrict-because "unable to load CFFI-GROVEL"))))
 	  (t
-	   (restrict-because
-	    "CLISP is compiled without FFI support")))
+	   (restrict-because "CLISP is compiled without FFI support")))
     #+(or allegro lispworks)
     (handler-case (asdf:load-system :cffi-grovel)
       (error ()
-	(restrict-because
-	 "unable to load ASDF component CFFI-GROVEL")))
+	(restrict-because "unable to load CFFI-GROVEL")))
     #+abcl
     (restrict-because "ABCL is in use"))
   (if (configuration :restricted)

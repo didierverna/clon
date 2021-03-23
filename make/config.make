@@ -38,9 +38,6 @@ PREFIX := /usr/local
 # section A.1 of the user manual):
 # RESTRICTED := t
 
-## C compiler configuration for sb-grovel and cffi-grovel.
-CC := gcc
-
 ## Preferred Common Lisp implementation.
 # Choices are SBCL, CMUCL, CCL, ECL, CLISP, ABCL, ACL (Allegro) and LW
 # (LispWorks).
@@ -53,12 +50,12 @@ BINLOC_CACHE := ${HOME}/.cache/common-lisp
 # required in order to generate the reference manual, so you must set
 # SBCL_PATH properly. If you don't have SBCL installed at all, set it to
 # nothing.
-SBCL_PATH  := CC=$(CC) sbcl
+SBCL_PATH  := sbcl
 CMUCL_PATH := lisp
 CCL_PATH   := ccl
 ECL_PATH   := ecl
 # -q is needed to remove 'bye' for version.cl to work properly.
-CLISP_PATH := CC=$(CC) clisp -q
+CLISP_PATH := clisp -q
 ACL_PATH   := alisp
 # Note: if you want to dump the demo examples, you should use a console image
 # without multiprocessing here. See section 12.3.5 of the LispWorks user guide
@@ -70,8 +67,9 @@ ABCL_JAR   := /usr/local/src/common-lisp/abcl/dist/abcl.jar
 JAVA       := java
 JAVAC      := javac
 JAR        := jar
-SED        := sed
 ABCL_PATH  := abcl
+# GNU sed is required.
+SED        := sed
 
 
 ## Programs for generating the documentation:
