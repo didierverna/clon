@@ -26,8 +26,6 @@
 
 ;;; Code:
 
-(load-system :net.didierverna.clon.setup)
-
 (defsystem :net.didierverna.clon.termio
   :long-name "The Command-Line Options Nuker, termio library"
   :description "Clon's support for termio (tty geometry and fontification)"
@@ -40,7 +38,8 @@ Clon, see the net.didierverna.clon system."
   :homepage "http://www.lrde.epita.fr/~didier/software/lisp/clon.php"
   :source-control "https://github.com/didierverna/clon"
   :license "BSD"
-  :version #.(net.didierverna.clon.setup:version :short)
+  :version (:read-file-line #p"../make/version.make"
+	     :at (1 (lambda (str) (subseq str 19))))
   :defsystem-depends-on
   (:net.didierverna.clon.setup/termio
    (:feature :sbcl (:require :sb-grovel))

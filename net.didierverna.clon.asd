@@ -26,8 +26,6 @@
 
 ;;; Code:
 
-(load-system :net.didierverna.clon.setup)
-
 (defsystem :net.didierverna.clon
   :long-name "The Command-Line Options Nuker"
   :description
@@ -55,7 +53,8 @@ Clon are the following.
   :source-control "https://github.com/didierverna/clon"
   :license "BSD"
   :defsystem-depends-on (:net.didierverna.clon.setup/termio)
-  :version #.(net.didierverna.clon.setup:version :short)
+  :version (:read-file-line #p"make/version.make"
+	     :at (1 (lambda (str) (subseq str 19))))
   :depends-on (:net.didierverna.clon.core
 	       (:feature :net.didierverna.clon.termio
 		:net.didierverna.clon.termio)))
