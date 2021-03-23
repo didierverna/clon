@@ -11,19 +11,13 @@ portability and dependencies.
 
    Clon’s main system is called ‘net.didierverna.clon’.  Depending on
 your installation, you may thus either ‘asdf:load-system’, or
-‘ql:quickload’ it in your Lisp image.
+‘ql:quickload’ it in your Lisp image.  If you encounter grovel or ffi
+related problems, you may need to set the ‘CC’ environment variable to a
+working compiler before loading.
 
    Alternatively, if you just want to use the core library without all
 the platform-dependent bells and whistles (*note Non-ANSI Features::),
 you may also just load the ‘net.didierverna.clon.core’ system.
-
-   In the general case, but specifically if you are using SBCL or CLISP,
-you may want to make sure that the ‘CC’ environment variable is set to
-your favorite C compiler in your init file.  Otherwise, Clon will run in
-restricted mode (*note Configuration::).  For instance, put this in your
-‘.sbclrc’:
-(require :sb-posix)
-(sb-posix:setenv "CC" "gcc" 1)
 
    In addition to the library itself, the Clon distribution offers
 documentation in the form of 3 different manuals, some data files like
