@@ -398,52 +398,6 @@ implementation. See appendix A.5 of the user manual for more information."
   #+allegro   (excl.osi:putenv (concatenate 'string variable "=" value))
   #+lispworks (setf (hcl:getenv variable) value))
 
-#+abcl
-(defparameter *abcl-main-class-template*
-  "import org.armedbear.lisp.*;
-
-public class ~A
-{
-  public static void main (final String[] argv)
-  {
-    Runnable r = new Runnable ()
-    {
-      public void run()
-      {
-	try
-	{
-	  LispObject cmdline = Lisp.NIL;
-	  for (String arg : argv)
-	    cmdline = new Cons (arg, cmdline);
-	  cmdline.nreverse ();
-	  Lisp._COMMAND_LINE_ARGUMENT_LIST_.setSymbolValue (cmdline);
-
-	  Interpreter interpreter = Interpreter.createInstance ();
-	  interpreter.eval (\"(defvar extensions::*argv0* \\\"~A\\\")\");
-	  interpreter.eval (\"(export 'extensions::*argv0* 'extensions)\");
-
-	  // You may need the line below or some other startup code if the
-	  // dumped ABCL pseudo-executable has trouble finding Clon or its
-	  // dependencies (e.g. if Quicklisp is involved).
-	  // interpreter.eval (\"(load #p\\\"~~/.abclrc\\\")\");
-	  interpreter.eval (\"(require \\\"asdf\\\")\");
-	  interpreter.eval (\"(asdf:load-system :net.didierverna.clon.setup)\");
-	  interpreter.eval (\"(net.didierverna.clon.setup:configure :restricted t)\");
-
-	  Load.loadSystemFile (\"/~A\", false, false, false);
-	}
-	catch (ProcessingTerminated e)
-	{
-	  System.exit (e.getStatus ());
-	}
-      }
-    };
-
-    new Thread (null, r, \"interpreter\", 4194304L).start();
-  }
-}~%"
-  "Main class template for ABCL.")
-
 ;; #### WARNING: retained only for backward compatibility.
 (defun exit (&optional (status 0))
   "Quit the current application with STATUS.
@@ -478,66 +432,68 @@ this function behaves differently in some cases, as described below.
   the file in which this macro call appears and calls FUNCTION. This also
   means that ARGS is unused."
   ;; #### PORTME.
-  #+ecl     (declare (ignore name))
+  #+ecl (declare (ignore name))
   #+allegro (declare (ignore function))
-  #+sbcl    `(progn
-	       (setq *executablep* t) ; not used but here for correctness
-	       (sb-ext:save-lisp-and-die ,name
-		 :toplevel #',function
-		 :executable t
-		 :save-runtime-options t
-		 ,@args))
-  #+cmu     `(progn
-	       (setq *executablep* t)
-	       (ext:save-lisp ,name
-		 :init-function #',function
-		 :executable t
-		 :process-command-line nil
-		 ,@args
-		 :load-init-file nil
-		 :site-init nil
-		 :print-herald nil))
-  #+ccl     `(progn
-	       (setq *executablep* t)
-	       (ccl:save-application ,name
-		 :toplevel-function #',function
-		 :prepend-kernel t
-		 ,@args
-		 :init-file nil
-		 :error-handler :quit))
+  #+sbcl `(progn
+	    (setq *executablep* t) ; not used but here for correctness
+	    (sb-ext:save-lisp-and-die ,name
+	      :toplevel #',function
+	      :executable t
+	      :save-runtime-options t
+	      ,@args))
+  #+cmu `(progn
+	   (setq *executablep* t)
+	   (ext:save-lisp ,name
+	     :init-function #',function
+	     :executable t
+	     :process-command-line nil
+	     ,@args
+	     :load-init-file nil
+	     :site-init nil
+	     :print-herald nil))
+  #+ccl `(progn
+	   (setq *executablep* t)
+	   (ccl:save-application ,name
+	     :toplevel-function #',function
+	     :prepend-kernel t
+	     ,@args
+	     :init-file nil
+	     :error-handler :quit))
   ;; #### NOTE: ECL works differently: it needs an entry point (i.e. actual
   ;; code to execute) instead of a main function. So we expand DUMP to just
   ;; call that function.
-  #+ecl     `(progn
-	       (setq *executablep* t)
-	       (,function))
+  #+ecl `(progn
+	   (setq *executablep* t)
+	   (,function))
   ;; CLISP's saveinitmem function doesn't quit, so we need to do so here.
-  #+clisp   `(progn
-	       (setq *executablep* t) ; not used but here for correctness
-	       (ext:saveinitmem ,name
-		 :init-function #',function
-		 :executable 0
-		 ,@args
-		 :quiet t
-		 :norc t)
-	       (uiop:quit))
-  #+abcl   (if (configuration :dump)
-	       (let ((source-pathname (or *compile-file-pathname*
-					  *load-pathname*))
-		     (class-name (copy-seq name)))
-		 (setf (aref class-name 0) (char-upcase (aref class-name 0)))
-		 (with-open-file
-		     (*standard-output*
-		      (merge-pathnames
-		       (make-pathname :name class-name :type "java")
-		       source-pathname)
-		      :direction :output :if-exists :supersede)
-		   (format t *abcl-main-class-template*
-		     class-name name (namestring source-pathname)))
-		 '(progn))
-	     `(progn
-		(setq *executablep* t) ; not used but here for correctness
-		(,function)))
+  #+clisp `(progn
+	     (setq *executablep* t) ; not used but here for correctness
+	     (ext:saveinitmem ,name
+	       :init-function #',function
+	       :executable 0
+	       ,@args
+	       :quiet t
+	       :norc t)
+	     (uiop:quit))
+  #+abcl (if (configuration :dump)
+	   (let ((source-pathname (or *compile-file-pathname* *load-pathname*))
+		 (class-name (copy-seq name))
+		 (template (uiop:read-file-string
+			    (merge-pathnames #p"etc/abcl/template.java"
+					     (asdf:system-source-directory
+					      :net.didierverna.clon)))))
+	     (setf (aref class-name 0) (char-upcase (aref class-name 0)))
+	     (with-open-file (*standard-output*
+			      (merge-pathnames
+			       (make-pathname :name class-name :type "java")
+			       source-pathname)
+			      :direction :output :if-exists :supersede)
+	       (format t template
+		 class-name name (namestring source-pathname)))
+	     '(progn))
+	   `(progn
+	      (setq *executablep* t) ; not used but here for correctness
+	      (,function)))
   ;; ACL's dumplisp function doesn't quit, so we need to do so here.
   #+allegro `(progn
 	       (setq *executablep* t) ; not used but here for correctness
