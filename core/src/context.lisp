@@ -1,6 +1,6 @@
 ;;; context.lisp --- Context management
 
-;; Copyright (C) 2010-2012, 2015, 2021 Didier Verna
+;; Copyright (C) 2010-2012, 2015, 2017, 2020, 2021 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
@@ -733,7 +733,7 @@ CONTEXT is where to look for the options."
 the Command-Line Options Nuker library, version ~A,
 written by Didier Verna <didier@didierverna.net>.
 
-Copyright (C) 2010, 2011, 2015 Didier Verna
+Copyright (C) 2010-2012, 2015, 2017, 2020, 2021 Didier Verna
 Clon is released under the terms of the BSD license.
 See http://www.opensource.org/licenses/bsd-license for more information.
 Clon is provided with NO warranty; not even for MERCHANTABILITY
