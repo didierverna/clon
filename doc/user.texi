@@ -3420,6 +3420,9 @@ compiler support or any other kind of help. You have my gratitude!
 @item Martin Simmons
 @item Nikodemus Siivola
 @item Sam Steingold
+@item Olivier Certner
+@item Thomas Fitzsimmons
+@item Pritam Baral
 @end multitable
 
 
