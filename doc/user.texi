@@ -2532,9 +2532,19 @@ have nothing to do with it; it's just a library that you might want to
 use in order to process the @cmdline{}. Unfortunately (and precisely
 because of the lack of standardization), there are some non-orthogonal
 concerns that need to be dealt with carefully for @clon{} to work
-properly in all situations. The following sections provide some
-important information regarding the use of @clon{} in standalone
-executables, or in regular interactive Lisp images.
+properly in all situations.
+
+@findex executablep
+The following sections provide some important information regarding the
+use of @clon{} in standalone executables, or in regular interactive Lisp
+images. Before going into the details, let me first introduce the
+@code{executablep} function, a predicate that returns @code{t} when
+called from a standalone executable. You may find this function useful,
+for example in order to write portable code deciding on whether or not
+to quit your application at the end of @clon{}'s main function. You'd
+quit a dumped executable, but you'd continue to a REPL in an interactive
+variation.
+
 
 @menu
 * Dumping Executables::         Using Clon in standalone applications
@@ -3123,6 +3133,10 @@ See @ref{Quick Start}.
 @defvar *executablep*
 See @ref{Dumping Methods}
 @end defvar
+
+@defun executablep
+See @ref{Application Delivery}
+@end defun
 
 @cindex Command-Line
 @defun cmdline

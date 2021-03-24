@@ -57,7 +57,7 @@
     :exit ;; #### WARNING: retained only for backward compatibility.
     :cmdline
     :dump
-    :*executablep*
+    :*executablep* :executablep
     ;; From src/text.lisp:
     :make-text
     ;; From src/options/flag.lisp:
