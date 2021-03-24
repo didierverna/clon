@@ -1,6 +1,6 @@
 							-*- mode: outline -*-
 
-* Copyright (C) 2010, 2011, 2013, 2015, 2020 Didier Verna
+* Copyright (C) 2010, 2011, 2013, 2015, 2020, 2021 Didier Verna
 
 This file is part of Clon.
 
@@ -10,7 +10,7 @@ notice and this notice are preserved.
 
 
 * Competition
-Look at the alternative and provide a comparative chart.
+Look at the alternatives and provide a comparative chart.
 
 * I18N
 
@@ -162,5 +162,3 @@ and provide a short bio, with option --clon-about=RELEASE
 
 * Pascal would like a simple way to declare options ala lambda list
 For instance define-main-function (&key opt1 opt2 ...), and be done with it.
-
-* Cf. ECL's asdf implementation of make-build.
