@@ -1,9 +1,3 @@
-.clisp.cnf
-
-sbcl-*/
-cmu-*/
-openmcl-*/
-
 demos/simple
 demos/advanced
 demos/simple.dxl
