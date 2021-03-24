@@ -796,7 +796,7 @@ actual way of dumping executables is compiler-dependent. For more
 information on the proper way to do it and on the compilers currently
 supported, see @ref{Dumping Executables}. Note also that it is possible
 to use @clon{} without actually dumping a standalone executable
-(@pxref{Not Dumping Executables}) at all.
+(@pxref{Delivering Scripts}) at all.
 
 
 
@@ -1506,7 +1506,7 @@ because @clon{} keeps track of the current status of the @cmdline{}. In
 fact, @clon{} never works on the original @cmdline{}, but uses a mutable
 @emph{copy} of it after parsing. If you want to access the real
 @cmdline{} of your application (except for the compiler-specific
-options, see @ref{Not Dumping Executables}), you may use the
+options, see @ref{Delivering Scripts}), you may use the
 @code{cmdline} function, which is a wrapper around an
 implementation-dependent way to access it.
 
@@ -2525,28 +2525,28 @@ this parameter.
 @c ====================================================================
 @node Application Delivery, Other Considerations, Advanced Usage, Top
 @chapter Application Delivery
-Application delivery, in other words, creating standalone executables,
-is a concern beyond the ANSI standard, and is implemented differently by
-each and every Lisp vendor. In theory, @clon{} should have nothing to do
-with it; it's just a library that you might want to use in order to
-process the @cmdline{}. Unfortunately (and precisely because of the lack
-of standardization), there are some non-orthogonal concerns that need to
-be dealt with carefully for @clon{} to work properly in all situations.
-The following sections provide some important information regarding the
-use of @clon{} in standalone applications, or in regular interactive
-Lisp images.
+Delivering self-contained Lisp applications (whether as executables, or
+as scripts) is a concern beyond the ANSI standard, and is implemented
+differently by each and every Lisp vendor. In theory, @clon{} should
+have nothing to do with it; it's just a library that you might want to
+use in order to process the @cmdline{}. Unfortunately (and precisely
+because of the lack of standardization), there are some non-orthogonal
+concerns that need to be dealt with carefully for @clon{} to work
+properly in all situations. The following sections provide some
+important information regarding the use of @clon{} in standalone
+executables, or in regular interactive Lisp images.
 
 @menu
 * Dumping Executables::         Using Clon in standalone applications
+* Delivering Scripts::          Using Clon in regular interactive sessions
 * Distributing Clon Material::  Themes and documentation
-* Not Dumping Executables::     Using Clon in regular interactive sessions
 @end menu
 
 
 @c -------------------
 @c Dumping Executables
 @c -------------------
-@node Dumping Executables, Distributing Clon Material, Application Delivery, Application Delivery
+@node Dumping Executables, Delivering Scripts, Application Delivery, Application Delivery
 @section Dumping Executables
 @cindex Dumping
 @findex dump
@@ -2630,7 +2630,7 @@ Dumping with both @clon{} and ASDF should work with CLISP in theory, but
 the current trunk (2.49) seems to have a problem with its @cmdline{} in
 dumped images. Its is possible to work around it by putting all
 @cmdline{} options after a @t{--} separator, as for regular sessions
-(@pxref{Not Dumping Executables}). This issue has been reported at
+(@pxref{Delivering Scripts}). This issue has been reported at
 @uref{https://sourceforge.net/p/clisp/bugs/745/}.
 
 Please note also that standalone CLISP executables continue to recognize
@@ -2717,35 +2717,22 @@ their own shell wrappers for loading the concerned images.
 @end table
 
 
-@c --------------------------
-@c Distributing Clon Material
-@c --------------------------
-@node Distributing Clon Material, Not Dumping Executables, Dumping Executables, Application Delivery
-@section Distributing Clon Material
-If you ship a clonified standalone executable, your clients may not have
-a properly installed @clon{} distribution locally. Although this is not
-a requirement by any means, it may be worth distributing some of
-@clon{}'s material with your application, for example, the end-user
-manual (@pxenduserref{Top}), or the standard output themes located in
-the @file{share/} directory.
-
-
 @c -----------------------
-@c Not Dumping Executables
+@c Delivering Scripts
 @c -----------------------
-@node Not Dumping Executables,  , Distributing Clon Material, Application Delivery
-@section Not Dumping Executables
-Although @cmdline{} processing really makes sense for standalone
+@node Delivering Scripts, Distributing Clon Material, Dumping Executables, Application Delivery
+@section Delivering Scripts
+Although @cmdline{} processing is mostly useful for standalone
 executables, you may want to preserve interactivity with your
-application during the development phase, for instance for testing or
-debugging purposes.
+application during the development phase (for instance for testing or
+debugging purposes), or you may even prefer to deliver possibly
+interactive scripts with a rich user-level @cmdline{} anyway.
 
-It is possible to use @clon{} interactively, that is, within a regular
-Lisp REPL, without dumping anything. First of all, we have already seen
-that it is possible to use a virtual @cmdline{} (@pxref{Using Different
-Command-Lines}). You can also use @clon{} interactively with the actual
-Lisp invocation's @cmdline{}, although a word of advice is in order
-here.
+It is possible to use @clon{} in a script (maybe ending up in a REPL as
+well), that is, without dumping anything. First of all, we have already
+seen that it is possible to use a virtual @cmdline{} (@pxref{Using
+Different Command-Lines}). You can also use @clon{} with the actual Lisp
+invocation's @cmdline{}, although a word of advice is in order here.
 
 @findex cmdline
 @findex dump
@@ -2753,9 +2740,8 @@ As you might expect, the problem in that situation lies in the way the
 different Lisp implementations treat their own @cmdline{}. Guess what,
 it's a mess. When you dump an executable as described previsouly, the
 @code{cmdline} function will always contain user options only. When you
-use @clon{} interactively and mix compiler-specific options with
-application ones when invoking your Lisp environment, the situation is
-as follows:
+use @clon{} in a script, there may be a mix of vendor-specific options
+with application ones, in which case the situation is as follows.
 
 @table @strong
 @item SBCL
@@ -2805,6 +2791,19 @@ option there is recognized by LispWorks itself. Note that you can still
 use a second such separator to provide @clon{} with both some options
 and a remainder (@pxenduserref{Option Separator}).
 @end table
+
+
+@c --------------------------
+@c Distributing Clon Material
+@c --------------------------
+@node Distributing Clon Material,  , Delivering Scripts, Application Delivery
+@section Distributing Clon Material
+If you ship a clonified standalone executable, your clients may not have
+a properly installed @clon{} distribution locally. Although this is not
+a requirement by any means, it may be worth distributing some of
+@clon{}'s material with your application, for example, the end-user
+manual (@pxenduserref{Top}), or the standard output themes located in
+the @file{share/} directory.
 
 
 
