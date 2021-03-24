@@ -46,10 +46,6 @@ LISP := SBCL
 ## Global Common Lisp binary cache location.
 BINLOC_CACHE := ${HOME}/.cache/common-lisp
 
-## Implementation paths. Note that regardless of the above setting, SBCL is
-# required in order to generate the reference manual, so you must set
-# SBCL_PATH properly. If you don't have SBCL installed at all, set it to
-# nothing.
 SBCL_PATH  := sbcl
 CMUCL_PATH := lisp
 CCL_PATH   := ccl
