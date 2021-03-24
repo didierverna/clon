@@ -38,6 +38,8 @@ see the `net.didierverna.clon' system."
   :homepage "http://www.lrde.epita.fr/~didier/software/lisp/clon.php"
   :source-control "https://github.com/didierverna/clon"
   :license "BSD"
+  :version (:read-file-line #p"../make/version.make"
+	     :at (1 (lambda (str) (subseq str 19))))
   :depends-on (:named-readtables)
   :serial t
   :components ((:file "package")
@@ -61,6 +63,8 @@ a more complete description of Clon, see the net.didierverna.clon system."
   :homepage "http://www.lrde.epita.fr/~didier/software/lisp/clon.php"
   :source-control "https://github.com/didierverna/clon"
   :license "BSD"
+  :version (:read-file-line #p"../make/version.make"
+	     :at (1 (lambda (str) (subseq str 19))))
   :depends-on (:net.didierverna.clon.setup)
   :perform (load-op (o c)
 	     (declare (ignore o c))

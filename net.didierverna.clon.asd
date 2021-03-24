@@ -52,9 +52,9 @@ Clon are the following.
   :homepage "http://www.lrde.epita.fr/~didier/software/lisp/clon.php"
   :source-control "https://github.com/didierverna/clon"
   :license "BSD"
-  :defsystem-depends-on (:net.didierverna.clon.setup/termio)
   :version (:read-file-line #p"make/version.make"
 	     :at (1 (lambda (str) (subseq str 19))))
+  :defsystem-depends-on (:net.didierverna.clon.setup/termio)
   :depends-on (:net.didierverna.clon.core
 	       (:feature :net.didierverna.clon.termio
 		:net.didierverna.clon.termio)))
