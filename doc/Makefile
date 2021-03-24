@@ -31,24 +31,31 @@ TOP_DIR := ..
 include $(TOP_DIR)/make/config.make
 include $(TOP_DIR)/make/version.make
 include $(TOP_DIR)/make/prologue.make
-ifneq ($(SBCL_PATH),)
-  include declt.make
-endif
 
 INFO_DIR        := $(PREFIX)/share/info
 DOC_DIR	:= $(SHARE)/doc
 PROJECT_DOC_DIR := $(DOC_DIR)/$(PROJECT)
-TEXI_MAN	:= user.texi enduser.texi
-TEXI_FILES      := $(TEXI_MAN) $(TEXI_REF)
 
+MAN   := user enduser
+REF   := reference
+FILES := $(MAN) $(REF)
+
+TEXI_MAN       := $(MAN:%=%.texi)
+TEXI_REF       := $(REF:%=%.texi)
+TEXI_FILES     := $(TEXI_MAN) $(TEXI_REF)
 INFO_FILES     := $(TEXI_FILES:%.texi=$(PROJECT)-%.info)
-PDF_FILES      := $(TEXI_FILES:%.texi=%.pdf)
 ALL_INFO_FILES := $(INFO_FILES:%.info=%.info*)
-DVI_FILES      := $(TEXI_FILES:%.texi=%.dvi)
-PS_FILES       := $(TEXI_FILES:%.texi=%.ps)
-HTML_DIRS      := $(TEXI_FILES:%.texi=%)
 
-INFO_REF       := $(PROJECT)-reference.info
+PDF_MAN   := $(MAN:%=%.pdf)
+PDF_REF   := $(REF:%=%.pdf)
+PDF_FILES := $(PDF_MAN) $(PDF_REF)
+
+HTML_MAN  := $(MAN)
+HTML_REF  := $(REF)
+HTML_DIRS := $(HTML_MAN) $(HTML_REF)
+
+DVI_FILES := $(FILES:%=%.dvi)
+PS_FILES  := $(FILES:%=%.ps)
 
 CSS := https://sirgazil.bitbucket.io/static/docs/css/texinfo/tip/document.css
 
@@ -59,45 +66,37 @@ webref: pdf-webref html-webref
 
 all-formats: all dvi ps
 
-install-at: $(PDF_FILES) $(HTML_DIRS)
+# Auxiliary target to install the PDF and HTML documentation at $(LOCATION),
+# excluding the reference manual. This is because different versions of the
+# reference are used according to the location (web or not).
+install-at: $(PDF_MAN) $(HTML_MAN)
 	install -d "$(LOCATION)"
-	install -m 644 $(PDF_FILES) "$(LOCATION)/"
-	install -d -m 755 "$(LOCATION)/user"
-	install -m 644 user/* "$(LOCATION)/user/"
-	install -d -m 755 "$(LOCATION)/enduser"
-	install -m 644 enduser/* "$(LOCATION)/enduser/"
+	install -m 644 $(PDF_MAN) "$(LOCATION)"/
+	for i in $(HTML_MAN); do			\
+	  install -d -m 755 "$(LOCATION)"/$$i;		\
+	  install -m 644 $$i/* "$(LOCATION)"/$$i/;	\
+	done
 
-install: $(INFO_FILES)
+install: $(INFO_FILES) $(PDF_FILES) $(HTML_DIRS)
 	install -d "$(INFO_DIR)"
-	install -m 644 $(ALL_INFO_FILES) "$(INFO_DIR)/"
+	install -m 644 $(ALL_INFO_FILES) "$(INFO_DIR)"/
 	for i in $(INFO_FILES); do					\
 	  install-info --info-dir="$(INFO_DIR)" $$i;			\
 	done
 	$(MAKE) install-at LOCATION="$(PROJECT_DOC_DIR)"
-	-for i in $(DVI_FILES) $(PS_FILES); do				\
-	  test -f $$i && install -m 644 $$i "$(PROJECT_DOC_DIR)";	\
-	done
-	-if test -f $(INFO_REF); then					\
-	  install -m 644 $(INFO_REF)* "$(INFO_DIR)/" ;			\
-	  install-info --info-dir="$(INFO_DIR)" $(INFO_REF) ;		\
-	fi
-	-if test -f reference.pdf ; then				\
-	  install -m 644 reference.pdf "$(PROJECT_DOC_DIR)/" ;		\
-	fi
-	-if test -f reference ; then					\
-	  install -d -m 755 "$(PROJECT_DOC_DIR)/reference" ;		\
-	  install -m 644 reference/* "$(PROJECT_DOC_DIR)/reference/" ;	\
-	fi
-	-for i in reference.dvi reference.ps; do			\
-	  test -f $$i && install -m 644 $$i "$(PROJECT_DOC_DIR)";	\
+	install -m 644 $(PDF_REF) "$(PROJECT_DOC_DIR)"/
+	install -d -m 755 "$(PROJECT_DOC_DIR)"/$(HTML_REF)
+	install -m 644 $(HTML_REF)/* "$(PROJECT_DOC_DIR)"/$(HTML_REF)/
+	for i in $(DVI_FILES) $(PS_FILES); do				\
+	  test -f $$i && install -m 644 $$i "$(PROJECT_DOC_DIR)"/;	\
 	done
 
 uninstall:
-	-rm -fr "$(PROJECT_DOC_DIR)"
-	for i in $(INFO_FILES) $(INFO_REF); do				\
+	rm -fr "$(PROJECT_DOC_DIR)"
+	for i in $(INFO_FILES); do					\
 	  install-info --remove --info-dir="$(INFO_DIR)" $$i;		\
 	done
-	cd "$(INFO_DIR)" && rm -f $(ALL_INFO_FILES) $(INFO_REF)*
+	cd "$(INFO_DIR)" && rm -f $(ALL_INFO_FILES)
 
 info: $(INFO_FILES)
 
@@ -150,7 +149,7 @@ clean:
 	-rm *.tmp *.fn* *.vr* *.ky* *.tp* *.cp* *.pg *.toc *.aux *.log *~
 
 distclean: clean
-	-rm -fr declt.make splash.eps webreference* $(TEXI_REF)	\
+	-rm -fr splash.eps webreference* $(TEXI_REF)			\
 		$(HTML_DIRS)						\
 		$(ALL_INFO_FILES) $(PDF_FILES) $(DVI_FILES) $(PS_FILES)
 
@@ -158,14 +157,11 @@ $(TEXI_MAN): $(TOP_DIR)/make/version.make
 	$(PERL) -pi -e 's/@set VERSION .*/@set VERSION $(LONG_VERSION)/' $@
 	$(PERL) -pi -e 's/@set COPYRIGHT_YEARS .*/@set COPYRIGHT_YEARS $(TYPESET_COPYRIGHT_YEARS)/' $@
 
-install-www: webref
+install-www: $(PDF_MAN) $(HTML_MAN) webref
 	$(MAKE) install-at LOCATION="$(W3DIR)"
-	install -m 644 webreference.pdf "$(W3DIR)/reference.pdf"
-	install -d -m 755 "$(W3DIR)/reference"
-	install -m 644 webreference/* "$(W3DIR)/reference/"
-
-declt.make: $(TOP_DIR)/make/config.make
-	$(SBCL_PATH) $(SBCL_LOAD) ./declt.cl
+	install -m 644 webreference.pdf "$(W3DIR)"/$(PDF_REF)
+	install -d -m 755 "$(W3DIR)"/$(HTML_REF)
+	install -m 644 webreference/* "$(W3DIR)"/$(HTML_REF)/
 
 include $(TOP_DIR)/make/epilogue.make
 

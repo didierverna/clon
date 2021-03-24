@@ -10,8 +10,6 @@ demos/Advanced*
 sbcl/foo.c
 sbcl/constants.lisp-temp
 
-doc/declt.make
-
 doc/splash.eps
 
 doc/user.pdf
@@ -22,7 +20,6 @@ doc/enduser.pdf
 doc/enduser.ps
 doc/enduser/
 
-doc/reference.texi
 doc/reference.pdf
 doc/reference.ps
 doc/reference/
