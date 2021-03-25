@@ -22,7 +22,7 @@
 @c Commentary:
 
 @c Generated automatically by Declt version 3.0 "Montgomery Scott"
-@c on Thu Mar 25 19:40:05 2021 GMT+1.
+@c on Thu Mar 25 20:06:20 2021 GMT+1.
 
 
 @c ====================================================================
@@ -102,7 +102,7 @@
 @c ====================================================================
 @setchapternewpage odd
 @documentdescription
-The Clon Reference Manual, version 1.0 beta 24 "Michael Brecker".
+The Clon Reference Manual, version 1.0 beta 25 "Michael Brecker".
 @end documentdescription
 
 
@@ -313,7 +313,7 @@ except that this permission notice may be translated as well.
 @c ====================================================================
 @titlepage
 @title The Clon Reference Manual
-@subtitle The Command-Line Options Nuker, version 1.0 beta 24 "Michael Brecker"
+@subtitle The Command-Line Options Nuker, version 1.0 beta 25 "Michael Brecker"
 
 @vskip 2cm
 @image{splash,16cm}
@@ -321,7 +321,7 @@ except that this permission notice may be translated as well.
 
 @page
 @quotation
-This manual was generated automatically by Declt 3.0 "Montgomery Scott" on Thu Mar 25 19:40:05 2021 GMT+1.
+This manual was generated automatically by Declt 3.0 "Montgomery Scott" on Thu Mar 25 20:06:20 2021 GMT+1.
 @end quotation
 @vskip 0pt plus 1filll
 @insertcopying
@@ -342,9 +342,9 @@ This manual was generated automatically by Declt 3.0 "Montgomery Scott" on Thu M
 @ifnottex
 @node Top, Copying, (dir), (dir)
 @top The Clon Reference Manual
-This is the Clon Reference Manual, version 1.0 beta 24 "Michael Brecker",
+This is the Clon Reference Manual, version 1.0 beta 25 "Michael Brecker",
 generated automatically by Declt version 3.0 "Montgomery Scott"
-on Thu Mar 25 19:40:05 2021 GMT+1.
+on Thu Mar 25 20:06:20 2021 GMT+1.
 
 @menu
 * Copying:: The BSD License

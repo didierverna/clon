@@ -41,7 +41,7 @@
 @c ====================================================================
 @c Settings
 @c ====================================================================
-@set VERSION 1.0 beta 24 "Michael Brecker"
+@set VERSION 1.0 beta 25 "Michael Brecker"
 @set COPYRIGHT_YEARS 2010--2012, 2015, 2017, 2020, 2021
 @setchapternewpage odd
 @documentdescription
