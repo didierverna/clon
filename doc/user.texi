@@ -1372,9 +1372,10 @@ of your program, for example (and most notably) with an actual
 @subsection Making A Context
 
 @cfindex{make-context}
-You create a context with the @code{make-context} function.
+You create a context with the @code{make-context} function. The possible
+options to this function will be described later on, when appropriate.
 
-@defun make-context
+@defun make-context OPTIONS@dots{}
 @cfsubindex{make-context}
 Create a new context. That's it.
 @end defun
@@ -1399,7 +1400,9 @@ wraps around implementation-dependent access methods to @code{argv[0]}.
 
 @findex progname
 In order to retrieve @code{argv[0]}, use the @code{progname} function
-like this: @code{(progname)}.
+like this: @code{(progname)}. In fact, it is possible to modify
+@clon{}'s notion of the program name, for example in cases where
+@code{argv[0]} is not very informative (@pxref{Delivering Scripts}).
 
 @node Command-Line Remainder, Command-Line Polling, Program Name, Contextual Information
 @subsubsection Command-Line Remainder
@@ -2744,6 +2747,13 @@ seen that it is possible to use a virtual @cmdline{} (@pxref{Using
 Different Command-Lines}). You can also use @clon{} with the actual Lisp
 invocation's @cmdline{}, although a word of advice is in order here.
 
+@menu
+* Scripts Command-Line::        Mixing of Lisp-level and user-level options
+* Scripts Program Name::        Maybe not so informative
+@end menu
+
+@node Scripts Command-Line, Scripts Program Name, Delivering Scripts, Delivering Scripts
+@subsection Scripts Command-Line
 @findex cmdline
 @findex dump
 As you might expect, the problem in that situation lies in the way the
@@ -2801,6 +2811,58 @@ option there is recognized by LispWorks itself. Note that you can still
 use a second such separator to provide @clon{} with both some options
 and a remainder (@pxenduserref{Option Separator}).
 @end table
+
+
+@node Scripts Program Name,  , Scripts Command-Line, Delivering Scripts
+@subsection Scripts Program Name
+Another issue with scripts is that @code{argv[0]} may not be want you
+want in some situations. If you run your script directly from a Lisp
+invocation such as @samp{sbcl --script myscript.lisp}, then it's
+probably okay for @code{argv[0]} to be @code{sbcl}. On the other hand,
+suppose you have written a shebang script called @code{myscript},
+starting like this: @samp{#!/usr/bin/sbcl --script}. Then, it's probably
+@emph{not} okay to advertise @code{/usr/bin/sbcl} as the program name
+(which it is).
+
+@cfiaindex{make-context,:progname}
+In order to compensate for this problem, the function
+@code{make-context} accepts a @code{:progname} initarg which allows you
+to override @clon{}'s notion of @code{argv[0]}. Currently, the value of
+@code{:progname} can be a non-empty string, or @code{:environment},
+meaning to retrieve the value of the @code{__CL_ARGV0} environment
+variable (which will be ignored if unset or empty).
+
+Using a non-empty string allows you to hard-wire a pseudo-executable
+name with regular shebang syntax, as follows.
+@cartouche
+@verbatim
+#!/usr/bin/sbcl --script
+...
+(make-context :progname "myscript")
+...
+@end verbatim
+@end cartouche
+
+Of course, this works for as long as your favorite nasty little end-user
+doesn't rename the script in question. A more flexible approach would be
+to retrieve the value of @code{$0} from the shell, which is dynamically
+computed as the actual script name. Here is a ``multiline shebang''
+trick to do that.
+@cartouche
+@verbatim
+#| myscript.lisp --- or at least, that was its name originally ;-)
+export __CL_ARGV0="$0"
+exec sbcl --script "$0" "$@"
+|#
+...
+(make-context :progname :environment)
+...
+@end verbatim
+@end cartouche
+Note how mixing shell and Lisp comments works here. The shell ignores
+the first line and executes the next 2 ones. The subsequent Lisp
+invocation ignores the whole first four lines, but gets the actual
+program name from the environment@dots{}
 
 
 @c --------------------------
@@ -3200,14 +3262,15 @@ See @ref{Synopsis Definition} and @ref{Using Different Synopsis}.
 @xref{Using Different Synopsis}.
 @end defopt
 
-@defun make-context &key (SYNOPSIS *synopsis*) CMDLINE @
+@defun make-context &key (SYNOPSIS *synopsis*) CMDLINE PROGNAME @
 (MAKE-CURRENT t)
 @cfsubindex{make-context}
 @cfiaindex{make-context,:synopsis}
 @cfiaindex{make-context,:cmdline}
+@cfiaindex{make-context,:progname}
 @cfiaindex{make-context,:make-current}
-@xref{Context Creation}, @ref{Using Different Synopsis} and @ref{Using
-Different Command-Lines}.
+@xref{Context Creation}, @ref{Using Different Synopsis}, @ref{Using
+Different Command-Lines}, and @ref{Scripts Program Name}.
 @end defun
 
 
