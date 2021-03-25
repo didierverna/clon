@@ -22,7 +22,7 @@
 @c Commentary:
 
 @c Generated automatically by Declt version 3.0 "Montgomery Scott"
-@c on Thu Mar 25 12:49:21 2021 GMT+1.
+@c on Thu Mar 25 19:40:05 2021 GMT+1.
 
 
 @c ====================================================================
@@ -321,7 +321,7 @@ except that this permission notice may be translated as well.
 
 @page
 @quotation
-This manual was generated automatically by Declt 3.0 "Montgomery Scott" on Thu Mar 25 12:49:21 2021 GMT+1.
+This manual was generated automatically by Declt 3.0 "Montgomery Scott" on Thu Mar 25 19:40:05 2021 GMT+1.
 @end quotation
 @vskip 0pt plus 1filll
 @insertcopying
@@ -344,7 +344,7 @@ This manual was generated automatically by Declt 3.0 "Montgomery Scott" on Thu M
 @top The Clon Reference Manual
 This is the Clon Reference Manual, version 1.0 beta 24 "Michael Brecker",
 generated automatically by Declt version 3.0 "Montgomery Scott"
-on Thu Mar 25 12:49:21 2021 GMT+1.
+on Thu Mar 25 19:40:05 2021 GMT+1.
 
 @menu
 * Copying:: The BSD License
@@ -541,8 +541,6 @@ Clon are the following.@*
 @end itemize
 @item Source
 @ref{go to the net․didierverna․clon․asd file, , @t{net.didierverna.clon.asd}} (file)
-@item Directory
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/, ignore, @t{/Users/didier/Documents/Science/Software/Common⎵Lisp/clon/}}
 @end table
 
 
@@ -597,8 +595,6 @@ required module @t{sb-grovel} (for feature @t{sbcl})
 @end itemize
 @item Source
 @ref{go to the net․didierverna․clon․termio․asd file, , @t{net.didierverna.clon.termio.asd}} (file)
-@item Directory
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/termio/, ignore, @t{/Users/didier/Documents/Science/Software/Common⎵Lisp/clon/termio/}}
 @item Components
 @itemize @bullet
 @item
@@ -640,8 +636,6 @@ a more complete description of Clon@comma{} see the net.didierverna.clon system.
 @ref{go to the net․didierverna․clon․setup system, , @t{net.didierverna.clon.setup}} (system)
 @item Source
 @ref{go to the net․didierverna․clon․setup․asd file, , @t{net.didierverna.clon.setup.asd}} (file)
-@item Directory
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/setup/, ignore, @t{/Users/didier/Documents/Science/Software/Common⎵Lisp/clon/setup/}}
 @end table
 
 
@@ -680,8 +674,6 @@ required module @t{sb-posix} (for feature @t{sbcl})
 @end itemize
 @item Source
 @ref{go to the net․didierverna․clon․core․asd file, , @t{net.didierverna.clon.core.asd}} (file)
-@item Directory
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/core/, ignore, @t{/Users/didier/Documents/Science/Software/Common⎵Lisp/clon/core/}}
 @item Components
 @itemize @bullet
 @item
@@ -723,8 +715,6 @@ see the `net.didierverna.clon' system.
 @t{named-readtables}
 @item Source
 @ref{go to the net․didierverna․clon․setup․asd file, , @t{net.didierverna.clon.setup.asd}} (file)
-@item Directory
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/setup/, ignore, @t{/Users/didier/Documents/Science/Software/Common⎵Lisp/clon/setup/}}
 @item Components
 @itemize @bullet
 @item
@@ -765,7 +755,7 @@ Modules are listed depth-first from the system components tree.
 @item Parent
 @ref{go to the net․didierverna․clon․core system, , @t{net.didierverna.clon.core}} (system)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/core/src/, ignore, @t{core/src/}}
+@t{core/src/}
 @item Components
 @itemize @bullet
 @item
@@ -805,7 +795,7 @@ Modules are listed depth-first from the system components tree.
 @item Parent
 @ref{go to the net․didierverna․clon․core/src module, , @t{src}} (module)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/core/src/options/, ignore, @t{core/src/options/}}
+@t{core/src/options/}
 @item Components
 @itemize @bullet
 @item
@@ -849,7 +839,7 @@ Modules are listed depth-first from the system components tree.
 @item Parent
 @ref{go to the net․didierverna․clon․core/src module, , @t{src}} (module)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/core/src/retrieval/, ignore, @t{core/src/retrieval/}}
+@t{core/src/retrieval/}
 @item Components
 @itemize @bullet
 @item
@@ -878,7 +868,7 @@ Modules are listed depth-first from the system components tree.
 @item Parent
 @ref{go to the net․didierverna․clon․core/src module, , @t{src}} (module)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/core/src/output/, ignore, @t{core/src/output/}}
+@t{core/src/output/}
 @item Components
 @itemize @bullet
 @item
@@ -902,7 +892,7 @@ Modules are listed depth-first from the system components tree.
 @item Parent
 @ref{go to the net․didierverna․clon․setup system, , @t{net.didierverna.clon.setup}} (system)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/setup/src/, ignore, @t{setup/src/}}
+@t{setup/src/}
 @item Components
 @itemize @bullet
 @item
@@ -980,7 +970,7 @@ components trees.
 @lispfileindex{net.didierverna.clon.asd}@c
 @table @strong
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/net.didierverna.clon.asd, ignore, @t{net.didierverna.clon.asd}}
+@t{net.didierverna.clon.asd}
 @item Systems
 @ref{go to the net․didierverna․clon system, , @t{net.didierverna.clon}} (system)
 @end table
@@ -991,7 +981,7 @@ components trees.
 @lispfileindex{net.didierverna.clon.termio.asd}@c
 @table @strong
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/termio/net.didierverna.clon.termio.asd, ignore, @t{termio/net.didierverna.clon.termio.asd}}
+@t{termio/net.didierverna.clon.termio.asd}
 @item Systems
 @ref{go to the net․didierverna․clon․termio system, , @t{net.didierverna.clon.termio}} (system)
 @end table
@@ -1002,7 +992,7 @@ components trees.
 @lispfileindex{net.didierverna.clon.core.asd}@c
 @table @strong
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/core/net.didierverna.clon.core.asd, ignore, @t{core/net.didierverna.clon.core.asd}}
+@t{core/net.didierverna.clon.core.asd}
 @item Systems
 @ref{go to the net․didierverna․clon․core system, , @t{net.didierverna.clon.core}} (system)
 @end table
@@ -1013,7 +1003,7 @@ components trees.
 @lispfileindex{net.didierverna.clon.setup.asd}@c
 @table @strong
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/setup/net.didierverna.clon.setup.asd, ignore, @t{setup/net.didierverna.clon.setup.asd}}
+@t{setup/net.didierverna.clon.setup.asd}
 @item Systems
 @itemize @bullet
 @item
@@ -1031,7 +1021,7 @@ components trees.
 @item Parent
 @ref{go to the net․didierverna․clon․termio system, , @t{net.didierverna.clon.termio}} (system)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/termio/sbcl/constants.lisp, ignore, @t{termio/sbcl/constants.lisp}}
+@t{termio/sbcl/constants.lisp}
 @end table
 
 @node The net․didierverna․clon․termio/termio․lisp file, The net․didierverna․clon․core/package․lisp file, The net․didierverna․clon․termio/sbcl/constants․lisp file, Lisp files
@@ -1044,7 +1034,7 @@ components trees.
 @item Parent
 @ref{go to the net․didierverna․clon․termio system, , @t{net.didierverna.clon.termio}} (system)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/termio/termio.lisp, ignore, @t{termio/termio.lisp}}
+@t{termio/termio.lisp}
 @item Internal Definitions
 @itemize @bullet
 @item
@@ -1070,7 +1060,7 @@ components trees.
 @item Parent
 @ref{go to the net․didierverna․clon․core system, , @t{net.didierverna.clon.core}} (system)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/core/package.lisp, ignore, @t{core/package.lisp}}
+@t{core/package.lisp}
 @item Packages
 @ref{go to the NET․DIDIERVERNA․CLON package, , @t{net.didierverna.clon}}
 @item Exported Definitions
@@ -1085,7 +1075,7 @@ components trees.
 @item Parent
 @ref{go to the net․didierverna․clon․core/src module, , @t{src}} (module)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/core/src/util.lisp, ignore, @t{core/src/util.lisp}}
+@t{core/src/util.lisp}
 @item Exported Definitions
 @itemize @bullet
 @item
@@ -1164,7 +1154,7 @@ components trees.
 @item Parent
 @ref{go to the net․didierverna․clon․core/src module, , @t{src}} (module)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/core/src/item.lisp, ignore, @t{core/src/item.lisp}}
+@t{core/src/item.lisp}
 @item Internal Definitions
 @itemize @bullet
 @item
@@ -1196,7 +1186,7 @@ components trees.
 @item Parent
 @ref{go to the net․didierverna․clon․core/src module, , @t{src}} (module)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/core/src/text.lisp, ignore, @t{core/src/text.lisp}}
+@t{core/src/text.lisp}
 @item Exported Definitions
 @ref{go to the NET․DIDIERVERNA․CLON∶∶MAKE-TEXT function, , @t{make-text}} (function)
 @item Internal Definitions
@@ -1222,7 +1212,7 @@ components trees.
 @item Parent
 @ref{go to the net․didierverna․clon․core/src/options module, , @t{options}} (module)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/core/src/options/option.lisp, ignore, @t{core/src/options/option.lisp}}
+@t{core/src/options/option.lisp}
 @item Internal Definitions
 @itemize @bullet
 @item
@@ -1282,7 +1272,7 @@ components trees.
 @item Parent
 @ref{go to the net․didierverna․clon․core/src/options module, , @t{options}} (module)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/core/src/options/flag.lisp, ignore, @t{core/src/options/flag.lisp}}
+@t{core/src/options/flag.lisp}
 @item Exported Definitions
 @ref{go to the NET․DIDIERVERNA․CLON∶∶MAKE-FLAG function, , @t{make-flag}} (function)
 @item Internal Definitions
@@ -1304,7 +1294,7 @@ components trees.
 @item Parent
 @ref{go to the net․didierverna․clon․core/src/options module, , @t{options}} (module)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/core/src/options/valued.lisp, ignore, @t{core/src/options/valued.lisp}}
+@t{core/src/options/valued.lisp}
 @item Internal Definitions
 @itemize @bullet
 @item
@@ -1370,7 +1360,7 @@ components trees.
 @item Parent
 @ref{go to the net․didierverna․clon․core/src/options module, , @t{options}} (module)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/core/src/options/negatable.lisp, ignore, @t{core/src/options/negatable.lisp}}
+@t{core/src/options/negatable.lisp}
 @item Internal Definitions
 @itemize @bullet
 @item
@@ -1392,7 +1382,7 @@ components trees.
 @item Parent
 @ref{go to the net․didierverna․clon․core/src/options module, , @t{options}} (module)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/core/src/options/switch-base.lisp, ignore, @t{core/src/options/switch-base.lisp}}
+@t{core/src/options/switch-base.lisp}
 @item Internal Definitions
 @itemize @bullet
 @item
@@ -1424,7 +1414,7 @@ components trees.
 @item Parent
 @ref{go to the net․didierverna․clon․core/src/options module, , @t{options}} (module)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/core/src/options/switch.lisp, ignore, @t{core/src/options/switch.lisp}}
+@t{core/src/options/switch.lisp}
 @item Exported Definitions
 @ref{go to the NET․DIDIERVERNA․CLON∶∶MAKE-SWITCH function, , @t{make-switch}} (function)
 @item Internal Definitions
@@ -1452,7 +1442,7 @@ components trees.
 @item Parent
 @ref{go to the net․didierverna․clon․core/src/options module, , @t{options}} (module)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/core/src/options/stropt.lisp, ignore, @t{core/src/options/stropt.lisp}}
+@t{core/src/options/stropt.lisp}
 @item Exported Definitions
 @ref{go to the NET․DIDIERVERNA․CLON∶∶MAKE-STROPT function, , @t{make-stropt}} (function)
 @item Internal Definitions
@@ -1480,7 +1470,7 @@ components trees.
 @item Parent
 @ref{go to the net․didierverna․clon․core/src/options module, , @t{options}} (module)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/core/src/options/lispobj.lisp, ignore, @t{core/src/options/lispobj.lisp}}
+@t{core/src/options/lispobj.lisp}
 @item Exported Definitions
 @ref{go to the NET․DIDIERVERNA․CLON∶∶MAKE-LISPOBJ function, , @t{make-lispobj}} (function)
 @item Internal Definitions
@@ -1510,7 +1500,7 @@ components trees.
 @item Parent
 @ref{go to the net․didierverna․clon․core/src/options module, , @t{options}} (module)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/core/src/options/path.lisp, ignore, @t{core/src/options/path.lisp}}
+@t{core/src/options/path.lisp}
 @item Exported Definitions
 @ref{go to the NET․DIDIERVERNA․CLON∶∶MAKE-PATH function, , @t{make-path}} (function)
 @item Internal Definitions
@@ -1544,7 +1534,7 @@ components trees.
 @item Parent
 @ref{go to the net․didierverna․clon․core/src/options module, , @t{options}} (module)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/core/src/options/enum-base.lisp, ignore, @t{core/src/options/enum-base.lisp}}
+@t{core/src/options/enum-base.lisp}
 @item Internal Definitions
 @itemize @bullet
 @item
@@ -1569,7 +1559,7 @@ components trees.
 @item Parent
 @ref{go to the net․didierverna․clon․core/src/options module, , @t{options}} (module)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/core/src/options/enum.lisp, ignore, @t{core/src/options/enum.lisp}}
+@t{core/src/options/enum.lisp}
 @item Exported Definitions
 @ref{go to the NET․DIDIERVERNA․CLON∶∶MAKE-ENUM function, , @t{make-enum}} (function)
 @item Internal Definitions
@@ -1604,7 +1594,7 @@ components trees.
 @item Parent
 @ref{go to the net․didierverna․clon․core/src/options module, , @t{options}} (module)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/core/src/options/xswitch.lisp, ignore, @t{core/src/options/xswitch.lisp}}
+@t{core/src/options/xswitch.lisp}
 @item Exported Definitions
 @ref{go to the NET․DIDIERVERNA․CLON∶∶MAKE-XSWITCH function, , @t{make-xswitch}} (function)
 @item Internal Definitions
@@ -1632,7 +1622,7 @@ components trees.
 @item Parent
 @ref{go to the net․didierverna․clon․core/src module, , @t{src}} (module)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/core/src/container.lisp, ignore, @t{core/src/container.lisp}}
+@t{core/src/container.lisp}
 @item Internal Definitions
 @itemize @bullet
 @item
@@ -1662,7 +1652,7 @@ components trees.
 @item Parent
 @ref{go to the net․didierverna․clon․core/src module, , @t{src}} (module)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/core/src/group.lisp, ignore, @t{core/src/group.lisp}}
+@t{core/src/group.lisp}
 @item Exported Definitions
 @itemize @bullet
 @item
@@ -1691,7 +1681,7 @@ components trees.
 @item Parent
 @ref{go to the net․didierverna․clon․core/src/retrieval module, , @t{retrieval}} (module)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/core/src/retrieval/cmdline.lisp, ignore, @t{core/src/retrieval/cmdline.lisp}}
+@t{core/src/retrieval/cmdline.lisp}
 @item Internal Definitions
 @itemize @bullet
 @item
@@ -1757,7 +1747,7 @@ components trees.
 @item Parent
 @ref{go to the net․didierverna․clon․core/src/retrieval module, , @t{retrieval}} (module)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/core/src/retrieval/environ.lisp, ignore, @t{core/src/retrieval/environ.lisp}}
+@t{core/src/retrieval/environ.lisp}
 @item Internal Definitions
 @itemize @bullet
 @item
@@ -1797,7 +1787,7 @@ components trees.
 @item Parent
 @ref{go to the net․didierverna․clon․core/src module, , @t{src}} (module)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/core/src/synopsis.lisp, ignore, @t{core/src/synopsis.lisp}}
+@t{core/src/synopsis.lisp}
 @item Exported Definitions
 @itemize @bullet
 @item
@@ -1850,7 +1840,7 @@ components trees.
 @item Parent
 @ref{go to the net․didierverna․clon․core/src/output module, , @t{output}} (module)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/core/src/output/face.lisp, ignore, @t{core/src/output/face.lisp}}
+@t{core/src/output/face.lisp}
 @item Internal Definitions
 @itemize @bullet
 @item
@@ -1936,7 +1926,7 @@ components trees.
 @item Parent
 @ref{go to the net․didierverna․clon․core/src/output module, , @t{output}} (module)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/core/src/output/sheet.lisp, ignore, @t{core/src/output/sheet.lisp}}
+@t{core/src/output/sheet.lisp}
 @item Internal Definitions
 @itemize @bullet
 @item
@@ -2144,7 +2134,7 @@ components trees.
 @item Parent
 @ref{go to the net․didierverna․clon․core/src module, , @t{src}} (module)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/core/src/context.lisp, ignore, @t{core/src/context.lisp}}
+@t{core/src/context.lisp}
 @item Exported Definitions
 @itemize @bullet
 @item
@@ -2285,7 +2275,7 @@ components trees.
 @item Parent
 @ref{go to the net․didierverna․clon․setup system, , @t{net.didierverna.clon.setup}} (system)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/setup/package.lisp, ignore, @t{setup/package.lisp}}
+@t{setup/package.lisp}
 @item Packages
 @ref{go to the NET․DIDIERVERNA․CLON․SETUP package, , @t{net.didierverna.clon.setup}}
 @end table
@@ -2298,7 +2288,7 @@ components trees.
 @item Parent
 @ref{go to the net․didierverna․clon․setup/src module, , @t{src}} (module)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/setup/src/version.lisp, ignore, @t{setup/src/version.lisp}}
+@t{setup/src/version.lisp}
 @item Exported Definitions
 @itemize @bullet
 @item
@@ -2333,7 +2323,7 @@ components trees.
 @item Parent
 @ref{go to the net․didierverna․clon․setup/src module, , @t{src}} (module)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/setup/src/configuration.lisp, ignore, @t{setup/src/configuration.lisp}}
+@t{setup/src/configuration.lisp}
 @item Exported Definitions
 @itemize @bullet
 @item
@@ -2355,7 +2345,7 @@ components trees.
 @item Parent
 @ref{go to the net․didierverna․clon․setup/src module, , @t{src}} (module)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/setup/src/readtable.lisp, ignore, @t{setup/src/readtable.lisp}}
+@t{setup/src/readtable.lisp}
 @item Internal Definitions
 @itemize @bullet
 @item
@@ -2379,7 +2369,7 @@ components trees.
 @item Parent
 @ref{go to the net․didierverna․clon․setup/src module, , @t{src}} (module)
 @item Location
-@url{file:///Users/didier/Documents/Science/Software/Common⎵Lisp/clon/setup/src/termio.lisp, ignore, @t{setup/src/termio.lisp}}
+@t{setup/src/termio.lisp}
 @item Exported Definitions
 @ref{go to the NET․DIDIERVERNA․CLON․SETUP∶∶SETUP-TERMIO function, , @t{setup-termio}} (function)
 @item Internal Definitions
@@ -4209,7 +4199,7 @@ the short version@comma{} a patchlevel of 0 is ignored in the output.
 @item Package
 @ref{go to the NET․DIDIERVERNA․CLON package, , @t{net.didierverna.clon}}
 @item Source
-@url{file:///Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common⎵Lisp/clon/termio/sbcl/constants.lisp-temp, ignore, @t{/Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common Lisp/clon/termio/sbcl/constants.lisp-temp}}
+@t{/Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common Lisp/clon/termio/sbcl/constants.lisp-temp}
 @end table
 @end defvr
 @defvr {Constant} offset-of-winsize-ws-col
@@ -4219,7 +4209,7 @@ the short version@comma{} a patchlevel of 0 is ignored in the output.
 @item Package
 @ref{go to the NET․DIDIERVERNA․CLON package, , @t{net.didierverna.clon}}
 @item Source
-@url{file:///Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common⎵Lisp/clon/termio/sbcl/constants.lisp-temp, ignore, @t{/Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common Lisp/clon/termio/sbcl/constants.lisp-temp}}
+@t{/Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common Lisp/clon/termio/sbcl/constants.lisp-temp}
 @end table
 @end defvr
 @defvr {Constant} offset-of-winsize-ws-row
@@ -4229,7 +4219,7 @@ the short version@comma{} a patchlevel of 0 is ignored in the output.
 @item Package
 @ref{go to the NET․DIDIERVERNA․CLON package, , @t{net.didierverna.clon}}
 @item Source
-@url{file:///Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common⎵Lisp/clon/termio/sbcl/constants.lisp-temp, ignore, @t{/Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common Lisp/clon/termio/sbcl/constants.lisp-temp}}
+@t{/Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common Lisp/clon/termio/sbcl/constants.lisp-temp}
 @end table
 @end defvr
 @defvr {Constant} offset-of-winsize-ws-xpixel
@@ -4239,7 +4229,7 @@ the short version@comma{} a patchlevel of 0 is ignored in the output.
 @item Package
 @ref{go to the NET․DIDIERVERNA․CLON package, , @t{net.didierverna.clon}}
 @item Source
-@url{file:///Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common⎵Lisp/clon/termio/sbcl/constants.lisp-temp, ignore, @t{/Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common Lisp/clon/termio/sbcl/constants.lisp-temp}}
+@t{/Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common Lisp/clon/termio/sbcl/constants.lisp-temp}
 @end table
 @end defvr
 @defvr {Constant} offset-of-winsize-ws-ypixel
@@ -4249,7 +4239,7 @@ the short version@comma{} a patchlevel of 0 is ignored in the output.
 @item Package
 @ref{go to the NET․DIDIERVERNA․CLON package, , @t{net.didierverna.clon}}
 @item Source
-@url{file:///Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common⎵Lisp/clon/termio/sbcl/constants.lisp-temp, ignore, @t{/Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common Lisp/clon/termio/sbcl/constants.lisp-temp}}
+@t{/Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common Lisp/clon/termio/sbcl/constants.lisp-temp}
 @end table
 @end defvr
 @defvr {Constant} size-of-winsize
@@ -4259,7 +4249,7 @@ the short version@comma{} a patchlevel of 0 is ignored in the output.
 @item Package
 @ref{go to the NET․DIDIERVERNA․CLON package, , @t{net.didierverna.clon}}
 @item Source
-@url{file:///Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common⎵Lisp/clon/termio/sbcl/constants.lisp-temp, ignore, @t{/Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common Lisp/clon/termio/sbcl/constants.lisp-temp}}
+@t{/Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common Lisp/clon/termio/sbcl/constants.lisp-temp}
 @end table
 @end defvr
 
@@ -4522,7 +4512,7 @@ Execute BODY with CONTEXT's error handler bound for CONDITION.
 @item Package
 @ref{go to the NET․DIDIERVERNA․CLON package, , @t{net.didierverna.clon}}
 @item Source
-@url{file:///Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common⎵Lisp/clon/termio/sbcl/constants.lisp-temp, ignore, @t{/Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common Lisp/clon/termio/sbcl/constants.lisp-temp}}
+@t{/Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common Lisp/clon/termio/sbcl/constants.lisp-temp}
 @end table
 @end deffn
 
@@ -4556,7 +4546,7 @@ Add SUBFACE to FACE's subfaces and return it.
 @item Package
 @ref{go to the NET․DIDIERVERNA․CLON package, , @t{net.didierverna.clon}}
 @item Source
-@url{file:///Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common⎵Lisp/clon/termio/sbcl/constants.lisp-temp, ignore, @t{/Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common Lisp/clon/termio/sbcl/constants.lisp-temp}}
+@t{/Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common Lisp/clon/termio/sbcl/constants.lisp-temp}
 @end table
 @end deffn
 @deffn {Function} {argument-popable-p} CMDLINE
@@ -6066,7 +6056,7 @@ Read a theme from PATHNAME or PATHNAME.cth if it exists or return nil.
 @item Package
 @ref{go to the NET․DIDIERVERNA․CLON package, , @t{net.didierverna.clon}}
 @item Source
-@url{file:///Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common⎵Lisp/clon/termio/sbcl/constants.lisp-temp, ignore, @t{/Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common Lisp/clon/termio/sbcl/constants.lisp-temp}}
+@t{/Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common Lisp/clon/termio/sbcl/constants.lisp-temp}
 @end table
 @end deffn
 @deffn {Function} {winsize-ws-row} STRUCT
@@ -6079,7 +6069,7 @@ Read a theme from PATHNAME or PATHNAME.cth if it exists or return nil.
 @item Package
 @ref{go to the NET․DIDIERVERNA․CLON package, , @t{net.didierverna.clon}}
 @item Source
-@url{file:///Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common⎵Lisp/clon/termio/sbcl/constants.lisp-temp, ignore, @t{/Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common Lisp/clon/termio/sbcl/constants.lisp-temp}}
+@t{/Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common Lisp/clon/termio/sbcl/constants.lisp-temp}
 @end table
 @end deffn
 @deffn {Function} {winsize-ws-xpixel} STRUCT
@@ -6092,7 +6082,7 @@ Read a theme from PATHNAME or PATHNAME.cth if it exists or return nil.
 @item Package
 @ref{go to the NET․DIDIERVERNA․CLON package, , @t{net.didierverna.clon}}
 @item Source
-@url{file:///Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common⎵Lisp/clon/termio/sbcl/constants.lisp-temp, ignore, @t{/Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common Lisp/clon/termio/sbcl/constants.lisp-temp}}
+@t{/Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common Lisp/clon/termio/sbcl/constants.lisp-temp}
 @end table
 @end deffn
 @deffn {Function} {winsize-ws-ypixel} STRUCT
@@ -6105,7 +6095,7 @@ Read a theme from PATHNAME or PATHNAME.cth if it exists or return nil.
 @item Package
 @ref{go to the NET․DIDIERVERNA․CLON package, , @t{net.didierverna.clon}}
 @item Source
-@url{file:///Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common⎵Lisp/clon/termio/sbcl/constants.lisp-temp, ignore, @t{/Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common Lisp/clon/termio/sbcl/constants.lisp-temp}}
+@t{/Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common Lisp/clon/termio/sbcl/constants.lisp-temp}
 @end table
 @end deffn
 @deffn {Function} {~-reader} STREAM CHAR
