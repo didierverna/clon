@@ -22,7 +22,7 @@
 @c Commentary:
 
 @c Generated automatically by Declt version 3.0 "Montgomery Scott"
-@c on Wed Mar 24 09:27:08 2021 GMT+1.
+@c on Thu Mar 25 12:49:21 2021 GMT+1.
 
 
 @c ====================================================================
@@ -321,7 +321,7 @@ except that this permission notice may be translated as well.
 
 @page
 @quotation
-This manual was generated automatically by Declt 3.0 "Montgomery Scott" on Wed Mar 24 09:27:08 2021 GMT+1.
+This manual was generated automatically by Declt 3.0 "Montgomery Scott" on Thu Mar 25 12:49:21 2021 GMT+1.
 @end quotation
 @vskip 0pt plus 1filll
 @insertcopying
@@ -344,7 +344,7 @@ This manual was generated automatically by Declt 3.0 "Montgomery Scott" on Wed M
 @top The Clon Reference Manual
 This is the Clon Reference Manual, version 1.0 beta 24 "Michael Brecker",
 generated automatically by Declt version 3.0 "Montgomery Scott"
-on Wed Mar 24 09:27:08 2021 GMT+1.
+on Thu Mar 25 12:49:21 2021 GMT+1.
 
 @menu
 * Copying:: The BSD License
@@ -1095,6 +1095,8 @@ components trees.
 @item
 @ref{go to the NET․DIDIERVERNA․CLON∶∶DUMP macro, , @t{dump}} (macro)
 @item
+@ref{go to the NET․DIDIERVERNA․CLON∶∶EXECUTABLEP function, , @t{executablep}} (function)
+@item
 @ref{go to the NET․DIDIERVERNA․CLON∶∶EXIT function, , @t{exit}} (function)
 @end itemize
 @item Internal Definitions
@@ -1125,8 +1127,6 @@ components trees.
 @ref{go to the NET․DIDIERVERNA․CLON∶∶ERROR-STRING NET․DIDIERVERNA․CLON∶∶HOME-DIRECTORY method, , @t{error-string}} (method)
 @item
 @ref{go to the NET․DIDIERVERNA․CLON∶∶❨SETF ERROR-STRING❩ COMMON-LISP∶∶T NET․DIDIERVERNA․CLON∶∶HOME-DIRECTORY method, , @t{(setf error-string)}} (method)
-@item
-@ref{go to the NET․DIDIERVERNA․CLON∶∶EXECUTABLEP function, , @t{executablep}} (function)
 @item
 @ref{go to the NET․DIDIERVERNA․CLON∶∶GETENV function, , @t{getenv}} (function)
 @item
@@ -2444,6 +2444,8 @@ The Clon library's package.
 @item
 @ref{go to the NET․DIDIERVERNA․CLON∶∶DUMP macro, , @t{dump}} (macro)
 @item
+@ref{go to the NET․DIDIERVERNA․CLON∶∶EXECUTABLEP function, , @t{executablep}} (function)
+@item
 @ref{go to the NET․DIDIERVERNA․CLON∶∶EXIT function, , @t{exit}} (function)
 @item
 @ref{go to the NET․DIDIERVERNA․CLON∶∶GETOPT function, , @t{getopt}} (function)
@@ -2490,8 +2492,6 @@ The Clon library's package.
 @ref{go to the NET․DIDIERVERNA․CLON∶∶%DEFGROUP macro, , @t{%defgroup}} (macro)
 @item
 @ref{go to the NET․DIDIERVERNA․CLON∶∶*HIGHLIGHT-PROPERTIES* special variable, , @t{*highlight-properties*}} (special variable)
-@item
-@ref{go to the NET․DIDIERVERNA․CLON∶∶*INTEGER-SIZES* special variable, , @t{*integer-sizes*}} (special variable)
 @item
 @ref{go to the NET․DIDIERVERNA․CLON∶∶*ITEM-NAMES* special variable, , @t{*item-names*}} (special variable)
 @item
@@ -2758,8 +2758,6 @@ The Clon library's package.
 @ref{go to the NET․DIDIERVERNA․CLON∶∶❨SETF ERROR-STRING❩ COMMON-LISP∶∶T NET․DIDIERVERNA․CLON∶∶HOME-DIRECTORY method, , @t{(setf error-string)}} (method)
 @item
 @ref{go to the NET․DIDIERVERNA․CLON∶∶❨SETF ERROR-STRING❩ generic function, , @t{(setf error-string)}} (generic function)
-@item
-@ref{go to the NET․DIDIERVERNA․CLON∶∶EXECUTABLEP function, , @t{executablep}} (function)
 @item
 @ref{go to the NET․DIDIERVERNA․CLON∶∶EXIT-ABNORMALLY function, , @t{exit-abnormally}} (function)
 @item
@@ -3800,6 +3798,20 @@ Set KEY to VALUE in the current Clon configuration.
 @ref{go to the net․didierverna․clon․setup/src/configuration․lisp file, , @t{configuration.lisp}} (file)
 @end table
 @end deffn
+@deffn {Function} {executablep} ()
+@anchor{go to the NET․DIDIERVERNA․CLON∶∶EXECUTABLEP function}@c
+@functionsubindex{executablep}@c
+Return T if the current Lisp image is a standalone executable.@*
+This function detects executables dumped by ASDF's program-op operation@comma{}
+those dumped by Clon's `dump' function (which see)@comma{} and those in which
+`*executablep*' (which see) has been set to T manually.
+@table @strong
+@item Package
+@ref{go to the NET․DIDIERVERNA․CLON package, , @t{net.didierverna.clon}}
+@item Source
+@ref{go to the net․didierverna․clon․core/src/util․lisp file, , @t{util.lisp}} (file)
+@end table
+@end deffn
 @deffn {Function} {exit} &optional STATUS
 @anchor{go to the NET․DIDIERVERNA․CLON∶∶EXIT function}@c
 @functionsubindex{exit}@c
@@ -3856,15 +3868,21 @@ Print CONTEXT's help.
 @ref{go to the net․didierverna․clon․core/src/context․lisp file, , @t{context.lisp}} (file)
 @end table
 @end deffn
-@deffn {Function} {make-context} &rest KEYS &key SYNOPSIS CMDLINE MAKE-CURRENT
+@deffn {Function} {make-context} &rest KEYS &key SYNOPSIS CMDLINE PROGNAME MAKE-CURRENT
 @anchor{go to the NET․DIDIERVERNA․CLON∶∶MAKE-CONTEXT function}@c
 @functionsubindex{make-context}@c
 Make a new context.@*
-- SYNOPSIS is the program synopsis to use in that context.
+- SYNOPSIS is the program synopsis to use in that context.@*
   It defaults to *SYNOPSIS*.@*
-- CMDLINE is the argument list (strings) to process.
+- CMDLINE is the argument list (strings) to process.@*
   It defaults to a POSIX conformant argv.@*
-- If MAKE-CURRENT@comma{} make the new context current.
+- PROGNAME is an alternate value for argv[0].@*
+  It defaults to NIL@comma{} in which case the actual argv[0] is used.
+  Otherwise@comma{} it can be a non-empty string@comma{} standing for itself@comma{}@*
+  or :environment meaning to retrieve the value of the __CL_ARGV0 environment
+  variable (ignored if it's empty).@*
+  value.@*
+- If MAKE-CURRENT@comma{} make the new context current. This is the default.
 @table @strong
 @item Package
 @ref{go to the NET․DIDIERVERNA․CLON package, , @t{net.didierverna.clon}}
@@ -4274,16 +4292,6 @@ The highlight face properties.
 @ref{go to the NET․DIDIERVERNA․CLON package, , @t{net.didierverna.clon}}
 @item Source
 @ref{go to the net․didierverna․clon․core/src/output/face․lisp file, , @t{face.lisp}} (file)
-@end table
-@end defvr
-@defvr {Special Variable} *integer-sizes*
-@anchor{go to the NET․DIDIERVERNA․CLON∶∶*INTEGER-SIZES* special variable}@c
-@specialsubindex{*integer-sizes*}@c
-@table @strong
-@item Package
-@ref{go to the NET․DIDIERVERNA․CLON package, , @t{net.didierverna.clon}}
-@item Source
-@url{file:///Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common⎵Lisp/clon/termio/sbcl/constants.lisp-temp, ignore, @t{/Users/didier/.cache/common-lisp/sbcl-2.1.2.72-f990ff7ad-macosx-x64/Users/didier/Documents/Science/Software/Common Lisp/clon/termio/sbcl/constants.lisp-temp}}
 @end table
 @end defvr
 @defvr {Special Variable} *item-names*
@@ -4844,20 +4852,6 @@ to raise the higher level invalid-environment-value error instead.
 @ref{go to the NET․DIDIERVERNA․CLON package, , @t{net.didierverna.clon}}
 @item Source
 @ref{go to the net․didierverna․clon․core/src/retrieval/environ․lisp file, , @t{environ.lisp}} (file)
-@end table
-@end deffn
-@deffn {Function} {executablep} ()
-@anchor{go to the NET․DIDIERVERNA․CLON∶∶EXECUTABLEP function}@c
-@functionsubindex{executablep}@c
-Return T if the current Lisp image is a standalone executable.@*
-This function detects executables dumped by ASDF's program-op operation@comma{}
-those dumped by Clon's `dump' function (which see)@comma{} and those in which
-`*executablep*' (which see) has been set to T manually.
-@table @strong
-@item Package
-@ref{go to the NET․DIDIERVERNA․CLON package, , @t{net.didierverna.clon}}
-@item Source
-@ref{go to the net․didierverna․clon․core/src/util․lisp file, , @t{util.lisp}} (file)
 @end table
 @end deffn
 @deffn {Function} {exit-abnormally} ERROR
