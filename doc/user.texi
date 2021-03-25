@@ -578,6 +578,15 @@ data files. If you have compiled the documentation in DVI and PostScript
 format, those will be installed as well.
 @end enumerate
 
+The reference manual's Texinfo source is included in the distribution
+(and in the repository), although it is generated automatically by
+@uref{https://www.lrde.epita.fr/~didier/software/lisp/typesetting.php#declt,,Declt}.
+Before compiling, it is possible to regenerate a local version of it
+with hyperlinks to your installation by typing @command{make localref}.
+For this to work, you need SBCL and Declt though. If you ever need to
+regenerate the regular version, you can also type @command{make
+generate}.
+
 Type @command{make uninstall} to uninstall the library.
 
 Finally, if you want to play with the demo programs, @command{cd} to the
