@@ -31,6 +31,7 @@ $(TOP_DIR)/make/version.make: \
   $(TOP_DIR)/setup/src/version.lisp
 	$($(LISP)_PATH) $(EVAL_CONFIG)		     \
 	  $($(LISP)_LOAD) $(TOP_DIR)/make/version.cl \
-	  | tail -3 > $@
+	  | tail -3 > $@.new
+	mv $@.new $@
 
 ### epilogue.make ends here
