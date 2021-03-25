@@ -465,9 +465,20 @@ If NEGATED, read a negated call or pack. Otherwise, read a short call or pack."
 
 #i(push-cmdline-option 1)
 #i(push-retrieved-option 3)
-(defmethod initialize-instance :after ((context context) &key cmdline)
+(defmethod initialize-instance :after ((context context) &key cmdline progname)
   "Parse CMDLINE."
   (setf (slot-value context 'progname) (pop cmdline))
+  (when progname
+    ;; #### NOTE: we are more tolerant with empty strings coming from the
+    ;; environment (discarded) than we are on programmatic ones. That's
+    ;; because we are less sure about who's responsible.
+    ;; #### FIXME: see about better error / warning handling here.
+    (econd ((and (stringp progname) (not (zerop (length progname))))
+	    (setf (slot-value context 'progname) progname))
+	   ((eq progname :environment)
+	    (let ((progname (getenv "__CL_ARGV0")))
+	      (when (and progname (not (zerop (length progname))))
+		(setf (slot-value context 'progname) progname))))))
   ;; #### WARNING: we have a chicken-and-egg problem here. The error handler
   ;; is supposed to be set from the --clon-error-handler option, but in order
   ;; to retrieve this option, we need to parse the command-line, which might
@@ -765,14 +776,21 @@ or FITNESS FOR A PARTICULAR PURPOSE.~%"
     (help :context context :item (clon-options-group context))
     (uiop:quit)))
 
-(defun make-context (&rest keys &key synopsis cmdline (make-current t))
+(defun make-context
+    (&rest keys &key synopsis cmdline progname (make-current t))
   "Make a new context.
 - SYNOPSIS is the program synopsis to use in that context.
   It defaults to *SYNOPSIS*.
 - CMDLINE is the argument list (strings) to process.
   It defaults to a POSIX conformant argv.
-- If MAKE-CURRENT, make the new context current."
-  (declare (ignore synopsis cmdline))
+- PROGNAME is an alternate value for argv[0].
+  It defaults to NIL, in which case the actual argv[0] is used.
+  Otherwise, it can be a non-empty string, standing for itself,
+  or :environment meaning to retrieve the value of the __CL_ARGV0 environment
+  variable (ignored if it's empty).
+  value.
+- If MAKE-CURRENT, make the new context current. This is the default."
+  (declare (ignore synopsis cmdline progname))
   (let ((context (apply #'make-instance 'context
 			(remove-keys keys :make-current))))
     (when make-current
