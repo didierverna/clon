@@ -164,10 +164,10 @@ FMT can be `number', `short' or `long'."
 	       (group (:header "Option retrieval:")
 		 (enum "error-handler"
 		       "Set the option retrieval error handler.
-HDL can be `interactive', `quit' or `none'."
+HDL can be `interactive', `help', `quit' or `none'."
 		       :argument-name "HDL"
 		       :argument-type :optional
-		       :enum '(:interactive :quit :none)
+		       :enum '(:interactive :help :quit :none)
 		       :fallback-value :none
 		       :default-value :quit
 		       :env-var "ERROR_HANDLER"))

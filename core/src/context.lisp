@@ -137,15 +137,38 @@ When INTERACTIVEP, print on *QUERY-IO* instead."
 ;; value.
 (defmacro with-context-error-handler (context &body body)
   "Execute BODY with CONTEXT's error handler bound for CONDITION."
-  `(handler-bind ((error
-		    (lambda (error)
-		      (ecase (error-handler ,context)
-			(:interactive
-			 (restart-on-error error))
-			(:quit
-			 (exit-abnormally error))
-			(:none)))))
-     ,@body))
+  (let ((the-context (gensym "context")))
+    `(let ((,the-context ,context))
+       (handler-bind
+	   ((error
+	      (lambda (error)
+		(ecase (error-handler ,the-context)
+		  (:interactive
+		   (restart-on-error error))
+		  (:help
+		   (print-error error)
+		   ;; #### NOTE: there are two special cases below.
+		   ;; 1. For an unknown command-line option error, we print
+		   ;;    the Clon help rather than the application one if the
+		   ;;    unknown option looks like a Clon one (i.e., it starts
+		   ;;    with "clon"-.
+		   ;; 2. For an error related to a known option, there's no
+		   ;;    point in printing a full help anyway, so we just fall
+		   ;;    back to the behavior of :quit.
+		   (cond ((and (typep error 'unknown-cmdline-option-error)
+			       (>= (length (item error)) 5)
+			       (string= "clon-" (subseq (item error) 0 5)))
+			  (help :context ,the-context
+				:item (clon-options-group context)))
+			 ((typep error 'option-error)) ;; do nothing
+
+			 (t
+			  (help :context ,the-context)))
+		   (uiop:quit 1))
+		  (:quit
+		   (exit-abnormally error))
+		  (:none)))))
+	 ,@body))))
 
 
 
@@ -171,7 +194,7 @@ When INTERACTIVEP, print on *QUERY-IO* instead."
 	     :type string) ;; see below for reader
    (cmdline-options :documentation "The options from the command-line."
 	  :type list ;; of cmdline-option objects
-	  :initform nil  ;; see the warning in initialize-instance
+	  :initform nil  ;; for bootstrapping the context
 	  :accessor cmdline-options)
    (remainder :documentation "The non-Clon part of the command-line."
 	      :type list) ;; see below for reader
@@ -180,8 +203,7 @@ When INTERACTIVEP, print on *QUERY-IO* instead."
    (theme :documentation "The theme filename."
 	  :reader theme)
    (line-width :documentation "The line width for help display."
-	       :reader line-width
-	       :initform nil)
+	       :reader line-width)
    (highlight :documentation "Clon's output highlight mode."
 	      :reader highlight)
    (error-handler :documentation ~"The behavior to adopt "
@@ -479,25 +501,51 @@ If NEGATED, read a negated call or pack. Otherwise, read a short call or pack."
 	    (let ((progname (getenv "__CL_ARGV0")))
 	      (when (and progname (not (zerop (length progname))))
 		(setf (slot-value context 'progname) progname))))))
-  ;; #### WARNING: we have a chicken-and-egg problem here. The error handler
-  ;; is supposed to be set from the --clon-error-handler option, but in order
-  ;; to retrieve this option, we need to parse the command-line, which might
-  ;; trigger some errors. Since we want the correct error handler to be set as
-  ;; soon as possible, we need to treat this option in a very special way.
-  ;; Here is what we do.
-  ;; 1/ A very early value of :quit is provided in the class definition,
-  ;;    thanks to an :initform.
-  ;; 2/ Before doing anything else, we try to get a value from the
-  ;;    environment. This is actually very simple: we can already use our
-  ;;    context, eventhough it is not completely initialized yet. The only
-  ;;    thing we need is a nil CMDLINE-OPTIONS slot, so that GETOPT directly
-  ;;    goes to environment retrieval. If there's an error during this
-  ;;    process, the handler is :quit. If nothing is found in the environment
-  ;;    variable, the default value is retrieved, which is also :quit.
+
+  ;; #### WARNING: we have several bootstrapping problems related to error
+  ;; handling here. First of all, the error handler is set up by the
+  ;; --clon-error-handler option, but in order to retrieve this option, we
+  ;; need to parse the command-line, which might trigger some errors. Next, if
+  ;; the :help error handler is selected, we also need four other values
+  ;; (search-path, theme, highlight, and line-width), all of which also being
+  ;; set up by options likely to trigger errors. Fortunately, there is a way
+  ;; out of this. The general idea is to set up all that information as soon
+  ;; as possible, while always making sure that we are in a consistent state.
+  ;; More specifically, this is how it works.
+
+  ;; 1. A very early error handler value of :quit is provided in the class
+  ;;    definition, thanks to an :initform. This handler doesn't require
+  ;;    anything particular to work out the box (in fact, it is also the
+  ;;    default one).
+
+  ;; 2. Before doing anything else, we try to get the four other values from
+  ;;    the environment. As a matter of fact, user settings are much likely to
+  ;;    be found there anyway, than on the actual command-line. This is in
+  ;;    fact very simple to do: we can already use our context, eventhough it
+  ;;    is not completely initialized yet. The only ;; thing we need is a nil
+  ;;    CMDLINE-OPTIONS slot, so that GETOPT directly goes to environment
+  ;;    retrieval. If there's an error during this process, the handler is
+  ;;    :quit, which is ok.
+  (setf (slot-value context 'search-path)
+	(getopt :context context :long-name "clon-search-path"))
+  (setf (slot-value context 'theme)
+	(getopt :context context :long-name "clon-theme"))
+  (setf (slot-value context 'line-width)
+	(getopt :context context :long-name "clon-line-width"))
+  (setf (slot-value context 'highlight)
+	(getopt :context context :long-name "clon-highlight"))
+
+  ;; 3. If everything goes well, we finally try to get another error handler
+  ;;    from the environment as well. At that point, it would be ok to find
+  ;;    :help. If nothing is found in the environment, the default value is
+  ;;    retrieved, which is also :quit.
   (setf (slot-value context 'error-handler)
 	(getopt :long-name "clon-error-handler" :context context))
-  ;; 3/ Finally, during command-line parsing, we check if we got that
-  ;; particular option, and handle it immediately.
+
+  ;; 4. Finally, during command-line parsing, we systematically check if we
+  ;; got one of those five particular options, and handle them immediately
+  ;; instead of waiting for the end of the process.
+
   ;; Step one: parse the command-line =======================================
   (let ((cmdline-options (list))
 	(remainder (list)))
@@ -578,27 +626,44 @@ CONTEXT is where to look for the options."
 						       cmdline)
 			    (setq cmdline new-cmdline)
 			    ;; #### NOTE: see comment at the top of this
-			    ;; function about this hack.
-			    (if (string= (long-name option)
-					 "clon-error-handler")
-				(setf (slot-value context 'error-handler)
-				      value)
-			      (push-cmdline-option cmdline-options
-				:name option-name
-				:option option
-				:value value
-				:source source)))
-			(restart-case (error 'unknown-cmdline-option-error
-					     :name cmdline-name
-					     :argument cmdline-value)
-			  (discard ()
-			    :report "Discard unknown option."
-			    nil)
-			  (fix-option-name (new-cmdline-name)
-			    :report "Fix the option's long name."
-			    :interactive read-long-name
-			    (setq cmdline-name new-cmdline-name)
-			    (go find-option)))))))
+			    ;; function about the bootstrapping problems.
+			    (cond ((string= (long-name option)
+					    "clon-search-path")
+				   (setf (slot-value context 'search-path)
+					 value))
+				  ((string= (long-name option)
+					    "clon-theme")
+				   (setf (slot-value context 'theme)
+					 value))
+				  ((string= (long-name option)
+					    "clon-line-width")
+				   (setf (slot-value context 'line-width)
+					 value))
+				  ((string= (long-name option)
+					    "clon-highlight")
+				   (setf (slot-value context 'highlight)
+					 value))
+				  ((string= (long-name option)
+					    "clon-error-handler")
+				   (setf (slot-value context 'error-handler)
+					 value))
+				  (t
+				   (push-cmdline-option cmdline-options
+				     :name option-name
+				     :option option
+				     :value value
+				     :source source))))
+			  (restart-case (error 'unknown-cmdline-option-error
+					       :name cmdline-name
+					       :argument cmdline-value)
+			    (discard ()
+			      :report "Discard unknown option."
+			      nil)
+			    (fix-option-name (new-cmdline-name)
+			      :report "Fix the option's long name."
+			      :interactive read-long-name
+			      (setq cmdline-name new-cmdline-name)
+			      (go find-option)))))))
 		;; A short call, or a short pack.
 		((beginning-of-string-p "-" arg)
 		 (tagbody figure-this-short-call
@@ -738,6 +803,7 @@ CONTEXT is where to look for the options."
 			(setq cmdline nil)))))))
       (setf (cmdline-options context) (nreverse cmdline-options))
       (setf (slot-value context 'remainder) remainder)))
+
   ;; Step two: handle internal options ======================================
   (when (getopt :context context :long-name "clon-banner")
     (format t "~A's command-line is powered by Clon,
@@ -762,16 +828,6 @@ or FITNESS FOR A PARTICULAR PURPOSE.~%"
       (lisp-implementation-type)
       (lisp-implementation-version))
     (uiop:quit))
-  (setf (slot-value context 'search-path)
-	(getopt :context context :long-name "clon-search-path"))
-  (setf (slot-value context 'theme)
-	(getopt :context context :long-name "clon-theme"))
-  (setf (slot-value context 'line-width)
-	(getopt :context context :long-name "clon-line-width"))
-  (setf (slot-value context 'highlight)
-	(getopt :context context :long-name "clon-highlight"))
-  ;; #### NOTE: do this one last because the output may depend on the values
-  ;; from the above four.
   (when (getopt :context context :long-name "clon-help")
     (help :context context :item (clon-options-group context))
     (uiop:quit)))
