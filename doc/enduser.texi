@@ -877,7 +877,21 @@ currently the following.
 This is the default. It means that when @clon{} encounters an error
 related to option retrieval, it prints an informative message about the
 error and terminates the application immediately (with an exit status of
-1). This is the behavior of most programs out there I guess.
+1).
+@cindex Error Management, printing help
+@item help
+Along with @t{quit}, this one implements a behavior also frequently
+found in many applications out there (I mean, those not using @clon{};
+believe it or not, there are some; oh boy, do I feel sorry for them).
+When an error occurs, the behavior is the same as above, but in addition
+to that, the application's help string is also printed automatically.
+
+There are two exceptions to this however. When the problem is related to
+a known option, the original error message is already informative
+enough, so there is no point in printing the full help string on top of
+it. Finally, when the problem seems related to a built-in option (that
+is, an option starting with @t{clon-}, then the @clon{}-specific help
+string is printed out, rather than the application's one.
 @item interactive
 When interactive error handling is selected and an error is signaled,
 you are presented with a list of possible options to ``fix'' the
@@ -909,24 +923,49 @@ debugger when creating standalone programs. So the situation when the
 @clon{} error handler is set to @code{none} depends on the application.
 @end table
 
-One last note about the @bioption{error-handler} option: we have a
-chicken-and-egg problem with it. The error handler must be known for
-parsing the @cmdline{}, but in order to get it, we need to retrieve the
-option which implies parsing the @cmdline{}@dots{} Whoops. Because of
-this problem, the option is treated in a very special way.
+One last note about erorr handling: we have several chicken-and-egg
+problems with it. The error handler must be known for parsing the
+@cmdline{}, but in order to get it, we'd need to retrieve and option,
+which implies parsing the @cmdline{}@dots{} Whoops. On top of that, if
+the error handler is set to @t{help}, it requires the use of several
+parameters (four, precisely) that also come from options
+(@pxref{Output}), themselves likely to trigger errors when misused.
+Second whoops.
 
+Because of this problem, the options affecting error handling are
+treated in a very special way.
 @enumerate
 @item
-First of all, a built-in default value of @code{quit} is used initially.
+First of all, a built-in default value of @code{quit} is used initially
+for error handling.
 @item
-However, if the @code{CLON_ERROR_HANDLER} environment variable is set,
-its value will be used immediately, even before trying to get the option
-on the @cmdline{} (if an error happens when trying the environment
-variable, the @code{quit} handler is used).
+@bievindex{SEARCH_PATH}@c
+@bievindex{THEME}@c
+@bievindex{LINE_WIDTH}@c
+@bievindex{HIGHLIGHT}@c
+Next, the environment variables affecting output are polled. These are
+@env{CLON_SEARCH_PATH}, @env{CLON_THEME}, @env{CLON_LINE_WIDTH}, and
+@env{CLON_HIGHLIGHT}. They will be described in greater detail in the
+next chapter. Most of the time, you won't need to use the associated
+@cmdline{} options anyway. During all this time, only the basic error
+handler is available.
 @item
-Finally, if the option is found on the @cmdline{} during the parsing of
-it, its value is updated immediately (so it also applies for parsing the
-rest of the @cmdline{}).
+@bievindex{ERROR_HANDLER}@c
+Then the environment is polled for @code{CLON_ERROR_HANDLER}, at which
+point a fully functional @t{help} one could be set up. Remember that all
+of this happens @emph{before} even looking at the @cmdline{} itself.
+@item
+@bioindex{search-path}@c
+@bioindex{theme}@c
+@bioindex{line-width}@c
+@bioindex{highlight}@c
+@bioindex{error-handler}@c
+Finally, the @cmdline{} is parsed, and during parsing, the five built-in
+options involved in error handling / help output are processed
+immediately if ever encountered, so as to affect the rest of the
+parsing. These are @bioption{error-handler}, @bioption{search-path},
+@bioption{theme}, @bioption{line-width}, and @bioption{highlight}.
+Again, the last four ones will be explained in the next chapter.
 @end enumerate
 
 Now you need to get some rest.
