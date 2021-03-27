@@ -52,20 +52,20 @@ CCL_PATH   := ccl
 ECL_PATH   := ecl
 # -q is needed to remove 'bye' for version.cl to work properly.
 CLISP_PATH := clisp -q
-ACL_PATH   := alisp
+ACL_PATH   := /Applications/AllegroCLexpress.app/Contents/Resources/alisp
 # Note: if you want to dump the demo examples, you should use a console image
 # without multiprocessing here. See section 12.3.5 of the LispWorks user guide
 # and reference manual.
 LW_PATH    := lispworks
 
 # For ABCL, we need something slightly different.
-ABCL_JAR   := /usr/local/src/common-lisp/abcl/dist/abcl.jar
+ABCL_JAR   := /usr/local/Cellar/abcl/1.8.0/libexec/abcl.jar
 JAVA       := java
 JAVAC      := javac
 JAR        := jar
 ABCL_PATH  := abcl
 # GNU sed is required.
-SED        := sed
+SED        := gsed
 
 
 ## Programs for generating the documentation:
@@ -73,9 +73,5 @@ MAKEINFO = makeinfo
 TEXI2DVI = texi2dvi
 DVIPS    = dvips
 CONVERT  = convert
-
-
-## Emacs site-lisp:
-SITE_LISP = $(SHARE)/emacs/site-lisp
 
 ### config.make ends here
