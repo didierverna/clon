@@ -48,7 +48,7 @@ HTML_DIRS      := $(MANUALS)
 DVI_FILES      := $(MANUALS:%=%.dvi)
 PS_FILES       := $(MANUALS:%=%.ps)
 
-CSS := https://sirgazil.bitbucket.io/static/docs/css/texinfo/tip/document.css
+CSS := texinfo-klare
 
 
 all: info pdf html
@@ -97,7 +97,7 @@ $(PROJECT)-%.info: %.texi
 	$(TEXI2DVI) -p $<
 
 $(HTML_DIRS): %: %.texi
-	$(MAKEINFO) --css-ref=$(CSS) --html -o $@ $<
+	$(MAKEINFO) --css-include=$(CSS).css --html -o $@ $<
 	touch $@
 
 %.dvi: %.texi
