@@ -116,9 +116,9 @@ and extend the library with your own option types.
 (asdf:load-system :net.didierverna.declt)
 (net.didierverna.declt:nickname-package)
 
-;; ASDF doesn't understand my version numnbering scheme. That will change
-;; soon, but in the meantime, I have to provide my version number explicitly
-;; here (and so I need to load at least the setup system in order to get the
+;; ASDF doesn't understand my version numbering scheme. That will change soon,
+;; but in the meantime, I have to provide my version number explicitly here
+;; (and so I need to load at least the setup system in order to get the
 ;; VERSION function).
 (asdf:load-system :net.didierverna.clon.setup)
 
