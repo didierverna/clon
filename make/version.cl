@@ -1,6 +1,6 @@
 ;;; version.cl --- Clon version extractor script
 
-;; Copyright (C) 2010-2012, 2015 Didier Verna
+;; Copyright (C) 2010-2012, 2015, 2021 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
