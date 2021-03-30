@@ -568,7 +568,7 @@ Edit @file{make/config.make} to your specific needs.
 @item
 Type @command{make} to compile the documentation (end-user manual, user
 manual and reference manual). By default, the documentation is built in
-info, PDF and HTML formats. If you want other formats (DVI and
+Info, PDF, and HTML formats. If you want other formats (DVI and
 PostScript are available), type @command{make all-formats}. You can also
 type individually @command{make dvi} and/or @command{make ps} in order
 to get the corresponding format.
