@@ -27,6 +27,7 @@
 ;;; Code:
 
 (in-package :net.didierverna.clon.setup)
+(in-readtable :net.didierverna.clon)
 
 
 (defun restrict-because (reason)

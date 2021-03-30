@@ -44,12 +44,10 @@ see the `net.didierverna.clon' system."
   :serial t
   :components ((:file "package")
 	       (:module "src"
-		:components ((:file "version")
-			     (:file "configuration")
-			     (:file "readtable"
-			      :depends-on ("configuration"))
-			     (:file "termio"
-			      :depends-on ("configuration"))))))
+		:components ((:file "configuration")
+			     (:file "readtable" :depends-on ("configuration"))
+			     (:file "version" :depends-on ("readtable"))
+			     (:file "termio" :depends-on ("readtable"))))))
 
 (defsystem :net.didierverna.clon.setup/termio
   :long-name "The Command-Line Options Nuker, termio setup"
