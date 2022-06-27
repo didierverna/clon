@@ -1,6 +1,6 @@
 ;;; version.lisp --- Clon version management
 
-;; Copyright (C) 2021 Didier Verna
+;; Copyright (C) 2021, 2022 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
@@ -32,7 +32,7 @@
 
 
 ;; Copyright years
-(defvar *copyright-years* "2010-2012, 2015, 2017, 2020, 2021"
+(defvar *copyright-years* "2010-2012, 2015, 2017, 2020-2022"
   "A string denoting the copyright years for the whole project.")
 
 
