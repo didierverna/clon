@@ -50,7 +50,7 @@ Clon, see the net.didierverna.clon system."
 	       :net.didierverna.clon.setup :net.didierverna.clon.core)
   :serial t
   :components (#+sbcl
-	       (sb-grovel:grovel-constants-file "sbcl/constants"
+	       ("sb-grovel:grovel-constants-file" "sbcl/constants"
 		 :package :net.didierverna.clon)
 	       ;; Cf. https://gitlab.common-lisp.net/asdf/asdf/-/issues/63
 	       #+(or allegro clisp lispworks)
