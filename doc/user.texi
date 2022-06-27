@@ -3499,6 +3499,7 @@ compiler support or any other kind of help. You have my gratitude!
 @item Erik Huelsmann
 @item Erik Winkels
 @item François-René Rideau
+@item Jake Connor
 @item Jan Moringen
 @item James Wright
 @item Martin Simmons
