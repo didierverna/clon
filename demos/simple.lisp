@@ -1,6 +1,6 @@
 ;;; simple.lisp --- Basic usage demonstration program
 
-;; Copyright (C) 2010-2012, 2015, 2021 Didier Verna
+;; Copyright (C) 2010-2012, 2015, 2021, 2023 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
@@ -31,8 +31,8 @@
 ;;; Code:
 
 (in-package :cl-user)
-(defpackage :simple (:use :cl) (:export :main))
-(in-package :simple)
+(defpackage :net.didierverna.clon.demo.simple (:use :cl) (:export :main))
+(in-package :net.didierverna.clon.demo.simple)
 
 (eval-when (:execute :load-toplevel :compile-toplevel)
   (net.didierverna.clon:nickname-package))

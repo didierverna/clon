@@ -1,6 +1,6 @@
 ;;; simple.dmp --- Dump script for the simple demo          -*- mode: lisp -*-
 
-;; Copyright (C) 2021 Didier Verna
+;; Copyright (C) 2021, 2023 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
@@ -32,6 +32,6 @@
 (asdf:load-system :net.didierverna.clon)
 (load #p"./simple.lisp")
 
-(clon:dump "simple" simple:main)
+(clon:dump "simple" net.didierverna.clon.demo.simple:main)
 
 ;;; simple.dmp ends here

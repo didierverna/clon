@@ -1,6 +1,6 @@
 ;;; advanced.dmp --- Dump script for the advanced demo      -*- mode: lisp -*-
 
-;; Copyright (C) 2021 Didier Verna
+;; Copyright (C) 2021, 2023 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
@@ -32,6 +32,6 @@
 (asdf:load-system :net.didierverna.clon)
 (load #p"./advanced.lisp")
 
-(clon:dump "advanced" advanced:main)
+(clon:dump "advanced" net.didierverna.clon.demo.advanced:main)
 
 ;;; advanced.dmp ends here

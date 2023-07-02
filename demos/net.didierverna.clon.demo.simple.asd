@@ -1,6 +1,7 @@
-;;; advanced.asd --- ASDF system definition for the advanced demo program
+;;; net.didierverna.clon.demo.simple.asd --- ASDF system definition
+;;; for the simple demo program
 
-;; Copyright (C) 2021 Didier Verna
+;; Copyright (C) 2021, 2023 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
@@ -26,10 +27,10 @@
 
 ;;; Code:
 
-(defsystem :advanced
+(defsystem :net.didierverna.clon.demo.simple
   :depends-on (#+ecl :net.didierverna.clon.setup ;; Cf. User manual Chap. 7.1
 	       :net.didierverna.clon)
-  :components ((:file "advanced"))
-  :entry-point "advanced:main")
+  :components ((:file "simple"))
+  :entry-point "net.didierverna.clon.demo.simple:main")
 
-;;; advanced.asd ends here
+;;; net.didierverna.clon.demo.simple.asd ends here

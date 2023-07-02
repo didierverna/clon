@@ -1,6 +1,6 @@
 ;;; advanced.lisp --- Advanced usage demonstration program
 
-;; Copyright (C) 2010-2012, 2015, 2021 Didier Verna
+;; Copyright (C) 2010-2012, 2015, 2021, 2023 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
@@ -32,8 +32,8 @@
 ;;; Code:
 
 (in-package :cl-user)
-(defpackage :advanced (:use :cl) (:export :main))
-(in-package :advanced)
+(defpackage :net.didierverna.clon.demo.advanced (:use :cl) (:export :main))
+(in-package :net.didierverna.clon.demo.advanced)
 
 (eval-when (:execute :load-toplevel :compile-toplevel)
   (net.didierverna.clon:nickname-package))

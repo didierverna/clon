@@ -1,6 +1,6 @@
 ### Makefile --- Demo directory
 
-## Copyright (C) 2010, 2011, 2015, 2021 Didier Verna
+## Copyright (C) 2010, 2011, 2015, 2021, 2023 Didier Verna
 
 ## Author: Didier Verna <didier@didierverna.net>
 
@@ -31,6 +31,7 @@ TOP_DIR := ..
 include $(TOP_DIR)/make/config.make
 include $(TOP_DIR)/make/prologue.make
 
+DEMO_PKG := $(PACKAGE).demo
 DEMOS := simple advanced
 METHOD :=
 
@@ -76,16 +77,16 @@ $(DEMOS): %: %.dmp %.lisp
 	$($(LISP)_PATH) $(EVAL_CONFIG) $($(LISP)_DUMP) $<
   endif
 else ifeq ($(METHOD),ASDF)
-$(DEMOS): %: %.asd %.lisp
+$(DEMOS): %: $(DEMO_PKG).%.asd %.lisp
 	$($(LISP)_PATH) $(EVAL_CONFIG) \
 	  $($(LISP)_EVAL) "(require \"asdf\")" \
-	  $($(LISP)_EVAL) "(asdf:operate 'asdf:program-op :$@)" \
+	  $($(LISP)_EVAL) "(asdf:operate 'asdf:program-op :$(DEMO_PKG).$@)" \
 	  $($(LISP)_EVAL) "(uiop:quit)"
 	$($(LISP)_PATH) $(EVAL_CONFIG) \
 	  $($(LISP)_EVAL) "(require \"asdf\")" \
 	  $($(LISP)_EVAL) "(uiop:run-program (list \"cp\" \
-	    (namestring (asdf:output-file 'asdf:program-op :$@)) \
-	    (namestring #p\"./\")))" \
+	    (namestring (asdf:output-file 'asdf:program-op :$(DEMO_PKG).$@)) \
+	    (namestring #p\"./$@\")))" \
 	  $($(LISP)_EVAL) "(uiop:quit)"
 else
 $(DEMOS):
