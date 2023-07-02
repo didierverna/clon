@@ -1,6 +1,6 @@
 ;;; version.lisp --- Clon version management
 
-;; Copyright (C) 2021, 2022 Didier Verna
+;; Copyright (C) 2021-2023 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
@@ -32,7 +32,7 @@
 
 
 ;; Copyright years
-(defvar *copyright-years* "2010-2012, 2015, 2017, 2020-2022"
+(defvar *copyright-years* "2010-2012, 2015, 2017, 2020-2023"
   "A string denoting the copyright years for the whole project.")
 
 
@@ -48,7 +48,7 @@
 (defparameter *release-status* :beta
   "The status of this release.")
 
-(defparameter *release-status-level* 26
+(defparameter *release-status-level* 27
   "The status level of this release.")
 
 (defparameter *release-name* "Michael Brecker"
