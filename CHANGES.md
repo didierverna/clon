@@ -1,3 +1,13 @@
+## Version 1.0b27
+- The demo programs are now fully qualified with a `net.didierverna.clon.demo`
+  prefix. This avoids polluting global namespaces and makes Quickref find
+  Clon's primary system correctly.
+
+## Version 1.0b26
+- Make the `termio` subsystem loadable on its own (this fixes an issue with
+  Quicklisp).
+- Support automatic printing of help on errors.
+
 ## Version 1.0b25
 - More infrastructure overhaul.
 - More flexible auto-detection of `termio`.
