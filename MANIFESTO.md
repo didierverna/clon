@@ -1,6 +1,4 @@
-							     -*- outline -*-
-
-* Copyright (C) 2010, 2011, 2015 Didier Verna
+# Copyright (C) 2010, 2011, 2015, 2024 Didier Verna
 
 This file is part of Clon.
 
@@ -9,7 +7,7 @@ are permitted in any medium without royalty provided the copyright
 notice and this notice are preserved.
 
 
-* Introduction
+# Introduction
 In the Lisp family of languages, one of the key components is the so-called
 REPL, the Read-Eval-Print Loop, which blends the runtime, compilation and
 development phases together, allowing for a very high level of interaction
@@ -35,7 +33,7 @@ components in a standalone application is the handling of the command-line.
 Clon is a library designed to do just that.
 
 
-* Overview
+# Overview
 Clon provides traditional features one might expect from a command-line
 options management library, but what makes it somewhat unique in its
 conception is that it has been designed with both the application developer
@@ -45,7 +43,7 @@ application user. The idea is that all Clon-enabled applications behave in a
 uniform way, and that it is the user who gets to decide, not the developper.
 The most important features of Clon are listed below.
 
-** Command-Line Syntax
+## Command-Line Syntax
 Clon imposes a particular yet flexible syntax for the command-line. Options
 have short and/or long names, beginning with either one or two dashes. Options
 may take an argument. In that case, the argument may be optional or mandatory.
@@ -54,14 +52,14 @@ together in a single call. There is an additional call syntax for Boolean or
 Boolean-based options. Finally, the command-line may have a "postfix", that
 is, a non-option part.
 
-** Option Types
+## Option Types
 Clon comes with a set of predefined option types, including "flags" (option
 without arguments), "switches" (Boolean options), simple Lisp objects, simple
 strings, enumerations, pathnames etc. Clon is also extensible: it is possible
 to define new option types, either from scratch or by subclassing an existing
 one.
 
-** Value Retrieval
+## Value Retrieval
 The traditional approach to command-line analysis is to process it
 sequentially, and Clon lets you do that. However, Clon also provides an
 explicit retrieval mechanism by which you can directly request the value of a
@@ -72,7 +70,7 @@ value or an environment variable associated with the option. The retrieval
 process is completely automated, hence removing this burden from the
 developer's shoulders.
 
-** Error Management
+## Error Management
 Another cumbersome task already taken care of is error management. Clon
 provides two built-in error management schemes, in case something is wrong on
 the command-line. The simplest one is to quit the application with an
@@ -82,7 +80,7 @@ discard an option call, provide a missing argument or value etc.). A unique
 feature of Clon is that the application user may choose his or her preferred
 error management scheme.
 
-** Help String Contents
+## Help String Contents
 The "help string" is typically what you expect from the output of a --help
 option. Maintaining an up-to-date help string is a very boring task, so Clon
 completely automates this for you (another burden removed from the developer's
@@ -91,7 +89,7 @@ help string's contents, notably the order in which options are displayed, and
 also by having the possibility of grouping options together and inserting
 arbitrary text in the output.
 
-** Help String Format
+# Help String Format
 Clon also completely automates the help string typesetting process. For
 instance, it can automatically format the output for 80 columns, but it is
 also aware of the tty geometry and will use it when appropriate. Clon also
