@@ -80,6 +80,26 @@
 ## Version 1.0b11
 - Support for CMU-CL.
 
-## Version 1.0b1
+## Version 1.0b10
+- New DUMP funciton.
+
+## Version 1.0b09
+- Support for the COLUMNS environment variable.
+
+## Version 1.0b08
+- New function NICKNAME-PACKAGE.
+- Documentation updates.
+
+## Version 1.0b06
+Bug fixes and documentation updates.
+
+## Version 1.0b04
+- Support for ASDF Install.
+
+## Version 1.0b03
+- Support for ASDF 2.
+- Protect pathnames containing whitespaces.
+
+## Version 1.0b01
 - First public release.
 - Only supports SBCL.
