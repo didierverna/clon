@@ -83,23 +83,23 @@
 ## Version 1.0b10
 - New DUMP funciton.
 
-## Version 1.0b09
+## Version 1.0b9
 - Support for the COLUMNS environment variable.
 
-## Version 1.0b08
+## Version 1.0b8
 - New function NICKNAME-PACKAGE.
 - Documentation updates.
 
-## Version 1.0b06
+## Version 1.0b6
 Bug fixes and documentation updates.
 
-## Version 1.0b04
+## Version 1.0b4
 - Support for ASDF Install.
 
-## Version 1.0b03
+## Version 1.0b3
 - Support for ASDF 2.
 - Protect pathnames containing whitespaces.
 
-## Version 1.0b01
+## Version 1.0b1
 - First public release.
 - Only supports SBCL.
