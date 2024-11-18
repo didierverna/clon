@@ -1,6 +1,6 @@
-;;; christmas.cth --- Christmas theme                            -*- lisp -*-
+;;; xmas.cth --- Christmas theme                                 -*- lisp -*-
 
-;; Copyright (C) 2010, 2011, 2015 Didier Verna
+;; Copyright (C) 2010, 2011, 2015, 2024 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
@@ -68,5 +68,4 @@
 	     :face (items :padding-right 0 :padding-top 0 :padding-bottom 0)
 	     :face (group :padding-left 2 :padding-right 0))
 
-
-;;; christmas.cth ends here
+;;; xmas.cth ends here

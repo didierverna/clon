@@ -1,6 +1,6 @@
-;;; dvl.cth --- My personal theme                                 -*- lisp -*-
+;;; warm.cth --- Warm theme                                      -*- lisp -*-
 
-;; Copyright (C) 2010, 2011, 2015 Didier Verna
+;; Copyright (C) 2010, 2011, 2015, 2024 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
@@ -54,4 +54,4 @@
 				       :padding-left 2)
 			  #| :face text :face option |#))
 
-;;; dvl.cth ends here
+;;; warm.cth ends here

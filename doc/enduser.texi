@@ -1188,18 +1188,18 @@ Displays a full help string occupying more space than the @t{raw} theme.
 Option descriptions don't start @emph{after} the option's name, but
 @emph{under} it. As a result, they occupy more horizontal space. Also,
 sub-groups are indented to the right.
-@item dvl
-@cindex Standard Themes, files, @file{dvl.cth}
-@cindex Themes, files, standard, @file{dvl.cth}
-This is my personal theme that I personally use myself in person.
-@item christmas
-@cindex Standard Themes, files, @file{christmas.cth}
-@cindex Themes, files, standard, @file{christmas.cth}
-This one is full of bells and whistles, which makes it essentially
-unusable. It exists only to provide a concrete example of all the
-available formatting and highlighting features of @clon{}. The
-@t{christmas} theme is only available once a year, at exactly 23:59:59
-on December the 24th.
+@item warm
+@cindex Standard Themes, files, @file{warm.cth}
+@cindex Themes, files, standard, @file{warm.cth}
+A fontified and colorful version of the raw theme.
+@item xmas
+@cindex Standard Themes, files, @file{xmas.cth}
+@cindex Themes, files, standard, @file{xmas.cth}
+This one is full of bells and whistles, which makes it essentially ugly
+and unusable. It exists only to provide a concrete example of all the
+available formatting and highlighting features of @clon{}. The @t{xmas}
+theme is only available once a year, at exactly 23:59:59 on December the
+24th.
 @end table
 
 @node Search Path, Theme Selection, Standard Themes, Theme Mechanism
