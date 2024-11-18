@@ -2,14 +2,14 @@
 2 Installation
 **************
 
-First of all, see Clon’s homepage for tarballs, Git repository and
+First of all, see Clon's homepage for tarballs, Git repository and
 online documentation.  Clon is an ASDF 3 library.  If you download a
 Clon tarball, or clone the repository, you need to unpack somewhere in
 the ASDF source registry.  Otherwise, Clon is also available via
 Quicklisp.  *Note Supported Platforms::, for more information on
 portability and dependencies.
 
-   Clon’s main system is called ‘net.didierverna.clon’.  Depending on
+   Clon's main system is called ‘net.didierverna.clon’.  Depending on
 your installation, you may thus either ‘asdf:load-system’, or
 ‘ql:quickload’ it in your Lisp image.  If you encounter grovel or ffi
 related problems, you may need to set the ‘CC’ environment variable to a
@@ -37,7 +37,7 @@ perform the following steps, in order.
      files.  If you have compiled the documentation in DVI and
      PostScript format, those will be installed as well.
 
-   The reference manual’s Texinfo source is included in the distribution
+   The reference manual's Texinfo source is included in the distribution
 (and in the repository), although it is generated automatically by
 Declt.  Before compiling, it is possible to regenerate a local version
 of it with hyperlinks to your installation by typing ‘make localref’.
@@ -57,7 +57,7 @@ programs.
 8.1 Configuration
 =================
 
-Some aspects of Clon’s behavior can be configured _before_ the library
+Some aspects of Clon's behavior can be configured _before_ the library
 is actually loaded.  Clon stores its user-level configuration (along
 with some other setup parameters) in another ASDF system called
 ‘net.didierverna.clon.setup’ (and the eponym package).  In order to
@@ -73,7 +73,7 @@ typically do something like this:
    Out of curiosity, you can also inquire the current configuration for
 specific options with the following function.
  -- Function: configuration KEY
-     Return KEY’s value in the current Clon configuration.
+     Return KEY's value in the current Clon configuration.
 
    Currently, the following options are provided.
 :swank-eval-in-emacs
@@ -84,7 +84,7 @@ specific options with the following function.
      when the ASDF system is loaded if you set this option to ‘t’.
      However, note that for this to work, the Slime variable
      ‘slime-enable-evaluate-in-emacs’ must also be set to ‘t’ in your
-     Emacs session.  If you’re interested to know how this process
+     Emacs session.  If you're interested to know how this process
      works, I have described it in this blog entry
      (http://www.didierverna.net/blog/index.php?post/2011/07/20/One-more-indentation-hack).
 :restricted
@@ -113,7 +113,7 @@ width.
 
    If, for some reason, terminal autodetection is not available, Clon
 will work in so-called _restricted mode_.  This means that
-‘--clon-highlight=auto’ won’t work (highlighting will _not_ be turned on
+‘--clon-highlight=auto’ won't work (highlighting will _not_ be turned on
 automatically on a tty).  For the same reason, unless otherwise
 specified via either the ‘COLUMNS’ environment variable or the
 ‘--clon-line-width’ option, terminal output will be formatted for 80
@@ -150,14 +150,14 @@ autodetection only (note that many other implementations come with their
 own foreign function interface).  If ‘cffi’ cannot be found when the
 ASDF system is loaded (or in the case of CLISP, if it has been compiled
 without ‘ffi’ support), you get a big red blinking light and a warning
-but that’s all.  Clon will still work, although in restricted mode.
+but that's all.  Clon will still work, although in restricted mode.
 
 A.2 ABCL specificities
 ======================
 
-Clon’s ABCL port currently has two limitations:
+Clon's ABCL port currently has two limitations:
    • It only works in restricted mode (*note Non-ANSI Features::).
-   • Since Java doesn’t have a ‘putenv’ or ‘setenv’ function (!!), the
+   • Since Java doesn't have a ‘putenv’ or ‘setenv’ function (!!), the
      ‘modify-environment’ restart, normally proposed when an environment
      variable is set to a bogus value, is unavailable (*note
      (clon-enduser)Error Management::).

@@ -32,7 +32,7 @@
 
 
 ;; Copyright years
-(defvar *copyright-years* "2010-2012, 2015, 2017, 2020-2023"
+(defvar *copyright-years* "2010-2012, 2015, 2017, 2020-2024"
   "A string denoting the copyright years for the whole project.")
 
 
