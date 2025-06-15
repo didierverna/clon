@@ -41,7 +41,7 @@
 @c Settings
 @c ====================================================================
 @set VERSION 1.0 beta 27 "Michael Brecker"
-@set COPYRIGHT_YEARS 2010--2012, 2015, 2017, 2020--2024
+@set COPYRIGHT_YEARS 2010--2012, 2015, 2017, 2020--2025
 @setchapternewpage odd
 @documentdescription
 The Clon End-User Manual for version @value{VERSION}.
