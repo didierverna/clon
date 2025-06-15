@@ -1,6 +1,6 @@
 ;;; generate.cl --- Clon reference manual generation script
 
-;; Copyright (C) 2010-2012, 2015, 2017, 2021 Didier Verna
+;; Copyright (C) 2010-2012, 2015, 2017, 2021, 2025 Didier Verna
 
 ;; Author: Didier Verna <didier@didierverna.net>
 
@@ -122,20 +122,20 @@ and extend the library with your own option types.
 ;; VERSION function).
 (asdf:load-system :net.didierverna.clon.setup)
 
-(defvar *hyperlinks* nil)
+(defvar *locations* nil)
 (when (and (second sb-ext:*posix-argv*)
-	   (string= (second sb-ext:*posix-argv*) "--hyperlinks"))
-  (setq *hyperlinks* t))
+	   (string= (second sb-ext:*posix-argv*) "--locations"))
+  (setq *locations* t))
 
 (declt:declt :net.didierverna.clon
 	     :library-name "Clon"
-	     :version (net.didierverna.clon.setup:version :long)
+	     :library-version (net.didierverna.clon.setup:version :long)
 	     :copyright-years net.didierverna.clon.setup:*copyright-years*
 	     :license :bsd
 	     :introduction +introduction+
-	     :texi-name "reference"
-	     :info-name "clon-reference"
-	     :hyperlinks *hyperlinks*)
+	     :locations *locations*
+	     :file-name "reference"
+	     :info-name "clon-reference")
 
 (uiop:quit)
 
