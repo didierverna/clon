@@ -37,7 +37,7 @@ PERL := perl
 SHARE := $(PREFIX)/share
 
 W3DIR := $(HOME)/Documents/Science/Sites/lrde/software/lisp/$(PROJECT)
-
+NET_DIR := $(HOME)/Documents/Science/Sites/didierverna.net/content/projects/$(PROJECT)
 
 SBCL_CACHE  := sbcl
 SBCL_BINLOC := sbcl
